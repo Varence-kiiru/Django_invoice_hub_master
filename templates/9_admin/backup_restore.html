@@ -1,0 +1,327 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Backup & Restore - Administration{% endblock %}
+
+{% block page_title %}Backup & Restore{% endblock %}
+{% block page_description %}Manage database backups and restore from previous versions{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/backup_restore.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <!-- Action Result Alert -->
+  {% if action_result %}
+    <div class="alert alert-{{ action_result.type }} alert-dismissible">
+      <strong>{{ action_result.action }}:</strong> {{ action_result.message }}
+      <button type="button" class="close" onclick="this.parentElement.style.display='none';">&times;</button>
+    </div>
+  {% endif %}
+  <div class="backup-info-section">
+    <h2>Backup Information</h2>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-label">Last Backup</div>
+        <div class="info-value">
+          {% if last_backup_date != 'Never' %}
+            {{ last_backup_date|date:"M d, Y \a\t H:i" }}
+          {% else %}
+            Never
+          {% endif %}
+        </div>
+      </div>
+      
+      <div class="info-card">
+        <div class="info-label">Total Backups</div>
+        <div class="info-value">{{ backup_count }}</div>
+      </div>
+      
+      <div class="info-card">
+        <div class="info-label">Storage Used</div>
+        <div class="info-value">{{ total_backup_size_mb }} MB</div>
+      </div>
+      
+      <div class="info-card">
+        <div class="info-label">Backup Location</div>
+        <div class="info-value info-path">{{ backup_location }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions Section -->
+  <div class="quick-actions-section">
+    <h2>Quick Actions</h2>
+    
+    <form method="post" class="actions-form" id="backup-form">
+      {% csrf_token %}
+      <div class="actions-grid">
+        <button type="button" class="btn btn-primary" onclick="showCreateBackupModal()">
+          💾 Create Backup
+        </button>
+        <a href="#restore-section" class="btn btn-secondary">
+          🔄 Restore from Backup
+        </a>
+        <a href="{% url 'core:system-status' %}" class="btn btn-secondary">
+          📊 System Status
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Backup History Section -->
+  <div class="backup-history-section">
+    <h2>Backup History</h2>
+    
+    {% if backups %}
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Backup Date</th>
+              <th>File Name</th>
+              <th>Size</th>
+              <th>Duration</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for backup in backups %}
+              <tr class="backup-row">
+                <td class="backup-date">{{ backup.created_at|date:"M d, Y" }}</td>
+                <td class="backup-filename">
+                  <code>{{ backup.file_name }}</code>
+                </td>
+                <td class="backup-size">{{ backup.get_file_size_mb }} MB</td>
+                <td class="backup-duration">{{ backup.get_duration_display }}</td>
+                <td class="backup-status">
+                  <span class="status-badge status-{{ backup.status }}">
+                    {% if backup.status == 'complete' %}✓{% endif %} {{ backup.get_status_display }}
+                  </span>
+                </td>
+                <td class="backup-actions">
+                  <button type="button" class="btn-action btn-delete-backup" onclick="event.preventDefault(); event.stopPropagation(); showDeleteBackupModal({{ backup.id }}, '{{ backup.file_name }}');" title="Delete Backup">
+                    🗑️ Delete
+                  </button>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <p>No backups found</p>
+        <p class="text-muted">Create your first backup using the "Create Backup" button above</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Restore from File Section -->
+  <div class="restore-section" id="restore-section">
+    <h2>Restore from File</h2>
+    <div class="upload-area">
+      <div class="upload-content">
+        <div class="upload-icon">📤</div>
+        <h3>Upload Backup File</h3>
+        <p>Upload a .sql or .sql.gz database backup file to restore</p>
+        <form method="post" enctype="multipart/form-data" class="upload-form" id="upload-form">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="upload_backup">
+          <div class="file-input-wrapper">
+            <input type="file" name="backup_file" accept=".sql,.sql.gz,.zip" id="file-input" required onchange="handleFileChange()">
+            <label for="file-input" class="file-input-label">Choose File</label>
+          </div>
+          
+          <!-- Selected File Display -->
+          <div id="file-display" class="file-display" style="display: none;">
+            <div class="file-display-content">
+              <span class="file-icon">📄</span>
+              <div class="file-info">
+                <div class="file-name" id="selected-filename"></div>
+                <div class="file-size" id="selected-filesize"></div>
+              </div>
+            </div>
+            <button type="button" class="btn-remove-file" onclick="clearFileInput()">✕</button>
+          </div>
+
+          <button type="button" class="btn btn-primary" id="upload-btn" onclick="handleFileSelect()" style="display: none;">Upload & Restore</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Before Restoring Info -->
+  <div class="restore-info-section">
+    <h2>Before Restoring a Backup</h2>
+    <div class="alert alert-warning">
+      <strong>⚠️ Important:</strong> Restoring from a backup will overwrite all current database data. Please ensure you have:
+      <ul>
+        <li>✓ Created a backup of your current database</li>
+        <li>✓ Verified the backup file is valid and uncorrupted</li>
+        <li>✓ Notified all users that the system will be temporarily unavailable</li>
+        <li>✓ Scheduled the restore during a maintenance window</li>
+        <li>✓ Tested the backup on a staging environment (recommended)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Indicator -->
+<div id="loading-indicator" class="loading-indicator" style="display: none;">
+  <div class="loading-spinner">
+    <div class="spinner"></div>
+    <p id="loading-text">Processing...</p>
+  </div>
+</div>
+
+<!-- Create Backup Confirmation Modal -->
+<div id="create-backup-modal" class="modal" style="display: none;">
+  <div class="modal-overlay" onclick="closeCreateBackupModal()"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Create Database Backup</h2>
+      <button class="modal-close" onclick="closeCreateBackupModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-warning">
+        <strong>⚠️ Note:</strong> Creating a backup may take several minutes depending on your database size. Your system will remain fully operational during this process.
+      </div>
+      <p><strong>The following will be backed up:</strong></p>
+      <ul style="margin: 1rem 0; padding-left: 1.5rem;">
+        <li>All database tables and data</li>
+        <li>Database structure and relationships</li>
+        <li>View data and configurations</li>
+      </ul>
+      <p style="color: var(--text-secondary); font-size: 0.9rem;">
+        The backup will be compressed with gzip and stored in: <code style="background-color: rgba(0,0,0,0.05); padding: 0.25rem 0.5rem; border-radius: 3px;">{{ backup_location }}</code>
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeCreateBackupModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmCreateBackup()">
+        💾 Create Backup Now
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Include Modal Templates -->
+{% include "10_modals/delete_backup_modal.html" %}
+{% include "10_modals/restore_warning_modal.html" %}
+
+<script>
+  // ========== FILE DISPLAY HANDLERS ==========
+  function handleFileChange() {
+    const fileInput = document.getElementById('file-input');
+    const fileDisplay = document.getElementById('file-display');
+    const uploadBtn = document.getElementById('upload-btn');
+    
+    if (fileInput.files[0]) {
+      const file = fileInput.files[0];
+      const filesize = (file.size / (1024*1024)).toFixed(2);
+      
+      document.getElementById('selected-filename').textContent = file.name;
+      document.getElementById('selected-filesize').textContent = filesize + ' MB';
+      
+      fileDisplay.style.display = 'block';
+      uploadBtn.style.display = 'block';
+    } else {
+      fileDisplay.style.display = 'none';
+      uploadBtn.style.display = 'none';
+    }
+  }
+
+  function clearFileInput() {
+    document.getElementById('file-input').value = '';
+    document.getElementById('file-display').style.display = 'none';
+    document.getElementById('upload-btn').style.display = 'none';
+  }
+
+  // ========== CREATE BACKUP MODAL ==========
+  function showCreateBackupModal() {
+    const modal = document.getElementById('create-backup-modal');
+    if (modal) {
+      modal.style.display = 'flex';
+    }
+  }
+
+  function closeCreateBackupModal() {
+    const modal = document.getElementById('create-backup-modal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  }
+
+  function confirmCreateBackup() {
+    closeCreateBackupModal();
+    showLoadingIndicator('Creating backup... Please wait');
+    
+    const form = document.getElementById('backup-form');
+    const actionInput = document.createElement('input');
+    actionInput.type = 'hidden';
+    actionInput.name = 'action';
+    actionInput.value = 'create_backup';
+    
+    form.appendChild(actionInput);
+    
+    // Submit after a brief delay to ensure modal closes
+    setTimeout(() => {
+      form.submit();
+    }, 300);
+  }
+
+  // ========== FILE RESTORE HANDLERS ==========
+  function handleFileSelect() {
+    const fileInput = document.getElementById('file-input');
+    if (!fileInput.files[0]) {
+      alert('Please select a backup file');
+      return;
+    }
+    
+    const file = fileInput.files[0];
+    const filesize = (file.size / (1024*1024)).toFixed(2);
+    
+    // Show restore warning modal
+    showRestoreWarningModal(file.name, filesize + ' MB');
+  }
+
+  // ========== LOADING INDICATOR ==========
+  function showLoadingIndicator(message = 'Processing...') {
+    const loader = document.getElementById('loading-indicator');
+    const loaderText = document.getElementById('loading-text');
+    
+    if (loader) {
+      loaderText.textContent = message;
+      loader.style.display = 'flex';
+    }
+  }
+
+  function hideLoadingIndicator() {
+    const loader = document.getElementById('loading-indicator');
+    if (loader) {
+      loader.style.display = 'none';
+    }
+  }
+
+  // Show loading on page load if there's an action result
+  document.addEventListener('DOMContentLoaded', function() {
+    const alert = document.querySelector('.alert');
+    if (alert) {
+      // Auto-scroll to alert
+      setTimeout(() => {
+        alert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 300);
+    }
+  });
+
+  document.getElementById('create-backup-modal')?.addEventListener('click', function(e) {
+    if (e.target.id === 'create-backup-modal') {
+      closeCreateBackupModal();
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,394 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}My Support Tickets - Invoice System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/help_support/support_tickets.css' %}">
+{% endblock %}
+
+<!-- Old styles block - to be removed in template
+<style>
+    .tickets-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px 30px;
+        border-radius: 8px;
+        margin-bottom: 40px;
+    }
+
+    .tickets-header h1 {
+        font-size: 2rem;
+        margin: 0;
+        margin-bottom: 10px;
+    }
+
+    .tickets-header p {
+        margin: 0;
+        opacity: 0.95;
+    }
+
+    .tickets-controls {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .tickets-filters {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        padding: 8px 16px;
+        border: 2px solid #e0e0e0;
+        background: white;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+        border-color: #667eea;
+        background: #f5f7ff;
+        color: #667eea;
+    }
+
+    .cta-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+        margin-left: auto;
+    }
+
+    .cta-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+
+    .tickets-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .ticket-card {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+
+    .ticket-card:hover {
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        border-color: #667eea;
+    }
+
+    .ticket-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .ticket-number {
+        font-family: 'Courier New', monospace;
+        font-weight: 700;
+        color: #667eea;
+        font-size: 1.05rem;
+    }
+
+    .ticket-status {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-open {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+
+    .status-in-progress {
+        background: #fff3e0;
+        color: #f57c00;
+    }
+
+    .status-resolved {
+        background: #e8f5e9;
+        color: #388e3c;
+    }
+
+    .status-closed {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+
+    .ticket-title {
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .ticket-meta {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .ticket-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .priority-high {
+        color: #dc3545;
+        font-weight: 600;
+    }
+
+    .priority-medium {
+        color: #f57c00;
+        font-weight: 600;
+    }
+
+    .priority-low {
+        color: #388e3c;
+        font-weight: 600;
+    }
+
+    .priority-urgent {
+        color: #c62828;
+        font-weight: 700;
+    }
+
+    .ticket-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #e0e0e0;
+        font-size: 0.9rem;
+        color: #999;
+    }
+
+    .ticket-link {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .ticket-link:hover {
+        text-decoration: underline;
+    }
+
+    .no-tickets {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+    }
+
+    .no-tickets-icon {
+        font-size: 4rem;
+        margin-bottom: 15px;
+    }
+
+    .pagination-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 40px;
+    }
+
+    @media (max-width: 768px) {
+        .tickets-controls {
+            flex-direction: column-reverse;
+        }
+
+        .cta-button {
+            margin-left: 0;
+            width: 100%;
+            text-align: center;
+        }
+
+        .ticket-card-header {
+            flex-direction: column;
+        }
+
+        .ticket-meta {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .ticket-footer {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+    }
+</style>
+-->
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="tickets-header">
+        <h1>🎫 My Support Tickets</h1>
+        <p>Track and manage your support requests</p>
+    </div>
+
+    <!-- Controls -->
+    <div class="tickets-controls">
+        <div class="tickets-filters">
+            <a href="{% url 'core:support-tickets' %}" class="filter-btn {% if not selected_status %}active{% endif %}">
+                All Tickets
+            </a>
+            {% for key, label in statuses %}
+            <a href="{% url 'core:support-tickets' %}?status={{ key }}" class="filter-btn {% if selected_status == key %}active{% endif %}">
+                {{ label }}
+            </a>
+            {% endfor %}
+        </div>
+        <a href="{% url 'core:support-form' %}" class="cta-button">
+            ➕ New Support Ticket
+        </a>
+    </div>
+
+    <!-- Tickets List -->
+    {% if tickets %}
+    <div class="tickets-list">
+        {% for ticket in tickets %}
+        <a href="{% url 'core:support-ticket-detail' ticket.ticket_number %}" style="text-decoration: none; color: inherit;">
+            <div class="ticket-card">
+                <div class="ticket-card-header">
+                    <div class="ticket-number">{{ ticket.ticket_number }}</div>
+                    <span class="ticket-status status-{{ ticket.status }}">
+                        {{ ticket.get_status_display }}
+                    </span>
+                </div>
+
+                <h3 class="ticket-title">{{ ticket.subject }}</h3>
+
+                <div class="ticket-meta">
+                    <div class="ticket-meta-item">
+                        <span>📅</span>
+                        <span>{{ ticket.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="ticket-meta-item">
+                        <span>🎯</span>
+                        <span class="priority-{{ ticket.priority }}">
+                            {{ ticket.get_priority_display }}
+                        </span>
+                    </div>
+                    <div class="ticket-meta-item">
+                        <span>🏷️</span>
+                        <span>{{ ticket.get_category_display }}</span>
+                    </div>
+                    {% if ticket.assigned_to %}
+                    <div class="ticket-meta-item">
+                        <span>📌</span>
+                        <span>Assigned to {{ ticket.assigned_to }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="ticket-footer">
+                    <span>
+                        {% if ticket.status == 'open' %}
+                            Waiting for response
+                        {% elif ticket.status == 'in_progress' %}
+                            Being worked on
+                        {% elif ticket.status == 'resolved' %}
+                            Resolved on {{ ticket.resolved_at|date:"M d, Y" }}
+                        {% elif ticket.status == 'closed' %}
+                            Closed
+                        {% endif %}
+                    </span>
+                    <span class="ticket-link">View Details →</span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination-wrapper">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if selected_status %}&status={{ selected_status }}{% endif %}">
+                        First
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}">
+                        Previous
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if selected_status %}&status={{ selected_status }}{% endif %}">
+                            {{ num }}
+                        </a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}">
+                        Next
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if selected_status %}&status={{ selected_status }}{% endif %}">
+                        Last
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="no-tickets">
+        <div class="no-tickets-icon">🎫</div>
+        <h3>No Support Tickets</h3>
+        <p>You haven't submitted any support tickets yet.</p>
+        <a href="{% url 'core:support-form' %}" style="color: #667eea; text-decoration: none; font-weight: 600; margin-top: 15px; display: inline-block;">
+            → Create Your First Ticket
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

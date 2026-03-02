@@ -1,0 +1,318 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Roles Management - Administration{% endblock %}
+
+{% block page_title %}Roles Management{% endblock %}
+{% block page_description %}Configure system roles and their permissions{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/roles_management.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <!-- Roles Header -->
+  <div class="roles-header">
+    <h1>System Roles</h1>
+    <button class="btn btn-primary" onclick="showCreateRoleModal()">➕ Create New Role</button>
+  </div>
+
+  <!-- Roles Grid -->
+  <div class="roles-grid">
+    <!-- Admin Role -->
+    <div class="role-card admin-role">
+      <div class="role-header">
+        <h2>Admin</h2>
+        <span class="role-badge">System</span>
+      </div>
+      <p class="role-description">Full system access with all administrative privileges</p>
+      <div class="permissions-list">
+        <h3>Permissions:</h3>
+        <ul>
+          <li>✓ Manage all users</li>
+          <li>✓ Configure system settings</li>
+          <li>✓ View audit logs</li>
+          <li>✓ Manage backups</li>
+          <li>✓ Create/Edit invoices</li>
+          <li>✓ Access all reports</li>
+        </ul>
+      </div>
+      <div class="role-actions">
+        <button class="btn btn-sm btn-secondary" onclick="editRole('admin')">Edit</button>
+        <button class="btn btn-sm btn-secondary" onclick="viewMembers('admin')">Members</button>
+      </div>
+    </div>
+
+    <!-- Manager Role -->
+    <div class="role-card manager-role">
+      <div class="role-header">
+        <h2>Manager</h2>
+        <span class="role-badge">Standard</span>
+      </div>
+      <p class="role-description">Elevated access to manage operations and staff</p>
+      <div class="permissions-list">
+        <h3>Permissions:</h3>
+        <ul>
+          <li>✓ Manage staff users</li>
+          <li>✓ Create/Edit invoices</li>
+          <li>✓ View reports</li>
+          <li>✓ Manage clients</li>
+          <li>✗ System settings</li>
+          <li>✗ Manage backups</li>
+        </ul>
+      </div>
+      <div class="role-actions">
+        <button class="btn btn-sm btn-secondary" onclick="editRole('manager')">Edit</button>
+        <button class="btn btn-sm btn-secondary" onclick="viewMembers('manager')">Members</button>
+      </div>
+    </div>
+
+    <!-- Staff Role -->
+    <div class="role-card staff-role">
+      <div class="role-header">
+        <h2>Staff</h2>
+        <span class="role-badge">Standard</span>
+      </div>
+      <p class="role-description">Standard access for daily operations</p>
+      <div class="permissions-list">
+        <h3>Permissions:</h3>
+        <ul>
+          <li>✓ View own profile</li>
+          <li>✓ Create/View invoices</li>
+          <li>✓ Manage clients</li>
+          <li>✓ Process payments</li>
+          <li>✗ Edit other users</li>
+          <li>✗ System settings</li>
+        </ul>
+      </div>
+      <div class="role-actions">
+        <button class="btn btn-sm btn-secondary" onclick="editRole('staff')">Edit</button>
+        <button class="btn btn-sm btn-secondary" onclick="viewMembers('staff')">Members</button>
+      </div>
+    </div>
+
+    <!-- User Role -->
+    <div class="role-card user-role">
+      <div class="role-header">
+        <h2>User</h2>
+        <span class="role-badge">Basic</span>
+      </div>
+      <p class="role-description">Basic read-only access for general users</p>
+      <div class="permissions-list">
+        <h3>Permissions:</h3>
+        <ul>
+          <li>✓ View own profile</li>
+          <li>✓ View invoices</li>
+          <li>✓ View clients (read-only)</li>
+          <li>✓ Access reports</li>
+          <li>✗ Create/Edit invoices</li>
+          <li>✗ View financial details</li>
+        </ul>
+      </div>
+      <div class="role-actions">
+        <button class="btn btn-sm btn-secondary" onclick="editRole('user')">Edit</button>
+        <button class="btn btn-sm btn-secondary" onclick="viewMembers('user')">Members</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Role Permission Matrix -->
+  <div class="permission-matrix-section">
+    <h2>Permission Matrix</h2>
+    <div class="matrix-wrapper">
+      <table class="permission-matrix">
+        <thead>
+          <tr>
+            <th>Permission</th>
+            <th>Admin</th>
+            <th>Manager</th>
+            <th>Staff</th>
+            <th>User</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Manage Users</td>
+            <td class="allowed">✓</td>
+            <td class="denied">✗</td>
+            <td class="denied">✗</td>
+            <td class="denied">✗</td>
+          </tr>
+          <tr>
+            <td>Create Invoices</td>
+            <td class="allowed">✓</td>
+            <td class="allowed">✓</td>
+            <td class="allowed">✓</td>
+            <td class="denied">✗</td>
+          </tr>
+          <tr>
+            <td>Edit Invoices</td>
+            <td class="allowed">✓</td>
+            <td class="allowed">✓</td>
+            <td class="allowed">✓</td>
+            <td class="denied">✗</td>
+          </tr>
+          <tr>
+            <td>Delete Invoices</td>
+            <td class="allowed">✓</td>
+            <td class="allowed">✓</td>
+            <td class="denied">✗</td>
+            <td class="denied">✗</td>
+          </tr>
+          <tr>
+            <td>Manage Clients</td>
+            <td class="allowed">✓</td>
+            <td class="allowed">✓</td>
+            <td class="allowed">✓</td>
+            <td class="denied">✗</td>
+          </tr>
+          <tr>
+            <td>View Reports</td>
+            <td class="allowed">✓</td>
+            <td class="allowed">✓</td>
+            <td class="allowed">✓</td>
+            <td class="allowed">✓</td>
+          </tr>
+          <tr>
+            <td>Manage Payments</td>
+            <td class="allowed">✓</td>
+            <td class="allowed">✓</td>
+            <td class="allowed">✓</td>
+            <td class="denied">✗</td>
+          </tr>
+          <tr>
+            <td>System Settings</td>
+            <td class="allowed">✓</td>
+            <td class="denied">✗</td>
+            <td class="denied">✗</td>
+            <td class="denied">✗</td>
+          </tr>
+          <tr>
+            <td>View Audit Logs</td>
+            <td class="allowed">✓</td>
+            <td class="denied">✗</td>
+            <td class="denied">✗</td>
+            <td class="denied">✗</td>
+          </tr>
+          <tr>
+            <td>Manage Backups</td>
+            <td class="allowed">✓</td>
+            <td class="denied">✗</td>
+            <td class="denied">✗</td>
+            <td class="denied">✗</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Role Members Modal -->
+{% include "10_modals/role_members_modal.html" %}
+
+<script>
+  // User data from Django context
+  const usersData = {
+    {% for user in users %}'{{ user.id }}': {
+      'id': {{ user.id }},
+      'name': '{{ user.get_full_name|default:user.username }}',
+      'email': '{{ user.email }}',
+      'role': '{% if user.is_superuser %}admin{% elif user.is_staff %}manager{% else %}user{% endif %}',
+      'is_active': {{ user.is_active|lower }},
+      'last_login': '{{ user.last_login|default:"Never" }}'
+    },
+    {% endfor %}
+  };
+
+  // Role ID mapping
+  const roleMap = {
+    {% for role in roles %}
+      '{{ role.name }}': {{ role.id }},
+    {% endfor %}
+  };
+
+  function showCreateRoleModal() {
+    alert('Create role form would appear here');
+  }
+
+  function editRole(roleName) {
+    const roleId = roleMap[roleName];
+    if (roleId) {
+      window.location.href = `/system/role/${roleId}/permissions/`;
+    } else {
+      alert('Role not found');
+    }
+  }
+
+  function viewMembers(roleName) {
+    const members = Object.values(usersData).filter(user => user.role === roleName);
+    
+    // Set modal title
+    document.getElementById('roleName').textContent = roleName.charAt(0).toUpperCase() + roleName.slice(1);
+    
+    // Populate table
+    const tbody = document.getElementById('membersTableBody');
+    const noMembers = document.getElementById('noMembers');
+    
+    if (members.length === 0) {
+      tbody.innerHTML = '';
+      noMembers.style.display = 'block';
+    } else {
+      noMembers.style.display = 'none';
+      tbody.innerHTML = members.map(user => `
+        <tr class="member-row" data-name="${user.name.toLowerCase()}" data-email="${user.email.toLowerCase()}">
+          <td class="member-name">
+            <div class="member-avatar">${user.name.charAt(0).toUpperCase()}</div>
+            <strong>${user.name}</strong>
+          </td>
+          <td>${user.email}</td>
+          <td>
+            <span class="status-badge ${user.is_active ? 'active' : 'inactive'}">
+              ${user.is_active ? '◉ Active' : '◌ Inactive'}
+            </span>
+          </td>
+          <td>${user.last_login}</td>
+          <td>
+            <a href="/system/users/create-edit/${user.id}/" class="btn btn-sm btn-primary">Edit</a>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    // Clear search
+    document.getElementById('memberSearch').value = '';
+    
+    // Show modal
+    document.getElementById('members-modal').style.display = 'flex';
+  }
+
+  function closeMembersModal() {
+    document.getElementById('members-modal').style.display = 'none';
+  }
+
+  function filterMembers() {
+    const searchTerm = document.getElementById('memberSearch').value.toLowerCase();
+    const rows = document.querySelectorAll('.member-row');
+    
+    rows.forEach(row => {
+      const name = row.getAttribute('data-name');
+      const email = row.getAttribute('data-email');
+      
+      if (name.includes(searchTerm) || email.includes(searchTerm)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+
+  // Close modal when clicking outside
+  window.onclick = function(event) {
+    const membersModal = document.getElementById('members-modal');
+    if (event.target === membersModal) {
+      closeMembersModal();
+    }
+  };
+</script>
+{% endblock %}

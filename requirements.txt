@@ -1,0 +1,76 @@
+# Python 3.11+ Compatible Dependencies
+# Production-ready Invoice Management System
+
+# ━━━━━ CORE FRAMEWORK ━━━━━
+Django==4.2.28
+djangorestframework==3.16.1
+django-filter==24.1
+
+# ━━━━━ DATABASE ━━━━━
+mysqlclient==2.2.6
+
+# ━━━━━ AUTHENTICATION & SECURITY ━━━━━
+djangorestframework-simplejwt==5.5.1
+django-cors-headers==4.9.0
+
+# ━━━━━ API DOCUMENTATION & SCHEMA ━━━━━
+drf-spectacular==0.29.0
+drf-spectacular-sidecar==2025.12.1
+
+# ━━━━━ PDF GENERATION ━━━━━
+reportlab==4.0.0
+xhtml2pdf==0.2.9
+weasyprint==60.0
+qrcode==7.4.2
+Pillow>=11.0.0
+
+# ━━━━━ DATA IMPORT & PROCESSING ━━━━━
+openpyxl==3.1.5
+pandas>=2.0.0
+
+# ━━━━━ EMAIL & NOTIFICATIONS ━━━━━
+django-anymail==9.2.0
+celery==5.4.0
+
+# ━━━━━ CACHING & MESSAGE BROKER ━━━━━
+redis==5.0.1
+django-redis==5.4.0
+django-celery-beat==2.5.0
+django-celery-results==2.5.1
+
+# ━━━━━ CLOUD STORAGE (OPTIONAL) ━━━━━
+boto3>=1.26
+django-storages==1.14.2
+
+# ━━━━━ GEO-IP & LOCATION SERVICES ━━━━━
+geoip2==4.7.0
+requests==2.31.0
+
+# ━━━━━ ENVIRONMENT & CONFIGURATION ━━━━━
+python-dotenv==1.0.0
+django-environ==0.11.0
+pytz>=2024.2
+
+# ━━━━━ ASYNC & DEPLOYMENT SERVERS ━━━━━
+uvicorn==0.22.0
+gunicorn==21.2.0
+whitenoise==6.6.0
+
+# ━━━━━ ERROR TRACKING & MONITORING ━━━━━
+sentry-sdk==1.40.0
+
+# ━━━━━ DEVELOPMENT & TESTING ━━━━━
+django-extensions==4.1.0
+pytest==7.4.0
+pytest-django==4.5.2
+factory-boy==3.2.1
+coverage==7.13.4
+pytest-cov==4.1.0
+black==24.3.0
+isort==5.12.0
+flake8==6.1.0
+pylint==3.1.0
+
+# ━━━━━ INTERACTIVE DEVELOPMENT ━━━━━
+ipython==8.20.0
+ipdb==0.13.13

@@ -1,0 +1,123 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Mark Invoice {{ invoice.invoice_number }} as Paid{% endblock %}
+
+{% block page_title %}Mark Invoice as Paid{% endblock %}
+{% block page_description %}Confirm marking invoice as fully paid{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/invoices.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="invoice-mark-paid-container">
+  <!-- Alerts -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Confirmation Card -->
+  <div class="confirmation-card">
+    <div class="confirmation-icon">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    
+    <div class="confirmation-content">
+      <h2>Mark Invoice as Paid</h2>
+      <p class="confirmation-subtitle">Are you sure you want to mark this invoice as fully paid?</p>
+      
+      <div class="invoice-summary">
+        <div class="summary-row">
+          <span class="label">Invoice Number:</span>
+          <span class="value">{{ invoice.invoice_number }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Client:</span>
+          <span class="value">{{ invoice.client.name }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Total Amount:</span>
+          <span class="value amount">{{ invoice.currency }} {{ invoice.total_amount|floatformat:2 }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Amount Due:</span>
+          <span class="value amount due">{{ invoice.currency }} {{ invoice.amount_due|floatformat:2 }}</span>
+        </div>
+      </div>
+
+      <div class="confirmation-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <p>This action will mark the invoice as fully paid and cannot be undone.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="confirmation-actions">
+    <form method="post" class="confirmation-form">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-success btn-lg">
+        <i class="fas fa-check"></i> Mark as Paid
+      </button>
+      <a href="{% url 'invoices:detail' invoice.id %}" class="btn btn-secondary btn-lg">
+        <i class="fas fa-times"></i> Cancel
+      </a>
+    </form>
+  </div>
+
+  <!-- Invoice Preview -->
+  <div class="invoice-preview">
+    <h3>Invoice Preview</h3>
+    <div class="preview-content">
+      <div class="preview-header">
+        <div class="preview-title">
+          <h4>{{ invoice.invoice_number }}</h4>
+          <span class="status-badge status-{{ invoice.status }}">{{ invoice.get_status_display }}</span>
+        </div>
+        <div class="preview-dates">
+          <div class="date-item">
+            <strong>Date:</strong> {{ invoice.invoice_date|date:"M d, Y" }}
+          </div>
+          <div class="date-item">
+            <strong>Due:</strong> {{ invoice.due_date|date:"M d, Y" }}
+          </div>
+        </div>
+      </div>
+      
+      <div class="preview-totals">
+        <div class="total-item">
+          <span class="label">Subtotal:</span>
+          <span class="value">{{ invoice.currency }} {{ invoice.subtotal_amount|floatformat:2 }}</span>
+        </div>
+        <div class="total-item">
+          <span class="label">Tax:</span>
+          <span class="value">{{ invoice.currency }} {{ invoice.vat_amount|floatformat:2 }}</span>
+        </div>
+        <div class="total-item total-grand">
+          <span class="label">Total:</span>
+          <span class="value">{{ invoice.currency }} {{ invoice.total_amount|floatformat:2 }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Add confirmation dialog for the form submission
+  document.querySelector('.confirmation-form').addEventListener('submit', function(e) {
+    if (!confirm('Are you sure you want to mark this invoice as fully paid? This action cannot be undone.')) {
+      e.preventDefault();
+    }
+  });
+</script>
+{% endblock %}

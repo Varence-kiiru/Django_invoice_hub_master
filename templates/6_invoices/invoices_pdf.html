@@ -1,0 +1,324 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}PDF Export - Invoice {{ invoice.invoice_number }}{% endblock %}
+
+{% block page_title %}Invoice PDF{% endblock %}
+{% block page_description %}Generate and download invoice as PDF{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/invoices.css' %}">
+<style>
+  .pdf-preview-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .pdf-toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .pdf-preview {
+    background: white;
+    color: #333;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .pdf-preview {
+      background: white;
+      color: #333;
+      filter: brightness(0.95);
+    }
+  }
+
+  .pdf-header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid #333;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+  }
+
+  .pdf-logo {
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .pdf-invoice-no {
+    text-align: right;
+  }
+
+  .pdf-invoice-no h2 {
+    margin: 0;
+    font-size: 18px;
+  }
+
+  .pdf-addresses {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 30px;
+  }
+
+  .pdf-address-block h3 {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin: 0 0 10px 0;
+  }
+
+  .pdf-address-block p {
+    margin: 5px 0;
+    font-size: 14px;
+  }
+
+  .pdf-details-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .pdf-details-table td {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .pdf-items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 30px 0;
+  }
+
+  .pdf-items-table thead tr {
+    background-color: #f5f5f5;
+    border-bottom: 2px solid #333;
+  }
+
+  .pdf-items-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  .pdf-items-table td {
+    padding: 12px;
+    font-size: 13px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .pdf-items-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .pdf-totals {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+    margin-top: 30px;
+  }
+
+  .pdf-notes {
+    grid-column: 1;
+  }
+
+  .pdf-notes h4 {
+    margin: 0 0 10px 0;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .pdf-notes p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .pdf-summary {
+    grid-column: 2;
+    border-top: 2px solid #333;
+    padding-top: 15px;
+  }
+
+  .pdf-summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 13px;
+  }
+
+  .pdf-summary-row.total {
+    border-top: 1px solid #ddd;
+    border-bottom: 2px solid #333;
+    padding: 12px 0;
+    font-weight: bold;
+    font-size: 14px;
+  }
+
+  @media print {
+    .pdf-toolbar { display: none; }
+    .pdf-preview { box-shadow: none; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <!-- Toolbar -->
+  <div class="pdf-toolbar">
+    <a href="{% url 'invoices:pdf' invoice.id %}" class="btn btn-primary">📥 Download PDF</a>
+    <button onclick="downloadPDF()" class="btn btn-primary">⬇️ Download PDF</button>
+    <a href="{% url 'invoices:detail' invoice.id %}" class="btn btn-secondary">← Back</a>
+  </div>
+
+  <!-- PDF Preview -->
+  <div class="pdf-preview-container">
+    <div class="pdf-preview" id="pdf-content">
+      <!-- Header -->
+      <div class="pdf-header">
+        <div class="pdf-logo">INVOICE</div>
+        <div class="pdf-invoice-no">
+          <h2>{{ invoice.invoice_number }}</h2>
+          <p>{{ invoice.invoice_date|date:"M d, Y" }}</p>
+        </div>
+      </div>
+
+      <!-- Addresses -->
+      <div class="pdf-addresses">
+        <div class="pdf-address-block">
+          <h3>Bill To:</h3>
+          <p><strong>{{ invoice.client.name }}</strong></p>
+          <p>{{ invoice.client.email }}</p>
+          {% if invoice.client.phone %}<p>{{ invoice.client.phone }}</p>{% endif %}
+          {% if invoice.client.city %}
+            <p>{% if invoice.client.city %}{{ invoice.client.city }}{% endif %}{% if invoice.client.country %}, {{ invoice.client.country }}{% endif %}</p>
+          {% endif %}
+        </div>
+
+        <div class="pdf-address-block">
+          <h3>Invoice Details:</h3>
+          <table class="pdf-details-table">
+            <tr>
+              <td><strong>Invoice #:</strong></td>
+              <td>{{ invoice.invoice_number }}</td>
+            </tr>
+            <tr>
+              <td><strong>Invoice Date:</strong></td>
+              <td>{{ invoice.invoice_date|date:"M d, Y" }}</td>
+            </tr>
+            <tr>
+              <td><strong>Due Date:</strong></td>
+              <td>{{ invoice.due_date|date:"M d, Y" }}</td>
+            </tr>
+            <tr>
+              <td><strong>Status:</strong></td>
+              <td>{{ invoice.get_status_display }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Line Items Table -->
+      <table class="pdf-items-table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th style="text-align: right; width: 80px;">Qty</th>
+            <th style="text-align: right; width: 100px;">Unit Price</th>
+            <th style="text-align: right; width: 80px;">Tax</th>
+            <th style="text-align: right; width: 100px;">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in invoice.line_items.all %}
+            <tr>
+              <td>{{ item.description }}</td>
+              <td style="text-align: right;">{{ item.quantity|floatformat:2 }}</td>
+              <td style="text-align: right;">{{ invoice.currency }} {{ item.unit_price|floatformat:2 }}</td>
+              <td style="text-align: right;">{{ item.tax_amount|floatformat:2 }}</td>
+              <td style="text-align: right;">{{ invoice.currency }} {{ item.line_total|floatformat:2 }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <!-- Totals Section -->
+      <div class="pdf-totals">
+        {% if invoice.description %}
+          <div class="pdf-notes">
+            <h4>Notes:</h4>
+            <p>{{ invoice.description }}</p>
+          </div>
+        {% else %}
+          <div></div>
+        {% endif %}
+
+        <div class="pdf-summary">
+          <div class="pdf-summary-row">
+            <span>Subtotal:</span>
+            <span>{{ invoice.currency }} {{ invoice.subtotal_amount|floatformat:2 }}</span>
+          </div>
+          <div class="pdf-summary-row">
+            <span>Tax:</span>
+            <span>{{ invoice.currency }} {{ invoice.tax_amount|floatformat:2 }}</span>
+          </div>
+          <div class="pdf-summary-row total">
+            <span>Total Due:</span>
+            <span>{{ invoice.currency }} {{ invoice.total_amount|floatformat:2 }}</span>
+          </div>
+          {% if invoice.amount_due > 0 %}
+            <div class="pdf-summary-row" style="color: #dc3545;">
+              <span><strong>Balance Due:</strong></span>
+              <span><strong>{{ invoice.currency }} {{ invoice.amount_due|floatformat:2 }}</strong></span>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="border-top: 1px solid #ddd; margin-top: 40px; padding-top: 20px; text-align: center; color: #666; font-size: 12px;">
+        <p>Generated on {{ "now"|date:"M d, Y \a\t H:i" }} - This document was generated electronically and is valid without a signature.</p>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="pdf-toolbar" style="margin-top: 20px;">
+      <a href="{% url 'invoices:pdf' invoice.id %}" class="btn btn-primary">📥 Download PDF</a>
+      <button onclick="downloadPDF()" class="btn btn-success">⬇️ Download as PDF</button>
+      <a href="{% url 'invoices:detail' invoice.id %}" class="btn btn-secondary">← Back</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function downloadPDF() {
+    // Using html2pdf library or similar
+    const element = document.getElementById('pdf-content');
+    const filename = 'invoice_{{ invoice.invoice_number }}.pdf';
+    
+    // Check if html2pdf is available
+    if (typeof html2pdf !== 'undefined') {
+      html2pdf().set({
+        margin: 10,
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+      }).save(element);
+    } else {
+      // Fallback to print dialog
+      alert('PDF download not available. Use the Print option to save as PDF.');
+      window.print();
+    }
+  }
+</script>
+{% endblock %}

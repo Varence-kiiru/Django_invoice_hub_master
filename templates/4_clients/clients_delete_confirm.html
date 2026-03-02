@@ -1,0 +1,44 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Delete Client - {{ client.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/clients.css' }">
+{% endblock %}
+
+{% block content %}
+<div class="confirmation-container">
+    <div class="confirmation-icon">⚠️</div>
+    
+    <h1>Delete Client</h1>
+    <p class="confirmation-message">Are you sure you want to delete this client?</p>
+    
+    <div class="client-info-box">
+        <div class="label">Client Name</div>
+        <div class="value">{{ client.name }}</div>
+    </div>
+    
+    <div class="client-stats">
+        <div class="stat">
+            <div class="stat-label">Total Invoiced</div>
+            <div class="stat-value">{{ client.currency }} {{ total_invoiced|default:"0" }}</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Outstanding</div>
+            <div class="stat-value" style="color: #e74c3c;">{{ client.currency }} {{ outstanding|default:"0" }}</div>
+        </div>
+    </div>
+    
+    <div class="warning-message">
+        <strong>⚠️ This action cannot be undone.</strong> The client will be marked as inactive and will not appear in future reports or lists. All related invoices and payment history will be retained for audit purposes.
+    </div>
+    
+    <div class="actions">
+        <form method="post" style="flex: 1;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Yes, Delete Client</button>
+        </form>
+        <a href="{% url 'clients:detail' client.id %}" class="btn btn-secondary" style="flex: 1;">Cancel</a>
+    </div>
+</div>
+{% endblock %}

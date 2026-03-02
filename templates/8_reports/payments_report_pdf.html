@@ -1,0 +1,87 @@
+{% extends "layouts/pdf_base.html" %}
+
+{% block title %}Payments Report{% endblock %}
+
+{% block content %}
+<div class="pdf-header">
+    {% if company_logo %}
+        <img src="{{ company_logo }}" alt="Logo" class="pdf-logo">
+    {% endif %}
+    <div class="company-info">
+        <h2>{{ company_name }}</h2>
+        <p>{{ company_address }}</p>
+        <p>Tel: {{ company_phone }}</p>
+        <p>Email: {{ company_email }}</p>
+        {% if company_tax_id %}
+        <p>Tax ID: {{ company_tax_id }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="report-title">Payment Register Report</div>
+<div class="report-subtitle">Complete view of all payment transactions</div>
+
+<!-- Statistics -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Total Payments</div>
+        <div class="stat-value">{{ summary.total_payments|default:0 }}</div>
+        <div class="stat-detail">All time</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Total Amount</div>
+        <div class="stat-value">KES {{ summary.total_amount|default:'0.00' }}</div>
+        <div class="stat-detail">Collected</div>
+    </div>
+</div>
+
+<!-- Payments Table -->
+<div class="section-title">Payment Details</div>
+
+{% if payments %}
+<table>
+    <thead>
+        <tr>
+            <th>Receipt #</th>
+            <th>Invoice #</th>
+            <th>Client</th>
+            <th>Payment Date</th>
+            <th>Amount</th>
+            <th>Method</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for payment in payments %}
+        <tr>
+            <td><strong>{{ payment.receipt_number }}</strong></td>
+            <td>{{ payment.invoice.invoice_number }}</td>
+            <td>{{ payment.invoice.client.name }}</td>
+            <td>{{ payment.payment_date|date:"d/m/Y" }}</td>
+            <td class="amount">KES {{ payment.amount|floatformat:2 }}</td>
+            <td>{{ payment.payment_method.name }}</td>
+            <td>
+                <span class="status-badge status-{{ payment.status|lower }}">
+                    {{ payment.get_status_display|upper }}
+                </span>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="no-data">No payments found</div>
+{% endif %}
+
+<!-- Summary -->
+<table class="summary-table">
+    <tr>
+        <td class="label">Total Payments:</td>
+        <td class="value">{{ summary.total_payments|default:0 }}</td>
+    </tr>
+    <tr>
+        <td class="label">Total Amount:</td>
+        <td class="value">KES {{ summary.total_amount|default:'0.00' }}</td>
+    </tr>
+</table>
+{% endblock %}

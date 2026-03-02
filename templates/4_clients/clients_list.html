@@ -1,0 +1,111 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Clients{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/clients.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container" data-entity-type="clients">
+    <div class="clients-header">
+        <h1>Clients</h1>
+        <a href="{% url 'clients:create' %}" class="btn-create">+ New Client</a>
+    </div>
+    
+    {% include "10_modals/filter_form_clients.html" %}
+    {% include "10_modals/bulk_actions_modal.html" %}
+    
+    <!-- Bulk Actions Toolbar -->
+    <div class="bulk-actions">
+        <span class="bulk-count">0 selected</span>
+        <button class="bulk-send-email">Send Email</button>
+        <button class="bulk-delete">Delete</button>
+    </div>
+    
+    {% if clients %}
+    <table class="clients-table">
+        <thead>
+            <tr>
+                <th style="width: 40px;"><input type="checkbox" class="bulk-select-all" title="Select all"></th>
+                <th>Client Name</th>
+                <th>Contact Info</th>
+                <th>Status</th>
+                <th style="text-align: right;">Invoices</th>
+                <th style="text-align: right;">Outstanding</th>
+                <th style="width: 120px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for client in clients %}
+            <tr>
+                <td><input type="checkbox" class="bulk-select-item" data-id="{{ client.id }}"></td>
+                <td>
+                    <div class="client-name">{{ client.name }}</div>
+                    <div class="client-email" style="font-size: 11px; color: #7f8c8d;">
+                        {% if client.tax_id %}{{ client.tax_id }}{% else %}<span style="text-transform: capitalize;">{{ client.get_client_type_display }}</span>{% endif %}
+                    </div>
+                </td>
+                <td>
+                    <div style="font-size: 12px;">{{ client.email }}</div>
+                    <div style="font-size: 12px; color: #7f8c8d;">{{ client.phone }}</div>
+                </td>
+                <td>
+                    <span class="status-badge {% if client.is_active %}status-active{% else %}status-inactive{% endif %}">
+                        {% if client.is_active %}Active{% else %}Inactive{% endif %}
+                    </span>
+                </td>
+                <td class="amount-text">
+                    {{ client.invoice_count|default:0 }}
+                </td>
+                <td class="amount-text outstanding-amount">
+                    {{ client.get_currency_symbol }} {{ client.outstanding_amount|default:0|floatformat:2 }}
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <a href="{% url 'clients:detail' client.id %}" class="btn-small btn-view">View</a>
+                        <a href="{% url 'clients:edit' client.id %}" class="btn-small btn-edit">Edit</a>
+                        <a href="{% url 'clients:delete' client.id %}" class="btn-small btn-delete">Delete</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if page_obj.has_other_pages %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+        
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <span class="current">{{ num }}</span>
+            {% else %}
+                <a href="?page={{ num }}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <div class="no-data">
+        <p>No clients found</p>
+        <a href="{% url 'clients:create' %}" class="btn-create">Create your first client</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/filter_system.js' %}"></script>
+<script src="{% static 'js/bulk_operations.js' %}"></script>
+{% endblock %}

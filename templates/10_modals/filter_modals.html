@@ -1,0 +1,260 @@
+{% load static %}
+
+<!-- Save Filter Modal -->
+<div id="saveFilterModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Save Filter as Preset</h2>
+            <button class="modal-close" onclick="closeSaveFilterModal()">&times;</button>
+        </div>
+        <form id="saveFilterForm" method="post">
+            {% csrf_token %}
+            <input type="hidden" id="filterType" name="filter_type" value="">
+            
+            <div class="form-group">
+                <label for="filterName">Filter Name</label>
+                <input type="text" id="filterName" name="name" placeholder="e.g., Unpaid Invoices" required class="form-control">
+                <small>Give this filter a memorable name</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="filterDescription">Description (Optional)</label>
+                <textarea id="filterDescription" name="description" placeholder="What does this filter show?" class="form-control" rows="3"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="filterGlobal" name="is_global" value="true">
+                    Share with all team members
+                </label>
+                <small>If checked, all users can access this filter</small>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-save">Save Filter</button>
+                <button type="button" class="btn-cancel" onclick="closeSaveFilterModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Saved Filters Management Modal -->
+<div id="savedFiltersModal" class="modal" style="display: none;">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h2>Manage Saved Filters</h2>
+            <button class="modal-close" onclick="closeSavedFiltersModal()">&times;</button>
+        </div>
+        <div id="savedFiltersList" class="saved-filters-list">
+            <p class="loading">Loading saved filters...</p>
+        </div>
+    </div>
+</div>
+
+<style>
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal.show { display: flex; }
+
+.modal-content {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-content.modal-large {
+    max-width: 800px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #999;
+}
+
+.modal-close:hover { color: #333; }
+
+.form-group {
+    margin-bottom: 15px;
+    padding: 0 20px;
+}
+
+.form-group:first-of-type {
+    padding-top: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+    font-size: 13px;
+}
+
+.form-group small {
+    display: block;
+    color: #999;
+    margin-top: 3px;
+    font-size: 11px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #3498db;
+    background: #f0f8ff;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    padding: 20px;
+    border-top: 1px solid #eee;
+}
+
+.btn-save, .btn-cancel {
+    flex: 1;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-save {
+    background: #27ae60;
+    color: white;
+}
+
+.btn-save:hover { background: #229954; }
+
+.btn-cancel {
+    background: #95a5a6;
+    color: white;
+}
+
+.btn-cancel:hover { background: #7f8c8d; }
+
+/* Saved Filters List Styles */
+.saved-filters-list {
+    padding: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.saved-filter-item {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    background: #f9f9f9;
+}
+
+.saved-filter-item:hover {
+    background: #f0f0f0;
+    border-color: #3498db;
+}
+
+.saved-filter-name {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.saved-filter-description {
+    font-size: 12px;
+    color: #7f8c8d;
+    margin-bottom: 8px;
+}
+
+.saved-filter-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 11px;
+    color: #95a5a6;
+    margin-bottom: 10px;
+}
+
+.saved-filter-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.saved-filter-actions button, .saved-filter-actions a {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    background: white;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.saved-filter-actions button:hover, .saved-filter-actions a:hover {
+    background: #ecf0f1;
+    border-color: #3498db;
+}
+
+.saved-filter-actions .btn-delete {
+    background: #ecf0f1;
+    color: #e74c3c;
+    border-color: #e74c3c;
+}
+
+.saved-filter-actions .btn-delete:hover {
+    background: #e74c3c;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .modal-content, .modal-content.modal-large {
+        width: 95%;
+        max-width: 100%;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn-save, .btn-cancel {
+        width: 100%;
+    }
+}
+</style>

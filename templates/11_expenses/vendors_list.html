@@ -1,0 +1,276 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Vendors - Invoicing App{% endblock %}
+
+{% block page_title %}Vendors{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'expenses:vendors-create' %}" class="btn btn-primary">
+    <span aria-hidden="true">➕</span> New Vendor
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Filters Section -->
+    <div class="filters-section">
+        <form method="get" class="filters-form">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <input type="text" name="search" class="form-control" 
+                           placeholder="Search by name, email, or phone"
+                           value="{{ search_query }}">
+                </div>
+
+                <div class="filter-group">
+                    <select name="status" class="form-control">
+                        <option value="">All Statuses</option>
+                        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <button type="submit" class="btn btn-primary">
+                        <span aria-hidden="true">🔍</span> Filter
+                    </button>
+                    <a href="{% url 'expenses:vendors-list' %}" class="btn btn-secondary">
+                        <span aria-hidden="true">↺</span> Clear
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Vendors Table -->
+    <div class="table-section">
+        <table class="table table-striped table-hover" role="grid" aria-label="Vendors list">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Payment Terms</th>
+                    <th scope="col">Expenses</th>
+                    <th scope="col">Total Spent</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vendor in vendors %}
+                <tr>
+                    <td>
+                        <strong>
+                            <a href="{% url 'expenses:vendors-detail' vendor.id %}">
+                                {{ vendor.name }}
+                            </a>
+                        </strong>
+                    </td>
+                    <td>
+                        {% if vendor.contact_email %}
+                        <a href="mailto:{{ vendor.contact_email }}">{{ vendor.contact_email }}</a>
+                        {% else %}
+                        <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if vendor.contact_phone %}
+                        {{ vendor.contact_phone }}
+                        {% else %}
+                        <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if vendor.payment_terms %}
+                        {{ vendor.payment_terms }}
+                        {% else %}
+                        <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge badge-info">{{ vendor.expense_count|default:0 }}</span>
+                    </td>
+                    <td>
+                        <strong>{{ vendor.total_spent|default:0|floatformat:2 }}</strong>
+                    </td>
+                    <td>
+                        <span class="badge {% if vendor.is_active %}badge-success{% else %}badge-secondary{% endif %}">
+                            {% if vendor.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'expenses:vendors-detail' vendor.id %}" class="btn btn-sm btn-info" title="View">
+                            👁️
+                        </a>
+                        <a href="{% url 'expenses:vendors-edit' vendor.id %}" class="btn btn-sm btn-warning" title="Edit">
+                            ✏️
+                        </a>
+                        <a href="{% url 'expenses:vendors-delete' vendor.id %}" class="btn btn-sm btn-danger" title="Delete">
+                            🗑️
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted">
+                        No vendors found. <a href="{% url 'expenses:vendors-create' %}">Create one</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav class="pagination-nav" aria-label="Pagination">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li><a href="?page=1{{ query_string }}">« First</a></li>
+            <li><a href="?page={{ page_obj.previous_page_number }}{{ query_string }}">‹ Previous</a></li>
+            {% endif %}
+
+            <li class="active"><span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+
+            {% if page_obj.has_next %}
+            <li><a href="?page={{ page_obj.next_page_number }}{{ query_string }}">Next ›</a></li>
+            <li><a href="?page={{ page_obj.paginator.num_pages }}{{ query_string }}">Last »</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<style>
+.filters-section {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.filters-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.filters-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-group input,
+.filter-group select {
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    width: 100%;
+}
+
+.table-section {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    background: #f9f9f9;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.table td a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.table td a:hover {
+    text-decoration: underline;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.badge-info {
+    background-color: #e3f2fd;
+    color: #1565c0;
+}
+
+.badge-success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.badge-secondary {
+    background-color: #eeeeee;
+    color: #424242;
+}
+
+.btn-sm {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.85rem;
+    margin: 0 2px;
+}
+
+.text-muted {
+    color: #999;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.pagination-nav {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+}
+
+.pagination a {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #667eea;
+}
+
+.pagination a:hover {
+    background-color: #f0f0f0;
+}
+</style>
+{% endblock %}

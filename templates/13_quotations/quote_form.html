@@ -1,0 +1,148 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Create Quotation - Invoice Management{% endblock %}
+
+{% block page_title %}Create Quotation{% endblock %}
+{% block page_description %}Create a new quotation{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/quotations.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <!-- Alerts -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="invoice-form-section">
+    <div class="form-header">
+      <h2>Create New Quotation</h2>
+      <p class="section-subtitle">Fill in the quotation details to get started</p>
+    </div>
+
+    <form method="post" id="quote-create-form" class="invoice-form">
+      {% csrf_token %}
+
+      <div class="form-section">
+        <h3 class="section-title">Quotation Details</h3>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="client">Client <span class="required">*</span></label>
+            <select name="client" id="client" required class="form-control">
+              <option value="">--- Select Client ---</option>
+              {% for client in clients %}
+                <option value="{{ client.id }}">{{ client.name }}</option>
+              {% endfor %}
+            </select>
+            <small class="form-text">Choose the client for this quotation</small>
+          </div>
+
+          <div class="form-group">
+            <label for="quote_date">Quote Date <span class="required">*</span></label>
+            <input type="date" name="quote_date" id="quote_date" required class="form-control">
+            <small class="form-text">Date quote is prepared</small>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="valid_until">Valid Until <span class="required">*</span></label>
+            <input type="date" name="valid_until" id="valid_until" required class="form-control">
+            <small class="form-text">When does this quotation expire?</small>
+          </div>
+
+          <div class="form-group">
+            <label for="currency">Currency</label>
+            <select name="currency" id="currency" class="form-control">
+              <option value="KES" selected>KES (Kenyan Shilling)</option>
+              <option value="USD">USD (US Dollar)</option>
+            </select>
+            <small class="form-text">Quotation currency</small>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label for="description">Quotation Memo</label>
+            <input type="text" name="description" id="description" placeholder="e.g., Web development project, Q1 services..." class="form-control">
+            <small class="form-text">Optional memo or description</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3 class="section-title">Next Steps</h3>
+        <div class="info-box">
+          <p><strong>After creating:</strong></p>
+          <ul>
+            <li>Add line items (products/services)</li>
+            <li>Review totals</li>
+            <li>Generate PDF if needed</li>
+            <li>Send to client via email</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a href="{% url 'quotations:list' %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary" id="create-btn">
+          ➕ Create Quotation
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const quoteDate = document.getElementById('quote_date');
+  const validUntil = document.getElementById('valid_until');
+  
+  // Set today's date as default quote date
+  const today = new Date();
+  quoteDate.value = today.toISOString().split('T')[0];
+  
+  // Set default valid_until to 30 days from today
+  const defaultValidUntil = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+  validUntil.value = defaultValidUntil.toISOString().split('T')[0];
+  
+  // When quote date changes, recalculate valid_until to 30 days later
+  quoteDate.addEventListener('change', function() {
+    const baseDate = new Date(this.value);
+    const newValidUntil = new Date(baseDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+    validUntil.value = newValidUntil.toISOString().split('T')[0];
+  });
+});
+
+/**
+ * Form submission handler
+ */
+document.getElementById('quote-create-form').addEventListener('submit', function(e) {
+  // Validate that client is selected
+  const clientId = document.getElementById('client').value;
+  if (!clientId) {
+    e.preventDefault();
+    alert('Please select a client for this quotation.');
+    return false;
+  }
+  
+  // Show loading indicator
+  document.getElementById('create-btn').disabled = true;
+  document.getElementById('create-btn').textContent = '⏳ Creating Quotation...';
+});
+</script>
+{% endblock %}

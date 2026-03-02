@@ -1,0 +1,43 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Currency Settings - Administration{% endblock %}
+
+{% block page_title %}Currency Settings{% endblock %}
+{% block page_description %}Configure currencies and exchange rates{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/settings_currency.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <!-- Page Header -->
+  <div class="settings-header">
+    <h2>Currency Settings</h2>
+    <p class="text-muted">Manage currencies and configure exchange rate settings</p>
+  </div>
+
+  <!-- Info Alert -->
+  <div class="alert alert-info" role="alert">
+    <strong>📋 Note:</strong> Currency settings (symbol and decimal places) are managed in <strong>General Settings</strong> under "System Preferences". This page is reserved for future exchange rate and multi-currency features.
+  </div>
+
+  <!-- Placeholder for Future Features -->
+  <div class="card">
+    <div class="card-header">
+      <h5>Coming Soon</h5>
+    </div>
+    <div class="card-body">
+      <p class="text-muted">Advanced currency management features including:</p>
+      <ul>
+        <li>Multi-currency support</li>
+        <li>Exchange rate management</li>
+        <li>Automatic rate updates</li>
+        <li>Currency conversion tracking</li>
+      </ul>
+      <p class="text-muted mt-3">These features will be available in a future update.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

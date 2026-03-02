@@ -1,0 +1,116 @@
+{% extends "layouts/pdf_base.html" %}
+
+{% block title %}Invoices Report{% endblock %}
+
+{% block content %}
+<div class="pdf-header">
+    {% if company_logo %}
+        <img src="{{ company_logo }}" alt="Logo" class="pdf-logo">
+    {% endif %}
+    <div class="company-info">
+        <h2>{{ company_name }}</h2>
+        <p>{{ company_address }}</p>
+        <p>Tel: {{ company_phone }}</p>
+        <p>Email: {{ company_email }}</p>
+        {% if company_tax_id %}
+        <p>Tax ID: {{ company_tax_id }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="report-title">Invoice Register Report</div>
+<div class="report-subtitle">Complete view of all invoices</div>
+
+{% if from_date or to_date %}
+<div class="filters-box">
+    <strong>Filter Period:</strong>
+    {% if from_date %}{{ from_date }}{% endif %}
+    {% if from_date and to_date %} to {% endif %}
+    {% if to_date %}{{ to_date }}{% endif %}
+</div>
+{% endif %}
+
+<!-- Statistics -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Total Invoices</div>
+        <div class="stat-value">{{ summary.total_invoices|default:0 }}</div>
+        <div class="stat-detail">All time</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Total Value</div>
+        <div class="stat-value">KES {{ summary.total_amount|default:'0.00' }}</div>
+        <div class="stat-detail">Grand total</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Outstanding</div>
+        <div class="stat-value">KES {{ summary.outstanding_amount|default:'0.00' }}</div>
+        <div class="stat-detail">Unpaid/partial</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Paid</div>
+        <div class="stat-value">KES {{ summary.paid_amount|default:'0.00' }}</div>
+        <div class="stat-detail">Collected</div>
+    </div>
+</div>
+
+<!-- Invoices Table -->
+<div class="section-title">Invoice Details</div>
+
+{% if invoices %}
+<table>
+    <thead>
+        <tr>
+            <th>Invoice #</th>
+            <th>Client</th>
+            <th>Date</th>
+            <th>Due Date</th>
+            <th>Total</th>
+            <th>Paid</th>
+            <th>Outstanding</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for invoice in invoices %}
+        <tr>
+            <td><strong>{{ invoice.invoice_number }}</strong></td>
+            <td>{{ invoice.client.name }}</td>
+            <td>{{ invoice.invoice_date|date:"d/m/Y" }}</td>
+            <td>{{ invoice.due_date|date:"d/m/Y" }}</td>
+            <td class="amount">KES {{ invoice.total_amount|floatformat:2 }}</td>
+            <td class="amount">KES {{ invoice.paid_amount|floatformat:2 }}</td>
+            <td class="amount">KES {{ invoice.amount_due|floatformat:2 }}</td>
+            <td>
+                <span class="status-badge status-{{ invoice.status|lower }}">
+                    {{ invoice.get_status_display|upper }}
+                </span>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="no-data">No invoices found</div>
+{% endif %}
+
+<!-- Summary -->
+<table class="summary-table">
+    <tr>
+        <td class="label">Total Invoices:</td>
+        <td class="value">{{ summary.total_invoices|default:0 }}</td>
+    </tr>
+    <tr>
+        <td class="label">Total Amount:</td>
+        <td class="value">KES {{ summary.total_amount|default:'0.00' }}</td>
+    </tr>
+    <tr>
+        <td class="label">Outstanding Amount:</td>
+        <td class="value">KES {{ summary.outstanding_amount|default:'0.00' }}</td>
+    </tr>
+    <tr>
+        <td class="label">Paid Amount:</td>
+        <td class="value">KES {{ summary.paid_amount|default:'0.00' }}</td>
+    </tr>
+</table>
+{% endblock %}

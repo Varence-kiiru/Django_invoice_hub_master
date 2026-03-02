@@ -1,0 +1,251 @@
+/**
+ * Layout CSS - Navbar, Sidebar, Footer, and Main Content Areas
+ * Responsive grid-based layout system
+ */
+
+/* ==================== LAYOUT STRUCTURE ==================== */
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: var(--navbar-height) 1fr var(--navbar-height);
+  gap: 0;
+}
+
+/* Tablet: 768px-1023px - Keep sidebar in grid but narrower */
+@media (min-width: 768px) and (max-width: 1023px) {
+  body {
+    grid-template-columns: 240px 1fr;
+  }
+
+  main {
+    grid-column: 2;
+  }
+}
+
+/* Mobile: max-width 767px - Sidebar full-screen overlay */
+@media (max-width: 767px) {
+  body {
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--navbar-height) 1fr auto;
+  }
+
+  #sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    grid-column: auto;
+    grid-row: auto;
+    overflow-y: auto;
+    z-index: calc(var(--z-navbar) - 1);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(-100%);
+  }
+
+  #sidebar.open,
+  #sidebar.active,
+  #sidebar.show {
+    transform: translateX(0);
+    left: 0;
+  }
+
+  main {
+    grid-column: 1;
+    grid-row: 2;
+    padding-left: var(--spacing-sm, 0.5rem);
+    padding-right: var(--spacing-sm, 0.5rem);
+    padding-top: calc(var(--navbar-height) + var(--spacing-md, 1rem));
+    padding-bottom: var(--spacing-md, 1rem);
+  }
+
+  #footer {
+    grid-column: 1;
+    grid-row: 3;
+  }
+}
+
+#navbar {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  z-index: var(--z-navbar);
+}
+
+#sidebar {
+  grid-column: 1;
+  grid-row: 1 / -1;  /* Span all rows to cover full height */
+  z-index: var(--z-sidebar);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+main {
+  grid-column: 2;
+  grid-row: 2;
+  overflow-y: auto;
+  background-color: var(--color-bg-light);
+}
+
+#footer {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  z-index: 10;
+}
+
+/* ==================== NAVBAR STYLES ==================== */
+/* Component navbar styling moved to static/css/components/navbar.css */
+
+/* ==================== SIDEBAR STYLES ==================== */
+/* Component sidebar styling moved to static/css/components/sidebar.css */
+
+/* ==================== MAIN CONTENT AREA ==================== */
+
+main {
+  padding: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+}
+
+.page-container {
+  flex: 1;
+  max-width: 100%;
+}
+
+/* Page header */
+.page-header {
+  margin-bottom: var(--spacing-xl);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+}
+
+.page-header-content {
+  flex: 1;
+}
+
+.page-title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.page-description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* ==================== FOOTER STYLES ==================== */
+/* Component footer styling moved to static/css/components/footer.css */
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+/* Tablet and up */
+@media (min-width: 769px) {
+  .navbar-brand-text {
+    display: inline;
+  }
+}
+
+/* Tablet and down */
+@media (max-width: 768px) {
+  body {
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--navbar-height) 1fr var(--navbar-height);
+  }
+
+  #navbar {
+    padding: 0 var(--spacing-md);
+  }
+
+  #sidebar {
+    width: 100%;
+  }
+
+  main {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .page-header {
+    flex-direction: column;
+  }
+
+  .page-actions {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  #footer {
+    width: 100%;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  main {
+    padding: var(--spacing-md);
+  }
+
+  .page-title {
+    font-size: var(--font-size-2xl);
+  }
+}
+
+/* ==================== SCROLLBAR STYLING ==================== */
+
+main::-webkit-scrollbar {
+  width: 8px;
+}
+
+main::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+main::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 4px;
+}
+
+main::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-secondary);
+}
+
+/* ==================== PRINT STYLES ==================== */
+
+@media print {
+  #navbar,
+  #sidebar,
+  #footer,
+  .navbar-actions,
+  .page-actions {
+    display: none;
+  }
+
+  body {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+  }
+
+  main {
+    padding: 0;
+    background-color: var(--color-white);
+  }
+}

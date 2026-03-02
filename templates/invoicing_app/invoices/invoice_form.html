@@ -1,0 +1,333 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Create Invoice{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/invoices.css' }">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Create Invoice</h1>
+        <p>Create a new invoice and add line items</p>
+    </div>
+    
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger" role="alert">
+        <strong>Form Errors:</strong>
+        <ul>
+        {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    
+    <form method="post" action="{% url 'invoices:create' %}">
+        {% csrf_token %}
+        
+        <!-- Invoice Details Section -->
+        <div class="form-section">
+            <h2>Invoice Details</h2>
+            
+            <div class="form-row">
+                <div class="form-group {% if form.client.errors %}has-error{% endif %}">
+                    <label for="{{ form.client.id_for_label }}">{{ form.client.label }}</label>
+                    {{ form.client }}
+                    {% if form.client.errors %}
+                        <div class="form-error">
+                            {{ form.client.errors.0 }}
+                        </div>
+                    {% endif %}
+                    <div class="form-help-text">Select the client for this invoice</div>
+                </div>
+                
+                <div class="form-group {% if form.invoice_date.errors %}has-error{% endif %}">
+                    <label for="{{ form.invoice_date.id_for_label }}">{{ form.invoice_date.label }}</label>
+                    {{ form.invoice_date }}
+                    {% if form.invoice_date.errors %}
+                        <div class="form-error">
+                            {{ form.invoice_date.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group {% if form.due_date.errors %}has-error{% endif %}">
+                    <label for="{{ form.due_date.id_for_label }}">{{ form.due_date.label }}</label>
+                    {{ form.due_date }}
+                    {% if form.due_date.errors %}
+                        <div class="form-error">
+                            {{ form.due_date.errors.0 }}
+                        </div>
+                    {% endif %}
+                    <div class="form-help-text">Due date must be after invoice date</div>
+                </div>
+                
+                <div class="form-group {% if form.currency.errors %}has-error{% endif %}">
+                    <label for="{{ form.currency.id_for_label }}">{{ form.currency.label }}</label>
+                    {{ form.currency }}
+                    {% if form.currency.errors %}
+                        <div class="form-error">
+                            {{ form.currency.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-group {% if form.description.errors %}has-error{% endif %}">
+                <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <div class="form-error">
+                        {{ form.description.errors.0 }}
+                    </div>
+                {% endif %}
+                <div class="form-help-text">Add any special notes or terms for this invoice</div>
+            </div>
+        </div>
+        
+        <!-- Line Items Section -->
+        <div class="form-section">
+            <h2>Line Items</h2>
+            
+            <div class="formset-section">
+                {{ formset.management_form }}
+                
+                {% if formset.non_form_errors %}
+                <div class="alert alert-danger">
+                    {{ formset.non_form_errors }}
+                </div>
+                {% endif %}
+                
+                <table class="formset-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th style="width: 100px;">Quantity</th>
+                            <th style="width: 100px;">Unit Price</th>
+                            <th style="width: 80px;">Tax Rate</th>
+                            <th style="width: 80px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for form in formset %}
+                        <tr>
+                            <td>
+                                {{ form.product }}
+                                {% if form.product.errors %}
+                                    <div class="form-error">{{ form.product.errors.0 }}</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ form.quantity }}
+                                {% if form.quantity.errors %}
+                                    <div class="form-error">{{ form.quantity.errors.0 }}</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ form.unit_price }}
+                                {% if form.unit_price.errors %}
+                                    <div class="form-error">{{ form.unit_price.errors.0 }}</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ form.tax_rate }}
+                                {% if form.tax_rate.errors %}
+                                    <div class="form-error">{{ form.tax_rate.errors.0 }}</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ form.DELETE }}
+                                <label for="{{ form.DELETE.id_for_label }}">Delete</label>
+                            </td>
+                        </tr>
+                        {% if form.description %}
+                        <tr>
+                            <td colspan="5">
+                                {{ form.description }}
+                                <label for="{{ form.description.id_for_label }}">Description (optional)</label>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                <p style="margin-top: 15px; color: #7f8c8d; font-size: 13px;">
+                    Click the "Delete" checkbox next to a line item to remove it.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create Invoice</button>
+            <a href="{% url 'invoices:list' %}" class="btn btn-secondary" style="text-decoration: none; display: inline-block;">Cancel</a>
+        </div>
+    </form>
+    
+    <script>
+        /**
+         * Auto-populate client details when client is selected
+         */
+        document.addEventListener('DOMContentLoaded', function() {
+          const clientField = document.getElementById('{{ form.client.id_for_label }}');
+          const currencyField = document.getElementById('{{ form.currency.id_for_label }}');
+          const invoiceDateField = document.getElementById('{{ form.invoice_date.id_for_label }}');
+          const dueDateField = document.getElementById('{{ form.due_date.id_for_label }}');
+          
+          if (!clientField || !currencyField || !dueDateField) {
+            return; // Form fields not found
+          }
+          
+          // Set today's date as default invoice date
+          const today = new Date();
+          if (invoiceDateField && !invoiceDateField.value) {
+            invoiceDateField.value = today.toISOString().split('T')[0];
+          }
+          
+          // Set default due date to 30 days from today
+          if (dueDateField && !dueDateField.value) {
+            const defaultDueDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+            dueDateField.value = defaultDueDate.toISOString().split('T')[0];
+          }
+          
+          /**
+           * Get CSRF token from DOM
+           */
+          function getCsrfToken() {
+            const name = 'csrftoken';
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+              const cookies = document.cookie.split(';');
+              for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+                }
+              }
+            }
+            // Also check for X-CSRFToken in meta tag
+            if (!cookieValue) {
+              const token = document.querySelector('meta[name="csrf-token"]');
+              if (token) cookieValue = token.getAttribute('content');
+            }
+            // Check in form
+            if (!cookieValue) {
+              const token = document.querySelector('input[name="csrfmiddlewaretoken"]');
+              if (token) cookieValue = token.value;
+            }
+            return cookieValue;
+          }
+          
+          /**
+           * When client selection changes, fetch client details and auto-populate fields
+           */
+          clientField.addEventListener('change', function() {
+            const clientId = this.value;
+            
+            if (!clientId) {
+              // Reset to defaults if no client selected
+              currencyField.value = 'KES';
+              invoiceDateField.value = today.toISOString().split('T')[0];
+              const defaultDueDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+              dueDateField.value = defaultDueDate.toISOString().split('T')[0];
+              return;
+            }
+            
+            const csrfToken = getCsrfToken();
+            
+            // Fetch client details from API
+            fetch(`/api/v1/clients/${clientId}/`, {
+              method: 'GET',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken || '',
+              },
+              credentials: 'include'
+            })
+            .then(response => {
+              if (response.ok) {
+                return response.json();
+              } else if (response.status === 404) {
+                console.warn('Client not found');
+                return null;
+              } else if (response.status === 401) {
+                console.warn('Unauthorized to fetch client details. Using form data instead.');
+                return null;
+              } else {
+                console.error('Failed to fetch client details:', response.status);
+                return null;
+              }
+            })
+            .then(data => {
+              if (data) {
+                // Auto-populate currency from client's default currency
+                if (data.currency) {
+                  currencyField.value = data.currency;
+                  console.log(`✓ Currency auto-populated: ${data.currency}`);
+                }
+                
+                // Calculate and auto-populate due date based on client's payment terms
+                if (data.payment_terms_days) {
+                  const invoiceDate = new Date(invoiceDateField.value);
+                  const dueDate = new Date(invoiceDate.getTime() + data.payment_terms_days * 24 * 60 * 60 * 1000);
+                  dueDateField.value = dueDate.toISOString().split('T')[0];
+                  console.log(`✓ Due date auto-calculated: ${data.payment_terms_days} days from invoice date`);
+                }
+              }
+            })
+            .catch(error => {
+              console.error('Error fetching client details:', error);
+            });
+          });
+          
+          /**
+           * When invoice date changes, recalculate due date based on client's payment terms
+           */
+          if (invoiceDateField) {
+            invoiceDateField.addEventListener('change', function() {
+              const clientId = clientField.value;
+              
+              if (!clientId) {
+                // No client selected, just set default 30 days
+                const baseDate = new Date(this.value);
+                const dueDate = new Date(baseDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+                dueDateField.value = dueDate.toISOString().split('T')[0];
+                return;
+              }
+              
+              const csrfToken = getCsrfToken();
+              
+              // Fetch client details to get payment terms
+              fetch(`/api/v1/clients/${clientId}/`, {
+                method: 'GET',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': csrfToken || '',
+                },
+                credentials: 'include'
+              })
+              .then(response => response.ok ? response.json() : null)
+              .then(data => {
+                if (data && data.payment_terms_days) {
+                  const invoiceDate = new Date(invoiceDateField.value);
+                  const dueDate = new Date(invoiceDate.getTime() + data.payment_terms_days * 24 * 60 * 60 * 1000);
+                  dueDateField.value = dueDate.toISOString().split('T')[0];
+                  console.log(`✓ Due date recalculated for new invoice date`);
+                }
+              })
+              .catch(error => console.error('Error fetching client details:', error));
+            });
+          }
+        });
+    </script>
+</div>
+{% endblock %}

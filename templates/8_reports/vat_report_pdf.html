@@ -1,0 +1,101 @@
+{% extends "layouts/pdf_base.html" %}
+
+{% block title %}VAT Report{% endblock %}
+
+{% block content %}
+<div class="pdf-header">
+    {% if company_logo %}
+        <img src="{{ company_logo }}" alt="Logo" class="pdf-logo">
+    {% endif %}
+    <div class="company-info">
+        <h2>{{ company_name }}</h2>
+        <p>{{ company_address }}</p>
+        <p>Tel: {{ company_phone }}</p>
+        <p>Email: {{ company_email }}</p>
+        {% if company_tax_id %}
+        <p>Tax ID: {{ company_tax_id }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="report-title">VAT Report</div>
+<div class="report-subtitle">Value Added Tax breakdown by invoice</div>
+
+{% if from_date or to_date %}
+<div class="filters-box">
+    <strong>Filter Period:</strong>
+    {% if from_date %}{{ from_date }}{% endif %}
+    {% if from_date and to_date %} to {% endif %}
+    {% if to_date %}{{ to_date }}{% endif %}
+</div>
+{% endif %}
+
+<!-- Statistics -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Subtotal</div>
+        <div class="stat-value">KES {{ subtotal|default:'0.00' }}</div>
+        <div class="stat-detail">Before VAT</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">VAT Amount</div>
+        <div class="stat-value">KES {{ vat_total|default:'0.00' }}</div>
+        <div class="stat-detail">16% taxable</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Total</div>
+        <div class="stat-value">KES {{ subtotal|add:vat_total|stringformat:".2f" }}</div>
+        <div class="stat-detail">Grand total</div>
+    </div>
+</div>
+
+<!-- VAT Details Table -->
+<div class="section-title">VAT Breakdown</div>
+
+{% if invoices %}
+<table>
+    <thead>
+        <tr>
+            <th>Invoice #</th>
+            <th>Client</th>
+            <th>Date</th>
+            <th>Subtotal</th>
+            <th>VAT Rate</th>
+            <th>VAT Amount</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for invoice in invoices %}
+        <tr>
+            <td><strong>{{ invoice.invoice_number }}</strong></td>
+            <td>{{ invoice.client.name }}</td>
+            <td>{{ invoice.invoice_date|date:"d/m/Y" }}</td>
+            <td class="amount">KES {{ invoice.subtotal_amount|floatformat:2 }}</td>
+            <td class="amount">16%</td>
+            <td class="amount">KES {{ invoice.vat_amount|floatformat:2 }}</td>
+            <td class="amount">KES {{ invoice.total_amount|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="no-data">No invoices found</div>
+{% endif %}
+
+<!-- Summary -->
+<table class="summary-table">
+    <tr>
+        <td class="label">Total Subtotal:</td>
+        <td class="value">KES {{ subtotal|default:'0.00' }}</td>
+    </tr>
+    <tr>
+        <td class="label">Total VAT (16%):</td>
+        <td class="value">KES {{ vat_total|default:'0.00' }}</td>
+    </tr>
+    <tr>
+        <td class="label">GRAND TOTAL:</td>
+        <td class="value">KES {{ subtotal|add:vat_total|stringformat:".2f" }}</td>
+    </tr>
+</table>
+{% endblock %}

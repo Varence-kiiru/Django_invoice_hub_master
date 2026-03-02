@@ -1,0 +1,96 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h2 mb-2">Clone Invoice</h1>
+            <p class="text-muted">Create a new invoice based on {{ invoice.invoice_number }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'invoices:detail' invoice.id %}" class="btn btn-outline-secondary">Back to Invoice</a>
+        </div>
+    </div>
+
+    <!-- Clone Form -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold mb-3">Cloning Details</h6>
+                    <form method="post" class="needs-validation">
+                        {% csrf_token %}
+                        
+                        <!-- Original Invoice Info -->
+                        <div class="mb-3 p-3 bg-light rounded">
+                            <h6 class="mb-2">Template Invoice</h6>
+                            <p class="mb-1"><strong>Invoice Number:</strong> {{ invoice.invoice_number }}</p>
+                            <p class="mb-1"><strong>Client:</strong> {{ invoice.client.name }}</p>
+                            <p class="mb-1"><strong>Total Amount:</strong> KES {{ invoice.total_amount|floatformat:2 }}</p>
+                            <p class="mb-0"><strong>Line Items:</strong> {{ invoice.line_items.count }}</p>
+                        </div>
+
+                        <!-- New Invoice Settings -->
+                        <div class="mb-3">
+                            <label class="form-label">New Due Date *</label>
+                            <input type="date" name="due_date" class="form-control" value="{{ default_due_date }}" required />
+                            <small class="form-text text-muted d-block mt-1">
+                                Default is 30 days from today
+                            </small>
+                        </div>
+
+                        <!-- What will be cloned -->
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading mb-2">What will be cloned:</h6>
+                            <ul class="small mb-0">
+                                <li>✓ All line items with quantities and prices</li>
+                                <li>✓ Tax rates and calculations</li>
+                                <li>✓ Description and notes</li>
+                                <li>✓ Client and currency information</li>
+                                <li>✗ Invoice number (auto-generated)</li>
+                                <li>✗ Payment history (new as draft)</li>
+                            </ul>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-files"></i> Clone Invoice
+                            </button>
+                            <a href="{% url 'invoices:detail' invoice.id %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Sidebar -->
+        <div class="col-md-6">
+            <div class="card bg-light border-0 shadow-sm mb-3">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold mb-2">Why Clone?</h6>
+                    <p class="small mb-0">
+                        Use the clone feature to quickly create a new invoice based on a previous one. Perfect for recurring orders or similar invoices.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card bg-light border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold mb-2">After Cloning</h6>
+                    <ol class="small mb-0">
+                        <li>The new invoice will be created as <strong>Draft</strong></li>
+                        <li>You can edit line items before issuing</li>
+                        <li>New invoice number will be auto-generated</li>
+                        <li>No payments will be transferred</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

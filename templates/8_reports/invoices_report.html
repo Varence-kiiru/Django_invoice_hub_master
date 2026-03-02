@@ -1,0 +1,489 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Invoices Report - Financial Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/icons.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/reports.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- ═══════════════════════ PAGE HEADER ═══════════════════════ -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="page-title">
+                <i class="icon-file-invoice-dollar"></i> Invoice Register Report
+            </h1>
+            <p class="text-muted">Complete view of all invoices with filtering and export options</p>
+        </div>
+        <div class="col-md-4">
+            <div class="d-flex gap-2 justify-content-end flex-wrap">
+                <a href="{% url 'invoices:list' %}" class="btn btn-outline-secondary">
+                    <i class="icon-list"></i> Manage Invoices
+                </a>
+                {% if settings.enable_export %}
+                    <button class="btn btn-outline-info" onclick="exportCSV()">
+                        <i class="icon-file-excel"></i> CSV
+                    </button>
+                {% endif %}
+                <button class="btn btn-primary" onclick="location.href='{% url 'core:invoices-report-pdf' %}' + window.location.search">
+                    <i class="icon-print"></i> Download PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reports Navigation Tabs -->
+    <div class="card mb-4 border-top border-primary border-3">
+        <div class="card-body p-2">
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'core:reports-invoices' %}" class="btn btn-sm btn-primary active">📄 Invoices</a>
+                <a href="{% url 'core:reports-payments' %}" class="btn btn-sm btn-outline-primary">💰 Payments</a>
+                <a href="{% url 'core:reports-vat' %}" class="btn btn-sm btn-outline-primary">🏛️ VAT</a>
+                <a href="{% url 'core:reports-aging' %}" class="btn btn-sm btn-outline-primary">📈 Aging</a>
+                <a href="{% url 'core:reports-outstanding' %}" class="btn btn-sm btn-outline-primary">⚠️ Outstanding</a>
+                <a href="{% url 'core:reports-product-sales' %}" class="btn btn-sm btn-outline-primary">📊 Sales</a>
+                <a href="{% url 'core:reports-monthly-summary' %}" class="btn btn-sm btn-outline-primary">📅 Monthly</a>
+                <a href="{% url 'core:reports-tax' %}" class="btn btn-sm btn-outline-primary">📋 Tax</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════ STATISTICS CARDS ═══════════════════════ -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Total Invoices</h6>
+                    <h3 class="text-primary">{{ summary.total_invoices|default:0 }}</h3>
+                    <small class="text-muted"><i class="icon-check-circle"></i> All time</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Total Value</h6>
+                    <h3 class="text-success">KES {{ summary.total_amount|default:'0.00' }}</h3>
+                    <small class="text-muted"><i class="icon-calculator"></i> Grand total</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Outstanding</h6>
+                    <h3 class="text-warning">KES {{ summary.outstanding_amount|default:'0.00' }}</h3>
+                    <small class="text-muted"><i class="icon-hourglass-end"></i> Unpaid/partial</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Collected</h6>
+                    <h3 class="text-info">KES {{ summary.paid_amount|default:'0.00' }}</h3>
+                    <small class="text-muted"><i class="icon-cash-register"></i> Received</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════ FILTERS CARD ═══════════════════════ -->
+    <div class="card mb-4" id="filterCard">
+        <div class="card-header">
+            <h6 class="mb-0">
+                <i class="icon-filter"></i> Filters & Search
+                <small class="text-muted ms-2" id="filterStatus"></small>
+            </h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3" id="filterForm" name="filterForm">
+                <div class="col-md-3">
+                    <label for="dateFrom" class="form-label">From Date</label>
+                    <input type="date" class="form-control" id="dateFrom" name="date_from" 
+                           value="{{ filters.date_from|default:'' }}">
+                    <small class="text-muted"><i class="icon-calendar"></i>Start date for invoice</small>
+                </div>
+                <div class="col-md-3">
+                    <label for="dateTo" class="form-label">To Date</label>
+                    <input type="date" class="form-control" id="dateTo" name="date_to"
+                           value="{{ filters.date_to|default:'' }}">
+                    <small class="text-muted"><i class="icon-calendar"></i>End date for invoice</small>
+                </div>
+                <div class="col-md-2">
+                    <label for="statusFilter" class="form-label">Status</label>
+                    <select class="form-select" id="statusFilter" name="status">
+                        <option value="">All Statuses</option>
+                        <option value="draft" {% if filters.status == 'draft' %}selected{% endif %}>📝 Draft</option>
+                        <option value="issued" {% if filters.status == 'issued' %}selected{% endif %}>✉️ Issued</option>
+                        <option value="paid" {% if filters.status == 'paid' %}selected{% endif %}>✅ Paid</option>
+                        <option value="partial" {% if filters.status == 'partial' %}selected{% endif %}>⏳ Partial</option>
+                        <option value="overdue" {% if filters.status == 'overdue' %}selected{% endif %}>⚠️ Overdue</option>
+                        <option value="cancelled" {% if filters.status == 'cancelled' %}selected{% endif %}>❌ Cancelled</option>
+                    </select>
+                    <small class="text-muted">Invoice status</small>
+                </div>
+                <div class="col-md-4">
+                    <label for="searchClient" class="form-label">Client Name</label>
+                    <input type="text" class="form-control" id="searchClient" name="client_name"
+                           placeholder="Type to search..." value="{{ filters.client_name|default:'' }}">
+                    <small class="text-muted">Search by client name (partial match)</small>
+                </div>
+                <div class="col-12 d-flex gap-2 flex-wrap align-items-end">
+                    <button type="submit" class="btn btn-primary" id="applyFilterBtn">
+                        <i class="icon-search"></i> Apply Filters
+                    </button>
+                    <a href="?" class="btn btn-secondary" id="clearFilterBtn">
+                        <i class="icon-times"></i> Clear All
+                    </a>
+                    <div class="ms-auto">
+                        <span class="badge bg-info d-none" id="filterBadge">
+                            <i class="icon-check-circle"></i> Filters Active
+                        </span>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════ INVOICES TABLE ═══════════════════════ -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0"><i class="icon-table"></i> Invoice Details</h6>
+            <span class="badge bg-primary">{{ invoices|length }} records</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="invoicesTable">
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="?sort=invoice_number{% if filters.sort == 'invoice_number' %}_desc{% endif %}" 
+                               title="Sort by Invoice Number">
+                                Invoice # <i class="icon-sort-alt"></i>
+                            </a>
+                        </th>
+                        <th>Client</th>
+                        <th>Invoice Date</th>
+                        <th>Due Date</th>
+                        <th class="text-end">Amount</th>
+                        <th class="text-end">Paid</th>
+                        <th class="text-end">Outstanding</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if invoices %}
+                        {% for invoice in invoices %}
+                            <tr>
+                                <td>
+                                    <strong>{{ invoice.invoice_number }}</strong>
+                                </td>
+                                <td>
+                                    <a href="{% url 'clients:detail' invoice.client.id %}" 
+                                       class="text-decoration-none" title="View client details">
+                                        {{ invoice.client.name }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <small><i class="icon-calendar"></i> {{ invoice.invoice_date|date:"d M Y" }}</small>
+                                </td>
+                                <td>
+                                    <small><i class="icon-calendar-check"></i> {{ invoice.due_date|date:"d M Y" }}</small>
+                                    {% if invoice.is_overdue %}
+                                        <br><span class="badge bg-danger"><i class="icon-exclamation-circle"></i> Overdue</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <strong>KES {{ invoice.total_amount|floatformat:2 }}</strong>
+                                </td>
+                                <td class="text-end text-success">
+                                    <strong><i class="icon-check"></i> {{ invoice.amount_paid|floatformat:2 }}</strong>
+                                </td>
+                                <td class="text-end text-warning">
+                                    <strong><i class="icon-minus-circle"></i> {{ invoice.amount_due|floatformat:2 }}</strong>
+                                </td>
+                                <td class="text-center">
+                                    {% if invoice.status == 'draft' %}
+                                        <span class="badge bg-secondary">📝 Draft</span>
+                                    {% elif invoice.status == 'issued' %}
+                                        <span class="badge bg-info">✉️ Issued</span>
+                                    {% elif invoice.status == 'paid' %}
+                                        <span class="badge bg-success">✅ Paid</span>
+                                    {% elif invoice.status == 'partial' %}
+                                        <span class="badge bg-warning text-dark">⏳ Partial</span>
+                                    {% elif invoice.status == 'overdue' %}
+                                        <span class="badge bg-danger">⚠️ Overdue</span>
+                                    {% elif invoice.status == 'cancelled' %}
+                                        <span class="badge bg-dark">❌ Cancelled</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="{% url 'invoices:detail' invoice.id %}" 
+                                           class="btn btn-outline-primary" title="View invoice details">
+                                            <i class="icon-eye"></i>
+                                        </a>
+                                        <button class="btn btn-outline-secondary" title="Download PDF"
+                                                onclick="downloadPDF({{ invoice.id }})" type="button">
+                                            <i class="icon-download"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="9" class="text-center py-4">
+                                <i class="icon-inbox text-muted" style="font-size: 3rem; opacity: 0.3;"></i>
+                                <p class="text-muted mt-3 mb-3">No invoices found matching your criteria</p>
+                                <a href="{% url 'invoices:create' %}" class="btn btn-primary btn-sm">
+                                    <i class="icon-plus"></i> Create First Invoice
+                                </a>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
+            <small class="text-muted">
+                Showing {% if invoices %}{{ invoices|length }}{% else %}0{% endif %} of {{ total_count|default:0 }} invoices
+                {% if filters.status %}<br>Filter: <strong>{{ filters.status|title }}</strong>{% endif %}
+            </small>
+            {% if page_obj %}
+                <nav aria-label="Page navigation" class="mt-2 mt-sm-0">
+                    <ul class="pagination pagination-sm mb-0">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1" title="First page">
+                                    <i class="icon-step-backward"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" title="Previous page">
+                                    <i class="icon-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+                        </li>
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}" title="Next page">
+                                    <i class="icon-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" title="Last page">
+                                    <i class="icon-step-forward"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pages/reports.js' %}"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// FILTER FUNCTIONALITY
+// ═══════════════════════════════════════════════════════════════
+
+(function() {
+    // Cache DOM elements
+    const filterForm = document.getElementById('filterForm');
+    const dateFromInput = document.getElementById('dateFrom');
+    const dateToInput = document.getElementById('dateTo');
+    const statusSelect = document.getElementById('statusFilter');
+    const clientInput = document.getElementById('searchClient');
+    const applyBtn = document.getElementById('applyFilterBtn');
+    const clearBtn = document.getElementById('clearFilterBtn');
+    const filterBadge = document.getElementById('filterBadge');
+    const filterStatus = document.getElementById('filterStatus');
+
+    // Check if any filters are active
+    function checkActiveFilters() {
+        const hasDateFrom = dateFromInput.value.trim() !== '';
+        const hasDateTo = dateToInput.value.trim() !== '';
+        const hasStatus = statusSelect.value.trim() !== '';
+        const hasClient = clientInput.value.trim() !== '';
+        const hasFilters = hasDateFrom || hasDateTo || hasStatus || hasClient;
+
+        // Update UI to show filters are active
+        if (hasFilters) {
+            filterBadge.style.display = 'inline-block';
+            let filterCount = (hasDateFrom ? 1 : 0) + (hasDateTo ? 1 : 0) + (hasStatus ? 1 : 0) + (hasClient ? 1 : 0);
+            filterStatus.textContent = `(${filterCount} filter${filterCount !== 1 ? 's' : ''} applied)`;
+        } else {
+            filterBadge.style.display = 'none';
+            filterStatus.textContent = '';
+        }
+    }
+
+    // Validate date range
+    function validateDates() {
+        const fromDate = new Date(dateFromInput.value);
+        const toDate = new Date(dateToInput.value);
+
+        if (dateFromInput.value && dateToInput.value && fromDate > toDate) {
+            alert('"From Date" cannot be after "To Date". Please adjust your date range.');
+            dateToInput.focus();
+            return false;
+        }
+        return true;
+    }
+
+    // Handle form submission
+    filterForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!validateDates()) {
+            return;
+        }
+
+        // Show loading state
+        applyBtn.disabled = true;
+        applyBtn.innerHTML = '<i class="icon-spinner spin"></i> Filtering...';
+
+        // Submit form
+        setTimeout(() => {
+            filterForm.submit();
+        }, 300);
+    });
+
+    // Real-time filter status update
+    dateFromInput.addEventListener('change', checkActiveFilters);
+    dateToInput.addEventListener('change', checkActiveFilters);
+    statusSelect.addEventListener('change', checkActiveFilters);
+    clientInput.addEventListener('input', checkActiveFilters);
+
+    // Auto-search on client name input (optional debounce)
+    let clientSearchTimeout;
+    clientInput.addEventListener('input', function() {
+        clearTimeout(clientSearchTimeout);
+        // Optionally auto-submit after 1 second of inactivity
+        // clientSearchTimeout = setTimeout(() => {
+        //     filterForm.submit();
+        // }, 1000);
+    });
+
+    // Clear button functionality
+    clearBtn.addEventListener('click', function(e) {
+        if (confirm('Clear all filters and reset the report?')) {
+            dateFromInput.value = '';
+            dateToInput.value = '';
+            statusSelect.value = '';
+            clientInput.value = '';
+            checkActiveFilters();
+            // Redirect to clean URL
+            window.location.href = '?';
+        } else {
+            e.preventDefault();
+        }
+    });
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        checkActiveFilters();
+        
+        // Add enter key submit for client input
+        clientInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                filterForm.submit();
+            }
+        });
+    });
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// EXPORT & PRINT FUNCTIONALITY
+// ═══════════════════════════════════════════════════════════════
+
+function exportPDF() {
+    if (!{{ settings.enable_export|lower }}) {
+        alert('Export to PDF is currently disabled by your administrator');
+        return;
+    }
+    alert('PDF export requires additional libraries. Please use the CSV export or Print feature.');
+}
+
+function exportCSV() {
+    if (!{{ settings.enable_export|lower }}) {
+        alert('Export to CSV is currently disabled by your administrator');
+        return;
+    }
+    
+    // Build URL with current filters
+    const url = new URL('{% url "core:export-invoices-csv" %}', window.location.origin);
+    const fromDate = document.getElementById('dateFrom').value;
+    const toDate = document.getElementById('dateTo').value;
+    const status = document.getElementById('statusFilter').value;
+    const clientName = document.getElementById('searchClient').value;
+    
+    if (fromDate) url.searchParams.append('from_date', fromDate);
+    if (toDate) url.searchParams.append('to_date', toDate);
+    if (status) url.searchParams.append('status', status);
+    if (clientName) url.searchParams.append('client_name', clientName);
+    
+    // Download the file
+    window.location.href = url.toString();
+}
+
+function printReport() {
+    window.print();
+}
+
+function downloadPDF(invoiceId) {
+    alert('Invoice PDF download is under development. Please view the invoice to download.');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PAGE INITIALIZATION
+// ═══════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Add smooth scroll behavior
+    document.documentElement.style.scrollBehavior = 'smooth';
+    
+    // Initialize tooltips if Bootstrap tooltips are available
+    if (typeof bootstrap !== 'undefined') {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    }
+    
+    // Add row click navigation (optional)
+    const tableRows = document.querySelectorAll('.table tbody tr');
+    tableRows.forEach(row => {
+        // Don't make empty state row clickable
+        if (row.querySelector('td[colspan]')) return;
+        
+        row.style.cursor = 'pointer';
+        row.addEventListener('click', function(e) {
+            // Don't navigate if clicking on a button or link
+            if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                return;
+            }
+            // Find the view link
+            const viewLink = row.querySelector('a[title="View invoice details"]');
+            if (viewLink) {
+                viewLink.click();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+

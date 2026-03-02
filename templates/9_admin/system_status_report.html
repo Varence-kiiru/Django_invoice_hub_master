@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Status Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            background: white;
+            padding: 40px 20px;
+        }
+        
+        .report-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+        }
+        
+        /* Header */
+        .report-header {
+            border-bottom: 3px solid #e5c158;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            text-align: center;
+        }
+        
+        .report-header h1 {
+            font-size: 32px;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+        }
+        
+        .report-header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* Metadata */
+        .report-metadata {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #e5c158;
+        }
+        
+        .metadata-item {
+            font-size: 14px;
+        }
+        
+        .metadata-item label {
+            font-weight: 600;
+            color: #1a1a2e;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .metadata-item value {
+            color: #666;
+        }
+        
+        /* Section Styling */
+        .report-section {
+            margin-bottom: 50px;
+            page-break-inside: avoid;
+        }
+        
+        .report-section h2 {
+            font-size: 20px;
+            color: #1a1a2e;
+            border-bottom: 2px solid #e5c158;
+            padding-bottom: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .report-section h3 {
+            font-size: 16px;
+            color: #e5c158;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        /* Status Grid */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .status-item {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+        
+        .status-item-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 13px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        
+        .status-item-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1a1a2e;
+        }
+        
+        .status-item-indicator {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        
+        .status-item-indicator.healthy {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        /* Metrics Table */
+        .metrics-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+        
+        .metrics-table thead {
+            background: #f8f9fa;
+            border-bottom: 2px solid #e5c158;
+        }
+        
+        .metrics-table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #1a1a2e;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+        
+        .metrics-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            color: #333;
+        }
+        
+        .metrics-table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .metrics-table tbody tr:hover {
+            background: #f0f0f0;
+        }
+        
+        .metric-value {
+            font-weight: 600;
+            color: #e5c158;
+        }
+        
+        /* Events Timeline */
+        .events-timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        
+        .event-item {
+            display: grid;
+            grid-template-columns: 150px 80px 1fr;
+            gap: 15px;
+            padding: 15px;
+            border-left: 3px solid #e5c158;
+            background: #f8f9fa;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+        
+        .event-time {
+            font-weight: 600;
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .event-action {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #e5c158;
+            color: white;
+        }
+        
+        .event-message {
+            color: #333;
+            font-size: 13px;
+        }
+        
+        /* Footer */
+        .report-footer {
+            border-top: 2px solid #e5c158;
+            margin-top: 50px;
+            padding-top: 30px;
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+        }
+        
+        .report-footer p {
+            margin-bottom: 5px;
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                padding: 0;
+            }
+            
+            .report-container {
+                max-width: 100%;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+            
+            .report-section {
+                page-break-inside: avoid;
+            }
+            
+            .status-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .print-button {
+            background: #e5c158;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+        
+        .print-button:hover {
+            background: #d4af47;
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <!-- Print Button -->
+        <div class="no-print" style="text-align: center; margin-bottom: 20px;">
+            <a href="{% url 'core:system-status-report-pdf' %}" class="btn btn-primary">📥 Download PDF</a>
+        </div>
+        
+        <!-- Report Header -->
+        <div class="report-header">
+            <h1>System Status Report</h1>
+            <p>Professional System Performance & Health Analysis</p>
+        </div>
+        
+        <!-- Report Metadata -->
+        <div class="report-metadata">
+            <div class="metadata-item">
+                <label>Generated:</label>
+                <value>{{ report_date|date:"F j, Y \a\t H:i" }}</value>
+            </div>
+            <div class="metadata-item">
+                <label>System Database:</label>
+                <value>{{ db_type }}</value>
+            </div>
+            <div class="metadata-item">
+                <label>Total Users:</label>
+                <value>{{ total_users }}</value>
+            </div>
+            <div class="metadata-item">
+                <label>Active Users:</label>
+                <value>{{ active_users }}</value>
+            </div>
+        </div>
+        
+        <!-- System Status Section -->
+        <div class="report-section">
+            <h2>System Status</h2>
+            
+            <h3>Core System Health</h3>
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="status-item-label">Database</div>
+                    <div class="status-item-value">{{ db_status }}</div>
+                    <div class="status-item-indicator healthy">✓ Connected</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-item-label">Cache System</div>
+                    <div class="status-item-value">{{ cache_status }}</div>
+                    <div class="status-item-indicator healthy">✓ Operational</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-item-label">Email Service</div>
+                    <div class="status-item-value">{{ email_status }}</div>
+                    <div class="status-item-indicator healthy">✓ Active</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-item-label">Storage</div>
+                    <div class="status-item-value">{{ storage_status }}</div>
+                    <div class="status-item-indicator healthy">✓ Available</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Database Metrics Section -->
+        <div class="report-section">
+            <h2>Database Performance</h2>
+            
+            <table class="metrics-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Tables</td>
+                        <td><span class="metric-value">{{ table_count }}</span></td>
+                        <td>Active</td>
+                    </tr>
+                    <tr>
+                        <td>Database Size</td>
+                        <td><span class="metric-value">{{ db_size_mb }} MB</span></td>
+                        <td>Monitored</td>
+                    </tr>
+                    <tr>
+                        <td>Query Time</td>
+                        <td><span class="metric-value">{{ query_time_ms }}ms</span></td>
+                        <td>Optimal</td>
+                    </tr>
+                    <tr>
+                        <td>Active Connections</td>
+                        <td><span class="metric-value">{{ db_connections }}</span></td>
+                        <td>Healthy</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Cache Performance Section -->
+        <div class="report-section">
+            <h2>Cache Performance</h2>
+            
+            <table class="metrics-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Cache Type</td>
+                        <td><span class="metric-value">{{ cache_type }}</span></td>
+                        <td>Configured</td>
+                    </tr>
+                    <tr>
+                        <td>Hit Rate</td>
+                        <td><span class="metric-value">{{ cache_hit_rate }}</span></td>
+                        <td>Excellent</td>
+                    </tr>
+                    <tr>
+                        <td>Memory Used</td>
+                        <td><span class="metric-value">{{ cache_memory_mb }} MB</span></td>
+                        <td>Monitored</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Application Performance Section -->
+        <div class="report-section">
+            <h2>Application Performance</h2>
+            
+            <table class="metrics-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Uptime</td>
+                        <td><span class="metric-value">{{ uptime_days }} days</span></td>
+                        <td>Stable</td>
+                    </tr>
+                    <tr>
+                        <td>Requests/sec</td>
+                        <td><span class="metric-value">{{ requests_per_sec }}</span></td>
+                        <td>Monitored</td>
+                    </tr>
+                    <tr>
+                        <td>Avg Response Time</td>
+                        <td><span class="metric-value">{{ avg_response_ms }}ms</span></td>
+                        <td>Optimal</td>
+                    </tr>
+                    <tr>
+                        <td>Active Users</td>
+                        <td><span class="metric-value">{{ active_users }}</span></td>
+                        <td>Live</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Security Section -->
+        <div class="report-section">
+            <h2>Security Status</h2>
+            
+            <table class="metrics-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Failed Login Attempts (24h)</td>
+                        <td><span class="metric-value">{{ failed_logins_24h }}</span></td>
+                        <td>Monitored</td>
+                    </tr>
+                    <tr>
+                        <td>Active Sessions</td>
+                        <td><span class="metric-value">{{ active_sessions }}</span></td>
+                        <td>Active</td>
+                    </tr>
+                    <tr>
+                        <td>SSL Status</td>
+                        <td><span class="metric-value">{{ ssl_status }}</span></td>
+                        <td>Secure</td>
+                    </tr>
+                    <tr>
+                        <td>Last Backup</td>
+                        <td><span class="metric-value">{{ last_backup }}</span></td>
+                        <td>Current</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Business Metrics Section -->
+        <div class="report-section">
+            <h2>Business Metrics</h2>
+            
+            <table class="metrics-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Total Invoices</td>
+                        <td><span class="metric-value">{{ total_invoices }}</span></td>
+                        <td>Active</td>
+                    </tr>
+                    <tr>
+                        <td>Total Payments</td>
+                        <td><span class="metric-value">{{ total_payments }}</span></td>
+                        <td>Active</td>
+                    </tr>
+                    <tr>
+                        <td>Invoice Total</td>
+                        <td><span class="metric-value">${{ invoice_total }}</span></td>
+                        <td>Monitored</td>
+                    </tr>
+                    <tr>
+                        <td>Payment Total</td>
+                        <td><span class="metric-value">${{ payment_total }}</span></td>
+                        <td>Monitored</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Recent Events Section -->
+        <div class="report-section">
+            <h2>Recent System Events</h2>
+            
+            {% if recent_logs %}
+                <div class="events-timeline">
+                    {% for log in recent_logs %}
+                        <div class="event-item">
+                            <div class="event-time">{{ log.timestamp|date:"M d, Y H:i" }}</div>
+                            <div class="event-action">{{ log.action|upper }}</div>
+                            <div class="event-message">
+                                {{ log.action|title }} {{ log.entity_type }} (ID: {{ log.entity_id|default:"-" }})
+                                {% if log.actor %} by {{ log.actor.get_full_name|default:log.actor.username }}{% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="color: #999;">No recent system events recorded.</p>
+            {% endif %}
+        </div>
+        
+        <!-- Footer -->
+        <div class="report-footer">
+            <p>💼 <strong>Invoicing App</strong></p>
+            <p>Professional System Status Report - {{ report_date|date:"Y-m-d H:i" }}</p>
+            <p>© 2026 Invoicing App. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

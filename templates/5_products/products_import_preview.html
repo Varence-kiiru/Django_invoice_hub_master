@@ -1,0 +1,168 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Import Products - Preview{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/products.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Import Products - Results</h1>
+    
+    {% if error %}
+    <div class="form-error" style="margin-bottom: var(--spacing-xl);">
+        <strong>Error:</strong> {{ error }}
+    </div>
+    <div class="form-actions">
+        <a href="{% url 'products:import' %}" class="btn-secondary">Try Again</a>
+        <a href="{% url 'products:list' %}" class="btn-primary">Back to Products</a>
+    </div>
+    {% else %}
+    
+    <!-- Success Summary -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
+        <div class="stat-card">
+            <div class="stat-value" style="color: var(--color-success);">{{ success_count }}</div>
+            <div class="stat-label">Successfully Imported</div>
+        </div>
+        {% if failed_rows %}
+        <div class="stat-card">
+            <div class="stat-value" style="color: var(--color-danger);">{{ failed_rows|length }}</div>
+            <div class="stat-label">Failed Rows</div>
+        </div>
+        {% endif %}
+        <div class="stat-card">
+            <div class="stat-value">{{ total_rows }}</div>
+            <div class="stat-label">Total Rows Processed</div>
+        </div>
+    </div>
+    
+    {% if success_count > 0 %}
+    <div class="form-success" style="margin-bottom: var(--spacing-xl);">
+        <strong>✓ Success!</strong> {{ success_count }} product{{ success_count|pluralize }} successfully imported to your catalog.
+    </div>
+    {% endif %}
+    
+    {% if failed_rows %}
+    <!-- Failed Rows -->
+    <div class="section">
+        <h2 style="color: var(--color-danger); margin-top: var(--spacing-xl);">Failed Rows ({{ failed_rows|length }})</h2>
+        <p>The following rows could not be imported. Please fix the issues and try again.</p>
+        
+        <div style="overflow-x: auto; margin-top: var(--spacing-lg);">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Row #</th>
+                        <th>Data</th>
+                        <th>Error Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for failed in failed_rows %}
+                    <tr>
+                        <td>{{ failed.row }}</td>
+                        <td>
+                            <small>
+                                {% for key, value in failed.data.items %}
+                                    <div><strong>{{ key }}:</strong> {{ value }}</div>
+                                {% endfor %}
+                            </small>
+                        </td>
+                        <td>
+                            <span style="color: var(--color-danger); font-size: var(--font-size-sm);">{{ failed.error }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Action Buttons -->
+    <div class="form-actions" style="margin-top: var(--spacing-xl);">
+        {% if failed_rows %}
+        <a href="{% url 'products:import' %}" class="btn-primary">Try Again</a>
+        {% endif %}
+        <a href="{% url 'products:list' %}" class="btn-primary">View Products</a>
+        <a href="{% url 'products:import' %}" class="btn-secondary">Import More</a>
+    </div>
+    
+    {% endif %}
+</div>
+
+<style>
+    .stat-card {
+        background: var(--color-gray-50);
+        padding: var(--spacing-lg);
+        border-radius: var(--radius-md);
+        text-align: center;
+        border: 1px solid var(--color-border);
+        transition: all var(--transition-base);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        background: var(--color-white);
+    }
+    
+    .stat-value {
+        font-size: var(--font-size-2xl);
+        font-weight: var(--font-weight-bold);
+        line-height: 1;
+    }
+    
+    .stat-label {
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+        margin-top: var(--spacing-sm);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--color-white);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+    }
+    
+    .data-table thead {
+        background: var(--color-gray-50);
+        border-bottom: 2px solid var(--color-border);
+    }
+    
+    .data-table th {
+        padding: var(--spacing-md);
+        text-align: left;
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-text-primary);
+        font-size: var(--font-size-sm);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .data-table td {
+        padding: var(--spacing-md);
+        border-bottom: 1px solid var(--color-gray-100);
+        vertical-align: top;
+        font-size: var(--font-size-sm);
+    }
+    
+    .data-table tbody tr:hover {
+        background: var(--color-gray-50);
+    }
+    
+    .section {
+        margin-top: var(--spacing-xl);
+        padding-top: var(--spacing-xl);
+        border-top: 1px solid var(--color-border);
+    }
+</style>
+{% endblock %}

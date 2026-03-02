@@ -1,0 +1,60 @@
+<!-- Generic Confirm Action Modal -->
+<div class="modal fade" id="confirmActionModal" tabindex="-1" role="dialog" aria-labelledby="confirmActionLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmActionLabel">
+          <span aria-hidden="true">❓</span> Confirm Action
+        </h5>
+        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <p id="actionMessage">Please confirm this action.</p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <form id="actionForm" method="POST" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" id="actionSubmitBtn" class="btn btn-primary">Confirm</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Modal trigger from action buttons
+document.querySelectorAll('.btn-confirm-action').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    const message = this.getAttribute('data-message') || 'Please confirm this action.';
+    const actionUrl = this.getAttribute('data-action');
+    const actionText = this.getAttribute('data-action-text') || 'Confirm';
+    const actionClass = this.getAttribute('data-action-class') || 'btn-primary';
+    
+    document.getElementById('actionMessage').textContent = message;
+    document.getElementById('actionForm').action = actionUrl;
+    const submitBtn = document.getElementById('actionSubmitBtn');
+    submitBtn.textContent = actionText;
+    submitBtn.className = 'btn ' + actionClass;
+    
+    // Show modal
+    const modal = document.getElementById('confirmActionModal');
+    modal.classList.add('show');
+    modal.style.display = 'flex';
+  });
+});
+
+// Modal close handler
+document.querySelectorAll('[data-dismiss="modal"]').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    const modal = e.target.closest('.modal');
+    if (modal) {
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+    }
+  });
+});
+</script>

@@ -1,0 +1,308 @@
+/* ==================== SYSTEM STATUS ADMIN PAGE ==================== */
+
+/* Alert Messages */
+.alert {
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border-left: 4px solid transparent;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.alert strong {
+  font-weight: var(--font-weight-bold);
+  margin-right: var(--spacing-sm);
+}
+
+.alert.alert-success {
+  background-color: #d4edda;
+  border-color: #28a745;
+  color: #155724;
+}
+
+.alert.alert-error {
+  background-color: #f8d7da;
+  border-color: #dc3545;
+  color: #721c24;
+}
+
+.alert.alert-warning {
+  background-color: #fff3cd;
+  border-color: #ffc107;
+  color: #856404;
+}
+
+.alert .close {
+  background: none;
+  border: none;
+  font-size: var(--font-size-lg);
+  cursor: pointer;
+  padding: 0;
+  margin-left: var(--spacing-md);
+}
+
+.alert .close:hover {
+  opacity: 0.7;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.status-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.status-icon {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-success);
+  min-width: 50px;
+  text-align: center;
+}
+
+.status-content h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+}
+
+.status-indicator {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.status-indicator.healthy {
+  color: var(--color-success);
+}
+
+.status-indicator.warning {
+  color: var(--color-warning);
+}
+
+.status-indicator.critical {
+  color: var(--color-danger);
+}
+
+.metrics-section h2,
+.logs-section h2,
+.actions-section h2 {
+  font-size: var(--font-size-2xl);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.metric-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.metric-title {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 2px solid var(--color-primary);
+}
+
+.metric-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) 0;
+  font-size: var(--font-size-sm);
+}
+
+.metric-label {
+  color: var(--color-text-secondary);
+}
+
+.metric-value {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.logs-section,
+.actions-section {
+  margin-top: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.logs-container {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+  box-shadow: none;
+}
+
+.log-entry {
+  display: grid;
+  grid-template-columns: 150px 80px 1fr;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+  align-items: center;
+  font-size: var(--font-size-sm);
+}
+
+.log-entry:last-child {
+  border-bottom: none;
+}
+
+.log-time {
+  color: var(--color-text-secondary);
+}
+
+.log-level {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-xs);
+}
+
+.log-level.info {
+  background: var(--color-info);
+  color: white;
+}
+
+.log-level.success {
+  background: var(--color-success);
+  color: white;
+}
+
+.log-level.warning {
+  background: var(--color-warning);
+  color: white;
+}
+
+.log-level.error {
+  background: var(--color-danger);
+  color: white;
+}
+
+.log-message {
+  color: var(--color-text-primary);
+}
+
+.actions-form {
+  width: 100%;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.actions-grid .btn {
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  white-space: nowrap;
+}
+
+.actions-grid .btn-primary {
+  background: linear-gradient(135deg, var(--color-primary), #5a8acc);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.actions-grid .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  background: linear-gradient(135deg, #5a8acc, var(--color-primary));
+}
+
+.actions-grid .btn-secondary {
+  background: var(--color-bg-light);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.actions-grid .btn-secondary:hover {
+  background: var(--color-border);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ==================== DARK THEME SUPPORT ==================== */
+
+[data-theme="dark"] .status-card,
+[data-theme="dark"] .metric-card,
+[data-theme="dark"] .logs-section,
+[data-theme="dark"] .actions-section {
+  background: var(--color-bg-light) !important;
+  border-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] .log-entry {
+  border-bottom-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] .alert.alert-success {
+  background-color: #0f5f1f !important;
+  border-color: #28a745 !important;
+  color: #90ee90 !important;
+}
+
+[data-theme="dark"] .alert.alert-error {
+  background-color: #5f0f0f !important;
+  border-color: #dc3545 !important;
+  color: #f599 !important;
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+@media (max-width: 768px) {
+  .log-entry {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+
+  .actions-grid {
+    grid-template-columns: 1fr;
+  }
+}

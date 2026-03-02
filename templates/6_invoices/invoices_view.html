@@ -1,0 +1,188 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Invoice {{ invoice.invoice_number }} - View{% endblock %}
+
+{% block page_title %}Invoice {{ invoice.invoice_number }}{% endblock %}
+{% block page_description %}View invoice (client-friendly view){% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/invoices.css' %}">
+<style>
+  .invoice-print-view {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    .invoice-print-view {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+  }
+
+  .invoice-header-print {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+  }
+
+  .invoice-logo-area h1 {
+    margin: 0;
+    font-size: 28px;
+  }
+
+  .invoice-number-area {
+    text-align: right;
+  }
+
+  .invoice-number-area h2 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--text-secondary);
+  }
+
+  .invoice-addresses {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 30px;
+  }
+
+  .address-block h3 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+  }
+
+  .address-block p {
+    margin: 5px 0;
+    font-size: 14px;
+  }
+
+  @media print {
+    .print-actions { display: none; }
+    .invoice-print-view { box-shadow: none; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <!-- Print Actions -->
+  <div class="print-actions" style="margin-bottom: 20px;">
+    <a href="{% url 'invoices:list-pdf' %}{% if sort %}?sort={{sort}}{% endif %}" class="btn btn-primary">📥 Download PDF</a>
+    <a href="{% url 'invoices:list' %}" class="btn btn-secondary">← Back</a>
+  </div>
+
+  <!-- Invoice View -->
+  <div class="invoice-print-view">
+    <!-- Header -->
+    <div class="invoice-header-print">
+      <div class="invoice-logo-area">
+        <h1>INVOICE</h1>
+      </div>
+      <div class="invoice-number-area">
+        <h2>{{ invoice.invoice_number }}</h2>
+        <p>{{ invoice.invoice_date|date:"M d, Y" }}</p>
+      </div>
+    </div>
+
+    <!-- Addresses -->
+    <div class="invoice-addresses">
+      <div class="address-block">
+        <h3>Bill To:</h3>
+        <p><strong>{{ invoice.client.name }}</strong></p>
+        <p>{{ invoice.client.email }}</p>
+        {% if invoice.client.phone %}
+          <p>{{ invoice.client.phone }}</p>
+        {% endif %}
+        {% if invoice.client.city %}
+          <p>{{ invoice.client.city }}{% if invoice.client.country %}, {{ invoice.client.country }}{% endif %}</p>
+        {% endif %}
+      </div>
+
+      <div class="address-block">
+        <h3>Invoice Details:</h3>
+        <p><strong>Invoice #:</strong> {{ invoice.invoice_number }}</p>
+        <p><strong>Invoice Date:</strong> {{ invoice.invoice_date|date:"M d, Y" }}</p>
+        <p><strong>Due Date:</strong> {{ invoice.due_date|date:"M d, Y" }}</p>
+        <p><strong>Status:</strong> {{ invoice.get_status_display }}</p>
+      </div>
+    </div>
+
+    <!-- Line Items -->
+    <div style="margin: 30px 0;">
+      <table class="invoice-table-print" style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background-color: rgba(0,0,0,0.05); border-bottom: 2px solid var(--border-color);">
+            <th style="padding: 10px; text-align: left; font-weight: 600;">Description</th>
+            <th style="padding: 10px; text-align: right; font-weight: 600; width: 80px;">Qty</th>
+            <th style="padding: 10px; text-align: right; font-weight: 600; width: 100px;">Unit Price</th>
+            <th style="padding: 10px; text-align: right; font-weight: 600; width: 80px;">Tax</th>
+            <th style="padding: 10px; text-align: right; font-weight: 600; width: 100px;">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in line_items %}
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 12px 10px;">{{ item.description }}</td>
+              <td style="padding: 12px 10px; text-align: right;">{{ item.quantity|floatformat:2 }}</td>
+              <td style="padding: 12px 10px; text-align: right;">{{ invoice.currency }} {{ item.unit_price|floatformat:2 }}</td>
+              <td style="padding: 12px 10px; text-align: right;">{{ item.tax_amount|floatformat:2 }}</td>
+              <td style="padding: 12px 10px; text-align: right; font-weight: 600;">{{ invoice.currency }} {{ item.line_total|floatformat:2 }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Totals -->
+    <div style="display: grid; grid-template-columns: 1fr 250px; gap: 40px; margin: 30px 0;">
+      <div>
+        {% if invoice.description %}
+          <h4 style="margin: 0 0 10px 0;">Notes:</h4>
+          <p style="margin: 0;">{{ invoice.description }}</p>
+        {% endif %}
+      </div>
+
+      <div style="border-top: 2px solid var(--border-color); padding-top: 15px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span>Subtotal:</span>
+          <span>{{ invoice.currency }} {{ invoice.subtotal_amount|floatformat:2 }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span>Tax:</span>
+          <span>{{ invoice.currency }} {{ invoice.tax_amount|floatformat:2 }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: 600; font-size: 16px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+          <span>Total Due:</span>
+          <span>{{ invoice.currency }} {{ invoice.total_amount|floatformat:2 }}</span>
+        </div>
+        
+        {% if invoice.amount_due > 0 %}
+          <div style="display: flex; justify-content: space-between; color: var(--warning-color); font-weight: 600;">
+            <span>Balance Due:</span>
+            <span>{{ invoice.currency }} {{ invoice.amount_due|floatformat:2 }}</span>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="border-top: 1px solid var(--border-color); padding-top: 20px; margin-top: 40px; text-align: center; color: var(--text-secondary); font-size: 12px;">
+      <p>Generated on {{ "now"|date:"M d, Y \a\t H:i" }}</p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

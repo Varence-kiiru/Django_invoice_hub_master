@@ -1,0 +1,40 @@
+<!-- Overdue Invoices Widget -->
+<div class="card card-widget">
+  <div class="card-header">
+    <h4 class="card-title">
+      <span aria-hidden="true">⚠</span> Overdue Invoices
+    </h4>
+    {% if overdue_count > 0 %}
+      <span class="badge badge-danger">{{ overdue_count }}</span>
+    {% endif %}
+  </div>
+  <div class="card-body">
+    {% if overdue_invoices %}
+      <ul class="list-unstyled widget-list">
+        {% for invoice in overdue_invoices|slice:":5" %}
+          <li class="widget-list-item">
+            <div class="item-header">
+              <strong>{{ invoice.invoice_number }}</strong>
+              <span class="item-amount">${{ invoice.outstanding|floatformat:2 }}</span>
+            </div>
+            <div class="item-meta">
+              <small class="text-danger">{{ invoice.days_overdue }} days overdue</small>
+              <span class="text-muted">{{ invoice.client.name|truncatewords:2 }}</span>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="empty-state">
+        <p class="text-muted">
+          <span aria-hidden="true">✓</span> No overdue invoices
+        </p>
+      </div>
+    {% endif %}
+  </div>
+  {% if overdue_count > 0 %}
+    <div class="card-footer">
+      <a href="{% url 'invoices:outstanding' %}" class="btn btn-sm btn-link">View All Overdue</a>
+    </div>
+  {% endif %}
+</div>

@@ -1,0 +1,41 @@
+<!-- 403 Permission Denied Error Page -->
+{% extends "layouts/base.html" %}
+
+{% block title %}Permission Denied (403){% endblock %}
+
+{% block content %}
+<div class="error-container error-403">
+  <div class="error-content">
+    <div class="error-code" aria-hidden="true">403</div>
+    
+    <h1 class="error-title">Permission Denied</h1>
+    
+    <p class="error-message">
+      You don't have permission to access this resource. If you believe this is a mistake, contact your administrator.
+    </p>
+
+    <div class="alert alert-warning alert-icon" role="alert">
+      <span aria-hidden="true">🔒</span>
+      <span>Your current role doesn't have access to this page.</span>
+    </div>
+
+    <div class="error-actions">
+      <a href="{% url 'core:dashboard' %}" class="btn btn-primary btn-lg">
+        <span aria-hidden="true">🏠</span> Go to Dashboard
+      </a>
+      <a href="javascript:history.back()" class="btn btn-outline-primary btn-lg">
+        <span aria-hidden="true">⬅</span> Go Back
+      </a>
+    </div>
+
+    <div class="error-suggestions">
+      <h3>What now?</h3>
+      <ul>
+        <li>Check if you're logged in with the correct account</li>
+        <li>Contact your administrator to request access</li>
+        <li>Try accessing a different section you have permission for</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

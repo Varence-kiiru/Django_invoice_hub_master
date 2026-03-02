@@ -1,0 +1,108 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Login - Invoicing App{% endblock %}
+
+{% block page_title %}Welcome Back{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <div class="auth-card">
+    <!-- Header -->
+    <div class="auth-header">
+      <div class="auth-header-icon">💼</div>
+      <h1 class="auth-header-title">Sign In</h1>
+      <p class="auth-header-subtitle">Welcome back to Invoicing App</p>
+    </div>
+
+    <!-- Messages -->
+    {% include '1_base/flash_messages.html' %}
+
+    <!-- Login Form -->
+    <form method="post" novalidate id="login-form">
+      {% csrf_token %}
+
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="id_email">Email Address</label>
+        <input
+          id="id_email"
+          name="email"
+          type="email"
+          required
+          placeholder="you@example.com"
+          value="{{ email|default:'' }}"
+          autocomplete="email"
+        >
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        <label for="id_password">Password</label>
+        <div class="password-field-wrapper">
+          <input
+            id="id_password"
+            name="password"
+            type="password"
+            required
+            placeholder="••••••••"
+            autocomplete="current-password"
+          >
+          <button class="password-toggle" type="button" id="password-toggle" aria-label="Toggle password visibility">
+            👁️
+          </button>
+        </div>
+      </div>
+
+      <!-- Remember Me -->
+      <div style="margin-bottom: var(--spacing-lg); display: flex; align-items: center; gap: var(--spacing-sm);">
+        <input type="checkbox" id="remember" name="remember" style="width: 16px; height: 16px; cursor: pointer;">
+        <label for="remember" style="cursor: pointer; font-size: var(--font-size-sm); color: var(--color-text-muted); margin: 0;">
+          Remember me
+        </label>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit" id="login-btn">
+          <span class="btn-text">Sign In</span>
+          <div class="loading-spinner"></div>
+        </button>
+      </div>
+    </form>
+
+    <!-- Forgot Password Link -->
+    <div class="forgot-password">
+      <a href="{% url 'core:password_reset' %}">Forgot your password?</a>
+    </div>
+
+    <!-- Register Link -->
+    <div class="auth-footer">
+      Don't have an account? <a href="{% url 'core:register' %}">Create one now</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Password toggle functionality
+  const passwordToggle = document.getElementById('password-toggle');
+  const passwordInput = document.getElementById('id_password');
+  
+  passwordToggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    const isPassword = passwordInput.type === 'password';
+    passwordInput.type = isPassword ? 'text' : 'password';
+    passwordToggle.textContent = isPassword ? '🙈' : '👁️';
+  });
+
+  // Loading state
+  document.getElementById('login-form').addEventListener('submit', () => {
+    const btn = document.getElementById('login-btn');
+    btn.classList.add('loading');
+  });
+</script>
+{% endblock %}

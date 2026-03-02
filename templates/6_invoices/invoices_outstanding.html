@@ -1,0 +1,234 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Outstanding Invoices - Invoice Management{% endblock %}
+
+{% block page_title %}Outstanding Invoices{% endblock %}
+{% block page_description %}View invoices pending payment or overdue{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/invoices.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <!-- Alerts -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Header Section -->
+  <div class="invoice-header-section">
+    <div class="section-title-group">
+      <h2>Outstanding Invoices</h2>
+      <p class="section-subtitle">Invoices pending payment or overdue</p>
+    </div>
+
+    <!-- Search and Filter Panel -->
+    <div class="invoice-search-panel">
+      <form method="get" class="search-form" id="outstanding-search-form">
+        <div class="search-input-group">
+          <input type="text" name="search" placeholder="Search invoice number or client..." 
+                 value="{{ search }}" class="search-input">
+          <button type="submit" class="btn-search">
+            <span>🔍</span>
+          </button>
+        </div>
+
+        <div class="filter-group">
+          <select name="client" class="filter-select" onchange="document.getElementById('outstanding-search-form').submit()">
+            <option value="">All Clients</option>
+            {% for client in clients %}
+              <option value="{{ client.id }}" {% if selected_client == client.id|stringformat:"s" %}selected{% endif %}>
+                {{ client.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <a href="{% url 'invoices:list' %}" class="btn btn-secondary" style="margin-left: auto;">
+          ← All Invoices
+        </a>
+      </form>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Outstanding</div>
+      <div class="stat-value">{{ invoices.paginator.count|default:0 }}</div>
+    </div>
+    <div class="stat-card warning">
+      <div class="stat-label">Overdue</div>
+      <div class="stat-value">{% with overdue_count=invoices|length %}{{ overdue_count }}{% endwith %}</div>
+    </div>
+  </div>
+
+  <!-- Outstanding Invoices List -->
+  <div class="invoice-list-section">
+    <div class="admin-table-wrapper">
+      {% if invoices %}
+        <table class="admin-table invoice-table">
+          <thead>
+            <tr>
+              <th class="col-invoice-num">Invoice #</th>
+              <th class="col-client">Client</th>
+              <th class="col-amount">Amount Due</th>
+              <th class="col-due">Due Date</th>
+              <th class="col-days">Days Overdue</th>
+              <th class="col-status">Status</th>
+              <th class="col-date">Date</th>
+              <th class="col-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for invoice in invoices %}
+              <tr class="invoice-row {% if invoice.is_overdue %}overdue-row{% endif %}" data-invoice-id="{{ invoice.id }}">
+                <td class="col-invoice-num">
+                  <a href="{% url 'invoices:detail' invoice.id %}" class="invoice-link">
+                    {{ invoice.invoice_number }}
+                  </a>
+                </td>
+                <td class="col-client">
+                  <a href="{% url 'clients:detail' invoice.client.id %}" title="{{ invoice.client.name }}">
+                    {{ invoice.client.name }}
+                  </a>
+                </td>
+                <td class="col-amount">
+                  <span class="amount-badge">
+                    {{ invoice.currency }} {{ invoice.amount_due|floatformat:2 }}
+                  </span>
+                </td>
+                <td class="col-due">
+                  <span class="date-badge {% if invoice.is_overdue %}overdue{% endif %}">
+                    {{ invoice.due_date|date:"M d, Y" }}
+                  </span>
+                </td>
+                <td class="col-days">
+                  {% if invoice.is_overdue %}
+                    <span class="days-badge overdue">{{ invoice.days_overdue }} days</span>
+                  {% else %}
+                    <span class="days-badge">-</span>
+                  {% endif %}
+                </td>
+                <td class="col-status">
+                  <span class="status-badge status-{{ invoice.status }}">
+                    {% if invoice.status == 'issued' %}✓ Issued{% elif invoice.status == 'overdue' %}⚠️ Overdue{% endif %}
+                  </span>
+                </td>
+                <td class="col-date">
+                  {{ invoice.invoice_date|date:"M d, Y" }}
+                </td>
+                <td class="col-actions">
+                  <div class="action-buttons">
+                    <a href="{% url 'invoices:detail' invoice.id %}" class="btn-action" title="View Details">
+                      👁️
+                    </a>
+                    <a href="{% url 'invoices:send' invoice.id %}" class="btn-action" title="Send Email">
+                      📧
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        {% if invoices.has_other_pages %}
+          <div class="pagination-container">
+            <ul class="pagination">
+              {% if invoices.has_previous %}
+                <li><a href="?page=1{% if search %}&search={{ search }}{% endif %}{% if selected_client %}&client={{ selected_client }}{% endif %}" class="page-link">« First</a></li>
+                <li><a href="?page={{ invoices.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if selected_client %}&client={{ selected_client }}{% endif %}" class="page-link">‹ Previous</a></li>
+              {% endif %}
+
+              {% for num in invoices.paginator.page_range %}
+                {% if invoices.number == num %}
+                  <li class="active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > invoices.number|add:'-3' and num < invoices.number|add:'3' %}
+                  <li><a href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if selected_client %}&client={{ selected_client }}{% endif %}" class="page-link">{{ num }}</a></li>
+                {% endif %}
+              {% endfor %}
+
+              {% if invoices.has_next %}
+                <li><a href="?page={{ invoices.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if selected_client %}&client={{ selected_client }}{% endif %}" class="page-link">Next ›</a></li>
+                <li><a href="?page={{ invoices.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if selected_client %}&client={{ selected_client }}{% endif %}" class="page-link">Last »</a></li>
+              {% endif %}
+            </ul>
+            <div class="pagination-info">
+              Page {{ invoices.number }} of {{ invoices.paginator.num_pages }} (Total: {{ invoices.paginator.count }} invoices)
+            </div>
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">✅</div>
+          <h3>All Caught Up!</h3>
+          <p>No outstanding or overdue invoices. All invoices are either paid or cancelled.</p>
+          <a href="{% url 'invoices:list' %}" class="btn btn-primary">View All Invoices</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+  }
+
+  .stat-card {
+    background: var(--bg-secondary);
+    padding: 20px;
+    border-radius: 6px;
+    border-left: 4px solid var(--info-color);
+  }
+
+  .stat-card.warning {
+    border-left-color: var(--warning-color);
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+  }
+
+  .stat-value {
+    font-size: 28px;
+    font-weight: bold;
+    margin-top: 8px;
+  }
+
+  .overdue-row {
+    background: rgba(255, 193, 7, 0.05);
+  }
+
+  .days-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.05);
+    font-size: 12px;
+  }
+
+  .days-badge.overdue {
+    background: rgba(220, 53, 69, 0.1);
+    color: var(--danger-color);
+    font-weight: 600;
+  }
+</style>
+
+{% endblock %}

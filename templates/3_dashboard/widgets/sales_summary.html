@@ -1,0 +1,32 @@
+<!-- Sales Summary Widget with Chart -->
+<div class="card card-chart">
+  <div class="card-header">
+    <h3>Sales Summary</h3>
+    <div class="chart-period-selector">
+      <button class="btn btn-sm btn-subtle" data-period="week">Week</button>
+      <button class="btn btn-sm btn-subtle active" data-period="month">Month</button>
+      <button class="btn btn-sm btn-subtle" data-period="year">Year</button>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="chart-container">
+      <canvas id="salesChart" height="300"></canvas>
+    </div>
+  </div>
+  <div class="card-footer">
+    <div class="chart-stats">
+      <div class="stat">
+        <span class="stat-label">Average Invoice</span>
+        <span class="stat-value">${{ avg_invoice|default:"0.00" }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Total This Month</span>
+        <span class="stat-value">${{ total_month|default:"0.00" }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Growth</span>
+        <span class="stat-value positive">+12.5%</span>
+      </div>
+    </div>
+  </div>
+</div>

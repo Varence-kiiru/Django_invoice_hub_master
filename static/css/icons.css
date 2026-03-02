@@ -1,0 +1,176 @@
+/* ═══════════════════════════════════════════════════════════════
+   CUSTOM ICON SYSTEM - Unicode-Based Icons
+   Replaces Font Awesome CDN with local, offline-compatible icons
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Icon Base Styles */
+[class^="icon-"],
+[class*=" icon-"] {
+    display: inline-block;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    vertical-align: middle;
+    margin-right: 0.35em;
+}
+
+/* Document & File Icons */
+.icon-file-invoice-dollar::before { content: "📄"; }
+.icon-file-pdf::before { content: "📕"; }
+.icon-file-excel::before { content: "📗"; }
+.icon-download::before { content: "⬇️"; }
+.icon-upload::before { content: "⬆️"; }
+.icon-print::before { content: "🖨️"; }
+
+/* Navigation & UI Icons */
+.icon-list::before { content: "☰"; }
+.icon-filter::before { content: "⚙️"; }
+.icon-search::before { content: "🔍"; }
+.icon-times::before { content: "✕"; }
+.icon-close::before { content: "✕"; }
+.icon-check::before { content: "✓"; }
+.icon-check-circle::before { content: "✓"; }
+.icon-exclamation-circle::before { content: "⚠"; }
+.icon-question-circle::before { content: "❓"; }
+.icon-info-circle::before { content: "ℹ"; }
+.icon-eye::before { content: "👁"; }
+.icon-eye-slash::before { content: "🚫"; }
+
+/* Table & List Icons */
+.icon-table::before { content: "◻"; }
+.icon-th::before { content: "▦"; }
+.icon-list-ul::before { content: "•"; }
+.icon-sort-alt::before { content: "⇅"; }
+.icon-sort-up::before { content: "⇧"; }
+.icon-sort-down::before { content: "⇩"; }
+
+/* Business Icons */
+.icon-invoice-dollar::before { content: "💵"; }
+.icon-calculator::before { content: "🧮"; }
+.icon-cash-register::before { content: "💳"; }
+.icon-money-bill::before { content: "💰"; }
+.icon-wallet::before { content: "👜"; }
+
+/* Time Icons */
+.icon-calendar::before { content: "📅"; }
+.icon-calendar-check::before { content: "✅"; }
+.icon-clock::before { content: "🕐"; }
+.icon-hourglass-end::before { content: "⌛"; }
+.icon-history::before { content: "🕒"; }
+
+/* Action Icons */
+.icon-plus::before { content: "+"; font-weight: 700; }
+.icon-minus::before { content: "−"; font-weight: 700; }
+.icon-minus-circle::before { content: "⊖"; }
+.icon-edit::before { content: "✏"; }
+.icon-trash::before { content: "🗑"; }
+.icon-copy::before { content: "📋"; }
+.icon-share::before { content: "🔗"; }
+.icon-link::before { content: "⛓"; }
+
+/* Navigation Arrows */
+.icon-arrow-right::before { content: "→"; }
+.icon-arrow-left::before { content: "←"; }
+.icon-arrow-up::before { content: "↑"; }
+.icon-arrow-down::before { content: "↓"; }
+.icon-chevron-left::before { content: "‹"; font-weight: 700; font-size: 1.3em; }
+.icon-chevron-right::before { content: "›"; font-weight: 700; font-size: 1.3em; }
+.icon-chevron-up::before { content: "^"; font-weight: 700; }
+.icon-chevron-down::before { content: "v"; font-weight: 700; }
+.icon-step-backward::before { content: "⏮"; }
+.icon-step-forward::before { content: "⏭"; }
+
+/* Status Icons */
+.icon-circle::before { content: "●"; }
+.icon-circle-o::before { content: "○"; }
+.icon-stop-circle::before { content: "⊘"; }
+.icon-success::before { content: "✓"; color: #10b981; }
+.icon-warning::before { content: "⚠"; color: #f59e0b; }
+.icon-error::before { content: "✕"; color: #ef4444; }
+.icon-info::before { content: "ℹ"; color: #0ea5e9; }
+
+/* Loading & Activity */
+.icon-spinner::before { content: "⟳"; }
+.icon-spinner.spin { 
+    display: inline-block;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.icon-loading::before { content: "⟳"; }
+.icon-loading.loading {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+}
+
+/* Entity Icons */
+.icon-user::before { content: "👤"; }
+.icon-users::before { content: "👥"; }
+.icon-user-plus::before { content: "➕👤"; }
+.icon-building::before { content: "🏢"; }
+.icon-home::before { content: "🏠"; }
+.icon-phone::before { content: "☎"; }
+.icon-envelope::before { content: "✉"; }
+.icon-location::before { content: "📍"; }
+
+/* Misc Icons */
+.icon-inbox::before { content: "📭"; }
+.icon-redo::before { content: "↻"; }
+.icon-refresh::before { content: "🔄"; }
+.icon-bell::before { content: "🔔"; }
+.icon-star::before { content: "★"; }
+.icon-heart::before { content: "♥"; }
+.icon-flag::before { content: "🚩"; }
+.icon-bookmark::before { content: "🔖"; }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    [class^="icon-"],
+    [class*=" icon-"] {
+        margin-right: 0.25em;
+    }
+}
+
+/* Icon sizing utilities */
+.icon-lg { font-size: 1.3em; }
+.icon-2x { font-size: 2em; }
+.icon-3x { font-size: 3em; }
+
+/* Icon colors */
+.icon-primary { color: #2563eb; }
+.icon-success { color: #10b981; }
+.icon-warning { color: #f59e0b; }
+.icon-danger { color: #ef4444; }
+.icon-info { color: #0ea5e9; }
+.icon-muted { color: #6b7280; }
+
+/* Compatibility with Bootstrap badge sizing */
+.badge [class^="icon-"],
+.badge [class*=" icon-"] {
+    margin-right: 0.25em;
+    font-size: 0.85em;
+}
+
+/* Compatibility with Button sizing */
+.btn [class^="icon-"],
+.btn [class*=" icon-"] {
+    margin-right: 0.35em;
+}
+
+.btn-sm [class^="icon-"],
+.btn-sm [class*=" icon-"] {
+    font-size: 0.85em;
+    margin-right: 0.25em;
+}
+
+/* Link styling for icons */
+a [class^="icon-"],
+a [class*=" icon-"] {
+    color: inherit;
+}

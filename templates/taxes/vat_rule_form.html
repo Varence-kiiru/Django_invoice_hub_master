@@ -1,0 +1,221 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-section { margin-bottom: 2rem; }
+    .form-section h6 { 
+        color: #495057; 
+        font-weight: 600; 
+        padding-bottom: 0.5rem; 
+        border-bottom: 2px solid #e9ecef;
+        margin-bottom: 1rem;
+    }
+    .help-text { font-size: 0.85rem; color: #6c757d; margin-top: 0.25rem; }
+    .required-indicator { color: #dc3545; }
+    .tips-panel { background: #f8f9fa; border-left: 4px solid #0d6efd; }
+    .current-values { background: #f0f7ff; border-left: 4px solid #0d6efd; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="mb-4">
+        <a href="{% url 'taxes:vat-rules-list' %}" class="btn btn-outline-secondary btn-sm mb-3">
+            <i class="bi bi-arrow-left"></i> Back to VAT Rules
+        </a>
+        <h1>{% if action == 'create' %}Create New VAT Rule{% else %}Edit VAT Rule: {{ vat_rule.name }}{% endif %}</h1>
+        <p class="text-muted">Define conditional VAT applicability rules</p>
+    </div>
+
+    <div class="row">
+        <!-- Form Column -->
+        <div class="col-lg-8">
+            <form method="POST" id="vat-rule-form">
+                {% csrf_token %}
+
+                <!-- Basic Information Section -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><i class="bi bi-info-circle"></i> Basic Information</h6>
+                    </div>
+                    <div class="card-body">
+                        <!-- Rule Name -->
+                        <div class="mb-3">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">
+                                Rule Name <span class="required-indicator">*</span>
+                            </label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="invalid-feedback d-block">{{ form.name.errors.0 }}</div>
+                            {% endif %}
+                            <small class="help-text">
+                                Descriptive name for this VAT rule (e.g., "Export goods - zero-rated")
+                            </small>
+                        </div>
+
+                        <!-- Tax Class -->
+                        <div class="mb-3">
+                            <label for="{{ form.tax_class.id_for_label }}" class="form-label">
+                                Tax Class <span class="required-indicator">*</span>
+                            </label>
+                            {{ form.tax_class }}
+                            {% if form.tax_class.errors %}
+                                <div class="invalid-feedback d-block">{{ form.tax_class.errors.0 }}</div>
+                            {% endif %}
+                            <small class="help-text">
+                                Select which product tax class this rule applies to
+                            </small>
+                        </div>
+
+                        <!-- Tax Rate -->
+                        <div class="mb-3">
+                            <label for="{{ form.tax_rate.id_for_label }}" class="form-label">
+                                Tax Rate <span class="required-indicator">*</span>
+                            </label>
+                            {{ form.tax_rate }}
+                            {% if form.tax_rate.errors %}
+                                <div class="invalid-feedback d-block">{{ form.tax_rate.errors.0 }}</div>
+                            {% endif %}
+                            <small class="help-text">
+                                Select the tax rate to apply for this rule
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configuration Section -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><i class="bi bi-sliders"></i> Configuration</h6>
+                    </div>
+                    <div class="card-body">
+                        <!-- Priority -->
+                        <div class="mb-3">
+                            <label for="{{ form.priority.id_for_label }}" class="form-label">
+                                Priority <span class="required-indicator">*</span>
+                            </label>
+                            {{ form.priority }}
+                            {% if form.priority.errors %}
+                                <div class="invalid-feedback d-block">{{ form.priority.errors.0 }}</div>
+                            {% endif %}
+                            <small class="help-text">
+                                Higher priority rules are evaluated first. Example: 100 for exports, 90 for exempt, 10 for standard
+                            </small>
+                        </div>
+
+                        <!-- Active Status -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form.is_active }}
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                    Active <span class="required-indicator">*</span>
+                                </label>
+                            </div>
+                            {% if form.is_active.errors %}
+                                <div class="invalid-feedback d-block">{{ form.is_active.errors.0 }}</div>
+                            {% endif %}
+                            <small class="help-text d-block mt-1">
+                                Uncheck to temporarily disable this rule
+                            </small>
+                        </div>
+
+                        <!-- Condition (Optional) -->
+                        <div class="mb-3">
+                            <label for="{{ form.condition.id_for_label }}" class="form-label">
+                                Condition (Optional)
+                            </label>
+                            {{ form.condition }}
+                            {% if form.condition.errors %}
+                                <div class="invalid-feedback d-block">{{ form.condition.errors.0 }}</div>
+                            {% endif %}
+                            <small class="help-text">
+                                Reserved for future use: JSON-based rule conditions (e.g., customer country, export status)
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="d-flex gap-2">
+                    <a href="{% url 'taxes:vat-rules-list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> {% if action == 'create' %}Create Rule{% else %}Update Rule{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sidebar Column -->
+        <div class="col-lg-4">
+            <!-- Tips Panel -->
+            <div class="card tips-panel mb-4">
+                <div class="card-header border-0 bg-transparent">
+                    <h6 class="mb-0"><i class="bi bi-lightbulb"></i> Tips</h6>
+                </div>
+                <div class="card-body small">
+                    <div class="mb-3">
+                        <strong>Priority Levels:</strong>
+                        <ul class="mb-0 mt-2 ps-3">
+                            <li><strong>100:</strong> Highest (special cases like exports)</li>
+                            <li><strong>90:</strong> High (exempt supplies)</li>
+                            <li><strong>50:</strong> Medium (intermediate rates)</li>
+                            <li><strong>10:</strong> Low (default/standard rate)</li>
+                        </ul>
+                    </div>
+                    <div class="border-top pt-3">
+                        <strong>Rule Evaluation:</strong>
+                        <p class="mb-0 mt-2">
+                            Rules are evaluated in priority order. The first matching rule determines the applicable tax rate.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Values Panel (Edit Mode) -->
+            {% if action == 'edit' %}
+            <div class="card current-values">
+                <div class="card-header border-0 bg-transparent">
+                    <h6 class="mb-0"><i class="bi bi-info-circle"></i> Current Values</h6>
+                </div>
+                <div class="card-body small">
+                    <div class="mb-2">
+                        <strong>Rule Name:</strong><br>
+                        <code>{{ vat_rule.name }}</code>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Tax Class:</strong><br>
+                        <span class="badge bg-secondary">{{ vat_rule.tax_class.name }}</span>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Tax Rate:</strong><br>
+                        <span class="badge bg-info">{{ vat_rule.tax_rate.rate_percentage }}% - {{ vat_rule.tax_rate.code }}</span>
+                    </div>
+                    <div>
+                        <strong>Priority:</strong> {{ vat_rule.priority }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Info Box -->
+            <div class="card border-info mt-4">
+                <div class="card-body small text-info">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>What is a VAT Rule?</strong><br>
+                    <p class="mb-0 mt-2">
+                        A VAT rule defines conditional applicability of tax rates based on product tax classifications. 
+                        Rules allow you to apply different tax rates to different product categories.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

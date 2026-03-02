@@ -1,0 +1,47 @@
+{% autoescape off %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; }
+        .email-container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #e3f2fd; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+        .content { line-height: 1.6; margin-bottom: 20px; }
+        .button { display: inline-block; padding: 12px 24px; background: #2196f3; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+        .detail-box { background: #f9f9f9; padding: 15px; border-left: 4px solid #2196f3; margin: 15px 0; }
+        .footer { font-size: 12px; color: #999; border-top: 1px solid #ddd; padding-top: 20px; margin-top: 30px; }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h2 style="margin: 0; color: #2c3e50;">📄 Invoice Generated from Quotation</h2>
+        </div>
+
+        <div class="content">
+            <p>Hello {{ client_name }},</p>
+
+            <p>Great news! Your accepted quotation has been converted to an official invoice. Please see the details below:</p>
+
+            <div class="detail-box">
+                <p><strong>Original Quotation:</strong> {{ quote_number }}</p>
+                <p><strong>Invoice Number:</strong> {{ invoice_number }}</p>
+                <p><strong>Total Amount:</strong> {{ total_amount }}</p>
+                <p><strong>Due Date:</strong> {{ due_date }}</p>
+            </div>
+
+            <p>An official invoice PDF has been attached for your records. Please ensure payment is made by the due date indicated above.</p>
+
+            <p>If you have any questions about this invoice or need clarification on any line items, please don't hesitate to contact us.</p>
+
+            <p>Thank you for your business!</p>
+        </div>
+
+        <div class="footer">
+            <p>This is an automated message. Please do not reply to this email. For inquiries, please contact our office directly.</p>
+        </div>
+    </div>
+</body>
+</html>
+{% endautoescape %}

@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Professional invoicing and finance management system">
+  <meta name="theme-color" content="#d4af37">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <title>{% block title %}Invoicing App{% endblock %}</title>
+
+  <!-- CSS Files - Global and Layout Styles -->
+  <link rel="stylesheet" href="{% static 'css/variables.css' %}">
+  <link rel="stylesheet" href="{% static 'css/core/typography.css' %}">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+  <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/navbar.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/sidebar.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/footer.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/flash-messages.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/buttons.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/cards.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/badges.css' %}">
+  <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+  <!-- Custom Bootstrap Framework (Modal, Forms, Utilities - No external dependencies) -->
+  <link rel="stylesheet" href="{% static 'css/custom-bootstrap.css' %}">
+
+  <!-- Responsive Design (Tablet & Mobile) -->
+  <link rel="stylesheet" href="{% static 'css/responsive/tablet.css' %}">
+  <link rel="stylesheet" href="{% static 'css/responsive/mobile.css' %}">
+
+  <!-- Additional CSS Blocks (for template-specific styles) -->
+  {% block extra_css %}{% endblock %}
+
+  <!-- Favicon - Dynamic from company settings or static fallback -->
+  {% if company_settings and company_settings.company_logo %}
+    <link rel="icon" type="image/jpeg" href="{{ company_settings.get_logo_url }}">
+    <link rel="apple-touch-icon" href="{{ company_settings.get_logo_url }}">
+  {% else %}
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+  {% endif %}
+
+  <!-- Theme Management (Loaded early to prevent flash) -->
+  <script src="{% static 'js/theme.js' %}" defer></script>
+</head>
+
+<body>
+  <!-- Skip to Main Content (Accessibility) -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- ==================== NAVBAR ==================== -->
+  {% include '1_base/navbar.html' %}
+
+  <!-- ==================== SIDEBAR ==================== -->
+  {% include '1_base/sidebar.html' %}
+
+  <!-- Sidebar Mobile Overlay -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- ==================== FLASH MESSAGES ==================== -->
+  {% include '1_base/flash_messages.html' %}
+
+  <!-- ==================== MAIN CONTENT AREA ==================== -->
+  <main role="main" id="main-content">
+    <div class="page-container">
+      {% block page_header %}
+      <header class="page-header">
+        <div class="page-header-content">
+          <h1 class="page-title">{% block page_title %}Welcome{% endblock %}</h1>
+          {% if page_description %}
+          <p class="page-description">{% block page_description %}{% endblock %}</p>
+          {% endif %}
+        </div>
+        <div class="page-actions">
+          {% block page_actions %}{% endblock %}
+        </div>
+      </header>
+      {% endblock %}
+
+      <!-- Main Page Content -->
+      {% block content %}
+      <div class="page-default">
+        <p class="text-muted">This is the main content area. Extend this template and override the <code>content</code> block.</p>
+      </div>
+      {% endblock %}
+    </div>
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  {% include '1_base/footer.html' %}
+
+  <!-- ==================== FILTER MODALS ==================== -->
+  {% include '10_modals/filter_modals.html' %}
+
+  <!-- JavaScript Files - Navigation and Interactions -->
+  <script src="{% static 'js/app.js' %}"></script>
+  <script src="{% static 'js/navigation.js' %}"></script>
+  <script src="{% static 'js/components/sidebar.js' %}"></script>
+  <script type="module" src="{% static 'js/utils/api-client.js' %}"></script>
+  <script type="module" src="{% static 'js/notifications.js' %}"></script>
+
+  <!-- Utility Scripts - No External Dependencies -->
+  <script src="{% static 'js/modals.js' %}"></script>
+  <script src="{% static 'js/forms.js' %}"></script>
+  <script src="{% static 'js/date-utils.js' %}"></script>
+  <script src="{% static 'js/formatting.js' %}"></script>
+  <script src="{% static 'js/invoice-line-items.js' %}"></script>
+  <script src="{% static 'js/global_search.js' %}"></script>
+
+  <!-- Service Worker Registration for PWA features -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      // Ensure correct path to service worker
+      const swPath = '{% static "js/sw.js" %}';
+      if (swPath && swPath.includes('js/sw.js')) {
+        navigator.serviceWorker.register(swPath + '?v=v2.0.1')
+          .then(registration => {
+            console.log('Service Worker registered successfully:', registration);
+          })
+          .catch(error => {
+            console.warn('Service Worker registration failed (PWA features will be limited):', error.message);
+          });
+      }
+    }
+  </script>
+
+  <!-- Additional JavaScript Blocks (for template-specific scripts) -->
+  {% block extra_js %}{% endblock %}
+
+  <!-- Inline Script for Dynamic Year -->
+  <script>
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+  </script>
+</body>
+
+</html>

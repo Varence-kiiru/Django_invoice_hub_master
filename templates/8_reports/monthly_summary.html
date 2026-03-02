@@ -1,0 +1,127 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h2 mb-2">Monthly Financial Summary</h1>
+            <p class="text-muted">Month-over-month financial overview</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'core:reports-invoices' %}" class="btn btn-outline-secondary">Back to Reports</a>
+        </div>
+    </div>
+
+    <!-- Reports Navigation Tabs -->
+    <div class="card mb-4 border-top border-primary border-3">
+        <div class="card-body p-2">
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'core:reports-invoices' %}" class="btn btn-sm btn-outline-primary">📄 Invoices</a>
+                <a href="{% url 'core:reports-payments' %}" class="btn btn-sm btn-outline-primary">💰 Payments</a>
+                <a href="{% url 'core:reports-vat' %}" class="btn btn-sm btn-outline-primary">🏛️ VAT</a>
+                <a href="{% url 'core:reports-aging' %}" class="btn btn-sm btn-outline-primary">📈 Aging</a>
+                <a href="{% url 'core:reports-outstanding' %}" class="btn btn-sm btn-outline-primary">⚠️ Outstanding</a>
+                <a href="{% url 'core:reports-product-sales' %}" class="btn btn-sm btn-outline-primary">📊 Sales</a>
+                <a href="{% url 'core:reports-monthly-summary' %}" class="btn btn-sm btn-primary active">📅 Monthly</a>
+                <a href="{% url 'core:reports-tax' %}" class="btn btn-sm btn-outline-primary">📋 Tax</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title small mb-2 opacity-85">Total Invoices</h6>
+                    <h3 class="mb-0">{{ total_invoices|default:0 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title small mb-2 opacity-85">Total Revenue</h6>
+                    <h3 class="mb-0">KES {{ total_revenue|default:'0.00' }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title small mb-2 opacity-85">Outstanding</h6>
+                    <h3 class="mb-0">KES {{ total_outstanding|default:'0.00' }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title small mb-2 opacity-85">Total Clients</h6>
+                    <h3 class="mb-0">{{ total_clients|default:0 }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Data Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h6 class="mb-0 fw-bold">Monthly Breakdown</h6>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Month</th>
+                        <th class="text-end">Invoices</th>
+                        <th class="text-end">Revenue</th>
+                        <th class="text-end">Payments</th>
+                        <th class="text-end">Outstanding</th>
+                        <th class="text-end">VAT Collected</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if monthly_data %}
+                        {% for data in monthly_data %}
+                        <tr>
+                            <td><strong>{{ data.month|date:"M Y" }}</strong></td>
+                            <td class="text-end">{{ data.invoices }}</td>
+                            <td class="text-end">KES {{ data.revenue|floatformat:2 }}</td>
+                            <td class="text-end">KES {{ data.payments|floatformat:2 }}</td>
+                            <td class="text-end">KES {{ data.outstanding|floatformat:2 }}</td>
+                            <td class="text-end">KES {{ data.vat|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            <i class="bi bi-inbox"></i> No data available
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Print Button -->
+    <div class="d-flex justify-content-end gap-2 mt-4">
+        <button onclick="location.href='{% url 'core:monthly-report-pdf' %}'" class="btn btn-outline-secondary">
+            <i class="bi bi-printer"></i> Download PDF
+        </button>
+        <a href="{% url 'core:reports-invoices' %}" class="btn btn-secondary">Back</a>
+    </div>
+</div>
+
+<style>
+    @media print {
+        .btn, .row:has(.col-md-4) { display: none !important; }
+        .card { box-shadow: none !important; border: 1px solid #ccc !important; }
+    }
+</style>
+{% endblock %}

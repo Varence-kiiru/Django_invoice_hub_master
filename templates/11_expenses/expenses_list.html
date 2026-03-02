@@ -1,0 +1,354 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Expenses - Invoicing App{% endblock %}
+
+{% block page_title %}Expenses{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'expenses:create' %}" class="btn btn-primary">
+    <span aria-hidden="true">➕</span> New Expense
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Stats Cards -->
+    <div class="stats-grid" role="region" aria-label="Expense summary">
+        <div class="stat-card">
+            <div class="stat-label">Total Amount</div>
+            <div class="stat-value">{{ total_amount|floatformat:2 }}</div>
+            <div class="stat-change">Across all expenses</div>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filters-section">
+        <form method="get" class="filters-form">
+            <div class="filters-row">
+                <!-- Search -->
+                <div class="filter-group">
+                    <input type="text" name="search" class="form-control" 
+                           placeholder="Search by description, reference, or vendor"
+                           value="{{ search_query }}">
+                </div>
+
+                <!-- Status Filter -->
+                <div class="filter-group">
+                    <select name="status" class="form-control">
+                        <option value="">All Statuses</option>
+                        {% for status in all_statuses %}
+                        <option value="{{ status }}" {% if status == status_filter %}selected{% endif %}>
+                            {{ status|title }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Category Filter -->
+                <div class="filter-group">
+                    <select name="category" class="form-control">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if category.id|stringformat:"s" == category_filter %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Vendor Filter -->
+                <div class="filter-group">
+                    <select name="vendor" class="form-control">
+                        <option value="">All Vendors</option>
+                        {% for vendor in vendors %}
+                        <option value="{{ vendor.id }}" {% if vendor.id|stringformat:"s" == vendor_filter %}selected{% endif %}>
+                            {{ vendor.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Submit -->
+                <div class="filter-group">
+                    <button type="submit" class="btn btn-primary">
+                        <span aria-hidden="true">🔍</span> Filter
+                    </button>
+                    <a href="{% url 'expenses:list' %}" class="btn btn-secondary">
+                        <span aria-hidden="true">↺</span> Clear
+                    </a>
+                </div>
+            </div>
+
+            <!-- Date Range -->
+            <div class="filters-row">
+                <div class="filter-group">
+                    <input type="date" name="start_date" class="form-control" 
+                           placeholder="Start Date" value="{{ start_date }}">
+                </div>
+                <div class="filter-group">
+                    <input type="date" name="end_date" class="form-control" 
+                           placeholder="End Date" value="{{ end_date }}">
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Expense Summary by Status -->
+    {% if by_status %}
+    <div class="summary-section">
+        <h3 class="section-title">Summary by Status</h3>
+        <div class="summary-grid">
+            {% for status_info in by_status %}
+            <div class="summary-card">
+                <div class="summary-label">{{ status_info.status|title }}</div>
+                <div class="summary-count">{{ status_info.count }}</div>
+                <div class="summary-amount">{{ currency_symbol }}{{ status_info.total|default:0|floatformat:2 }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Expenses Table -->
+    <div class="table-section">
+        <table class="table table-striped table-hover" role="grid" aria-label="Expenses list">
+            <thead>
+                <tr>
+                    <th scope="col">Description</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Vendor</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                <tr>
+                    <td><strong>{{ expense.description }}</strong></td>
+                    <td>
+                        <span class="badge badge-light">{{ expense.category.name }}</span>
+                    </td>
+                    <td>
+                        {% if expense.vendor %}
+                        <a href="{% url 'expenses:vendors-detail' expense.vendor.id %}">
+                            {{ expense.vendor.name }}
+                        </a>
+                        {% else %}
+                        <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ expense.amount|floatformat:2 }}</td>
+                    <td>{{ expense.expense_date|date:"M d, Y" }}</td>
+                    <td>
+                        <span class="badge badge-{{ expense.status|lower }}">
+                            {{ expense.status|title }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'expenses:detail' expense.id %}" class="btn btn-sm btn-info" title="View">
+                            👁️
+                        </a>
+                        {% if expense.status == 'draft' %}
+                        <a href="{% url 'expenses:edit' expense.id %}" class="btn btn-sm btn-warning" title="Edit">
+                            ✏️
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted">
+                        No expenses found. <a href="{% url 'expenses:create' %}">Create one</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav class="pagination-nav" aria-label="Pagination">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li><a href="?page=1{{ query_string }}">« First</a></li>
+            <li><a href="?page={{ page_obj.previous_page_number }}{{ query_string }}">‹ Previous</a></li>
+            {% endif %}
+
+            <li class="active"><span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+
+            {% if page_obj.has_next %}
+            <li><a href="?page={{ page_obj.next_page_number }}{{ query_string }}">Next ›</a></li>
+            <li><a href="?page={{ page_obj.paginator.num_pages }}{{ query_string }}">Last »</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<style>
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    opacity: 0.8;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.stat-change {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.filters-section {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.filters-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.filters-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 150px;
+}
+
+.filter-group input,
+.filter-group select {
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.summary-section {
+    margin-bottom: 2rem;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.summary-card {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    text-align: center;
+}
+
+.summary-label {
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+.summary-count {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.summary-amount {
+    font-size: 0.875rem;
+    color: #667eea;
+    margin-top: 0.5rem;
+}
+
+.table-section {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+}
+
+.badge-draft {
+    background-color: #e9ecef;
+    color: #495057;
+}
+
+.badge-submitted {
+    background-color: #e3f2fd;
+    color: #1565c0;
+}
+
+.badge-approved {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.badge-rejected {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.badge-paid {
+    background-color: #f3e5f5;
+    color: #6a1b9a;
+}
+
+.pagination-nav {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+}
+
+.pagination a {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #667eea;
+}
+
+.pagination a:hover {
+    background-color: #f0f0f0;
+}
+
+.pagination .active {
+    padding: 0.5rem 1rem;
+}
+</style>
+{% endblock %}

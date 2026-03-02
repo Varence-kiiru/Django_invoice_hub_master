@@ -1,0 +1,146 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Help & Documentation - Invoice System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/help_support/help_articles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="articles-header">
+        <h1>📚 Help & Documentation</h1>
+        <p>Comprehensive guides and tutorials to help you get the most out of our invoicing system</p>
+    </div>
+
+    <!-- Search & Controls -->
+    <div class="articles-controls">
+        <div class="articles-search">
+            <form method="GET" style="display: flex; gap: 10px; width: 100%;">
+                <input 
+                    type="text" 
+                    name="search" 
+                    placeholder="Search articles..." 
+                    value="{{ search_query }}"
+                    style="flex: 1;"
+                >
+                <button type="submit">🔍 Search</button>
+            </form>
+        </div>
+
+        <div>
+            <div style="font-size: 0.9rem; font-weight: 600; color: #666; margin-bottom: 10px; text-transform: uppercase;">Categories</div>
+            <div class="category-pills">
+                <a href="{% url 'core:help-articles' %}" class="category-pill {% if not selected_category %}active{% endif %}">
+                    All Categories
+                </a>
+                {% for key, label in categories %}
+                <a href="{% url 'core:help-articles' %}?category={{ key }}" class="category-pill {% if selected_category == key %}active{% endif %}">
+                    {{ label }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Articles Grid -->
+    <div class="articles-grid">
+        {% if articles %}
+            {% for article in articles %}
+            <a href="{% url 'core:help-article-detail' article.slug %}" style="text-decoration: none; color: inherit;">
+                <div class="article-card {% if article.featured %}article-card-featured{% endif %}">
+                    <div class="article-card-header">
+                        {% if 'invoicing' in article.category %}📄
+                        {% elif 'payments' in article.category %}💰
+                        {% elif 'clients' in article.category %}👥
+                        {% elif 'products' in article.category %}📦
+                        {% elif 'reports' in article.category %}📊
+                        {% elif 'settings' in article.category %}⚙️
+                        {% elif 'getting-started' in article.category %}🚀
+                        {% elif 'integration' in article.category %}🔗
+                        {% elif 'api' in article.category %}📡
+                        {% elif 'troubleshooting' in article.category %}🔧
+                        {% else %}📖{% endif %}
+                    </div>
+                    <div class="article-card-content">
+                        <div class="article-card-category">{{ article.get_category_display }}</div>
+                        <h3 class="article-card-title">{{ article.title }}</h3>
+                        <p class="article-card-excerpt">{{ article.excerpt|truncatewords:20 }}</p>
+                        <div class="article-card-footer">
+                            <span>👁️ {{ article.views_count }} views</span>
+                            <span class="article-card-link">Read More →</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        {% else %}
+        <div class="no-results">
+            <div class="no-results-icon">🔍</div>
+            <h3>No Articles Found</h3>
+            <p>Try adjusting your search terms or category filter</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination-wrapper">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                        First
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                        Previous
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                            {{ num }}
+                        </a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                        Next
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                        Last
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+
+    <!-- CTA Section -->
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 30px; border-radius: 8px; margin-top: 50px; text-align: center;">
+        <h3 style="margin-bottom: 15px; font-size: 1.3rem;">Didn't find what you need?</h3>
+        <p style="margin-bottom: 20px; opacity: 0.95;">Our support team is here to help you</p>
+        <a href="{% url 'core:support-form' %}" style="display: inline-block; background: white; color: #667eea; padding: 10px 25px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: all 0.3s;">
+            Contact Support →
+        </a>
+    </div>
+</div>
+{% endblock %}

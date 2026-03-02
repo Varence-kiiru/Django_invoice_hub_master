@@ -1,0 +1,49 @@
+<!-- Generic Confirm Delete Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-danger bg-opacity-10">
+        <h5 class="modal-title" id="confirmDeleteLabel">
+          <span aria-hidden="true">⚠</span> Confirm Delete
+        </h5>
+        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <p id="deleteMessage">This action cannot be undone. Are you sure?</p>
+        <div class="alert alert-danger alert-sm alert-icon" role="alert">
+          <span aria-hidden="true">🔒</span>
+          <span>This will permanently delete the selected item.</span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <form id="deleteForm" method="POST" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">
+            <span aria-hidden="true">✕</span> Delete
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Modal trigger from delete buttons
+document.querySelectorAll('.btn-delete').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    const message = this.getAttribute('data-message') || 'This action cannot be undone. Are you sure?';
+    const form = this.getAttribute('data-form');
+    document.getElementById('deleteMessage').textContent = message;
+    const deleteForm = document.getElementById('deleteForm');
+    deleteForm.action = form;
+    // Show modal
+    const modal = document.getElementById('confirmDeleteModal');
+    modal.classList.add('show');
+    modal.style.display = 'flex';
+  });
+});
+</script>

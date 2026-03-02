@@ -1,0 +1,297 @@
+<div class="filter-section">
+    <div class="filter-header">
+        <button class="filter-toggle" onclick="toggleAdvancedFilter('quotations-filter')">
+            <span class="toggle-icon">▼</span>
+            <span>Advanced Filters</span>
+            {% if total_filters > 0 %}
+                <span class="filter-badge">{{ total_filters }} active</span>
+            {% endif %}
+        </button>
+    </div>
+
+    <div id="quotations-filter" class="filter-panel" {% if not request.GET.keys|length %}style="display: none;"{% endif %}>
+        <form method="get" action="" class="filter-form">
+            <div class="filter-grid">
+                
+                <!-- Status Filter -->
+                <div class="filter-group">
+                    <label for="status-filter">Status</label>
+                    <select id="status-filter" name="status" class="filter-input" multiple>
+                        <option value="">-- All Statuses --</option>
+                        <option value="draft" {% if 'draft' in current_filters.status|default:'' %}selected{% endif %}>Draft</option>
+                        <option value="issued" {% if 'issued' in current_filters.status|default:'' %}selected{% endif %}>Issued</option>
+                        <option value="sent" {% if 'sent' in current_filters.status|default:'' %}selected{% endif %}>Sent</option>
+                        <option value="viewed" {% if 'viewed' in current_filters.status|default:'' %}selected{% endif %}>Viewed</option>
+                        <option value="accepted" {% if 'accepted' in current_filters.status|default:'' %}selected{% endif %}>Accepted</option>
+                        <option value="rejected" {% if 'rejected' in current_filters.status|default:'' %}selected{% endif %}>Rejected</option>
+                        <option value="expired" {% if 'expired' in current_filters.status|default:'' %}selected{% endif %}>Expired</option>
+                        <option value="converted" {% if 'converted' in current_filters.status|default:'' %}selected{% endif %}>Converted</option>
+                        <option value="archived" {% if 'archived' in current_filters.status|default:'' %}selected{% endif %}>Archived</option>
+                    </select>
+                </div>
+
+                <!-- Client Search -->
+                <div class="filter-group">
+                    <label for="client-name-filter">Client Name</label>
+                    <input 
+                        type="text" 
+                        id="client-name-filter" 
+                        name="client_name" 
+                        class="filter-input" 
+                        placeholder="Search client..."
+                        value="{{ client_name|default:'' }}"
+                    >
+                </div>
+
+                <!-- Quote Number Search -->
+                <div class="filter-group">
+                    <label for="quote-number-filter">Quote Number</label>
+                    <input 
+                        type="text" 
+                        id="quote-number-filter" 
+                        name="quote_number" 
+                        class="filter-input" 
+                        placeholder="e.g., QUOTE-2026-001"
+                        value="{{ quote_number|default:'' }}"
+                    >
+                </div>
+
+                <!-- Amount Range -->
+                <div class="filter-group">
+                    <label for="min-amount-filter">Min Amount</label>
+                    <input 
+                        type="number" 
+                        id="min-amount-filter" 
+                        name="min_amount" 
+                        class="filter-input" 
+                        placeholder="0.00"
+                        step="0.01"
+                        value="{{ min_amount|default:'' }}"
+                    >
+                </div>
+
+                <div class="filter-group">
+                    <label for="max-amount-filter">Max Amount</label>
+                    <input 
+                        type="number" 
+                        id="max-amount-filter" 
+                        name="max_amount" 
+                        class="filter-input" 
+                        placeholder="9999.99"
+                        step="0.01"
+                        value="{{ max_amount|default:'' }}"
+                    >
+                </div>
+
+                <!-- Quote Date Range -->
+                <div class="filter-group">
+                    <label for="from-date-filter">Quote Date From</label>
+                    <input 
+                        type="date" 
+                        id="from-date-filter" 
+                        name="from_date" 
+                        class="filter-input"
+                        value="{{ from_date|default:'' }}"
+                    >
+                </div>
+
+                <div class="filter-group">
+                    <label for="to-date-filter">Quote Date To</label>
+                    <input 
+                        type="date" 
+                        id="to-date-filter" 
+                        name="to_date" 
+                        class="filter-input"
+                        value="{{ to_date|default:'' }}"
+                    >
+                </div>
+
+                <!-- Valid Until Range -->
+                <div class="filter-group">
+                    <label for="valid-from-filter">Valid Until From</label>
+                    <input 
+                        type="date" 
+                        id="valid-from-filter" 
+                        name="valid_until_from" 
+                        class="filter-input"
+                        value="{{ valid_until_from|default:'' }}"
+                    >
+                </div>
+
+                <div class="filter-group">
+                    <label for="valid-to-filter">Valid Until To</label>
+                    <input 
+                        type="date" 
+                        id="valid-to-filter" 
+                        name="valid_until_to" 
+                        class="filter-input"
+                        value="{{ valid_until_to|default:'' }}"
+                    >
+                </div>
+
+                <!-- Expired Filter -->
+                <div class="filter-group">
+                    <label for="expired-filter">Status</label>
+                    <select id="expired-filter" name="is_expired" class="filter-input">
+                        <option value="">-- Any Status --</option>
+                        <option value="false" {% if is_expired == False %}selected{% endif %}>Active (Not Expired)</option>
+                        <option value="true" {% if is_expired == True %}selected{% endif %}>Expired</option>
+                    </select>
+                </div>
+
+                <!-- Full-Text Search -->
+                <div class="filter-group">
+                    <label for="search-filter">Full-Text Search</label>
+                    <input 
+                        type="text" 
+                        id="search-filter" 
+                        name="q" 
+                        class="filter-input" 
+                        placeholder="Search all fields..."
+                        value="{{ search_query|default:'' }}"
+                    >
+                </div>
+
+            </div>
+
+            <!-- Actions -->
+            <div class="filter-actions">
+                <button type="submit" class="btn-filter-apply">
+                    <span class="icon">✓</span> Apply Filters
+                </button>
+                <a href="{% url 'quotations:list' %}" class="btn-filter-clear">
+                    <span class="icon">✕</span> Clear All
+                </a>
+                <button type="button" class="btn-filter-save" onclick="openSaveFilterModal('quotation')">
+                    <span class="icon">💾</span> Save Filter
+                </button>
+                <select class="btn-filter-preset" onchange="if(this.value) loadSavedFilter(this.value); this.value=''">
+                    <option value="">📋 Load Saved Filter...</option>
+                    {% for filter in user_filters %}
+                        <option value="{{ filter.id }}">{{ filter.name }}{% if filter.is_global %} (Team){% endif %}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.filter-section { margin-bottom: 20px; }
+.filter-header { display: flex; align-items: center; margin-bottom: 10px; }
+.filter-toggle { 
+    background: #f5f5f5; 
+    border: 1px solid #ddd; 
+    padding: 10px 15px; 
+    cursor: pointer; 
+    border-radius: 4px;
+    font-weight: 500;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.filter-toggle:hover { background: #eeeeee; }
+.toggle-icon { font-size: 12px; transition: transform 0.2s; }
+.filter-toggle.open .toggle-icon { transform: rotate(180deg); }
+.filter-badge { 
+    background: #3498db; 
+    color: white; 
+    padding: 2px 8px; 
+    border-radius: 12px; 
+    font-size: 11px; 
+    font-weight: 600;
+}
+
+.filter-panel { 
+    background: #f9f9f9; 
+    border: 1px solid #ddd; 
+    border-top: none;
+    padding: 20px; 
+    border-radius: 0 0 4px 4px;
+    display: none;
+}
+.filter-panel.open { display: block; }
+
+.filter-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+    gap: 15px; 
+    margin-bottom: 15px;
+}
+.filter-grid .full-width { grid-column: 1 / -1; }
+
+.filter-group { display: flex; flex-direction: column; }
+.filter-group label { 
+    font-weight: 600; 
+    margin-bottom: 5px; 
+    font-size: 12px; 
+    text-transform: uppercase;
+    color: #555;
+}
+.filter-input { 
+    padding: 8px 10px; 
+    border: 1px solid #ddd; 
+    border-radius: 4px;
+    font-size: 13px;
+}
+.filter-input:focus { outline: none; border-color: #3498db; background: #f0f8ff; }
+
+.filter-range { display: flex; gap: 8px; align-items: center; }
+.range-input { flex: 1; }
+.range-separator { color: #999; font-weight: 500; }
+
+.filter-actions { 
+    display: flex; 
+    gap: 10px; 
+    flex-wrap: wrap; 
+    margin-top: 15px;
+    border-top: 1px solid #ddd;
+    padding-top: 15px;
+}
+
+.btn-filter-apply, .btn-filter-clear, .btn-filter-save, .btn-filter-preset {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.btn-filter-apply { 
+    background: #3498db; 
+    color: white;
+}
+.btn-filter-apply:hover { background: #2980b9; }
+
+.btn-filter-clear { 
+    background: #e74c3c; 
+    color: white;
+    text-decoration: none;
+}
+.btn-filter-clear:hover { background: #c0392b; }
+
+.btn-filter-save { 
+    background: #27ae60; 
+    color: white;
+}
+.btn-filter-save:hover { background: #229954; }
+
+.btn-filter-preset {
+    background: #f39c12;
+    color: white;
+    padding: 8px 14px;
+}
+.btn-filter-preset:hover { background: #d68910; }
+
+.icon { font-size: 14px; }
+
+@media (max-width: 768px) {
+    .filter-grid { grid-template-columns: 1fr; }
+    .filter-actions { flex-direction: column; }
+    .btn-filter-apply, .btn-filter-clear, .btn-filter-save, .btn-filter-preset { width: 100%; justify-content: center; }
+}
+</style>

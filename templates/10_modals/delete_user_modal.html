@@ -1,0 +1,25 @@
+<!-- Delete Confirmation Modal -->
+<div id="delete-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Delete User</h2>
+      <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p><strong>⚠️ Warning:</strong> This action cannot be undone.</p>
+      <p>Are you sure you want to delete <strong id="deleteUserName"></strong>? All associated data will be preserved but the user account will be permanently removed.</p>
+      <div class="modal-warning">
+        <strong>Before deleting:</strong>
+        <ul>
+          <li>Ensure no active sessions are using this account</li>
+          <li>Reassign any pending invoices or tasks</li>
+          <li>Archive user data if needed</li>
+        </ul>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDeleteUser()">Delete User</button>
+    </div>
+  </div>
+</div>

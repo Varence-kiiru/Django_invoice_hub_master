@@ -1,0 +1,120 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}{{ article.title }} - Invoice System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/help_support/help_article_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="article-wrapper">
+        <!-- Breadcrumb -->
+        <div class="article-breadcrumb">
+            <a href="{% url 'core:help-center' %}">Help Center</a>
+            <span>/</span>
+            <a href="{% url 'core:help-articles' %}">Documentation</a>
+            <span>/</span>
+            <span>{{ article.title }}</span>
+        </div>
+
+        <!-- Article Header -->
+        <div class="article-header">
+            <div class="article-category">{{ article.get_category_display }}</div>
+            <h1 class="article-title">{{ article.title }}</h1>
+            <div class="article-meta">
+                <div class="article-meta-item">
+                    <span>✏️</span>
+                    <span>By {{ article.author }}</span>
+                </div>
+                <div class="article-meta-item">
+                    <span>📅</span>
+                    <span>Updated {{ article.updated_at|date:"M d, Y" }}</span>
+                </div>
+                <div class="article-meta-item">
+                    <span>👁️</span>
+                    <span>{{ article.views_count }} views</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Article Content -->
+        <div class="article-content">
+            {{ article.content|safe }}
+        </div>
+
+        <!-- Article Footer -->
+        <div class="article-footer">
+            <!-- Helpful Rating -->
+            <div class="article-helpful">
+                <div class="article-helpful-text">Was this article helpful?</div>
+                <div class="article-helpful-buttons">
+                    <button class="article-helpful-btn" onclick="markHelpful({{ article.id }}, true);">
+                        👍 Yes, helpful
+                    </button>
+                    <button class="article-helpful-btn" onclick="markHelpful({{ article.id }}, false);">
+                        👎 No, not helpful
+                    </button>
+                </div>
+            </div>
+
+            <!-- Author Info -->
+            <div class="article-author-info">
+                <div class="article-author-label">Article Author</div>
+                <div class="article-author-name">{{ article.author }}</div>
+            </div>
+
+            <!-- Support CTA -->
+            <div style="text-align: center;">
+                <p style="margin-bottom: 15px; color: #666;">
+                    Still have questions? Our support team is here to help.
+                </p>
+                <a href="{% url 'core:support-form' %}" class="article-helpful-btn" style="border-color: #667eea; color: #667eea;">
+                    💬 Contact Support
+                </a>
+            </div>
+        </div>
+
+        <!-- Related Articles -->
+        {% if related_articles %}
+        <div class="article-related">
+            <h2 class="article-related-title">📚 Related Articles</h2>
+            <div class="article-related-grid">
+                {% for related in related_articles %}
+                <a href="{% url 'core:help-article-detail' related.slug %}" class="article-related-item">
+                    <div class="article-related-icon">
+                        {% if 'invoicing' in related.category %}📄
+                        {% elif 'payments' in related.category %}💰
+                        {% elif 'clients' in related.category %}👥
+                        {% elif 'products' in related.category %}📦
+                        {% elif 'reports' in related.category %}📊
+                        {% elif 'settings' in related.category %}⚙️
+                        {% else %}📖{% endif %}
+                    </div>
+                    <div class="article-related-name">{{ related.title }}</div>
+                    <div class="article-related-desc">{{ related.excerpt|truncatewords:15 }}</div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Support CTA -->
+        <div class="support-cta">
+            <h3>Need More Help?</h3>
+            <p>Can't find what you're looking for? Contact our support team for personalized assistance.</p>
+            <a href="{% url 'core:support-form' %}" class="support-cta-btn">
+                Get Support
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function markHelpful(articleId, helpful) {
+    alert('Thank you for your feedback!');
+    // In production, this would make an AJAX call to save the rating
+}
+</script>
+{% endblock %}

@@ -1,0 +1,297 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Email Settings - Administration{% endblock %}
+
+{% block page_title %}Email Settings{% endblock %}
+{% block page_description %}Configure email notifications and SMTP settings{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/settings_email.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <!-- Page Header -->
+  <div class="settings-header">
+    <div class="header-content">
+      <h2>Email Settings</h2>
+      <p class="text-muted">Configure SMTP server and email notification preferences</p>
+    </div>
+  </div>
+
+  <!-- Settings Form -->
+  <form method="POST" class="settings-form">
+    {% csrf_token %}
+
+    <!-- SMTP Configuration Section -->
+    <div class="card mb-4">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">📧 SMTP Configuration</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="smtp_host" class="form-label">SMTP Host</label>
+            <input type="text" class="form-control" id="smtp_host" name="smtp_host" 
+                   placeholder="smtp.gmail.com" value="{{ email_config.smtp_host }}">
+            <small class="text-muted">SMTP server address</small>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="smtp_port" class="form-label">SMTP Port</label>
+            <input type="number" class="form-control" id="smtp_port" name="smtp_port" 
+                   placeholder="587" value="{{ email_config.smtp_port }}">
+            <small class="text-muted">Default: 587 (TLS) or 465 (SSL)</small>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="smtp_username" class="form-label">SMTP Username</label>
+            <input type="text" class="form-control" id="smtp_username" name="smtp_username" 
+                   placeholder="your-email@gmail.com" value="{{ email_config.smtp_username }}">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="smtp_password" class="form-label">SMTP Password</label>
+            <input type="password" class="form-control" id="smtp_password" name="smtp_password" 
+                   placeholder="••••••••">
+            <small class="text-muted">Your SMTP password or app-specific password</small>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Encryption Method</label>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="smtp_use_tls" name="smtp_use_tls" 
+                     {% if email_config.smtp_use_tls %}checked{% endif %}>
+              <label class="form-check-label" for="smtp_use_tls">
+                Use TLS (Port 587)
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="smtp_use_ssl" name="smtp_use_ssl"
+                     {% if email_config.smtp_use_ssl %}checked{% endif %}>
+              <label class="form-check-label" for="smtp_use_ssl">
+                Use SSL (Port 465)
+              </label>
+            </div>
+            <small class="text-muted">Select one or none</small>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="from_email" class="form-label">From Email Address</label>
+            <input type="email" class="form-control" id="from_email" name="from_email" 
+                   placeholder="noreply@example.com" value="{{ email_config.from_email }}">
+            <small class="text-muted">Email address for sending notifications</small>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="from_name" class="form-label">From Name</label>
+            <input type="text" class="form-control" id="from_name" name="from_name" 
+                   placeholder="Invoice System" value="{{ email_config.from_name }}">
+            <small class="text-muted">Display name in recipient's email client</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Email Notifications Section -->
+    <div class="card mb-4">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">🔔 Email Notifications</h5>
+      </div>
+      <div class="card-body">
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="enable_invoice_created" name="enable_invoice_created" 
+                 {% if email_config.enable_invoice_created %}checked{% endif %}>
+          <label class="form-check-label" for="enable_invoice_created">
+            <strong>Invoice Created</strong>
+            <small class="text-muted d-block">Send notification when a new invoice is created</small>
+          </label>
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="enable_invoice_sent" name="enable_invoice_sent" 
+                 {% if email_config.enable_invoice_sent %}checked{% endif %}>
+          <label class="form-check-label" for="enable_invoice_sent">
+            <strong>Invoice Sent to Client</strong>
+            <small class="text-muted d-block">Send notification when invoice is sent</small>
+          </label>
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="enable_payment_received" name="enable_payment_received" 
+                 {% if email_config.enable_payment_received %}checked{% endif %}>
+          <label class="form-check-label" for="enable_payment_received">
+            <strong>Payment Received</strong>
+            <small class="text-muted d-block">Send notification when payment is received</small>
+          </label>
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="enable_payment_overdue" name="enable_payment_overdue" 
+                 {% if email_config.enable_payment_overdue %}checked{% endif %}>
+          <label class="form-check-label" for="enable_payment_overdue">
+            <strong>Payment Overdue</strong>
+            <small class="text-muted d-block">Send notification for overdue payments</small>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Client Notifications Section -->
+    <div class="card mb-4">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">👥 Client Email Settings</h5>
+      </div>
+      <div class="card-body">
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="send_to_client_on_creation" name="send_to_client_on_creation" 
+                 {% if email_config.send_to_client_on_creation %}checked{% endif %}>
+          <label class="form-check-label" for="send_to_client_on_creation">
+            <strong>Send Invoice to Client on Creation</strong>
+            <small class="text-muted d-block">Automatically email invoices to clients when created</small>
+          </label>
+        </div>
+        <div class="mb-3">
+          <label for="days_before_due_reminder" class="form-label">Days Before Sending Reminder</label>
+          <input type="number" class="form-control" id="days_before_due_reminder" name="days_before_due_reminder" 
+                 placeholder="3" value="{{ email_config.days_before_due_reminder }}" min="0">
+          <small class="text-muted">Send payment reminder X days before due date (0 = no reminder)</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Test Email Section -->
+    <div class="card mb-4">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">✉️ Test Email Connection</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label for="test_email" class="form-label">Test Email Address</label>
+          <input type="email" class="form-control" id="test_email" name="test_email" 
+                 placeholder="your-email@example.com">
+          <small class="text-muted">Enter email address to receive test message</small>
+        </div>
+        <button type="button" class="btn btn-outline-primary" id="send_test_btn">📧 Send Test Email</button>
+        <div id="test_result" style="display:none; margin-top: 1rem;" class="alert"></div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">💾 Save Settings</button>
+      <button type="reset" class="btn btn-secondary">↺ Reset</button>
+    </div>
+  </form>
+</div>
+
+<style>
+.settings-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.settings-header h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.75rem;
+  color: #333;
+}
+
+.settings-header .text-muted {
+  margin: 0;
+  color: #6c757d;
+}
+
+.settings-form .card {
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #dee2e6;
+}
+
+.form-check-label {
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+  }
+}
+</style>
+
+<script>
+document.getElementById('send_test_btn').addEventListener('click', async function() {
+  const testEmail = document.getElementById('test_email').value;
+  const resultDiv = document.getElementById('test_result');
+  
+  if (!testEmail) {
+    resultDiv.classList.remove('alert-success', 'alert-danger');
+    resultDiv.classList.add('alert-danger');
+    resultDiv.textContent = 'Please enter a test email address';
+    resultDiv.style.display = 'block';
+    return;
+  }
+  
+  // Show loading state
+  const btn = this;
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  resultDiv.style.display = 'none';
+  
+  try {
+    const formData = new FormData();
+    formData.append('test_email', testEmail);
+    formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+    
+    const response = await fetch('{% url "core:test-email" %}', {
+      method: 'POST',
+      body: formData
+    });
+    
+    // Check if response is JSON
+    const contentType = response.headers.get('content-type');
+    let data;
+    
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      // If not JSON, it's probably an error page
+      const text = await response.text();
+      console.error('Non-JSON response:', text);
+      throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+    }
+    
+    resultDiv.classList.remove('alert-success', 'alert-danger');
+    if (data.success) {
+      resultDiv.classList.add('alert-success');
+    } else {
+      resultDiv.classList.add('alert-danger');
+    }
+    
+    resultDiv.textContent = data.message;
+    resultDiv.style.display = 'block';
+    
+  } catch (error) {
+    resultDiv.classList.remove('alert-success', 'alert-danger');
+    resultDiv.classList.add('alert-danger');
+    resultDiv.textContent = 'Error sending test email: ' + error.message;
+    resultDiv.style.display = 'block';
+    console.error('Test email error:', error);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalText;
+  }
+});
+</script>
+{% endblock %}

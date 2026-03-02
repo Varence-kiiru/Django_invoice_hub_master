@@ -1,0 +1,168 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Record Payment{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/payments.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="payment-form-container" data-currency-symbol="{{ company_settings.currency_symbol }}">
+    <div class="page-header">
+        <h1>Record Payment</h1>
+        <p>Process a payment for an invoice</p>
+    </div>
+    
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger" role="alert">
+        <strong>Error:</strong>
+        {% for error in form.non_field_errors %}
+            <div>{{ error }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <form method="post" action="{% url 'payments:create' %}">
+        {% csrf_token %}
+        
+        <!-- Invoice Selection -->
+        <div class="form-section">
+            <h2>Select Invoice</h2>
+            
+            <div class="form-group {% if form.invoice.errors %}has-error{% endif %}">
+                <label for="{{ form.invoice.id_for_label }}">{{ form.invoice.label }}</label>
+                {{ form.invoice }}
+                {% if form.invoice.errors %}
+                    <div class="form-error">{{ form.invoice.errors.0 }}</div>
+                {% endif %}
+                <div class="form-help-text">Choose an unpaid invoice from your list</div>
+            </div>
+        </div>
+        
+        <!-- Invoice Summary (JavaScript populated) -->
+        <div class="form-section" id="invoice-summary-section" style="display: none;">
+            <h2>Invoice Summary</h2>
+            <div class="invoice-summary">
+                <div class="summary-row">
+                    <span class="summary-label">Invoice Number:</span>
+                    <span class="summary-value" id="summary-invoice-number">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Client:</span>
+                    <span class="summary-value" id="summary-client">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Total Amount:</span>
+                    <span class="summary-value" id="summary-total">{{ company_settings.currency_symbol }}0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Amount Paid:</span>
+                    <span class="summary-value" id="summary-paid">{{ company_settings.currency_symbol }}0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Outstanding Balance:</span>
+                    <span class="summary-value summary-outstanding" id="summary-outstanding">{{ company_settings.currency_symbol }}0.00</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Payment Details -->
+        <div class="form-section">
+            <h2>Payment Details</h2>
+            
+            <div class="form-group {% if form.amount.errors %}has-error{% endif %}">
+                <label for="{{ form.amount.id_for_label }}">{{ form.amount.label }}</label>
+                {{ form.amount }}
+                {% if form.amount.errors %}
+                    <div class="form-error">{{ form.amount.errors.0 }}</div>
+                {% endif %}
+                <div class="payment-amount-info" style="display: none;" id="amount-info">
+                    Payment cannot exceed outstanding balance
+                </div>
+            </div>
+            
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group {% if form.payment_method.errors %}has-error{% endif %}">
+                    <label for="{{ form.payment_method.id_for_label }}">{{ form.payment_method.label }}</label>
+                    {{ form.payment_method }}
+                    {% if form.payment_method.errors %}
+                        <div class="form-error">{{ form.payment_method.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group {% if form.payment_date.errors %}has-error{% endif %}">
+                    <label for="{{ form.payment_date.id_for_label }}">{{ form.payment_date.label }}</label>
+                    {{ form.payment_date }}
+                    {% if form.payment_date.errors %}
+                        <div class="form-error">{{ form.payment_date.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-group {% if form.transaction_reference.errors %}has-error{% endif %}">
+                <label for="{{ form.transaction_reference.id_for_label }}">{{ form.transaction_reference.label }}</label>
+                {{ form.transaction_reference }}
+                {% if form.transaction_reference.errors %}
+                    <div class="form-error">{{ form.transaction_reference.errors.0 }}</div>
+                {% endif %}
+                <div class="form-help-text">Optional: Check number, reference ID, or transaction code</div>
+            </div>
+            
+            <div class="form-group {% if form.notes.errors %}has-error{% endif %}">
+                <label for="{{ form.notes.id_for_label }}">{{ form.notes.label }}</label>
+                {{ form.notes }}
+                {% if form.notes.errors %}
+                    <div class="form-error">{{ form.notes.errors.0 }}</div>
+                {% endif %}
+                <div class="form-help-text">Optional: Any additional payment notes</div>
+            </div>
+        </div>
+        
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success">Record Payment</button>
+            <a href="{% url 'invoices:list' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const invoiceSelect = document.getElementById('id_invoice');
+        const summarySection = document.getElementById('invoice-summary-section');
+        const amountInput = document.getElementById('id_amount');
+        const amountInfo = document.getElementById('amount-info');
+        const currencySymbol = document.querySelector('.payment-form-container').getAttribute('data-currency-symbol');
+        
+        // Fetch and display invoice details when selected
+        invoiceSelect?.addEventListener('change', function() {
+            if (!this.value) {
+                summarySection.style.display = 'none';
+                return;
+            }
+            
+            // Fetch invoice data via AJAX
+            fetch(`/api/invoices/${this.value}/detail/`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('summary-invoice-number').textContent = data.invoice_number;
+                    document.getElementById('summary-client').textContent = data.client_name;
+                    document.getElementById('summary-total').textContent = `${currencySymbol}${parseFloat(data.total_amount).toFixed(2)}`;
+                    document.getElementById('summary-paid').textContent = `${currencySymbol}${parseFloat(data.amount_paid).toFixed(2)}`;
+                    document.getElementById('summary-outstanding').textContent = `${currencySymbol}${parseFloat(data.amount_due).toFixed(2)}`;
+                    
+                    // Set maximum payment amount
+                    amountInput.max = data.amount_due;
+                    summarySection.style.display = 'block';
+                })
+                .catch(error => console.error('Error fetching invoice details:', error));
+        });
+        
+        // Show/hide amount info
+        amountInput?.addEventListener('change', function() {
+            amountInfo.style.display = this.value ? 'block' : 'none';
+        });
+    });
+</script>
+{% endblock %}

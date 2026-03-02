@@ -1,0 +1,135 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Client Addresses - {{ client.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/clients.css' }">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Manage Addresses</h1>
+        <div class="breadcrumb">{{ client.name }}</div>
+    </div>
+    <a href="{% url 'clients:detail' client.id %}" class="btn btn-secondary">Back to Client</a>
+</div>
+
+<!-- Current Addresses -->
+<div class="section">
+    <div class="section-title">Addresses on File</div>
+    
+    {% if addresses %}
+        {% for address in addresses %}
+        <div class="address-card">
+            <div class="address-card-content">
+                <div class="address-type">{{ address.get_address_type_display }}</div>
+                <div class="address-text">
+                    {{ address.street_address }}<br>
+                    {% if address.street_address_2 %}
+                        {{ address.street_address_2 }}<br>
+                    {% endif %}
+                    {{ address.city }}, {{ address.state }} {{ address.postal_code }}<br>
+                    {% if address.country %}
+                        {{ address.country }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="address-actions">
+                <a href="#edit-{{ address.id }}" class="btn btn-primary btn-small" onclick="editAddress({{ address.id }})">Edit</a>
+                <form method="post" action="{% url 'clients:address-delete' address.id %}" style="display: inline;" onsubmit="return confirm('Delete this address?');"> 
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary btn-small" style="width: 100%; padding: 6px 12px;">Delete</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-message">No addresses recorded. Add one below.</div>
+    {% endif %}
+</div>
+
+<!-- Add/Edit Address Form -->
+<div class="section">
+    <div class="section-title">
+        {% if editing %}
+            Edit Address
+        {% else %}
+            Add New Address
+        {% endif %}
+    </div>
+    
+    <form method="post" class="form-container">
+        {% csrf_token %}
+        
+        <div class="form-group required">
+            <label>{{ form.address_type.label }}</label>
+            {{ form.address_type }}
+            {% if form.address_type.errors %}
+                <div class="form-error">{{ form.address_type.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group required">
+            <label>{{ form.street_address.label }}</label>
+            {{ form.street_address }}
+            {% if form.street_address.errors %}
+                <div class="form-error">{{ form.street_address.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label>{{ form.street_address_2.label }}</label>
+            {{ form.street_address_2 }}
+            {% if form.street_address_2.errors %}
+                <div class="form-error">{{ form.street_address_2.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group required">
+            <label>{{ form.city.label }}</label>
+            {{ form.city }}
+            {% if form.city.errors %}
+                <div class="form-error">{{ form.city.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group required">
+            <label>{{ form.state.label }}</label>
+            {{ form.state }}
+            {% if form.state.errors %}
+                <div class="form-error">{{ form.state.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group required">
+            <label>{{ form.postal_code.label }}</label>
+            {{ form.postal_code }}
+            {% if form.postal_code.errors %}
+                <div class="form-error">{{ form.postal_code.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label>{{ form.country.label }}</label>
+            {{ form.country }}
+            {% if form.country.errors %}
+                <div class="form-error">{{ form.country.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save Address</button>
+            <a href="{% url 'clients:detail' client.id %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    function editAddress(id) {
+        // Implementation: Load address into form for editing
+        // This would be handled by the view passing in pre-filled form
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - Invoicing App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .offline-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 60px 40px;
+            text-align: center;
+            max-width: 500px;
+        }
+        
+        .offline-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 32px;
+        }
+        
+        p {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        
+        .status-info {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            text-align: left;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+        
+        .status-info h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .status-info ul {
+            list-style: none;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .status-info li {
+            padding: 8px 0;
+        }
+        
+        .status-info li:before {
+            content: "✓ ";
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #f0f4ff;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .helpful-tips {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #eee;
+            text-align: left;
+        }
+        
+        .helpful-tips h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .helpful-tips ul {
+            list-style: none;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .helpful-tips li {
+            padding: 8px 0;
+            line-height: 1.5;
+        }
+        
+        .helpful-tips li:before {
+            content: "→ ";
+            color: #667eea;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="offline-icon">📡</div>
+        <h1>You're Currently Offline</h1>
+        <p>Your internet connection appears to be offline. Some features may be limited.</p>
+        
+        <div class="status-info">
+            <h3>✓ What You Can Still Do</h3>
+            <ul>
+                <li>View cached invoices and reports</li>
+                <li>Access your dashboard</li>
+                <li>Review saved invoices</li>
+            </ul>
+        </div>
+        
+        <div class="actions">
+            <button class="btn btn-primary" onclick="location.reload()">
+                🔄 Try Again
+            </button>
+            <a href="/" class="btn btn-secondary">
+                ← Go to Dashboard
+            </a>
+        </div>
+        
+        <div class="helpful-tips">
+            <h3>Quick Tips</h3>
+            <ul>
+                <li>Check your internet connection</li>
+                <li>Restart your WiFi or mobile data</li>
+                <li>Try refreshing the page once you're online</li>
+                <li>Check if your service provider has any outages</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

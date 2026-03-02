@@ -1,0 +1,165 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Delete Category - Invoicing App{% endblock %}
+
+{% block page_title %}Delete Category{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="confirm-container">
+        <div class="confirm-card">
+            <div class="confirm-icon warn">
+                <span aria-hidden="true">⚠️</span>
+            </div>
+
+            <h2>Delete Category?</h2>
+            
+            <p class="confirm-message">
+                You are about to delete the category <strong>{{ category.name }}</strong>.
+            </p>
+
+            {% if category.expenses.all %}
+            <div class="alert alert-warning">
+                <strong>Warning:</strong> This category has {{ category.expenses.count }} associated expense(s). 
+                Deleting this category will also delete all associated expenses.
+            </div>
+            {% endif %}
+
+            <p class="confirm-subtext">
+                This action cannot be undone. Please confirm if you want to proceed.
+            </p>
+
+            <div class="confirm-actions">
+                <form method="post" class="confirm-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-lg">
+                        <span aria-hidden="true">🗑️</span> Delete Category
+                    </button>
+                </form>
+                <a href="{% url 'expenses:categories-list' %}" class="btn btn-secondary btn-lg">
+                    <span aria-hidden="true">❌</span> Cancel
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.confirm-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    padding: 2rem 0;
+}
+
+.confirm-card {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.confirm-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+}
+
+.confirm-icon.warn {
+    color: #ff9800;
+}
+
+.confirm-card h2 {
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.confirm-message {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.confirm-subtext {
+    font-size: 0.9rem;
+    color: #999;
+    margin: 1rem 0 2rem 0;
+}
+
+.confirm-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.confirm-form {
+    margin: 0;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-danger {
+    background-color: #d32f2f;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #b71c1c;
+}
+
+.btn-secondary {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background-color: #d0d0d0;
+}
+
+.btn-lg {
+    padding: 0.75rem 1rem;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-left: 4px solid #ff9800;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 4px;
+}
+
+@media (max-width: 600px) {
+    .confirm-card {
+        padding: 1.5rem;
+    }
+
+    .confirm-actions {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}

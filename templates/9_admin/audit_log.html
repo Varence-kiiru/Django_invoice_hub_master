@@ -1,0 +1,180 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Audit Log - Administration{% endblock %}
+
+{% block page_title %}Audit Log{% endblock %}
+{% block page_description %}View system-wide activity and compliance audit trail{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/audit_log.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <!-- Filters Section -->
+  <div class="admin-filters">
+    <div class="filter-group">
+      <form method="get" class="filter-form">
+        <div class="filter-row">
+          <div class="form-group">
+            <label for="action-filter">Action Type</label>
+            <select id="action-filter" name="action" class="form-control">
+              <option value="" {% if not selected_action %}selected{% endif %}>All Actions</option>
+              <option value="create" {% if selected_action == 'create' %}selected{% endif %}>Create</option>
+              <option value="update" {% if selected_action == 'update' %}selected{% endif %}>Update</option>
+              <option value="delete" {% if selected_action == 'delete' %}selected{% endif %}>Delete</option>
+              <option value="login" {% if selected_action == 'login' %}selected{% endif %}>Login</option>
+              <option value="logout" {% if selected_action == 'logout' %}selected{% endif %}>Logout</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="user-filter">User</label>
+            <select id="user-filter" name="user" class="form-control">
+              <option value="" {% if not selected_user %}selected{% endif %}>All Users</option>
+              {% for user in users %}
+                <option value="{{ user.id }}" {% if selected_user|stringformat:'s' == user.id|stringformat:'s' %}selected{% endif %}>{{ user.get_full_name|default:user.username }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="date-from">From Date</label>
+            <input type="date" id="date-from" name="date_from" class="form-control" value="{{ selected_date_from }}">
+          </div>
+
+          <div class="form-group">
+            <label for="date-to">To Date</label>
+            <input type="date" id="date-to" name="date_to" class="form-control" value="{{ selected_date_to }}">
+          </div>
+
+          <button type="submit" class="btn btn-primary">Filter</button>
+          <a href="{% url 'core:audit-log' %}" class="btn btn-secondary">Reset</a>
+        </div>
+      </form>
+    </div>
+
+    <div class="filter-stats">
+      <span class="stat-badge">Total Records: {{ logs.paginator.count }}</span>
+    </div>
+  </div>
+
+  <!-- Audit Log Table -->
+  <div class="admin-table-wrapper">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>User</th>
+          <th>Action</th>
+          <th>Content Type</th>
+          <th>Object ID</th>
+          <th>Changes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if logs %}
+          {% for log in logs %}
+            <tr class="audit-row">
+              <td class="timestamp">
+                <span class="date">{{ log.timestamp|date:"M d, Y" }}</span>
+                <span class="time">{{ log.timestamp|time:"H:i" }}</span>
+              </td>
+              <td class="user">
+                {% if log.actor %}
+                  <strong>{{ log.actor.get_full_name|default:log.actor.username }}</strong>
+                {% else %}
+                  <strong>System</strong>
+                {% endif %}
+              </td>
+              <td class="action">
+                <span class="action-badge action-{{ log.action|lower }}">
+                  {{ log.get_action_display }}
+                </span>
+              </td>
+              <td class="content-type">{{ log.entity_type }}</td>
+              <td class="object-id">{{ log.entity_id|default:"-" }}</td>
+              <td class="changes">
+                {% if log.old_values or log.new_values %}
+                  <button class="btn-details" onclick="toggleDetails(this)">View</button>
+                  <div class="details-preview">
+                    {% if log.old_values %}<strong>Old:</strong><pre>{{ log.old_values }}</pre>{% endif %}
+                    {% if log.new_values %}<strong>New:</strong><pre>{{ log.new_values }}</pre>{% endif %}
+                  </div>
+                {% else %}
+                  <span class="text-muted">-</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="6" class="text-center py-4">
+              <p class="text-muted">No audit logs found</p>
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if logs.has_other_pages %}
+    <div class="admin-pagination">
+      <nav aria-label="Page navigation">
+        <ul class="pagination">
+          <!-- Previous Page -->
+          {% if logs.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page=1{% if selected_action %}&action={{ selected_action }}{% endif %}{% if selected_user %}&user={{ selected_user }}{% endif %}{% if selected_date_from %}&date_from={{ selected_date_from }}{% endif %}{% if selected_date_to %}&date_to={{ selected_date_to }}{% endif %}">« First</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ logs.previous_page_number }}{% if selected_action %}&action={{ selected_action }}{% endif %}{% if selected_user %}&user={{ selected_user }}{% endif %}{% if selected_date_from %}&date_from={{ selected_date_from }}{% endif %}{% if selected_date_to %}&date_to={{ selected_date_to }}{% endif %}">‹ Previous</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">« First</span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link">‹ Previous</span>
+            </li>
+          {% endif %}
+
+          <!-- Page Numbers -->
+          <li class="page-item active">
+            <span class="page-link">Page {{ logs.number }} of {{ logs.paginator.num_pages }}</span>
+          </li>
+
+          <!-- Next Page -->
+          {% if logs.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ logs.next_page_number }}{% if selected_action %}&action={{ selected_action }}{% endif %}{% if selected_user %}&user={{ selected_user }}{% endif %}{% if selected_date_from %}&date_from={{ selected_date_from }}{% endif %}{% if selected_date_to %}&date_to={{ selected_date_to }}{% endif %}">Next ›</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ logs.paginator.num_pages }}{% if selected_action %}&action={{ selected_action }}{% endif %}{% if selected_user %}&user={{ selected_user }}{% endif %}{% if selected_date_from %}&date_from={{ selected_date_from }}{% endif %}{% if selected_date_to %}&date_to={{ selected_date_to }}{% endif %}">Last »</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">Next ›</span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link">Last »</span>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+  function toggleDetails(button) {
+    const preview = button.nextElementSibling;
+    if (preview) {
+      preview.classList.toggle('show');
+      button.textContent = preview.classList.contains('show') ? 'Hide' : 'View';
+    }
+  }
+</script>
+{% endblock %}

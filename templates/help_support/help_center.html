@@ -1,0 +1,121 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Help & Support Center - Invoice System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/help_support/help_center.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-0">
+    <!-- Hero Section -->
+    <div class="help-hero">
+        <h1>🎯 Help & Support Center</h1>
+        <p>Find answers, explore guides, and get support for your invoicing needs</p>
+    </div>
+
+    <!-- Search Box -->
+    <div class="help-search-box">
+        <form method="GET" action="{% url 'core:help-articles' %}">
+            <input 
+                type="text" 
+                name="search" 
+                placeholder="Search articles, FAQs, and more..." 
+                value=""
+            >
+        </form>
+        <div class="search-quick-links">
+            <div class="quick-links-title">Quick Links</div>
+            <div class="quick-links">
+                <a href="{% url 'core:faq' %}" class="quick-link">📌 FAQs</a>
+                <a href="{% url 'core:help-articles' %}" class="quick-link">📚 Documentation</a>
+                <a href="{% url 'core:support-form' %}" class="quick-link">💬 Contact Support</a>
+                <a href="{% url 'core:support-tickets' %}" class="quick-link">🎫 My Tickets</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured Articles Section -->
+    {% if featured_articles %}
+    <div class="help-section">
+        <h2 class="help-section-title">📚 Featured Articles</h2>
+        <div class="featured-grid">
+            {% for article in featured_articles %}
+            <div class="featured-card">
+                <div class="featured-card-icon">
+                    {% if 'invoicing' in article.category %}📄
+                    {% elif 'payments' in article.category %}💰
+                    {% elif 'clients' in article.category %}👥
+                    {% elif 'products' in article.category %}📦
+                    {% elif 'reports' in article.category %}📊
+                    {% elif 'settings' in article.category %}⚙️
+                    {% elif 'integration' in article.category %}🔗
+                    {% elif 'api' in article.category %}📡
+                    {% else %}📖{% endif %}
+                </div>
+                <h3 class="featured-card-title">{{ article.title }}</h3>
+                <p class="featured-card-desc">{{ article.excerpt|truncatewords:20 }}</p>
+                <a href="{% url 'core:help-article-detail' article.slug %}" class="featured-card-link">
+                    Read Article
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Browse by Category -->
+    <div class="help-section">
+        <h2 class="help-section-title">🗂️ Browse by Category</h2>
+        <div class="category-grid">
+            {% for key, label in article_categories %}
+            <a href="{% url 'core:help-articles' %}?category={{ key }}" class="category-btn">
+                {{ label }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Popular FAQs Section -->
+    {% if popular_faqs %}
+    <div class="help-section">
+        <h2 class="help-section-title">❓ Popular Questions</h2>
+        <div class="popular-items">
+            {% for faq in popular_faqs %}
+            <a href="{% url 'core:faq' %}?search={{ faq.question|urlencode }}" class="popular-item" style="text-decoration: none; color: inherit;">
+                <div class="popular-item-title">{{ faq.question }}</div>
+                <div class="popular-item-meta">
+                    {{ faq.get_category_display }} • {{ faq.views_count }} views
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <div style="text-align: center; margin-top: 25px;">
+            <a href="{% url 'core:faq' %}" class="btn-help btn-help-secondary">
+                View All FAQs →
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    <div class="help-section" style="text-align: center; padding-top: 20px;">
+        <h2 class="help-section-title" style="display: block; margin: 0 0 30px 0;">Need More Help?</h2>
+        <div class="action-buttons" style="max-width: 500px; margin: 0 auto;">
+            <a href="{% url 'core:faq' %}" class="btn-help btn-help-primary">
+                📌 View FAQs
+            </a>
+            <a href="{% url 'core:support-form' %}" class="btn-help btn-help-primary">
+                💬 Contact Us
+            </a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'core:support-tickets' %}" class="btn-help btn-help-secondary">
+                🎫 Support Tickets
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

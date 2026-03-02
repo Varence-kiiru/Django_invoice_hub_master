@@ -1,0 +1,72 @@
+{% extends "layouts/pdf_base.html" %}
+
+{% block title %}Client Aging Report{% endblock %}
+
+{% block content %}
+<div class="pdf-header">
+    {% if company_logo %}
+        <img src="{{ company_logo }}" alt="Logo" class="pdf-logo">
+    {% endif %}
+    <div class="company-info">
+        <h2>{{ company_name }}</h2>
+        <p>{{ company_address }}</p>
+        <p>Tel: {{ company_phone }}</p>
+        <p>Email: {{ company_email }}</p>
+        {% if company_tax_id %}
+        <p>Tax ID: {{ company_tax_id }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="report-title">Client Receivables Aging Report</div>
+<div class="report-subtitle">Outstanding amounts by client and aging period</div>
+
+<!-- Statistics -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Total Outstanding</div>
+        <div class="stat-value">KES {{ total_due|default:'0.00' }}</div>
+        <div class="stat-detail">All clients</div>
+    </div>
+</div>
+
+<!-- Aging Details Table -->
+<div class="section-title">Client Aging Analysis</div>
+
+{% if aging_data %}
+<table>
+    <thead>
+        <tr>
+            <th>Client Name</th>
+            <th>Total Due</th>
+            <th>Overdue</th>
+            <th>Days Overdue</th>
+            <th>Aging %</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in aging_data %}
+        <tr>
+            <td><strong>{{ item.client.name }}</strong></td>
+            <td class="amount">KES {{ item.total_due|floatformat:2 }}</td>
+            <td class="amount">KES {{ item.overdue|floatformat:2 }}</td>
+            <td class="amount">{{ item.days_overdue }}</td>
+            <td class="amount">
+                {{ item.percentage }}%
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="no-data">No outstanding invoices found</div>
+{% endif %}
+
+<!-- Summary -->
+<table class="summary-table">
+    <tr>
+        <td class="label">Total Outstanding:</td>
+        <td class="value">KES {{ total_due|default:'0.00' }}</td>
+    </tr>
+</table>
+{% endblock %}

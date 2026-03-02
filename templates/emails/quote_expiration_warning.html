@@ -1,0 +1,44 @@
+{% autoescape off %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; }
+        .email-container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #fff3e0; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+        .content { line-height: 1.6; margin-bottom: 20px; }
+        .button { display: inline-block; padding: 12px 24px; background: #ff9800; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+        .detail-box { background: #f9f9f9; padding: 15px; border-left: 4px solid #ff9800; margin: 15px 0; }
+        .footer { font-size: 12px; color: #999; border-top: 1px solid #ddd; padding-top: 20px; margin-top: 30px; }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h2 style="margin: 0; color: #2c3e50;">⏰ Quotation Expiring Soon</h2>
+        </div>
+
+        <div class="content">
+            <p>Hello {{ client_name }},</p>
+
+            <p>This is a friendly reminder that the quotation we provided is expiring soon. Please review and let us know if you would like to proceed.</p>
+
+            <div class="detail-box">
+                <p><strong>Quotation Number:</strong> {{ quote_number }}</p>
+                <p><strong>Expires On:</strong> {{ valid_until }}</p>
+                <p><strong>Days Remaining:</strong> {{ days_remaining }} day{{ days_remaining|pluralize }}</p>
+            </div>
+
+            <p>If you would like to accept this quotation or if you need any changes, please contact us as soon as possible. Once the expiration date passes, we may need to revise the pricing and terms.</p>
+
+            <p>We are here to help and look forward to hearing from you!</p>
+        </div>
+
+        <div class="footer">
+            <p>This is an automated message. Please do not reply to this email. For inquiries, please contact our office directly.</p>
+        </div>
+    </div>
+</body>
+</html>
+{% endautoescape %}

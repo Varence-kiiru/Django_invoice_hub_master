@@ -1,0 +1,199 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Match Payment - Invoicing App{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/payments.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <div class="row">
+            <div class="col-md-8">
+                <h1 class="page-title">🔗 Match Payment</h1>
+                <p class="text-muted">Match payment #{{ payment.id }} to an invoice</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{% url 'payments:detail' payment.id %}" class="btn btn-outline-secondary">← Back to Payment</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        <!-- Payment Information -->
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">💰 Payment Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Payment ID</label>
+                        <p class="form-control-plaintext">#{{ payment.id }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Amount</label>
+                        <p class="form-control-plaintext fs-4 text-success">{{ payment.currency }} {{ payment.amount|floatformat:2 }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Method</label>
+                        <p class="form-control-plaintext">{{ payment.payment_method.name }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Date</label>
+                        <p class="form-control-plaintext">{{ payment.payment_date|date:"F j, Y" }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Reference</label>
+                        <p class="form-control-plaintext">{{ payment.transaction_reference|default:"—" }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Status</label>
+                        <span class="badge bg-warning">{{ payment.get_status_display }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Matching Tips -->
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">💡 Matching Tips</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="text-muted">
+                        <li>Look for matching transaction references</li>
+                        <li>Check for amounts that match invoice totals</li>
+                        <li>Consider invoices issued around the payment date</li>
+                        <li>Partial payments are allowed</li>
+                        <li>Multiple invoices can be matched to one payment</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice Matching -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">📄 Select Invoice to Match</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Search and Filter -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <input type="text" name="search" class="form-control" placeholder="Search invoices...">
+                            </div>
+                            <div class="col-md-6">
+                                <select name="client" class="form-select">
+                                    <option value="">All Clients</option>
+                                    <!-- Client options would go here -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Invoices List -->
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Select</th>
+                                        <th>Invoice</th>
+                                        <th>Client</th>
+                                        <th>Date</th>
+                                        <th>Total</th>
+                                        <th>Due</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Invoice rows would be populated here -->
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="invoice_ids" value="1">
+                                        </td>
+                                        <td>INV-2024-0001</td>
+                                        <td>Client Name</td>
+                                        <td>Jan 1, 2024</td>
+                                        <td>KES 1,000.00</td>
+                                        <td>KES 1,000.00</td>
+                                        <td><span class="badge bg-primary">Issued</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Matching Amount -->
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Match Amount</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">{{ payment.currency }}</span>
+                                        <input type="number" name="match_amount" class="form-control" 
+                                               value="{{ payment.amount }}" step="0.01" min="0" max="{{ payment.amount }}">
+                                    </div>
+                                    <small class="form-text text-muted">Amount to match to selected invoice(s)</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Remaining Amount</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">{{ payment.currency }}</span>
+                                        <input type="text" class="form-control" value="0.00" readonly>
+                                    </div>
+                                    <small class="form-text text-muted">Amount left unmatched</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Matching Notes</label>
+                            <textarea name="matching_notes" class="form-control" rows="3" 
+                                      placeholder="Any notes about this matching..."></textarea>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                ✅ Match Payment
+                            </button>
+                            <a href="{% url 'payments:detail' payment.id %}" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Matched Invoices -->
+            <div class="card mt-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">✅ Previously Matched Invoices</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">No invoices have been matched to this payment yet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

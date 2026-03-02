@@ -1,0 +1,136 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Edit Invoice {{ invoice.invoice_number }}{% endblock %}
+
+{% block page_title %}Edit Invoice {{ invoice.invoice_number }}{% endblock %}
+{% block page_description %}Edit invoice details (draft only){% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/invoices.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <!-- Alerts -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if invoice.status != 'draft' %}
+    <div class="alert alert-info">
+      <strong>ℹ️ Note:</strong> This invoice cannot be edited as it is no longer in draft status. Only draft invoices can be modified.
+    </div>
+  {% endif %}
+
+  <div class="invoice-form-section">
+    <div class="form-header">
+      <h2>Edit Invoice {{ invoice.invoice_number }}</h2>
+      <p class="section-subtitle">Update invoice details</p>
+    </div>
+
+    {% if invoice.status == 'draft' %}
+      <form method="post" id="invoice-edit-form" class="invoice-form">
+        {% csrf_token %}
+
+        <div class="form-section">
+          <h3 class="section-title">Invoice Details</h3>
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="client">Client</label>
+              <select name="client" id="client" disabled class="form-control">
+                <option value="{{ invoice.client.id }}" selected>{{ invoice.client.name }}</option>
+              </select>
+              <small class="form-text">Cannot change client after creation</small>
+            </div>
+
+            <div class="form-group">
+              <label for="due_date">Due Date <span class="required">*</span></label>
+              <input type="date" name="due_date" id="due_date" value="{{ invoice.due_date|date:'Y-m-d' }}" required class="form-control">
+              <small class="form-text">When should this invoice be paid?</small>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="currency">Currency</label>
+              <input type="text" value="{{ invoice.get_currency_display }}" disabled class="form-control">
+              <small class="form-text">Cannot change currency after creation</small>
+            </div>
+
+            <div class="form-group">
+              <label for="description">Invoice Memo</label>
+              <textarea name="description" id="description" placeholder="e.g., Monthly retainer, Q1 services..." class="form-control" rows="3">{{ invoice.description }}</textarea>
+              <small class="form-text">Optional memo or description</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">Invoice Summary</h3>
+          <div class="info-grid">
+            <div class="info-card">
+              <div class="info-label">Invoice Number</div>
+              <div class="info-value">{{ invoice.invoice_number }}</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Created</div>
+              <div class="info-value">{{ invoice.created_at|date:"M d, Y" }}</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Subtotal</div>
+              <div class="info-value">{{ invoice.currency }} {{ invoice.subtotal_amount|floatformat:2 }}</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Total</div>
+              <div class="info-value" style="font-weight: bold; color: var(--success-color);">{{ invoice.currency }} {{ invoice.total_amount|floatformat:2 }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">Quick Actions</h3>
+          <ul>
+            <li><a href="{% url 'invoices:detail' invoice.id %}">📋 View Full Details</a></li>
+            <li><a href="{% url 'invoices:line-items' invoice.id %}">➕ Manage Line Items</a></li>
+          </ul>
+        </div>
+
+        <div class="form-actions">
+          <a href="{% url 'invoices:detail' invoice.id %}" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary" id="save-btn">
+            ✓ Save Changes
+          </button>
+        </div>
+      </form>
+    {% else %}
+      <div class="alert alert-warning">
+        <strong>⚠️ Cannot Edit:</strong> This invoice is no longer in draft status and cannot be edited. 
+        <a href="{% url 'invoices:detail' invoice.id %}">View invoice details</a>
+      </div>
+      <div class="form-actions">
+        <a href="{% url 'invoices:list' %}" class="btn btn-secondary">← Back to List</a>
+        <a href="{% url 'invoices:detail' invoice.id %}" class="btn btn-primary">View Invoice</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.getElementById('invoice-edit-form')?.addEventListener('submit', function(e) {
+    showLoadingIndicator();
+    document.getElementById('save-btn').disabled = true;
+  });
+</script>
+{% endblock %}

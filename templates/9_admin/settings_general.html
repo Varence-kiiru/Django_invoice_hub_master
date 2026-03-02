@@ -1,0 +1,479 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}General Settings - Administration{% endblock %}
+
+{% block page_title %}General Settings{% endblock %}
+{% block page_description %}Configure global system preferences and configurations{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/settings_general.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <!-- Page Header -->
+  <div class="settings-header">
+    <h2>General Settings</h2>
+    <p class="text-muted">Manage global system preferences, company information, and system configurations</p>
+  </div>
+
+  <!-- Settings Form -->
+  <form method="POST" class="settings-form" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- Company Information Section -->
+    <div class="card">
+      <div class="card-header">
+        <h5>Company Information</h5>
+      </div>
+      <div class="card-body">
+        <!-- Logo Upload -->
+        <div class="mb-4 pb-4 border-bottom">
+          <label for="company_logo" class="form-label">Company Logo</label>
+          <div class="logo-upload">
+            <div id="logo-preview" class="mb-3">
+              {% if settings.company_logo %}
+              <img src="{{ settings.company_logo.url }}" alt="Company Logo">
+              <p class="mt-2">Current logo (recommended size: 300×150px)</p>
+              {% else %}
+              <p class="text-muted">No logo uploaded yet</p>
+              {% endif %}
+            </div>
+            <input type="file" class="form-control" id="company_logo" name="company_logo" 
+                   accept="image/png,image/jpeg,image/jpg" onchange="previewLogo(this)">
+            <small class="form-text text-muted d-block mt-2">
+              Supported formats: PNG and JPG | Maximum size: 2MB | Recommended dimensions: 300×150px (landscape)
+            </small>
+          </div>
+        </div>
+
+        <!-- Company Details Grid -->
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="company_name" class="form-label">Company Name</label>
+              <input type="text" class="form-control" id="company_name" name="company_name" 
+                     value="{{ settings.company_name }}" placeholder="Enter your company name" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="company_email" class="form-label">Company Email</label>
+              <input type="email" class="form-control" id="company_email" name="company_email" 
+                     value="{{ settings.company_email }}" placeholder="company@example.com" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="company_phone" class="form-label">Company Phone</label>
+              <input type="tel" class="form-control" id="company_phone" name="company_phone" 
+                     value="{{ settings.company_phone }}" placeholder="+1 (555) 000-0000" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="company_website" class="form-label">Company Website</label>
+              <input type="url" class="form-control" id="company_website" name="company_website" 
+                     value="{{ settings.company_website }}" placeholder="https://example.com">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="company_address" class="form-label">Company Address</label>
+          <textarea class="form-control" id="company_address" name="company_address" 
+                    rows="3" placeholder="Enter your complete company address" required>{{ settings.company_address }}</textarea>
+        </div>
+
+        <!-- Tax & Invoice Prefix -->
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="tax_id" class="form-label">Tax ID / VAT Registration</label>
+              <input type="text" class="form-control" id="tax_id" name="tax_id" 
+                     value="{{ settings.tax_id }}" placeholder="e.g., KRA PIN for Kenya">
+              <small class="form-text text-muted">Tax identification number used for compliance and displayed on invoices</small>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="invoice_prefix" class="form-label">Invoice Number Prefix</label>
+              <input type="text" class="form-control" id="invoice_prefix" name="invoice_prefix" 
+                     value="{{ settings.invoice_prefix }}" placeholder="INV" maxlength="10">
+              <small class="form-text text-muted">Format: PREFIX-YEAR-NUMBER (e.g., INV-2026-0001)</small>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="payment_prefix" class="form-label">Payment Receipt Prefix</label>
+              <input type="text" class="form-control" id="payment_prefix" name="payment_prefix" 
+                     value="{{ settings.payment_prefix }}" placeholder="REC" maxlength="10">
+              <small class="form-text text-muted">Format: PREFIX-YEAR-NUMBER (e.g., REC-2026-0001)</small>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="quote_prefix" class="form-label">Quotation Number Prefix</label>
+              <input type="text" class="form-control" id="quote_prefix" name="quote_prefix" 
+                     value="{{ settings.quote_prefix }}" placeholder="QUOTE" maxlength="10">
+              <small class="form-text text-muted">Format: PREFIX-YEAR-NUMBER (e.g., QUOTE-2026-0001)</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Financial Year & Payment Terms -->
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="financial_year_start" class="form-label">Financial Year Starts</label>
+              <select class="form-control" id="financial_year_start" name="financial_year_start" required>
+              <option value="1" {% if settings.financial_year_start == 1 %}selected{% endif %}>January</option>
+              <option value="2" {% if settings.financial_year_start == 2 %}selected{% endif %}>February</option>
+              <option value="3" {% if settings.financial_year_start == 3 %}selected{% endif %}>March</option>
+              <option value="4" {% if settings.financial_year_start == 4 %}selected{% endif %}>April</option>
+              <option value="5" {% if settings.financial_year_start == 5 %}selected{% endif %}>May</option>
+              <option value="6" {% if settings.financial_year_start == 6 %}selected{% endif %}>June</option>
+              <option value="7" {% if settings.financial_year_start == 7 %}selected{% endif %}>July</option>
+              <option value="8" {% if settings.financial_year_start == 8 %}selected{% endif %}>August</option>
+              <option value="9" {% if settings.financial_year_start == 9 %}selected{% endif %}>September</option>
+              <option value="10" {% if settings.financial_year_start == 10 %}selected{% endif %}>October</option>
+              <option value="11" {% if settings.financial_year_start == 11 %}selected{% endif %}>November</option>
+              <option value="12" {% if settings.financial_year_start == 12 %}selected{% endif %}>December</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="default_payment_terms" class="form-label">Default Payment Terms</label>
+              <textarea class="form-control" id="default_payment_terms" name="default_payment_terms" 
+                        rows="3" placeholder="e.g., Net 30 days&#10;Payment due within 30 days of invoice date">{{ settings.default_payment_terms }}</textarea>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+
+    <!-- System Preferences Section -->
+    <div class="card">
+      <div class="card-header">
+        <h5>System Preferences</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="timezone" class="form-label">Timezone</label>
+              <select class="form-control" id="timezone" name="timezone" required>
+              <option value="">-- Select Timezone --</option>
+              <option value="America/New_York" {% if settings.timezone == 'America/New_York' %}selected{% endif %}>America/New_York</option>
+              <option value="America/Chicago" {% if settings.timezone == 'America/Chicago' %}selected{% endif %}>America/Chicago</option>
+              <option value="America/Los_Angeles" {% if settings.timezone == 'America/Los_Angeles' %}selected{% endif %}>America/Los_Angeles</option>
+              <option value="America/Denver" {% if settings.timezone == 'America/Denver' %}selected{% endif %}>America/Denver</option>
+              <option value="America/Anchorage" {% if settings.timezone == 'America/Anchorage' %}selected{% endif %}>America/Anchorage</option>
+              <option value="America/Toronto" {% if settings.timezone == 'America/Toronto' %}selected{% endif %}>America/Toronto</option>
+              <option value="America/Mexico_City" {% if settings.timezone == 'America/Mexico_City' %}selected{% endif %}>America/Mexico_City</option>
+              <option value="America/Sao_Paulo" {% if settings.timezone == 'America/Sao_Paulo' %}selected{% endif %}>America/Sao_Paulo</option>
+              <option value="America/Buenos_Aires" {% if settings.timezone == 'America/Buenos_Aires' %}selected{% endif %}>America/Buenos_Aires</option>
+              <option value="Europe/London" {% if settings.timezone == 'Europe/London' %}selected{% endif %}>Europe/London</option>
+              <option value="Europe/Paris" {% if settings.timezone == 'Europe/Paris' %}selected{% endif %}>Europe/Paris</option>
+              <option value="Europe/Berlin" {% if settings.timezone == 'Europe/Berlin' %}selected{% endif %}>Europe/Berlin</option>
+              <option value="Europe/Amsterdam" {% if settings.timezone == 'Europe/Amsterdam' %}selected{% endif %}>Europe/Amsterdam</option>
+              <option value="Europe/Rome" {% if settings.timezone == 'Europe/Rome' %}selected{% endif %}>Europe/Rome</option>
+              <option value="Europe/Stockholm" {% if settings.timezone == 'Europe/Stockholm' %}selected{% endif %}>Europe/Stockholm</option>
+              <option value="Europe/Moscow" {% if settings.timezone == 'Europe/Moscow' %}selected{% endif %}>Europe/Moscow</option>
+              <option value="Africa/Cairo" {% if settings.timezone == 'Africa/Cairo' %}selected{% endif %}>Africa/Cairo</option>
+              <option value="Africa/Johannesburg" {% if settings.timezone == 'Africa/Johannesburg' %}selected{% endif %}>Africa/Johannesburg</option>
+              <option value="Africa/Lagos" {% if settings.timezone == 'Africa/Lagos' %}selected{% endif %}>Africa/Lagos</option>
+              <option value="Africa/Nairobi" {% if settings.timezone == 'Africa/Nairobi' %}selected{% endif %}>Africa/Nairobi</option>
+              <option value="Asia/Dubai" {% if settings.timezone == 'Asia/Dubai' %}selected{% endif %}>Asia/Dubai</option>
+              <option value="Asia/Kolkata" {% if settings.timezone == 'Asia/Kolkata' %}selected{% endif %}>Asia/Kolkata</option>
+              <option value="Asia/Bangkok" {% if settings.timezone == 'Asia/Bangkok' %}selected{% endif %}>Asia/Bangkok</option>
+              <option value="Asia/Hong_Kong" {% if settings.timezone == 'Asia/Hong_Kong' %}selected{% endif %}>Asia/Hong_Kong</option>
+              <option value="Asia/Tokyo" {% if settings.timezone == 'Asia/Tokyo' %}selected{% endif %}>Asia/Tokyo</option>
+              <option value="Asia/Seoul" {% if settings.timezone == 'Asia/Seoul' %}selected{% endif %}>Asia/Seoul</option>
+              <option value="Australia/Sydney" {% if settings.timezone == 'Australia/Sydney' %}selected{% endif %}>Australia/Sydney</option>
+              <option value="Australia/Melbourne" {% if settings.timezone == 'Australia/Melbourne' %}selected{% endif %}>Australia/Melbourne</option>
+              <option value="Pacific/Auckland" {% if settings.timezone == 'Pacific/Auckland' %}selected{% endif %}>Pacific/Auckland</option>
+              <option value="UTC" {% if settings.timezone == 'UTC' %}selected{% endif %}>UTC</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="date_format" class="form-label">Date Format</label>
+              <select class="form-control" id="date_format" name="date_format" required>
+              <option value="MM/DD/YYYY" {% if settings.date_format == 'MM/DD/YYYY' %}selected{% endif %}>MM/DD/YYYY</option>
+              <option value="DD/MM/YYYY" {% if settings.date_format == 'DD/MM/YYYY' %}selected{% endif %}>DD/MM/YYYY</option>
+              <option value="YYYY-MM-DD" {% if settings.date_format == 'YYYY-MM-DD' %}selected{% endif %}>YYYY-MM-DD</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="currency_symbol" class="form-label">Default Currency Symbol</label>
+              <input type="text" class="form-control" id="currency_symbol" name="currency_symbol" 
+                     placeholder="$" maxlength="5" value="{{ settings.currency_symbol }}" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="default_currency" class="form-label">Default Currency Code</label>
+              <select class="form-control" id="default_currency" name="default_currency" required>
+              <option value="KES" {% if settings.default_currency == 'KES' %}selected{% endif %}>Kenyan Shilling (KES)</option>
+              <option value="USD" {% if settings.default_currency == 'USD' %}selected{% endif %}>US Dollar (USD)</option>
+              <option value="EUR" {% if settings.default_currency == 'EUR' %}selected{% endif %}>Euro (EUR)</option>
+              <option value="GBP" {% if settings.default_currency == 'GBP' %}selected{% endif %}>British Pound (GBP)</option>
+              <option value="JPY" {% if settings.default_currency == 'JPY' %}selected{% endif %}>Japanese Yen (JPY)</option>
+              <option value="AUD" {% if settings.default_currency == 'AUD' %}selected{% endif %}>Australian Dollar (AUD)</option>
+              <option value="CAD" {% if settings.default_currency == 'CAD' %}selected{% endif %}>Canadian Dollar (CAD)</option>
+              <option value="CHF" {% if settings.default_currency == 'CHF' %}selected{% endif %}>Swiss Franc (CHF)</option>
+              <option value="CNY" {% if settings.default_currency == 'CNY' %}selected{% endif %}>Chinese Yuan (CNY)</option>
+              <option value="INR" {% if settings.default_currency == 'INR' %}selected{% endif %}>Indian Rupee (INR)</option>
+              <option value="ZAR" {% if settings.default_currency == 'ZAR' %}selected{% endif %}>South African Rand (ZAR)</option>
+              <option value="NGN" {% if settings.default_currency == 'NGN' %}selected{% endif %}>Nigerian Naira (NGN)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <select class="form-control" id="decimal_places" name="decimal_places" required>
+              <option value="2" {% if settings.decimal_places == '2' %}selected{% endif %}>2 decimal places</option>
+              <option value="3" {% if settings.decimal_places == '3' %}selected{% endif %}>3 decimal places</option>
+              <option value="4" {% if settings.decimal_places == '4' %}selected{% endif %}>4 decimal places</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bank Details Section -->
+    <div class="card">
+      <div class="card-header">
+        <h5>Bank Details</h5>
+        <small class="text-muted">Automatically displayed on unpaid and partially paid invoices for payment instructions</small>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="bank_account_name" class="form-label">Account Holder Name</label>
+              <input type="text" class="form-control" id="bank_account_name" name="bank_account_name" 
+                     value="{{ settings.bank_account_name }}" placeholder="The Olivian Group Limited">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="bank_account_number" class="form-label">Account Number</label>
+              <input type="text" class="form-control" id="bank_account_number" name="bank_account_number" 
+                     value="{{ settings.bank_account_number }}" placeholder="1323876154">
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="bank_name" class="form-label">Bank Name</label>
+              <input type="text" class="form-control" id="bank_name" name="bank_name" 
+                     value="{{ settings.bank_name }}" placeholder="Kenya Commercial Bank">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="bank_branch" class="form-label">Bank Branch (Optional)</label>
+              <input type="text" class="form-control" id="bank_branch" name="bank_branch" 
+                     value="{{ settings.bank_branch }}" placeholder="e.g., Nairobi Main Branch">
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="bank_swift_code" class="form-label">SWIFT Code (Optional)</label>
+              <input type="text" class="form-control" id="bank_swift_code" name="bank_swift_code" 
+                     value="{{ settings.bank_swift_code }}" placeholder="e.g., KCBLKENX">
+              <small class="form-text text-muted">For international bank transfers</small>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="bank_iban" class="form-label">IBAN (Optional)</label>
+              <input type="text" class="form-control" id="bank_iban" name="bank_iban" 
+                     value="{{ settings.bank_iban }}" placeholder="e.g., KE89KCBL0000000000001">
+              <small class="form-text text-muted">International Bank Account Number</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- M-Pesa Details Section -->
+    <div class="card">
+      <div class="card-header">
+        <h5>M-Pesa Payment Details</h5>
+        <small class="text-muted">Displayed on unpaid and partially paid invoices as alternative payment method</small>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="mpesa_paybill_number" class="form-label">Paybill Number</label>
+              <input type="text" class="form-control" id="mpesa_paybill_number" name="mpesa_paybill_number" 
+                     value="{{ settings.mpesa_paybill_number }}" placeholder="e.g., 247247">
+              <small class="form-text text-muted">Your M-Pesa business paybill number</small>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="mpesa_account_name" class="form-label">Account Name / Reference</label>
+              <input type="text" class="form-control" id="mpesa_account_name" name="mpesa_account_name" 
+                     value="{{ settings.mpesa_account_name }}" placeholder="e.g., Invoice Number or Account ID">
+              <small class="form-text text-muted">What customers should enter as the reference/account name</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="mpesa_phone" class="form-label">Till Number / Phone (Optional)</label>
+              <input type="text" class="form-control" id="mpesa_phone" name="mpesa_phone" 
+                     value="{{ settings.mpesa_phone }}" placeholder="e.g., 0719728666">
+              <small class="form-text text-muted">Till number or phone for direct M-Pesa transfers (optional)</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Terms and Conditions Section -->
+    <div class="card">
+      <div class="card-header">
+        <h5>Terms and Conditions</h5>
+        <small class="text-muted">Displayed on quotations and invoices</small>
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <label for="terms_and_conditions" class="form-label">Default Terms and Conditions</label>
+          <textarea class="form-control" id="terms_and_conditions" name="terms_and_conditions" 
+                    rows="8" placeholder="Enter your standard terms and conditions here. This will be displayed on quotations and invoices.&#10;&#10;Example:&#10;1. Payment is due within the agreed number of days&#10;2. All goods remain the property of [Company Name] until paid in full&#10;3. Prices subject to change without notice">{{ settings.terms_and_conditions }}</textarea>
+          <small class="form-text text-muted d-block mt-2">
+            Use line breaks to format your terms. They will be displayed on all quotations and invoices.
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature Toggles Section -->
+    <div class="card">
+      <div class="card-header">
+        <h5>Feature Toggles</h5>
+      </div>
+      <div class="card-body">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="enable_payments" name="enable_payments" {% if settings.enable_payments %}checked{% endif %}>
+          <label class="form-check-label" for="enable_payments">
+            <strong>Enable Payment Tracking</strong>
+            <small>Track and record invoice payments, manage payment history and reconciliation</small>
+          </label>
+        </div>
+
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="enable_reminders" name="enable_reminders" {% if settings.enable_reminders %}checked{% endif %}>
+          <label class="form-check-label" for="enable_reminders">
+            <strong>Enable Payment Reminders</strong>
+            <small>Send automatic reminders for unpaid invoices on configurable schedules</small>
+          </label>
+        </div>
+
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="enable_export" name="enable_export" {% if settings.enable_export %}checked{% endif %}>
+          <label class="form-check-label" for="enable_export">
+            <strong>Enable Export Features</strong>
+            <small>Allow users to export invoice data and reports to PDF and Excel formats</small>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Save Settings</button>
+      <button type="reset" class="btn btn-secondary">Reset Changes</button>
+    </div>
+  </form>
+</div>
+
+<script>
+function previewLogo(input) {
+  const preview = document.getElementById('logo-preview');
+  
+  if (input.files && input.files[0]) {
+    // Check file type
+    const file = input.files[0];
+    const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+    
+    if (!validTypes.includes(file.type)) {
+      preview.innerHTML = `
+        <div class="alert alert-danger" role="alert">
+          Invalid file type: ${file.type}<br>
+          Only PNG and JPG images are allowed.
+        </div>
+      `;
+      return;
+    }
+    
+    // Check file size (2MB max)
+    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    if (file.size > maxSize) {
+      const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+      preview.innerHTML = `
+        <div class="alert alert-danger" role="alert">
+          File too large: ${sizeMB}MB<br>
+          Maximum size is 2MB.
+        </div>
+      `;
+      return;
+    }
+    
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      preview.innerHTML = `
+        <img src="${e.target.result}" alt="Logo Preview">
+        <p class="mt-2">New logo selected (click Save to apply changes)</p>
+      `;
+    };
+    
+    reader.readAsDataURL(file);
+  }
+}
+
+// Show success/error messages
+document.addEventListener('DOMContentLoaded', function() {
+  // Auto-hide success messages after 5 seconds
+  const successMessages = document.querySelectorAll('.alert-success');
+  successMessages.forEach(msg => {
+    setTimeout(() => {
+      msg.style.transition = 'opacity 0.3s ease-out';
+      msg.style.opacity = '0';
+      setTimeout(() => msg.remove(), 300);
+    }, 5000);
+  });
+});
+</script>
+{% endblock %}

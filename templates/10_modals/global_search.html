@@ -1,0 +1,139 @@
+{% load static %}
+
+<!-- Global Search Box (for navbar) -->
+<div class="global-search-container">
+    <form method="get" action="{% url 'core:global-search' %}" class="global-search-form">
+        <div class="search-input-group">
+            <input 
+                type="text" 
+                name="q" 
+                id="globalSearchInput"
+                placeholder="🔍 Search invoices, payments, clients..." 
+                class="global-search-input"
+                autocomplete="off"
+            >
+            <button type="submit" class="search-submit-btn" title="Search">
+                <span class="icon">🔍</span>
+            </button>
+        </div>
+        <div id="searchSuggestions" class="search-suggestions" style="display: none;"></div>
+    </form>
+</div>
+
+<style>
+.global-search-container {
+    position: relative;
+    flex: 1;
+    max-width: 400px;
+    margin: 0 20px;
+}
+
+.global-search-form {
+    position: relative;
+}
+
+.search-input-group {
+    display: flex;
+    gap: 5px;
+}
+
+.global-search-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+    background: white;
+}
+
+.global-search-input:focus {
+    outline: none;
+    border-color: #3498db;
+    background: #f0f8ff;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+.search-submit-btn {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    background: #f5f5f5;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.search-submit-btn:hover {
+    background: #eeeeee;
+}
+
+.search-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 100;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.suggestion-group {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.suggestion-group:last-child {
+    border-bottom: none;
+}
+
+.suggestion-group-title {
+    padding: 5px 15px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #999;
+    text-transform: uppercase;
+}
+
+.suggestion-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.suggestion-item:hover {
+    background: #f0f8ff;
+}
+
+.suggestion-item-title {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.suggestion-item-subtitle {
+    font-size: 11px;
+    color: #7f8c8d;
+}
+
+@media (max-width: 1024px) {
+    .global-search-container {
+        max-width: 300px;
+        margin: 0 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .global-search-container {
+        max-width: 200px;
+        margin: 0 5px;
+    }
+    
+    .global-search-input {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+}
+</style>

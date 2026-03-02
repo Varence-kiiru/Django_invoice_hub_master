@@ -1,0 +1,123 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Edit Client - {{ client.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/clients.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Edit Client</h1>
+    <div class="client-info">
+        Created on {{ client.created_at|date:"M d, Y" }} | Last updated {{ client.updated_at|date:"M d, Y" }}
+    </div>
+    
+{% if form.non_field_errors %}
+    <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 20px;">
+        <strong>Form Errors:</strong>
+        <ul>
+        {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    
+    {% for field in form %}
+        {% if field.errors %}
+            <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
+                <strong>{{ field.label }}:</strong>
+                <ul>
+                {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    {% endfor %}
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group required">
+            <label>{{ form.name.label }}</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+                <div class="form-error">{{ form.name.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group required">
+            <label>{{ form.client_type.label }}</label>
+            {{ form.client_type }}
+            {% if form.client_type.errors %}
+                <div class="form-error">{{ form.client_type.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group required">
+            <label>{{ form.email.label }}</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <div class="form-error">{{ form.email.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label>{{ form.phone.label }}</label>
+            {{ form.phone }}
+            {% if form.phone.errors %}
+                <div class="form-error">{{ form.phone.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label>{{ form.tax_id.label }}</label>
+            {{ form.tax_id }}
+            {% if form.tax_id.errors %}
+                <div class="form-error">{{ form.tax_id.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label>{{ form.payment_terms_days.label }}</label>
+            {{ form.payment_terms_days }}
+            {% if form.payment_terms_days.errors %}
+                <div class="form-error">{{ form.payment_terms_days.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label>{{ form.currency.label }}</label>
+            {{ form.currency }}
+            {% if form.currency.errors %}
+                <div class="form-error">{{ form.currency.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label>{{ form.credit_limit.label }}</label>
+            {{ form.credit_limit }}
+            {% if form.credit_limit.errors %}
+                <div class="form-error">{{ form.credit_limit.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label>{{ form.notes.label }}</label>
+            {{ form.notes }}
+            {% if form.notes.errors %}
+                <div class="form-error">{{ form.notes.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="{% url 'clients:detail' client.id %}" class="btn btn-secondary">Cancel</a>
+            <a href="{% url 'clients:delete' client.id %}" class="btn btn-danger">Delete</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

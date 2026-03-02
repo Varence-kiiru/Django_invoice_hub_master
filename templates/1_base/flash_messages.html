@@ -1,0 +1,13 @@
+{% if messages %}
+  <div class="flash-container">
+    {% for message in messages %}
+      <div class="alert-message {% if message.tags %}{{ message.tags }}{% else %}info{% endif %}">
+        <div class="alert-icon">
+          {% if message.tags == 'success' %}✓{% elif message.tags == 'error' %}✕{% elif message.tags == 'warning' %}!{% else %}ⓘ{% endif %}
+        </div>
+        <div class="alert-content">{{ message|safe }}</div>
+        <button class="alert-close" onclick="this.parentElement.remove();">✕</button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}

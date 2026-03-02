@@ -1,0 +1,211 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Payment Receipt - Invoicing App{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/payments.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <div class="row">
+            <div class="col-md-8">
+                <h1 class="page-title">📄 Payment Receipt</h1>
+                <p class="text-muted">Receipt for Payment {{ payment.receipt_number|default:payment.id }} - {{ payment.invoice.invoice_number }}</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{% url 'payments:detail' payment.id %}" class="btn btn-outline-secondary">← Back to Payment</a>
+                <a href="{% url 'payments:receipt_download' payment.id %}" class="btn btn-primary">📥 Download PDF</a>
+            </div>
+            
+            <script>
+            function printPaymentReceipt(printUrl) {
+                // Open PDF in new window and trigger print when loaded
+                const printWindow = window.open(printUrl, 'PaymentReceipt');
+                printWindow.onload = function() {
+                    setTimeout(() => {
+                        printWindow.print();
+                    }, 250);
+                };
+            }
+            </script>
+        </div>
+    </div>
+
+    <!-- Receipt Card -->
+    <div class="card">
+        <div class="card-body">
+            <!-- Receipt Header -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h2 class="mb-0">Payment Receipt</h2>
+                    <p class="text-muted mb-2">Receipt {{ payment.receipt_number|default:payment.id }}</p>
+                    <p class="text-muted">Date: {{ payment.payment_date|date:"F j, Y" }}</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="badge bg-success fs-4">{{ payment.get_status_display }}</div>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Payment Information -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5>Payment Details</h5>
+                    <table class="table table-borderless">
+                        <tr>
+                            <td><strong>Payment ID:</strong></td>
+                            <td>#{{ payment.id }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Payment Date:</strong></td>
+                            <td>{{ payment.payment_date|date:"F j, Y" }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Payment Method:</strong></td>
+                            <td>{{ payment.payment_method.name }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Transaction Reference:</strong></td>
+                            <td>{{ payment.transaction_reference|default:"—" }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Recorded By:</strong></td>
+                            <td>{{ payment.recorded_by.get_full_name|default:payment.recorded_by.username }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h5>Invoice Information</h5>
+                    <table class="table table-borderless">
+                        <tr>
+                            <td><strong>Invoice Number:</strong></td>
+                            <td>{{ payment.invoice.invoice_number }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Invoice Date:</strong></td>
+                            <td>{{ payment.invoice.invoice_date|date:"F j, Y" }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Client:</strong></td>
+                            <td>{{ payment.invoice.client.name }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Client Email:</strong></td>
+                            <td>{{ payment.invoice.client.email }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Client Phone:</strong></td>
+                            <td>{{ payment.invoice.client.phone|default:"—" }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Amount Section -->
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="alert alert-success">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Payment Amount</h5>
+                                <p class="text-muted">Amount received from client</p>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <h2 class="mb-0">{{ payment.currency }} {{ payment.amount|floatformat:2 }}</h2>
+                                <p class="text-muted">Payment Amount</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invoice Summary -->
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h5>Invoice Summary</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Invoice Total</td>
+                                    <td class="text-end">{{ payment.invoice.currency }} {{ payment.invoice.total_amount|floatformat:2 }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Previous Payments</td>
+                                    <td class="text-end">{{ payment.invoice.currency }} {{ previous_payments|floatformat:2 }}</td>
+                                </tr>
+                                <tr class="table-active">
+                                    <td><strong>This Payment</strong></td>
+                                    <td class="text-end"><strong>{{ payment.currency|default:payment.invoice.currency }} {{ payment.amount|floatformat:2 }}</strong></td>
+                                </tr>
+                                <tr class="table-success">
+                                    <td><strong>Remaining Balance</strong></td>
+                                    <td class="text-end"><strong>{{ payment.invoice.currency }} {{ payment.invoice.amount_due|floatformat:2 }}</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            {% if payment.notes %}
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <h5>Notes</h5>
+                        <div class="alert alert-info">
+                            {{ payment.notes }}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Payment Method Details -->
+            {% if payment.payment_method.description %}
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <h5>Payment Method Details</h5>
+                        <div class="alert alert-secondary">
+                            <p>{{ payment.payment_method.description }}</p>
+                            {% if payment.payment_method.account_details %}
+                                <hr>
+                                <strong>Account Details:</strong>
+                                <p class="mb-0">{{ payment.payment_method.account_details }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Footer -->
+            <div class="row">
+                <div class="col-md-12 text-center text-muted">
+                    <p>Thank you for your payment. This receipt is computer-generated and does not require a signature.</p>
+                    <p>For any questions regarding this payment, please contact our accounting department.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mt-4">
+        <div class="col-md-12 text-center">
+            <a href="{% url 'payments:detail' payment.id %}" class="btn btn-outline-primary">View Payment Details</a>
+            <a href="{% url 'invoices:detail' payment.invoice.id %}" class="btn btn-outline-secondary">View Invoice</a>
+            <button onclick="printPaymentReceipt('{% url 'payments:receipt_print' payment.id %}')" class="btn btn-primary">🖨️ Print Receipt</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

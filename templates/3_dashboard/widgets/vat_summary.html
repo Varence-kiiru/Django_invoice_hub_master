@@ -1,0 +1,27 @@
+<!-- VAT Summary Widget -->
+<div class="card card-widget">
+  <div class="card-header">
+    <h4 class="card-title">
+      <span aria-hidden="true">📊</span> VAT Summary
+    </h4>
+  </div>
+  <div class="card-body">
+    <div class="vat-breakdown">
+      <div class="vat-item">
+        <div class="vat-label">VAT Collected</div>
+        <div class="vat-value text-success">${{ vat_collected|default:"0.00" }}</div>
+      </div>
+      <div class="vat-item">
+        <div class="vat-label">VAT Paid</div>
+        <div class="vat-value text-muted">${{ vat_paid|default:"0.00" }}</div>
+      </div>
+      <div class="vat-item">
+        <div class="vat-label">Net VAT Due</div>
+        <div class="vat-value text-primary">${{ vat_due|default:"0.00" }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="card-footer">
+    <a href="{% url 'core:reports-vat' %}" class="btn btn-sm btn-link">View VAT Report</a>
+  </div>
+</div>

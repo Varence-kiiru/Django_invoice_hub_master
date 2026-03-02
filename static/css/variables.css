@@ -1,0 +1,257 @@
+/**
+ * Design System - Professional Gold, Black & White Palette
+ * Premium look for invoicing/finance application
+ */
+
+:root {
+  /* Primary Gold Accent - Premium, professional, financial */
+  --color-primary: #d4af37;           /* Luxury gold */
+  --color-primary-dark: #aa8c2c;      /* Deep gold for interactions */
+  --color-primary-light: #e5c158;     /* Bright gold for hover */
+
+  /* Secondary Deep Navy - Professional, trustworthy */
+  --color-secondary: #1a1a2e;         /* Deep navy/black */
+  --color-secondary-light: #f5f5f7;   /* Off-white background */
+  --color-secondary-dark: #0f0f1e;    /* Darker navy for contrast */
+
+  /* Accent Colors - Status indicators */
+  --color-success: #10b981;           /* Green - positive/paid */
+  --color-warning: #f59e0b;           /* Amber - pending */
+  --color-danger: #ef4444;            /* Red - overdue/error */
+  --color-info: #06b6d4;              /* Cyan - informational */
+
+  /* Neutrals - Professional grays for borders and text */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-gray-50: #f9fafb;           /* Near white */
+  --color-gray-100: #f3f4f6;          /* Light gray */
+  --color-gray-200: #e5e7eb;          /* Mid-light gray */
+  --color-gray-300: #d1d5db;          /* Mid gray */
+  --color-gray-400: #9ca3af;          /* Medium gray */
+  --color-gray-500: #6b7280;          /* Darker gray */
+  --color-gray-600: #4b5563;          /* Dark gray */
+  --color-gray-700: #374151;          /* Very dark gray */
+  --color-gray-800: #1f2937;          /* Near black */
+  --color-gray-900: #111827;          /* True black */
+
+  /* Component Colors */
+  --color-border: #e5e7eb;            /* Light borders */
+  --color-bg-light: #f9fafb;          /* Page background */
+  --color-bg-lighter: #ffffff;        /* Card/form background */
+  --color-text-primary: #1f2937;      /* Main text - dark gray */
+  --color-text-secondary: #6b7280;    /* Secondary text */
+  --color-text-muted: #9ca3af;        /* Muted text */
+
+  /* Sidebar Colors */
+  --color-sidebar-bg: #1a1a2e;        /* Deep navy sidebar */
+  --color-sidebar-hover: #2d2d4a;     /* Slightly lighter on hover */
+  --color-sidebar-active: #d4af37;    /* Gold active indicator */
+  --color-sidebar-text: #e5e7eb;      /* Light text on dark bg */
+
+  /* Navbar Colors */
+  --color-navbar-bg: #ffffff;         /* Clean white navbar */
+  --color-navbar-border: #e5e7eb;     /* Subtle border */
+  --color-navbar-text: #1f2937;       /* Dark text on light bg */
+
+  /* Shadows - Subtle, professional */
+  --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 1.5rem 3rem rgba(0, 0, 0, 0.2);
+  --shadow-gold: 0 0 0 3px rgba(212, 175, 55, 0.1);
+  --shadow-focus: 0 0 0 3px rgba(212, 175, 55, 0.25), 0 0 0 6px rgba(212, 175, 55, 0.1);
+
+  /* Typography - Modern, readable */
+  --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  --font-family-heading: 'Segoe UI', 'Roboto', sans-serif;
+  --font-family-mono: 'Courier New', monospace;
+
+  --font-size-xs: 0.75rem;           /* 12px */
+  --font-size-sm: 0.875rem;          /* 14px */
+  --font-size-base: 1rem;            /* 16px */
+  --font-size-lg: 1.125rem;          /* 18px */
+  --font-size-xl: 1.25rem;           /* 20px */
+  --font-size-2xl: 1.5rem;           /* 24px */
+  --font-size-3xl: 1.875rem;         /* 30px */
+  --font-size-4xl: 2.25rem;          /* 36px */
+
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --line-height-loose: 2;
+
+  /* Spacing Scale (8px base) */
+  --spacing-xs: 0.25rem;             /* 4px */
+  --spacing-sm: 0.5rem;              /* 8px */
+  --spacing-md: 1rem;                /* 16px */
+  --spacing-lg: 1.5rem;              /* 24px */
+  --spacing-xl: 2rem;                /* 32px */
+  --spacing-2xl: 3rem;               /* 48px */
+  --spacing-3xl: 4rem;               /* 64px */
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;              /* 4px - small elements */
+  --radius-md: 0.375rem;             /* 6px - buttons, inputs */
+  --radius-lg: 0.5rem;               /* 8px - cards, modals */
+  --radius-xl: 0.75rem;              /* 12px - larger cards */
+  --radius-2xl: 1rem;                /* 16px - very large */
+  --radius-full: 9999px;             /* Fully rounded */
+
+  /* Transitions */
+  --transition-fast: 100ms ease-in-out;
+  --transition-base: 200ms ease-in-out;
+  --transition-slow: 300ms ease-in-out;
+  --transition-slower: 500ms ease-in-out;
+
+  /* Z-Index Scale */
+  --z-dropdown: 100;
+  --z-overlay: 998;
+  --z-sidebar: 999;
+  --z-navbar: 1000;
+  --z-modal: 1050;
+  --z-tooltip: 1070;
+
+  /* Layout */
+  --container-max-width: 1400px;
+  --navbar-height: 72px;
+  --sidebar-width: 260px;
+  --sidebar-width-collapsed: 70px;
+
+  /* Footer Colors */
+  --footer-bg: #f8fafc;
+  --footer-text: #0f1724;
+}
+
+/* Dark Theme */
+:root[data-theme="dark"] {
+  /* Primary Gold Accent - Slightly lighter gold for dark mode */
+  --color-primary: #e5c158;
+  --color-primary-dark: #d4af37;
+  --color-primary-light: #f0d580;
+
+  /* Secondary - Dark backgrounds */
+  --color-secondary: #f5f5f7;
+  --color-secondary-light: #1a1a2e;
+  --color-secondary-dark: #ffffff;
+
+  /* Accent Colors - Status indicators (slightly adjusted for dark) */
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-danger: #f87171;
+  --color-info: #22d3ee;
+
+  /* Neutrals - Inverted for dark mode */
+  --color-white: #1a1a2e;
+  --color-black: #ffffff;
+  --color-gray-50: #1f2937;
+  --color-gray-100: #2d3748;
+  --color-gray-200: #374151;
+  --color-gray-300: #4b5563;
+  --color-gray-400: #6b7280;
+  --color-gray-500: #9ca3af;
+  --color-gray-600: #d1d5db;
+  --color-gray-700: #e5e7eb;
+  --color-gray-800: #f3f4f6;
+  --color-gray-900: #f9fafb;
+
+  /* Component Colors */
+  --color-border: #4b5563;
+  --color-bg-light: #1a1a2e;
+  --color-bg-lighter: #2d2d4a;
+  --color-text-primary: #f5f5f7;
+  --color-text-secondary: #d1d5db;
+  --color-text-muted: #b4b8be;
+
+
+  /* Sidebar Colors */
+  --color-sidebar-bg: #0f0f1e;
+  --color-sidebar-hover: #1a1a2e;
+  --color-sidebar-active: #e5c158;
+  --color-sidebar-text: #f5f5f7;
+
+  /* Navbar Colors */
+  --color-navbar-bg: #2d2d4a;
+  --color-navbar-border: #4b5563;
+  --color-navbar-text: #f5f5f7;
+
+  /* Shadows - Adjusted for dark mode */
+  --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 1.5rem 3rem rgba(0, 0, 0, 0.6);
+
+  /* Footer Colors */
+  --footer-bg: #2d2d4a;
+  --footer-text: #f5f5f7;
+}
+
+/* Auto theme - use system preference */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    /* Primary Gold Accent */
+    --color-primary: #e5c158;
+    --color-primary-dark: #d4af37;
+    --color-primary-light: #f0d580;
+
+    /* Secondary */
+    --color-secondary: #f5f5f7;
+    --color-secondary-light: #1a1a2e;
+    --color-secondary-dark: #ffffff;
+
+    /* Accent Colors */
+    --color-success: #34d399;
+    --color-warning: #fbbf24;
+    --color-danger: #f87171;
+    --color-info: #22d3ee;
+
+    /* Neutrals */
+    --color-white: #1a1a2e;
+    --color-black: #ffffff;
+    --color-gray-50: #1f2937;
+    --color-gray-100: #2d3748;
+    --color-gray-200: #374151;
+    --color-gray-300: #4b5563;
+    --color-gray-400: #6b7280;
+    --color-gray-500: #9ca3af;
+    --color-gray-600: #d1d5db;
+    --color-gray-700: #e5e7eb;
+    --color-gray-800: #f3f4f6;
+    --color-gray-900: #f9fafb;
+
+    /* Component Colors */
+    --color-border: #4b5563;
+    --color-bg-light: #1a1a2e;
+    --color-bg-lighter: #2d2d4a;
+    --color-text-primary: #f5f5f7;
+    --color-text-secondary: #d1d5db;
+    --color-text-muted: #b4b8be;
+
+    /* Sidebar Colors */
+    --color-sidebar-bg: #0f0f1e;
+    --color-sidebar-hover: #1a1a2e;
+    --color-sidebar-active: #e5c158;
+    --color-sidebar-text: #f5f5f7;
+
+    /* Navbar Colors */
+    --color-navbar-bg: #2d2d4a;
+    --color-navbar-border: #4b5563;
+    --color-navbar-text: #f5f5f7;
+
+    /* Shadows */
+    --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 1.5rem 3rem rgba(0, 0, 0, 0.6);
+
+    /* Footer Colors */
+    --footer-bg: #2d2d4a;
+    --footer-text: #f5f5f7;
+  }
+}

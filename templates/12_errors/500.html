@@ -1,0 +1,41 @@
+<!-- 500 Server Error Page -->
+{% extends "layouts/base.html" %}
+
+{% block title %}Server Error (500){% endblock %}
+
+{% block content %}
+<div class="error-container error-500">
+  <div class="error-content">
+    <div class="error-code" aria-hidden="true">500</div>
+    
+    <h1 class="error-title">Server Error</h1>
+    
+    <p class="error-message">
+      Something went wrong on our end. We've been notified and are working to fix it.
+    </p>
+
+    <div class="error-details">
+      <p class="text-muted">Error ID: <code>{{ request.META.HTTP_X_REQUEST_ID|default:"unknown" }}</code></p>
+      <p class="text-muted">Time: <code>{{ now|date:"Y-m-d H:i:s" }}</code></p>
+    </div>
+
+    <div class="error-actions">
+      <a href="{% url 'core:dashboard' %}" class="btn btn-primary btn-lg">
+        <span aria-hidden="true">🏠</span> Return to Dashboard
+      </a>
+      <button onclick="window.location.reload()" class="btn btn-outline-primary btn-lg">
+        <span aria-hidden="true">🔄</span> Try Again
+      </button>
+    </div>
+
+    <div class="error-support">
+      <h3>Need help?</h3>
+      <p>
+        Contact our support team at 
+        <a href="mailto:support@example.com">support@example.com</a> 
+        with the Error ID above.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

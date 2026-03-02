@@ -1,0 +1,255 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}User Management - Administration{% endblock %}
+
+{% block page_title %}User Management{% endblock %}
+{% block page_description %}Manage application users and their access permissions{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/users_management.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <!-- Quick Actions -->
+  <div class="actions-toolbar">
+    <a href="{% url 'core:users-create-edit' %}" class="btn btn-primary">➕ Add New User</a>
+    <div class="search-group">
+      <input type="text" id="searchInput" placeholder="Search users by name or email..." class="form-control search-input" onkeyup="filterUsers()">
+      <select id="roleFilter" class="form-control filter-select" onchange="filterUsers()">
+        <option value="">All Roles</option>
+        <option value="admin">Admin</option>
+        <option value="manager">Manager</option>
+        <option value="staff">Staff</option>
+        <option value="user">User</option>
+        <option value="accountant">Accountant</option>
+        <option value="sales">Sales</option>
+        <option value="viewer">Viewer</option>
+      </select>
+      <button class="btn btn-secondary" onclick="resetFilters()">Reset</button>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <div class="users-table-wrapper">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Last Login</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="usersTableBody">
+        {% if users %}
+          {% for user in users %}
+            <tr class="user-row" data-name="{{ user.get_full_name|default:user.username|lower }}" data-email="{{ user.email|lower }}" data-role="{% if user.invoicing_profile.role %}{{ user.invoicing_profile.role.name|lower }}{% else %}user{% endif %}">
+              <td class="user-name">
+                <div class="user-avatar">{{ user.first_name|first|upper|default:user.username|first|upper }}</div>
+                <div class="user-info">
+                  <strong>{{ user.get_full_name|default:user.username }}</strong>
+                </div>
+              </td>
+              <td class="user-email">{{ user.email }}</td>
+              <td class="user-role">
+                <span class="role-badge {% if user.invoicing_profile.role %}role-{{ user.invoicing_profile.role.name|lower }}{% else %}role-user{% endif %}">
+                  {% if user.invoicing_profile.role %}{{ user.invoicing_profile.role.name|title }}{% else %}User{% endif %}
+                </span>
+              </td>
+              <td class="user-status">
+                <span class="status-badge {% if user.is_active %}active{% else %}inactive{% endif %}">
+                  {% if user.is_active %}◉ Active{% else %}◌ Inactive{% endif %}
+                </span>
+              </td>
+              <td class="last-login">{{ user.last_login|default:"Never" }}</td>
+              <td class="created">{{ user.date_joined|date:"M d, Y" }}</td>
+              <td class="actions">
+                <a href="{% url 'core:users-edit' user.id %}" class="btn btn-sm btn-primary">✏️ Edit</a>
+                <button class="btn btn-sm btn-danger" onclick="showDeleteConfirm({{ user.id }}, '{{ user.get_full_name|default:user.username }}')" >🗑️ Delete</button>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="7" class="text-center py-4">
+              <p class="text-muted">No users found</p>
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-section">
+    <div class="pagination-info">Total Users: <span id="userCount">{{ users|length }}</span></div>
+    <div class="pagination-controls">
+      <button class="btn btn-sm btn-secondary" disabled>← Previous</button>
+      <button class="btn btn-sm btn-secondary" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- User Roles Information -->
+  <div class="roles-info-section">
+    <h2>User Roles & Permissions</h2>
+    <div class="roles-grid">
+      <div class="role-card">
+        <h3>👑 Administrator</h3>
+        <p>Full access to all system features and user management</p>
+        <ul>
+          <li>All system operations</li>
+          <li>User management</li>
+          <li>System configuration</li>
+          <li>Audit logs</li>
+        </ul>
+      </div>
+
+      <div class="role-card">
+        <h3>📋 Manager</h3>
+        <p>Access to invoicing, clients, and team management</p>
+        <ul>
+          <li>Create & manage invoices</li>
+          <li>Manage clients</li>
+          <li>View reports</li>
+          <li>Team supervision</li>
+        </ul>
+      </div>
+
+      <div class="role-card">
+        <h3>👨‍💼 Staff</h3>
+        <p>Access to daily operations and data entry</p>
+        <ul>
+          <li>Create invoices</li>
+          <li>Manage payments</li>
+          <li>View clients</li>
+          <li>Data entry</li>
+        </ul>
+      </div>
+
+      <div class="role-card">
+        <h3>👤 User</h3>
+        <p>Limited read-only access to invoicing data</p>
+        <ul>
+          <li>View invoices</li>
+          <li>View clients</li>
+          <li>View reports</li>
+          <li>Export data</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+{% include "10_modals/delete_user_modal.html" %}
+
+<script>
+  let currentUserId = null;
+
+  // Search and Filter Functions
+  function filterUsers() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const roleFilter = document.getElementById('roleFilter').value;
+    const rows = document.querySelectorAll('.user-row');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+      const name = row.getAttribute('data-name');
+      const email = row.getAttribute('data-email');
+      const role = row.getAttribute('data-role');
+
+      const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
+      const matchesRole = roleFilter === '' || role === roleFilter;
+
+      if (matchesSearch && matchesRole) {
+        row.style.display = '';
+        visibleCount++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+
+    document.getElementById('userCount').textContent = visibleCount;
+  }
+
+  function resetFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('roleFilter').value = '';
+    filterUsers();
+  }
+
+  // Delete Modal Functions
+  function showDeleteConfirm(userId, userName) {
+    currentUserId = userId;
+    document.getElementById('deleteUserName').textContent = userName;
+    document.getElementById('delete-modal').style.display = 'flex';
+  }
+
+  function closeDeleteModal() {
+    document.getElementById('delete-modal').style.display = 'none';
+    currentUserId = null;
+  }
+
+  function confirmDeleteUser() {
+    if (currentUserId) {
+      const btn = document.querySelector('#delete-modal button[onclick="confirmDeleteUser()"]');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+      
+      fetch(`/api/system/users/${currentUserId}/delete/`, {
+        method: 'DELETE',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert(data.message);
+          closeDeleteModal();
+          location.reload();
+        } else {
+          alert('Error: ' + (data.error || 'Unknown error'));
+          btn.disabled = false;
+          btn.innerHTML = 'Yes, Delete User';
+        }
+      })
+      .catch(error => {
+        alert('An error occurred while deleting the user');
+        console.error('Error:', error);
+        btn.disabled = false;
+        btn.innerHTML = 'Yes, Delete User';
+      });
+    }
+  }
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  // Close modals when clicking outside
+  window.onclick = function(event) {
+    const deleteModal = document.getElementById('delete-modal');
+    
+    if (event.target === deleteModal) {
+      closeDeleteModal();
+    }
+  };
+</script>
+{% endblock %}

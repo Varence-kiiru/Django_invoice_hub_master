@@ -1,0 +1,247 @@
+/**
+ * Tablet Responsive Styles (768px+)
+ * Breakpoint adjustments for tablet and small desktop screens
+ */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* ===== Layout Adjustments ===== */
+  body {
+    --navbar-height: 64px;
+    --sidebar-width: 240px;
+  }
+
+  .navbar {
+    height: var(--navbar-height);
+  }
+
+  .sidebar {
+    width: var(--sidebar-width);
+  }
+
+  /* ===== Main Container ===== */
+  main, .main-content {
+    margin-left: var(--sidebar-width);
+    padding-top: var(--navbar-height);
+  }
+
+  /* ===== Typography ===== */
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
+
+  /* ===== Grid and Flex ===== */
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md, 1rem);
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr 300px;
+    gap: var(--spacing-lg, 1.5rem);
+  }
+
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* ===== Navigation ===== */
+  .navbar-search {
+    max-width: 400px;
+    height: 40px;
+  }
+
+  .navbar-search input,
+  .navbar-search button {
+    font-size: 0.875rem;
+  }
+
+  /* ===== Sidebar ===== */
+  .sidebar-nav-item {
+    padding: var(--spacing-sm, 0.5rem) var(--spacing-md, 1rem);
+  }
+
+  .sidebar-nav-link {
+    font-size: 0.9375rem;
+  }
+
+  .sidebar-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* ===== Tables ===== */
+  .table {
+    font-size: 0.875rem;
+  }
+
+  .table th,
+  .table td {
+    padding: var(--spacing-sm, 0.5rem) var(--spacing-md, 1rem);
+  }
+
+  .table-responsive {
+    max-height: 500px;
+  }
+
+  /* ===== Forms ===== */
+  .form-group {
+    margin-bottom: var(--spacing-md, 1rem);
+  }
+
+  .form-label {
+    margin-bottom: var(--spacing-xs, 0.25rem);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .form-control,
+  .form-select {
+    padding: var(--spacing-xs, 0.25rem) var(--spacing-sm, 0.5rem);
+    font-size: 0.875rem;
+  }
+
+  .form-control-lg,
+  .form-select-lg {
+    padding: var(--spacing-sm, 0.5rem) var(--spacing-md, 1rem);
+    font-size: 1rem;
+  }
+
+  /* ===== Buttons ===== */
+  .btn {
+    padding: var(--spacing-xs, 0.25rem) var(--spacing-md, 1rem);
+    font-size: 0.875rem;
+  }
+
+  .btn-lg {
+    padding: var(--spacing-sm, 0.5rem) var(--spacing-lg, 1.5rem);
+    font-size: 1rem;
+  }
+
+  /* ===== Modals ===== */
+  .modal-dialog {
+    max-width: 600px;
+  }
+
+  .modal-header {
+    padding: var(--spacing-md, 1rem) var(--spacing-lg, 1.5rem);
+  }
+
+  .modal-body {
+    padding: var(--spacing-md, 1rem) var(--spacing-lg, 1.5rem);
+  }
+
+  /* ===== Cards ===== */
+  .card {
+    border-radius: var(--border-radius-md, 6px);
+  }
+
+  .card-header {
+    padding: var(--spacing-md, 1rem) var(--spacing-lg, 1.5rem);
+  }
+
+  .card-body {
+    padding: var(--spacing-md, 1rem) var(--spacing-lg, 1.5rem);
+  }
+
+  .card-footer {
+    padding: var(--spacing-md, 1rem) var(--spacing-lg, 1.5rem);
+  }
+
+  /* ===== Alerts ===== */
+  .alert {
+    padding: var(--spacing-md, 1rem) var(--spacing-lg, 1.5rem);
+    border-radius: var(--border-radius-md, 6px);
+  }
+
+  /* ===== Pagination ===== */
+  .pagination {
+    gap: var(--spacing-sm, 0.5rem);
+  }
+
+  .page-link {
+    min-width: 2.25rem;
+    height: 2.25rem;
+    font-size: 0.8125rem;
+  }
+
+  /* ===== Badges ===== */
+  .badge {
+    padding: var(--spacing-xs, 0.25rem) var(--spacing-sm, 0.5rem);
+    font-size: 0.75rem;
+  }
+
+  /* ===== Dropdowns ===== */
+  .dropdown-menu {
+    min-width: 160px;
+    max-width: 300px;
+  }
+
+  .dropdown-item {
+    padding: var(--spacing-sm, 0.5rem) var(--spacing-md, 1rem);
+    font-size: 0.875rem;
+  }
+
+  /* ===== Tooltips ===== */
+  .tooltip-inner {
+    font-size: 0.75rem;
+    max-width: 200px;
+  }
+
+  /* ===== Spacing Utilities ===== */
+  .mt-1, .my-1 { margin-top: 0.25rem !important; }
+  .mt-2, .my-2 { margin-top: 0.5rem !important; }
+  .mt-3, .my-3 { margin-top: 1rem !important; }
+  .mt-4, .my-4 { margin-top: 1.5rem !important; }
+
+  .mb-1, .my-1 { margin-bottom: 0.25rem !important; }
+  .mb-2, .my-2 { margin-bottom: 0.5rem !important; }
+  .mb-3, .my-3 { margin-bottom: 1rem !important; }
+  .mb-4, .my-4 { margin-bottom: 1.5rem !important; }
+
+  .pt-2, .py-2 { padding-top: 0.5rem !important; }
+  .pt-3, .py-3 { padding-top: 1rem !important; }
+  .pb-2, .py-2 { padding-bottom: 0.5rem !important; }
+  .pb-3, .py-3 { padding-bottom: 1rem !important; }
+
+  /* ===== Display and Visibility ===== */
+  .d-tablet-none {
+    display: none !important;
+  }
+
+  .d-tablet-inline {
+    display: inline !important;
+  }
+
+  .d-tablet-block {
+    display: block !important;
+  }
+
+  .d-tablet-flex {
+    display: flex !important;
+  }
+
+  .d-tablet-grid {
+    display: grid !important;
+  }
+
+  /* ===== Text Alignment ===== */
+  .text-tablet-center {
+    text-align: center !important;
+  }
+
+  .text-tablet-left {
+    text-align: left !important;
+  }
+
+  .text-tablet-right {
+    text-align: right !important;
+  }
+}

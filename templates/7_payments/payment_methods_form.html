@@ -1,0 +1,139 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h2 mb-2">
+                {% if is_edit %}
+                    Edit Payment Method
+                {% else %}
+                    Create Payment Method
+                {% endif %}
+            </h1>
+            <p class="text-muted">Add or update payment method details</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'payments:methods-list' %}" class="btn btn-outline-secondary">Back to Methods</a>
+        </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="post" class="needs-validation">
+                        {% csrf_token %}
+                        
+                        <!-- Error Messages -->
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {% for error in form.non_field_errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Name Field -->
+                        <div class="mb-3">
+                            <label for="id_name" class="form-label">Method Name *</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.name.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted d-block mt-1">
+                                Examples: Cash, Bank Transfer, Card, Check, Mobile Money
+                            </small>
+                        </div>
+
+                        <!-- Description Field -->
+                        <div class="mb-3">
+                            <label for="id_description" class="form-label">Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.description.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted d-block mt-1">
+                                Optional: Add details like account number or contact info
+                            </small>
+                        </div>
+
+                        <!-- Status Field -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form.is_active }}
+                                <label for="id_is_active" class="form-check-label">
+                                    Active (Accept this payment method)
+                                </label>
+                            </div>
+                            <small class="form-text text-muted d-block mt-1">
+                                Uncheck to disable without deleting
+                            </small>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                {% if is_edit %}
+                                    <i class="bi bi-check-lg"></i> Update Method
+                                {% else %}
+                                    <i class="bi bi-plus-circle"></i> Create Method
+                                {% endif %}
+                            </button>
+                            <a href="{% url 'payments:methods-list' %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Sidebar -->
+        <div class="col-md-4">
+            <div class="card bg-light border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold mb-3">Payment Method Tips</h6>
+                    <ul class="small">
+                        <li><strong>Cash:</strong> Received in person, deposit to bank</li>
+                        <li><strong>Bank Transfer:</strong> Electronic funds transfer, MPESA</li>
+                        <li><strong>Check:</strong> Physical check, date received</li>
+                        <li><strong>Credit Card:</strong> Card payments, gateway fees</li>
+                        <li><strong>Mobile Money:</strong> M-Pesa, Airtel Money, etc.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Form Legend -->
+            <div class="card border-0 shadow-sm mt-3">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold mb-2">Field Guide</h6>
+                    <dl class="small mb-0">
+                        <dt><strong>Name</strong></dt>
+                        <dd class="text-muted">Required. Display name for the method</dd>
+                        <dt><strong>Description</strong></dt>
+                        <dd class="text-muted">Optional. Additional details</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    input, textarea {
+        border-color: #dee2e6;
+    }
+    input:focus, textarea:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+</style>
+{% endblock %}

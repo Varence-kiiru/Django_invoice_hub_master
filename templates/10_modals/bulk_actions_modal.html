@@ -1,0 +1,254 @@
+<!-- Bulk Actions Toolbar -->
+<style>
+    .bulk-actions {
+        display: none;
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        gap: 10px;
+        align-items: center;
+        border-left: 4px solid #3498db;
+    }
+
+    .bulk-actions.visible {
+        display: flex;
+    }
+
+    .bulk-count {
+        font-weight: bold;
+        color: #2c3e50;
+        min-width: 150px;
+    }
+
+    .bulk-actions button {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .bulk-status-update {
+        background: #3498db;
+        color: white;
+    }
+
+    .bulk-status-update:hover {
+        background: #2980b9;
+    }
+
+    .bulk-send-email {
+        background: #2ecc71;
+        color: white;
+    }
+
+    .bulk-send-email:hover {
+        background: #27ae60;
+    }
+
+    .bulk-delete {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .bulk-delete:hover {
+        background: #c0392b;
+    }
+
+    /* Modal Styles */
+    .bulk-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .bulk-modal.visible {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .bulk-modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .bulk-modal-header {
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .bulk-modal-header h2 {
+        margin: 0;
+        color: #2c3e50;
+    }
+
+    .bulk-modal-close {
+        background: none;
+        border: none;
+        font-size: 28px;
+        cursor: pointer;
+        color: #7f8c8d;
+    }
+
+    .bulk-modal-close:hover {
+        color: #2c3e50;
+    }
+
+    .bulk-modal-body {
+        margin-bottom: 20px;
+    }
+
+    .bulk-form-group {
+        margin-bottom: 15px;
+    }
+
+    .bulk-form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    .bulk-form-group select,
+    .bulk-form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #bdc3c7;
+        border-radius: 4px;
+        font-size: 14px;
+        font-family: inherit;
+    }
+
+    .bulk-form-group select:focus,
+    .bulk-form-group textarea:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .bulk-form-group textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .bulk-custom-fields {
+        display: none;
+    }
+
+    .bulk-modal-footer {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+
+    .bulk-modal-footer button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .bulk-modal-footer .bulk-submit {
+        background: #27ae60;
+        color: white;
+    }
+
+    .bulk-modal-footer .bulk-submit:hover {
+        background: #229954;
+    }
+
+    .bulk-modal-footer .bulk-cancel {
+        background: #ecf0f1;
+        color: #2c3e50;
+    }
+
+    .bulk-modal-footer .bulk-cancel:hover {
+        background: #bdc3c7;
+    }
+
+    /* Notification */
+    @keyframes slideIn {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    .bulk-notification {
+        animation: slideIn 0.3s ease;
+    }
+</style>
+
+<!-- Status Update Modal -->
+<div id="bulk-status-modal" class="bulk-modal bulk-status-modal">
+    <div class="bulk-modal-content">
+        <div class="bulk-modal-header">
+            <h2>Update Status</h2>
+            <button class="bulk-modal-close bulk-status-close">&times;</button>
+        </div>
+        <div class="bulk-modal-body">
+            <div class="bulk-form-group">
+                <label for="bulk-status-select">New Status:</label>
+                <select id="bulk-status-select" class="bulk-status-select">
+                    <option value="">-- Select Status --</option>
+                </select>
+            </div>
+        </div>
+        <div class="bulk-modal-footer">
+            <button class="bulk-cancel bulk-status-close">Cancel</button>
+            <button class="bulk-submit bulk-status-submit">Update Status</button>
+        </div>
+    </div>
+</div>
+
+<!-- Email Modal -->
+<div id="bulk-email-modal" class="bulk-modal bulk-email-modal">
+    <div class="bulk-modal-content">
+        <div class="bulk-modal-header">
+            <h2>Send Email</h2>
+            <button class="bulk-modal-close bulk-email-close">&times;</button>
+        </div>
+        <div class="bulk-modal-body">
+            <div class="bulk-form-group">
+                <label for="bulk-email-type-select">Email Type:</label>
+                <select id="bulk-email-type-select" class="bulk-email-type-select">
+                    <option value="">-- Select Email Type --</option>
+                </select>
+            </div>
+            <div class="bulk-email-custom-fields">
+                <div class="bulk-form-group">
+                    <label for="bulk-email-subject">Subject:</label>
+                    <input type="text" id="bulk-email-subject" class="bulk-email-subject" placeholder="Email subject">
+                </div>
+                <div class="bulk-form-group">
+                    <label for="bulk-email-message">Message:</label>
+                    <textarea id="bulk-email-message" class="bulk-email-message" placeholder="Email message"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="bulk-modal-footer">
+            <button class="bulk-cancel bulk-email-close">Cancel</button>
+            <button class="bulk-submit bulk-email-submit">Send Email</button>
+        </div>
+    </div>
+</div>

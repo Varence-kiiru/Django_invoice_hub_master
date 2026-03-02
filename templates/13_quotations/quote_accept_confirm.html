@@ -1,0 +1,255 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Accept Quotation - {{ quote.quote_number }}{% endblock %}
+
+{% block page_title %}Accept Quotation{% endblock %}
+{% block page_description %}Confirm acceptance of quotation {{ quote.quote_number }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/quotations.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <!-- Alerts -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb-nav" aria-label="breadcrumb">
+    <a href="{% url 'core:dashboard' %}">Dashboard</a> 
+    <span>/</span> 
+    <a href="{% url 'quotations:list' %}">Quotations</a> 
+    <span>/</span> 
+    <a href="{% url 'quotations:detail' quote.id %}">{{ quote.quote_number }}</a> 
+    <span>/</span> 
+    <span>Accept Quotation</span>
+  </nav>
+
+  <div class="quote-form-section">
+    <div class="form-header">
+      <h2>Accept Quotation</h2>
+      <p class="section-subtitle">Confirm that quotation {{ quote.quote_number }} has been accepted by the client</p>
+    </div>
+
+    <!-- Quotation Summary -->
+    <div class="info-card">
+      <h3>Quotation Details</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Quotation #</span>
+          <span class="info-value">{{ quote.quote_number }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Client</span>
+          <span class="info-value">{{ quote.client.name }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Amount</span>
+          <span class="info-value">{{ quote.currency }} {{ quote.total_amount|floatformat:2 }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Current Status</span>
+          <span class="info-value">
+            <span class="status-badge status-{{ quote.status }}">
+              {{ quote.get_status_display }}
+            </span>
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Quote Date</span>
+          <span class="info-value">{{ quote.quote_date|date:'F d, Y' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Valid Until</span>
+          <span class="info-value">{{ quote.valid_until|date:'F d, Y' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Acceptance Form -->
+    <form method="post" id="accept-form" class="quote-form">
+      {% csrf_token %}
+
+      <!-- Confirmation Alert -->
+      <div class="alert alert-info" style="margin-bottom: 2rem;">
+        <strong>✓ Accepting this quotation means:</strong>
+        <ul style="margin-bottom: 0; padding-left: 1.5rem;">
+          <li>The quotation status will change to <strong>Accepted</strong></li>
+          <li>The current date/time will be recorded as acceptance time</li>
+          <li>An acceptance notification email will be sent to the client</li>
+          <li>You'll be able to convert this quotation to an invoice immediately</li>
+        </ul>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <a href="{% url 'quotations:detail' quote.id %}" class="btn btn-secondary">
+          ← Cancel
+        </a>
+        <button type="submit" class="btn btn-success btn-lg">
+          ✓ Confirm Acceptance
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .info-card {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .info-card h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .info-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .info-value {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #1a1a1a;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .status-draft {
+    background: #e3f2fd;
+    color: #1976d2;
+  }
+
+  .status-sent {
+    background: #f3e5f5;
+    color: #7b1fa2;
+  }
+
+  .status-viewed {
+    background: #e0f2f1;
+    color: #00695c;
+  }
+
+  .quote-form {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    justify-content: flex-end;
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s;
+    font-weight: 600;
+  }
+
+  .btn-secondary {
+    background: #95a5a6;
+    color: white;
+  }
+
+  .btn-secondary:hover {
+    background: #7f8c8d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(159, 168, 174, 0.3);
+  }
+
+  .btn-success {
+    background: #28a745;
+    color: white;
+  }
+
+  .btn-success:hover {
+    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+  }
+
+  .btn-lg {
+    padding: 0.9rem 2rem;
+    font-size: 1.1rem;
+  }
+
+  .alert {
+    padding: 1.5rem;
+    border-radius: 6px;
+    border-left: 4px solid #0066cc;
+  }
+
+  .alert-info {
+    background: #e3f2fd;
+    color: #1976d2;
+    border-left-color: #1976d2;
+  }
+
+  .alert ul {
+    margin: 0;
+    padding-left: 1.5rem;
+  }
+
+  .alert li {
+    margin-bottom: 0.5rem;
+  }
+</style>
+{% endblock %}

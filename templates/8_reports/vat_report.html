@@ -1,0 +1,136 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h2 mb-2">VAT Report</h1>
+            <p class="text-muted">Value Added Tax breakdown and reconciliation</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'core:reports-invoices' %}" class="btn btn-outline-secondary">Back to Reports</a>
+        </div>
+    </div>
+
+    <!-- Reports Navigation Tabs -->
+    <div class="card mb-4 border-top border-primary border-3">
+        <div class="card-body p-2">
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'core:reports-invoices' %}" class="btn btn-sm btn-outline-primary">📄 Invoices</a>
+                <a href="{% url 'core:reports-payments' %}" class="btn btn-sm btn-outline-primary">💰 Payments</a>
+                <a href="{% url 'core:reports-vat' %}" class="btn btn-sm btn-primary active">🏛️ VAT</a>
+                <a href="{% url 'core:reports-aging' %}" class="btn btn-sm btn-outline-primary">📈 Aging</a>
+                <a href="{% url 'core:reports-outstanding' %}" class="btn btn-sm btn-outline-primary">⚠️ Outstanding</a>
+                <a href="{% url 'core:reports-product-sales' %}" class="btn btn-sm btn-outline-primary">📊 Sales</a>
+                <a href="{% url 'core:reports-monthly-summary' %}" class="btn btn-sm btn-outline-primary">📅 Monthly</a>
+                <a href="{% url 'core:reports-tax' %}" class="btn btn-sm btn-outline-primary">📋 Tax</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Card -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h6 class="card-title fw-bold mb-3">Filter By Date</h6>
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">From Date</label>
+                    <input type="date" name="from_date" class="form-control" value="{{ from_date }}" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">To Date</label>
+                    <input type="date" name="to_date" class="form-control" value="{{ to_date }}" />
+                </div>
+                <div class="col-md-4 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <a href="?" class="btn btn-outline-secondary">Clear</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card bg-light border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Total Taxable Amount</h6>
+                    <h3 class="mb-0 text-primary">KES {{ subtotal|floatformat:2 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-light border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Total VAT Collected</h6>
+                    <h3 class="mb-0 text-success">KES {{ vat_total|floatformat:2 }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VAT Breakdown Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h6 class="mb-0 fw-bold">VAT Breakdown by Invoice</h6>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Invoice #</th>
+                        <th>Client</th>
+                        <th>Invoice Date</th>
+                        <th>Subtotal</th>
+                        <th>VAT Rate</th>
+                        <th>VAT Amount</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invoice in invoices %}
+                    <tr>
+                        <td><strong>{{ invoice.invoice_number }}</strong></td>
+                        <td>{{ invoice.client.name }}</td>
+                        <td>{{ invoice.invoice_date|date:"d M Y" }}</td>
+                        <td class="text-end">KES {{ invoice.subtotal_amount|floatformat:2 }}</td>
+                        <td class="text-center">16%</td>
+                        <td class="text-end"><strong>KES {{ invoice.vat_amount|floatformat:2 }}</strong></td>
+                        <td class="text-end">KES {{ invoice.total_amount|floatformat:2 }}</td>
+                        <td>
+                            <a href="{% url 'invoices:detail' invoice.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            <i class="bi bi-inbox"></i> No invoices found for selected period
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Print Button -->
+    <div class="d-flex justify-content-end gap-2 mt-4">
+        <button onclick="location.href='{% url 'core:vat-report-pdf' %}' + window.location.search" class="btn btn-outline-secondary">
+            <i class="bi bi-printer"></i> Download PDF
+        </button>
+        <a href="{% url 'core:reports-invoices' %}" class="btn btn-secondary">Back</a>
+    </div>
+</div>
+
+<style>
+    @media print {
+        .btn, .row:has(.col-md-4), form { display: none !important; }
+        .card { box-shadow: none !important; border: 1px solid #ccc !important; }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,28 @@
+<!-- Quick Actions Widget -->
+<div class="card card-widget card-actions">
+  <div class="card-header">
+    <h4 class="card-title">
+      <span aria-hidden="true">⚡</span> Quick Actions
+    </h4>
+  </div>
+  <div class="card-body">
+    <div class="action-buttons">
+      <a href="{% url 'invoices:create' %}" class="btn btn-action btn-block">
+        <span class="btn-icon" aria-hidden="true">📄</span>
+        <span class="btn-text">New Invoice</span>
+      </a>
+      <a href="{% url 'clients:create' %}" class="btn btn-action btn-block">
+        <span class="btn-icon" aria-hidden="true">👤</span>
+        <span class="btn-text">New Client</span>
+      </a>
+      <a href="{% url 'payments:create' %}" class="btn btn-action btn-block">
+        <span class="btn-icon" aria-hidden="true">💰</span>
+        <span class="btn-text">Record Payment</span>
+      </a>
+      <a href="{% url 'products:create' %}" class="btn btn-action btn-block">
+        <span class="btn-icon" aria-hidden="true">📦</span>
+        <span class="btn-text">New Product</span>
+      </a>
+    </div>
+  </div>
+</div>

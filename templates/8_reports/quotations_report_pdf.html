@@ -1,0 +1,154 @@
+{% extends "layouts/pdf_base.html" %}
+
+{% block title %}Quotations Report{% endblock %}
+
+{% block content %}
+<div class="pdf-header">
+    {% if company_logo %}
+        <img src="{{ company_logo }}" alt="Logo" class="pdf-logo">
+    {% endif %}
+    <div class="company-info">
+        <h2>{{ company_name }}</h2>
+        <p>{{ company_address }}</p>
+        <p>Tel: {{ company_phone }}</p>
+        <p>Email: {{ company_email }}</p>
+        {% if company_tax_id %}
+        <p>Tax ID: {{ company_tax_id }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="report-title">Quotation Register Report</div>
+<div class="report-subtitle">Complete view of all quotations</div>
+
+{% if from_date or to_date %}
+<div class="filters-box">
+    <strong>Filter Period:</strong>
+    {% if from_date %}{{ from_date }}{% endif %}
+    {% if from_date and to_date %} to {% endif %}
+    {% if to_date %}{{ to_date }}{% endif %}
+    {% if status_filter %}<br><strong>Status:</strong> {{ status_filter }}{% endif %}
+    {% if client_name %}<br><strong>Client:</strong> {{ client_name }}{% endif %}
+</div>
+{% endif %}
+
+<!-- Statistics -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Total Quotations</div>
+        <div class="stat-value">{{ summary.total_quotations|default:0 }}</div>
+        <div class="stat-detail">All time</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Total Value</div>
+        <div class="stat-value">KES {{ summary.total_value|default:'0.00' }}</div>
+        <div class="stat-detail">Grand total</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">VAT Total</div>
+        <div class="stat-value">KES {{ summary.vat_total|default:'0.00' }}</div>
+        <div class="stat-detail">Total VAT</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Conversion Rate</div>
+        <div class="stat-value">{{ summary.conversion_rate|default:'0%' }}</div>
+        <div class="stat-detail">Converted to Invoice</div>
+    </div>
+</div>
+
+<!-- Status Breakdown -->
+<div class="section-title">Status Breakdown</div>
+<table class="summary-table">
+    <tr>
+        <td class="label">Draft:</td>
+        <td class="value">{{ status_breakdown.draft|default:0 }}</td>
+        <td class="label" style="padding-left: 20px;">Issued:</td>
+        <td class="value">{{ status_breakdown.issued|default:0 }}</td>
+    </tr>
+    <tr>
+        <td class="label">Sent:</td>
+        <td class="value">{{ status_breakdown.sent|default:0 }}</td>
+        <td class="label" style="padding-left: 20px;">Viewed:</td>
+        <td class="value">{{ status_breakdown.viewed|default:0 }}</td>
+    </tr>
+    <tr>
+        <td class="label">Accepted:</td>
+        <td class="value">{{ status_breakdown.accepted|default:0 }}</td>
+        <td class="label" style="padding-left: 20px;">Converted:</td>
+        <td class="value">{{ status_breakdown.converted|default:0 }}</td>
+    </tr>
+    <tr>
+        <td class="label">Expired:</td>
+        <td class="value">{{ status_breakdown.expired|default:0 }}</td>
+        <td class="label" style="padding-left: 20px;">Rejected:</td>
+        <td class="value">{{ status_breakdown.rejected|default:0 }}</td>
+    </tr>
+</table>
+
+<!-- Quotations Table -->
+<div class="section-title">Quotation Details</div>
+
+{% if quotes %}
+<table>
+    <thead>
+        <tr>
+            <th>Quote #</th>
+            <th>Client</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>VAT</th>
+            <th>Status</th>
+            <th>Valid Until</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for quote in quotes %}
+        <tr>
+            <td><strong>{{ quote.quote_number }}</strong></td>
+            <td>{{ quote.client.name }}</td>
+            <td>{{ quote.quote_date|date:"d/m/Y" }}</td>
+            <td class="amount">KES {{ quote.total_amount|floatformat:2 }}</td>
+            <td class="amount">KES {{ quote.vat_amount|floatformat:2 }}</td>
+            <td>
+                <span class="status-badge status-{{ quote.status|lower }}">
+                    {{ quote.get_status_display|upper }}
+                </span>
+            </td>
+            <td>{{ quote.valid_until|date:"d/m/Y" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="no-data">No quotations found</div>
+{% endif %}
+
+<!-- Summary -->
+<div class="page-break"></div>
+<table class="summary-table">
+    <tr>
+        <td class="label">Total Quotations:</td>
+        <td class="value">{{ summary.total_quotations|default:0 }}</td>
+    </tr>
+    <tr>
+        <td class="label">Total Value:</td>
+        <td class="value">KES {{ summary.total_value|default:'0.00' }}</td>
+    </tr>
+    <tr>
+        <td class="label">Total VAT:</td>
+        <td class="value">KES {{ summary.vat_total|default:'0.00' }}</td>
+    </tr>
+    <tr>
+        <td class="label">Converted Quotations:</td>
+        <td class="value">{{ summary.converted|default:0 }}</td>
+    </tr>
+    <tr>
+        <td class="label">Conversion Rate:</td>
+        <td class="value">{{ summary.conversion_rate|default:'0%' }}</td>
+    </tr>
+</table>
+
+<div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; text-align: center; color: #666;">
+    <p>Report generated on {{ "now"|date:"d M Y, H:i" }}</p>
+</div>
+{% endblock %}

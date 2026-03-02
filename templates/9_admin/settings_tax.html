@@ -1,0 +1,267 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Tax Settings - Administration{% endblock %}
+
+{% block page_title %}Tax Settings{% endblock %}
+{% block page_description %}Manage tax rates and configurations{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/tax_management.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <!-- Page Header with Actions -->
+  <div class="settings-header">
+    <div class="header-content">
+      <h2>Tax Rates Management</h2>
+      <p class="text-muted">View and manage tax rates and VAT rules for your invoices</p>
+    </div>
+    <div class="header-actions">
+      <a href="{% url 'taxes:list' %}" class="btn btn-primary">
+        <i class="bi bi-pencil"></i> Manage Tax Rates
+      </a>
+      <a href="{% url 'taxes:vat-rules-list' %}" class="btn btn-secondary">
+        <i class="bi bi-diagram-3"></i> View VAT Rules
+      </a>
+    </div>
+  </div>
+
+  <!-- Quick Info Alert -->
+  <div class="alert alert-info alert-soft mb-4">
+    <h5 class="alert-heading"><i class="bi bi-info-circle"></i> Professional Tax Management System</h5>
+    <p class="mb-2">
+      The tax rate management system has been completely redesigned with a professional HTML interface. 
+      You can now manage all tax rates and VAT rules directly through the web interface without using REST APIs.
+    </p>
+    <p class="mb-0">
+      <strong>Benefits:</strong> Full CRUD operations, advanced filtering, search functionality, bulk operations, 
+      and comprehensive audit trails for all tax-related changes.
+    </p>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-content">
+        <span class="stat-label">Total Rates</span>
+        <span class="stat-value">{{ tax_rates|length }}</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <span class="stat-label">Active</span>
+        <span class="stat-value">
+          {% with active_count=tax_rates|dictsort:"is_active"|slice:"-1:"|length %}
+            {{ active_count }}
+          {% endwith %}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tax Rates Table -->
+  <div class="card">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">💰 Tax Rates</h5>
+    </div>
+    
+    {% if tax_rates %}
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Rate</th>
+              <th>Type</th>
+              <th>Country</th>
+              <th>Effective From</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for rate in tax_rates %}
+              <tr>
+                <td>
+                  <strong>{{ rate.code }}</strong>
+                </td>
+                <td>{{ rate.name }}</td>
+                <td>
+                  <span class="badge bg-info">{{ rate.rate_percentage }}%</span>
+                </td>
+                <td>{{ rate.get_tax_type_display }}</td>
+                <td>{{ rate.country }}</td>
+                <td>{{ rate.effective_from|date:"d M Y" }}</td>
+                <td>
+                  {% if rate.is_active %}
+                    <span class="badge bg-success">✓ Active</span>
+                  {% else %}
+                    <span class="badge bg-secondary">○ Inactive</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="card-body text-center py-5">
+        <p class="text-muted mb-3">📭 No tax rates configured yet</p>
+        <p class="text-muted small mb-3">Start creating tax rates through the professional management interface</p>
+        <a href="{% url 'taxes:create' %}" class="btn btn-success">
+          <i class="bi bi-plus-circle"></i> Create First Tax Rate
+        </a>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Information Panel -->
+  <div class="info-panel mt-4">
+    <div class="panel-header">
+      <h5>ℹ️ About Tax Rates</h5>
+    </div>
+    <div class="panel-body">
+      <ul class="info-list">
+        <li><strong>Code:</strong> Unique identifier for the tax rate (e.g., VAT-20, GST-10)</li>
+        <li><strong>Name:</strong> Descriptive name of the tax rate</li>
+        <li><strong>Rate:</strong> The percentage applied to invoice amounts</li>
+        <li><strong>Type:</strong> Whether it's VAT, GST, Sales Tax, or other type</li>
+        <li><strong>Country:</strong> The country where this rate applies</li>
+        <li><strong>Effective From:</strong> The date this rate becomes active</li>
+        <li><strong>Status:</strong> Whether this rate is currently active for use</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<style>
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.header-content h2 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.75rem;
+  color: #333;
+}
+
+.header-content .text-muted {
+  margin: 0;
+  color: #6c757d;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stat-icon {
+  font-size: 2rem;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.info-panel {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.panel-header {
+  background: #e9ecef;
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.panel-header h5 {
+  margin: 0;
+  color: #333;
+}
+
+.panel-body {
+  padding: 1rem;
+}
+
+.info-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.info-list li {
+  padding: 0.5rem 0;
+  color: #555;
+  font-size: 0.9375rem;
+}
+
+.info-list strong {
+  color: #333;
+}
+
+@media (max-width: 768px) {
+  .settings-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .header-actions {
+    width: 100%;
+  }
+
+  .header-actions .btn {
+    width: 100%;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .action-buttons {
+    flex-wrap: wrap;
+  }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "layouts/pdf_base.html" %}
+
+{% block title %}Outstanding Invoices Report{% endblock %}
+
+{% block content %}
+<div class="pdf-header">
+    {% if company_logo %}
+        <img src="{{ company_logo }}" alt="Logo" class="pdf-logo">
+    {% endif %}
+    <div class="company-info">
+        <h2>{{ company_name }}</h2>
+        <p>{{ company_address }}</p>
+        <p>Tel: {{ company_phone }}</p>
+        <p>Email: {{ company_email }}</p>
+        {% if company_tax_id %}
+        <p>Tax ID: {{ company_tax_id }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="report-title">Outstanding Invoices Report</div>
+<div class="report-subtitle">All invoices with unpaid or partial payments</div>
+
+<!-- Outstanding Invoices Table -->
+<div class="section-title">Outstanding Invoices Details</div>
+
+{% if invoices %}
+<table>
+    <thead>
+        <tr>
+            <th>Invoice #</th>
+            <th>Client</th>
+            <th>Invoice Date</th>
+            <th>Due Date</th>
+            <th>Total Amount</th>
+            <th>Outstanding</th>
+            <th>Days Outstanding</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for invoice in invoices %}
+        <tr>
+            <td><strong>{{ invoice.invoice_number }}</strong></td>
+            <td>{{ invoice.client.name }}</td>
+            <td>{{ invoice.invoice_date|date:"d/m/Y" }}</td>
+            <td>{{ invoice.due_date|date:"d/m/Y" }}</td>
+            <td class="amount">KES {{ invoice.total_amount|floatformat:2 }}</td>
+            <td class="amount">KES {{ invoice.amount_due|floatformat:2 }}</td>
+            <td class="amount">
+                {% if today >= invoice.due_date %}
+                    {{ today|add:invoice.due_date|timeuntil }}
+                {% else %}
+                    0
+                {% endif %}
+            </td>
+            <td>
+                <span class="status-badge status-{{ invoice.status|lower }}">
+                    {{ invoice.get_status_display|upper }}
+                </span>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="no-data">No outstanding invoices found</div>
+{% endif %}
+{% endblock %}

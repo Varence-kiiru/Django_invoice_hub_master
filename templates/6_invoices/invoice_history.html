@@ -1,0 +1,319 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}History - Invoice {{ invoice.invoice_number }}{% endblock %}
+
+{% block page_title %}Invoice History{% endblock %}
+{% block page_description %}Audit log for invoice {{ invoice.invoice_number }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/invoices.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <div class="history-section">
+    <div class="section-header">
+      <h2>Invoice History {{ invoice.invoice_number }}</h2>
+      <p>All changes to this invoice are tracked and audited</p>
+    </div>
+
+    <!-- History Timeline -->
+    {% if history %}
+      <div class="history-timeline">
+        {% for entry in history %}
+          <div class="history-item">
+            <div class="history-marker {% if entry.action == 'create' %}create{% elif entry.action == 'update' %}update{% elif entry.action == 'delete' %}delete{% endif %}">
+              {% if entry.action == 'create' %}
+                ✚
+              {% elif entry.action == 'update' %}
+                ◉
+              {% elif entry.action == 'delete' %}
+                ✕
+              {% else %}
+                •
+              {% endif %}
+            </div>
+
+            <div class="history-content">
+              <div class="history-header">
+                <h4>
+                  {{ entry.get_action_display }}
+                  <span class="action-badge action-{{ entry.action }}">{{ entry.action|upper }}</span>
+                </h4>
+                <p class="history-time">{{ entry.timestamp|date:"M d, Y \a\t H:i:s" }}</p>
+              </div>
+
+              <div class="history-details">
+                <div class="detail-row">
+                  <span class="detail-label">By:</span>
+                  <span class="detail-value">
+                    {% if entry.actor %}
+                      {{ entry.actor.get_full_name|default:entry.actor.username }}
+                    {% else %}
+                      System
+                    {% endif %}
+                  </span>
+                </div>
+
+                {% if entry.changes %}
+                  <div class="changes-list">
+                    <p style="font-weight: 600; margin: 10px 0 5px 0;">Changes:</p>
+                    {% for field, old_val, new_val in entry.changes %}
+                      <div class="change-item">
+                        <span class="field-name">{{ field }}:</span>
+                        <span class="old-value">{{ old_val }}</span>
+                        <span class="arrow">→</span>
+                        <span class="new-value">{{ new_val }}</span>
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+
+                {% if entry.notes %}
+                  <div class="entry-notes">
+                    <p><strong>Notes:</strong> {{ entry.notes }}</p>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <h3>No History Available</h3>
+        <p>No audit log entries found for this invoice.</p>
+      </div>
+    {% endif %}
+
+    <!-- Back Link -->
+    <div class="form-actions" style="margin-top: 30px;">
+      <a href="{% url 'invoices:detail' invoice.id %}" class="btn btn-secondary">← Back to Invoice</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .history-section {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .section-header {
+    margin-bottom: 30px;
+  }
+
+  .section-header h2 {
+    margin: 0 0 5px 0;
+  }
+
+  .section-header p {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+
+  .history-timeline {
+    position: relative;
+    padding-left: 40px;
+  }
+
+  .history-timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border-color);
+  }
+
+  .history-item {
+    display: flex;
+    margin-bottom: 25px;
+    position: relative;
+  }
+
+  .history-marker {
+    position: absolute;
+    left: -42px;
+    width: 24px;
+    height: 24px;
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  .history-marker.create {
+    background: #d4edda;
+    border-color: #28a745;
+    color: #28a745;
+  }
+
+  .history-marker.update {
+    background: #d1ecf1;
+    border-color: #17a2b8;
+    color: #17a2b8;
+  }
+
+  .history-marker.delete {
+    background: #f8d7da;
+    border-color: #dc3545;
+    color: #dc3545;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .history-marker.create {
+      background: rgba(40, 167, 69, 0.2);
+    }
+    .history-marker.update {
+      background: rgba(23, 162, 184, 0.2);
+    }
+    .history-marker.delete {
+      background: rgba(220, 53, 69, 0.2);
+    }
+  }
+
+  .history-content {
+    flex: 1;
+    background: rgba(0,0,0,0.02);
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 3px solid var(--border-color);
+  }
+
+  .history-header {
+    margin-bottom: 10px;
+  }
+
+  .history-header h4 {
+    margin: 0 0 5px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .action-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .action-create { background: #d4edda; color: #155724; }
+  .action-update { background: #d1ecf1; color: #0c5460; }
+  .action-delete { background: #f8d7da; color: #721c24; }
+
+  @media (prefers-color-scheme: dark) {
+    .action-create { background: rgba(40, 167, 69, 0.3); color: #84e9a3; }
+    .action-update { background: rgba(23, 162, 184, 0.3); color: #7dd4e3; }
+    .action-delete { background: rgba(220, 53, 69, 0.3); color: #f59e95; }
+  }
+
+  .history-time {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 12px;
+  }
+
+  .history-details {
+    font-size: 13px;
+  }
+
+  .detail-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .detail-label {
+    font-weight: 600;
+    min-width: 80px;
+    color: var(--text-secondary);
+  }
+
+  .detail-value {
+    color: var(--text-primary);
+  }
+
+  .changes-list {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .change-item {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 5px;
+    align-items: center;
+    font-size: 12px;
+  }
+
+  .field-name {
+    font-weight: 600;
+    color: var(--text-secondary);
+    min-width: 100px;
+  }
+
+  .old-value {
+    background: rgba(220, 53, 69, 0.1);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--danger-color);
+  }
+
+  .new-value {
+    background: rgba(40, 167, 69, 0.1);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--success-color);
+  }
+
+  .arrow {
+    color: var(--text-secondary);
+    font-weight: bold;
+  }
+
+  .entry-notes {
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(255, 193, 7, 0.1);
+    border-radius: 4px;
+    border-left: 3px solid #ffc107;
+  }
+
+  .entry-notes p {
+    margin: 0;
+    font-size: 12px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .empty-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+  }
+
+  .empty-state h3 {
+    margin: 10px 0;
+  }
+
+  .empty-state p {
+    color: var(--text-secondary);
+  }
+</style>
+{% endblock %}

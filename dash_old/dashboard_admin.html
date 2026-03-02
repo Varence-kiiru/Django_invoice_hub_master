@@ -1,0 +1,440 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - Invoicing App{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Page Header -->
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">System Administration</h1>
+    <p class="dashboard-subtitle">Comprehensive system monitoring and management</p>
+  </div>
+
+  <!-- Admin Control Panel -->
+  <div class="dashboard-section">
+    <div class="dashboard-section-title">Administration Controls</div>
+    
+    <div class="admin-grid">
+      <!-- User Management -->
+      <div class="admin-card">
+        <div class="admin-card-title">👥 User Management</div>
+        <div class="admin-card-actions">
+          <a href="{% url 'core:users-management' %}" class="btn btn-primary btn-sm">Manage Users</a>
+          <a href="{% url 'core:users-create-edit' %}" class="btn btn-secondary btn-sm">Create User</a>
+          <a href="{% url 'core:roles-management' %}" class="btn btn-secondary btn-sm">Manage Roles</a>
+        </div>
+      </div>
+
+      <!-- System Settings -->
+      <div class="admin-card">
+        <div class="admin-card-title">⚙️ System Settings</div>
+        <div class="admin-card-actions">
+          <a href="{% url 'core:settings-general' %}" class="btn btn-primary btn-sm">General</a>
+          <a href="{% url 'core:settings-tax' %}" class="btn btn-secondary btn-sm">Tax Configuration</a>
+          <a href="{% url 'core:settings-invoice' %}" class="btn btn-secondary btn-sm">Invoice Settings</a>
+          <a href="{% url 'core:settings-currency' %}" class="btn btn-secondary btn-sm">Currency</a>
+        </div>
+      </div>
+
+      <!-- Audit & Compliance -->
+      <div class="admin-card">
+        <div class="admin-card-title">📋 Audit & Compliance</div>
+        <div class="admin-card-actions">
+          <a href="{% url 'core:audit-log' %}" class="btn btn-primary btn-sm">Audit Log</a>
+          <a href="{% url 'core:system-status' %}" class="btn btn-secondary btn-sm">System Status</a>
+          <a href="{% url 'core:backup-restore' %}" class="btn btn-secondary btn-sm">Backup & Recovery</a>
+        </div>
+      </div>
+
+      <!-- Email Configuration -->
+      <div class="admin-card">
+        <div class="admin-card-title">📧 Email Settings</div>
+        <div class="admin-card-actions">
+          <a href="{% url 'core:settings-email' %}" class="btn btn-primary btn-sm">Email Config</a>
+          <a href="{% url 'core:settings' %}" class="btn btn-secondary btn-sm">Notifications</a>
+        </div>
+      </div>
+
+      <!-- Database -->
+      <div class="admin-card">
+        <div class="admin-card-title">💾 Database</div>
+        <div class="admin-card-actions">
+          <a href="{% url 'core:backup-restore' %}" class="btn btn-primary btn-sm">Backup Now</a>
+          <a href="{% url 'core:system-status' %}" class="btn btn-secondary btn-sm">Database Status</a>
+        </div>
+      </div>
+
+      <!-- Reporting -->
+      <div class="admin-card">
+        <div class="admin-card-title">📊 Reports</div>
+        <div class="admin-card-actions">
+          <a href="{% url 'core:reports-invoices' %}" class="btn btn-primary btn-sm">Invoice Reports</a>
+          <a href="{% url 'core:reports-payments' %}" class="btn btn-secondary btn-sm">Payment Reports</a>
+          <a href="{% url 'core:audit-log' %}" class="btn btn-secondary btn-sm">Activity Log</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comprehensive KPI Dashboard -->
+  <div class="dashboard-grid" role="region" aria-label="Key Performance Indicators">
+    <!-- Total Invoices -->
+    <div class="kpi-card" role="article">
+      <div class="kpi-label" id="kpi-invoices-label">📄 Total Invoices</div>
+      <div class="kpi-value" aria-labelledby="kpi-invoices-label" role="status">{{ total_invoices|default:'0' }}</div>
+      <div class="kpi-change {% if issued_invoices > 0 %}positive{% else %}neutral{% endif %}">
+        <span aria-hidden="true">{% if issued_invoices > 0 %}↑{% else %}→{% endif %}</span> <span>{{ issued_invoices|default:'0' }} issued this month</span>
+      </div>
+    </div>
+
+    <!-- Total Clients -->
+    <div class="kpi-card" role="article">
+      <div class="kpi-label" id="kpi-clients-label">👥 Active Clients</div>
+      <div class="kpi-value" aria-labelledby="kpi-clients-label" role="status">{{ total_clients|default:'0' }}</div>
+      <div class="kpi-change {% if total_clients > 0 %}positive{% else %}neutral{% endif %}">
+        <span>{% if total_clients > 0 %}<span aria-hidden="true">✓</span> Active{% else %}<span aria-hidden="true">→</span> Get started{% endif %}</span>
+      </div>
+    </div>
+
+    <!-- Total Revenue -->
+    <div class="kpi-card" role="article">
+      <div class="kpi-label" id="kpi-revenue-label">💰 Total Revenue</div>
+      <div class="kpi-value kpi-large" aria-labelledby="kpi-revenue-label" role="status">{{ company_settings.currency_symbol }}{{ total_revenue|default:'0'|floatformat:2 }}</div>
+      <div class="kpi-change {% if revenue_trend == 'up' %}positive{% elif revenue_trend == 'down' %}negative{% else %}neutral{% endif %}">
+        <span aria-hidden="true">{% if revenue_trend == 'up' %}↑{% elif revenue_trend == 'down' %}↓{% else %}→{% endif %}</span> 
+        <span>{% if month_revenue > prev_month_revenue %}+{{ revenue_change|floatformat:0 }}{% elif month_revenue < prev_month_revenue %}-{{ revenue_change|floatformat:0 }}{% else %}0{% endif %}% vs last month</span>
+      </div>
+    </div>
+
+    <!-- Monthly Revenue -->
+    <div class="kpi-card" role="article">
+      <div class="kpi-label" id="kpi-month-label">📈 This Month</div>
+      <div class="kpi-value kpi-large" aria-labelledby="kpi-month-label" role="status">{{ company_settings.currency_symbol }}{{ month_revenue|default:'0'|floatformat:2 }}</div>
+      <div class="kpi-change {% if month_revenue > 0 %}positive{% else %}neutral{% endif %}">
+        <span>{% if month_revenue > 0 %}<span aria-hidden="true">✓</span> On track{% else %}<span aria-hidden="true">→</span> No revenue yet{% endif %}</span>
+      </div>
+    </div>
+
+    <!-- Overdue Invoices -->
+    <div class="kpi-card" role="article">
+      <div class="kpi-label" id="kpi-overdue-label">⚠️ Overdue</div>
+      <div class="kpi-value {% if overdue_count > 0 %}kpi-alert{% else %}kpi-success{% endif %}" aria-labelledby="kpi-overdue-label" role="status">
+        {{ overdue_count|default:'0' }}
+      </div>
+      <div class="kpi-change {% if overdue_count > 0 %}negative{% else %}positive{% endif %}">
+        <span>{% if overdue_count > 0 %}! Needs attention{% else %}<span aria-hidden="true">✓</span> None{% endif %}</span>
+      </div>
+    </div>
+
+    <!-- Draft Invoices -->
+    <div class="kpi-card" role="article">
+      <div class="kpi-label" id="kpi-draft-label">📝 In Progress</div>
+      <div class="kpi-value" aria-labelledby="kpi-draft-label" role="status">{{ draft_invoices|default:'0' }}</div>
+      <div class="kpi-change {% if draft_invoices > 0 %}positive{% else %}neutral{% endif %}">
+        <span aria-hidden="true">{% if draft_invoices > 0 %}→{% else %}✓{% endif %}</span> <span>{% if draft_invoices > 0 %}Ready to send{% else %}None in progress{% endif %}</span>
+      </div>
+    </div>
+
+    <!-- Pending Quotations -->
+    <div class="kpi-card" role="article">
+      <div class="kpi-label" id="kpi-quotes-label">📋 Total Quotations</div>
+      <div class="kpi-value" aria-labelledby="kpi-quotes-label" role="status">{{ total_quotations|default:'0' }}</div>
+      <div class="kpi-change {% if sent_quotations > 0 %}positive{% else %}neutral{% endif %}">
+        <span aria-hidden="true">{% if sent_quotations > 0 %}→{% else %}✓{% endif %}</span> 
+        <span>{{ sent_quotations|default:'0' }} awaiting response</span>
+      </div>
+    </div>
+
+    <!-- Quotation Value -->
+    <div class="kpi-card" role="article">
+      <div class="kpi-label" id="kpi-quote-value-label">💵 Quote Value</div>
+      <div class="kpi-value kpi-large" aria-labelledby="kpi-quote-value-label" role="status">{{ company_settings.currency_symbol }}{{ total_quotation_value|default:'0'|floatformat:2 }}</div>
+      <div class="kpi-change {% if month_quotation_value > 0 %}positive{% else %}neutral{% endif %}">
+        <span>This month: {{ company_settings.currency_symbol }}{{ month_quotation_value|default:'0'|floatformat:2 }}</span>
+      </div>
+    </div>
+
+    <!-- Converted Quotations -->
+    <div class="kpi-card" role="article">
+      <div class="kpi-label" id="kpi-converted-label">🔄 Converted to Invoice</div>
+      <div class="kpi-value" aria-labelledby="kpi-converted-label" role="status">{{ converted_quotations|default:'0' }}</div>
+      <div class="kpi-change {% if accepted_quotations > 0 %}positive{% else %}neutral{% endif %}">
+        <span aria-hidden="true">{% if accepted_quotations > 0 %}→{% else %}✓{% endif %}</span> 
+        <span>{{ accepted_quotations|default:'0' }} accepted</span>
+      </div>
+    </div>
+
+    <!-- Total Expenses -->
+    <div class="kpi-card" role="article">
+      <div class="kpi-label" id="kpi-expenses-label">💸 Total Expenses</div>
+      <div class="kpi-value kpi-large" aria-labelledby="kpi-expenses-label" role="status">{{ company_settings.currency_symbol }}{{ total_expenses|default:'0'|floatformat:2 }}</div>
+      <div class="kpi-change {% if month_expenses > 0 %}negative{% else %}neutral{% endif %}">
+        <span>This month: {{ company_settings.currency_symbol }}{{ month_expenses|default:'0'|floatformat:2 }}</span>
+      </div>
+    </div>
+
+    <!-- Profit Margin -->
+    <div class="kpi-card" role="article">
+      <div class="kpi-label" id="kpi-profit-label">📊 Profit Margin</div>
+      <div class="kpi-value {% if profit_margin > 20 %}kpi-success{% elif profit_margin > 10 %}kpi-warning{% else %}kpi-alert{% endif %}" aria-labelledby="kpi-profit-label" role="status">
+        {{ profit_margin|default:'0'|floatformat:1 }}%
+      </div>
+      <div class="kpi-change">
+        <span>Revenue minus expenses</span>
+      </div>
+    </div>
+
+    <!-- Outstanding Revenue -->
+    <div class="kpi-card" role="article">
+      <div class="kpi-label" id="kpi-outstanding-label">💎 Outstanding</div>
+      <div class="kpi-value kpi-large" aria-labelledby="kpi-outstanding-label" role="status">{{ company_settings.currency_symbol }}{{ outstanding_revenue|default:'0'|floatformat:2 }}</div>
+      <div class="kpi-change">
+        <span>Awaiting payment</span>
+      </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="kpi-card" role="article">
+      <div class="kpi-label" id="kpi-status-label">🔧 System Status</div>
+      <div class="kpi-value {% if system_status == 'healthy' %}kpi-success{% else %}kpi-alert{% endif %}" aria-labelledby="kpi-status-label" role="status">
+        {% if system_status == 'healthy' %}✓ Healthy{% else %}⚠ Alert{% endif %}
+      </div>
+      <div class="kpi-change">
+        <span>
+          {% if overdue_count > 0 %}
+            {{ overdue_count }} overdue invoice(s)
+          {% elif expiring_quotations %}
+            {{ expiring_quotations|length }} expiring quote(s)
+          {% else %}
+            All systems operational
+          {% endif %}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Invoice Status Breakdown -->
+  <div class="dashboard-section">
+    <div class="dashboard-section-title">Invoice Status Breakdown</div>
+    <div class="revenue-breakdown">
+      <div class="breakdown-item">
+        <div class="breakdown-label">Draft</div>
+        <div class="breakdown-value">{{ draft_invoices|default:'0' }}</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-label">Issued</div>
+        <div class="breakdown-value">{{ issued_invoices|default:'0' }}</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-label">Paid</div>
+        <div class="breakdown-value">{{ paid_invoices|default:'0' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quotation Status Breakdown -->
+  <div class="dashboard-section">
+    <div class="dashboard-section-title">Quotation Status Breakdown</div>
+    <div class="revenue-breakdown">
+      <div class="breakdown-item">
+        <div class="breakdown-label">Draft</div>
+        <div class="breakdown-value">{{ draft_quotations|default:'0' }}</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-label">Issued</div>
+        <div class="breakdown-value">{{ issued_quotations|default:'0' }}</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-label">Sent</div>
+        <div class="breakdown-value">{{ sent_quotations|default:'0' }}</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-label">Accepted</div>
+        <div class="breakdown-value">{{ accepted_quotations|default:'0' }}</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-label">Converted</div>
+        <div class="breakdown-value">{{ converted_quotations|default:'0' }}</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-label">Expired</div>
+        <div class="breakdown-value">{{ expired_quotations|default:'0' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alerts Section -->
+  {% if overdue_invoices or expiring_quotations %}
+  <div class="dashboard-section">
+    <div class="dashboard-section-title">⚠️ Alerts & Notifications</div>
+    
+    <div class="dashboard-grid-2col">
+      {% if overdue_invoices %}
+      <div class="dashboard-panel">
+        <h3 class="dashboard-panel-title">Overdue Invoices</h3>
+        <div class="dashboard-flex-column">
+          {% for invoice in overdue_invoices %}
+          <div class="alert-item alert-critical">
+            <strong>{{ invoice.invoice_number }}</strong> - {{ invoice.client.name|default:'Client' }}
+            <br><small>Due: {{ invoice.due_date|date:'M d, Y' }} | Amount: {{ company_settings.currency_symbol }}{{ invoice.amount_due|floatformat:2 }}</small>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if expiring_quotations %}
+      <div class="dashboard-panel">
+        <h3 class="dashboard-panel-title">Expiring Quotations</h3>
+        <div class="dashboard-flex-column">
+          {% for quote in expiring_quotations %}
+          <div class="alert-item alert-warning">
+            <strong>{{ quote.quote_number }}</strong> - {{ quote.client.name|default:'Client' }}
+            <br><small>Expires: {{ quote.valid_until|date:'M d, Y' }} | Value: {{ quote.currency }} {{ quote.total_amount|floatformat:2 }}</small>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Recent Invoices -->
+  <div class="dashboard-section">
+    <div class="dashboard-flex-row">
+      <div class="dashboard-section-title">Recent Invoices</div>
+      <a href="{% url 'invoices:list' %}" class="btn btn-secondary btn-sm">View All →</a>
+    </div>
+    
+    <div class="dashboard-card">
+      {% if recent_invoices %}
+        <table class="recent-table">
+          <thead>
+            <tr>
+              <th>Invoice #</th>
+              <th>Client</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for invoice in recent_invoices %}
+              <tr>
+                <td><strong>{{ invoice.invoice_number }}</strong></td>
+                <td>{{ invoice.client.name|default:'N/A' }}</td>
+                <td>{{ company_settings.currency_symbol }}{{ invoice.total_amount|default:'0'|floatformat:2 }}</td>
+                <td>
+                  <span class="badge badge-{{ invoice.status }}">
+                    {{ invoice.get_status_display }}
+                  </span>
+                </td>
+                <td>{{ invoice.invoice_date|date:'M d, Y' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="dashboard-card-empty">
+          No invoices yet. <a href="{% url 'invoices:create' %}">Create your first invoice →</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Recent Quotations -->
+  <div class="dashboard-section">
+    <div class="dashboard-flex-row">
+      <div class="dashboard-section-title">Recent Quotations</div>
+      <a href="{% url 'quotations:list' %}" class="btn btn-secondary btn-sm">View All →</a>
+    </div>
+
+    <div class="dashboard-card">
+      {% if recent_quotations %}
+        <table class="recent-table">
+          <thead>
+            <tr>
+              <th>Quote #</th>
+              <th>Client</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Valid Until</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for quote in recent_quotations %}
+              <tr>
+                <td>
+                  <a href="{% url 'quotations:detail' quote.id %}" style="color: inherit; text-decoration: none; font-weight: bold;">
+                    {{ quote.quote_number }}
+                  </a>
+                </td>
+                <td>{{ quote.client.name }}</td>
+                <td>{{ quote.currency }} {{ quote.total_amount|floatformat:2 }}</td>
+                <td>
+                  <span class="badge badge-{{ quote.status }}">
+                    {{ quote.get_status_display }}
+                  </span>
+                </td>
+                <td>
+                  {{ quote.valid_until|date:'M d, Y' }}
+                  {% if quote.is_expired %}<br><small style="color: #e74c3c;">EXPIRED</small>{% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="dashboard-card-empty">
+          No quotations yet. <a href="{% url 'quotations:create' %}">Create your first quotation →</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Recent Payments -->
+  <div class="dashboard-section">
+    <div class="dashboard-flex-row">
+      <div class="dashboard-section-title">Recent Payments</div>
+      <a href="{% url 'payments:list' %}" class="btn btn-secondary btn-sm">View All →</a>
+    </div>
+
+    <div class="dashboard-card">
+      {% if recent_payments %}
+        <table class="recent-table">
+          <thead>
+            <tr>
+              <th>Payment ID</th>
+              <th>Client</th>
+              <th>Amount</th>
+              <th>Method</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for payment in recent_payments %}
+              <tr>
+                <td><strong>{{ payment.receipt_number|default:'Pending' }}</strong></td>
+                <td>{{ payment.invoice.client.name|default:'N/A' }}</td>
+                <td>{{ company_settings.currency_symbol }}{{ payment.amount|floatformat:2 }}</td>
+                <td><span class="badge badge-success">{{ payment.payment_method.name|default:'Unknown' }}</span></td>
+                <td>{{ payment.payment_date|date:'M d, Y' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="dashboard-card-empty">
+          No payments recorded yet.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,467 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Record Payment - Invoicing App{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/payments.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <div class="row">
+            <div class="col-md-8">
+                <h1 class="page-title">💰 Record Payment</h1>
+                <p class="text-muted">Register a new payment for an invoice</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{% url 'payments:list' %}" class="btn btn-outline-secondary">← Back to Payments</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Payment Form -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">📝 Payment Details</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Invoice Selection -->
+                        <div class="mb-3">
+                            <label for="invoice" class="form-label">Invoice <span class="text-danger">*</span></label>
+                            <select name="invoice" id="invoice" class="form-control" required onchange="updateInvoiceAmount()">
+                                <option value="">-- Select Invoice --</option>
+                                {% for invoice in invoices %}
+                                    <option value="{{ invoice.id }}" 
+                                        data-amount-due="{{ invoice.amount_due }}"
+                                        data-client="{{ invoice.client.name }}"
+                                        data-currency="{{ invoice.currency }}"
+                                        {% if pre_selected_invoice and pre_selected_invoice.id == invoice.id %}selected{% endif %}>
+                                        {{ invoice.invoice_number }} - {{ invoice.client.name }} (Balance: {{ invoice.currency }} {{ invoice.amount_due|floatformat:2 }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">Choose the invoice to apply this payment to</small>
+                        </div>
+
+                        <!-- Invoice Info (Read-only) -->
+                        <div id="invoice-info" class="card mb-3" style="display: none; border: 2px solid #17a2b8;">
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <strong>Client:</strong><br>
+                                        <span id="client-name" class="text-primary"></span>
+                                    </div>
+                                    <div class="col-md-6 text-end">
+                                        <strong>Invoice Currency:</strong><br>
+                                        <span id="invoice-currency" class="text-muted"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Payment Breakdown -->
+                                <div class="payment-breakdown p-3" style="background-color: #f8f9fa; border-radius: 5px;">
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <small class="text-muted">Original Invoice Amount:</small>
+                                        </div>
+                                        <div class="col-6 text-end">
+                                            <strong id="original-amount"></strong>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2 text-success">
+                                        <div class="col-6">
+                                            <small><i class="icon-check"></i> Already Paid:</small>
+                                        </div>
+                                        <div class="col-6 text-end">
+                                            <strong id="already-paid"></strong>
+                                        </div>
+                                    </div>
+                                    <hr class="my-2">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <small class="text-danger"><i class="icon-minus-circle"></i> Remaining Balance:</small>
+                                        </div>
+                                        <div class="col-6 text-end">
+                                            <strong style="color: #dc3545; font-size: 1.1rem;" id="balance-due"></strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Quick Action Button -->
+                                <div class="mt-3">
+                                    <button type="button" class="btn btn-outline-info w-100" onclick="payRemainingBalance()">
+                                        <i class="icon-lightning"></i> Pay Remaining Balance: <span id="quick-pay-amount"></span>
+                                    </button>
+                                </div>
+
+                                <!-- View Payment History Link -->
+                                <div class="mt-2 text-center">
+                                    <a href="#" id="view-payment-history" class="small text-muted" style="text-decoration: none;">
+                                        <i class="icon-history"></i> View payment history
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="mb-3">
+                            <label for="payment_method" class="form-label">Payment Method <span class="text-danger">*</span></label>
+                            <select name="payment_method" id="payment_method" class="form-control" required onchange="updatePaymentMethodInfo()">
+                                <option value="">-- Select Payment Method --</option>
+                                {% for method in payment_methods %}
+                                    <option value="{{ method.id }}" data-description="{{ method.description }}">
+                                        {{ method.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">Choose how the payment was made</small>
+                        </div>
+
+                        <!-- Payment Method Info -->
+                        <div id="payment-method-info" class="alert alert-secondary mb-3" style="display: none;">
+                            <span id="method-description"></span>
+                        </div>
+
+                        <!-- Amount -->
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">Payment Amount <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text" id="currency-label">{{ company_settings.currency_symbol }}</span>
+                                <input type="number" name="amount" id="amount" class="form-control" 
+                                    placeholder="0.00" step="0.01" min="0" required>
+                            </div>
+                            <small class="form-text text-muted">Amount received from the client</small>
+                        </div>
+
+                        <!-- Payment Date -->
+                        <div class="mb-3">
+                            <label for="payment_date" class="form-label">Payment Date <span class="text-danger">*</span></label>
+                            <input type="date" name="payment_date" id="payment_date" class="form-control" value="{% now 'Y-m-d' %}" required>
+                            <small class="form-text text-muted">When payment was received</small>
+                        </div>
+
+                        <!-- Transaction Reference -->
+                        <div class="mb-3">
+                            <label for="reference" class="form-label">Transaction Reference</label>
+                            <input type="text" name="reference" id="reference" class="form-control" 
+                                placeholder="e.g., Cheque #123, M-Pesa code, Bank ref">
+                            <small class="form-text text-muted">Transaction ID, check number, M-Pesa code, bank reference, etc.</small>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea name="notes" id="notes" class="form-control" rows="3" 
+                                placeholder="Any additional notes about this payment"></textarea>
+                            <small class="form-text text-muted">Optional: Any remarks or notes</small>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                💾 Record Payment
+                            </button>
+                            <a href="{% url 'payments:list' %}" class="btn btn-outline-secondary btn-lg">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tips -->
+            <div class="card mt-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">📌 Payment Recording Tips</h5>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li><strong>Partial Payments:</strong> You can record partial payments. The invoice balance will update automatically.</li>
+                        <li><strong>Transaction Reference:</strong> Always include reference numbers for reconciliation (M-Pesa code, check #, bank ref, etc.)</li>
+                        <li><strong>Payment Date:</strong> Use the actual date the payment was received, not today's date if it's backdated.</li>
+                        <li><strong>Multiple Payments:</strong> One invoice can have multiple payment records. Each will be added to the total.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Payment Methods Info -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">💳 Available Payment Methods</h5>
+                </div>
+                <div class="card-body">
+                    <div class="payment-methods-list">
+                        {% for method in payment_methods %}
+                            <div class="payment-method-item mb-3 p-2 border rounded">
+                                <strong>{{ method.name }}</strong>
+                                {% if method.description %}
+                                    <div class="small text-muted">{{ method.description }}</div>
+                                {% endif %}
+                            </div>
+                        {% empty %}
+                            <p class="text-muted">No payment methods configured.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Reference -->
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">📋 Quick Reference</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Cash Payment</h6>
+                    <p class="small text-muted">Use for physical cash payments. Keep cash envelopes or receipts.</p>
+
+                    <hr>
+
+                    <h6>Bank Transfer</h6>
+                    <p class="small text-muted">Reference: Bank name, account, reference number, date of transfer</p>
+
+                    <hr>
+
+                    <h6>M-Pesa</h6>
+                    <p class="small text-muted">Reference: M-Pesa transaction code (e.g., MPESA-123456)</p>
+
+                    <hr>
+
+                    <h6>Cheque</h6>
+                    <p class="small text-muted">Reference: Cheque number and bank</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateInvoiceAmount() {
+    const select = document.getElementById('invoice');
+    const selected = select.options[select.selectedIndex];
+    
+    if (selected.value) {
+        const amountDue = selected.getAttribute('data-amount-due');
+        const clientName = selected.getAttribute('data-client');
+        const currency = selected.getAttribute('data-currency');
+        const invoiceId = selected.value;
+        
+        // Store invoice data for reference
+        const invoiceData = window.invoiceData = window.invoiceData || {};
+        invoiceData[invoiceId] = {
+            amountDue: parseFloat(amountDue),
+            clientName: clientName,
+            currency: currency
+        };
+        
+        // Fetch invoice details for breakdown
+        fetchInvoiceDetails(invoiceId);
+        
+        document.getElementById('client-name').textContent = clientName;
+        document.getElementById('invoice-currency').textContent = currency;
+        document.getElementById('balance-due').textContent = currency + ' ' + parseFloat(amountDue).toFixed(2);
+        document.getElementById('quick-pay-amount').textContent = currency + ' ' + parseFloat(amountDue).toFixed(2);
+        document.getElementById('currency-label').textContent = currency;
+        document.getElementById('invoice-info').style.display = 'block';
+        document.getElementById('amount').value = parseFloat(amountDue).toFixed(2);
+        
+        // Setup payment history link
+        document.getElementById('view-payment-history').onclick = function(e) {
+            e.preventDefault();
+            showPaymentHistory(invoiceId);
+        };
+    } else {
+        document.getElementById('invoice-info').style.display = 'none';
+    }
+}
+
+function fetchInvoiceDetails(invoiceId) {
+    // Fetch additional invoice details via AJAX
+    fetch(`/api/v1/invoices/${invoiceId}/details/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the breakdown display
+                const currency = data.currency;
+                const originalAmount = data.total_amount;
+                const amountPaid = data.amount_paid;
+                const amountDue = data.amount_due;
+                
+                document.getElementById('original-amount').textContent = 
+                    currency + ' ' + parseFloat(originalAmount).toFixed(2);
+                document.getElementById('already-paid').textContent = 
+                    currency + ' ' + parseFloat(amountPaid).toFixed(2);
+                document.getElementById('balance-due').textContent = 
+                    currency + ' ' + parseFloat(amountDue).toFixed(2);
+                document.getElementById('quick-pay-amount').textContent = 
+                    currency + ' ' + parseFloat(amountDue).toFixed(2);
+                
+                // Visual feedback
+                if (amountPaid > 0) {
+                    document.querySelector('.payment-breakdown').style.borderLeft = '4px solid #28a745';
+                }
+            }
+        })
+        .catch(error => console.log('Invoice details loaded (may use cached values)'));
+}
+
+function payRemainingBalance() {
+    const select = document.getElementById('invoice');
+    const selected = select.options[select.selectedIndex];
+    
+    if (!selected.value) {
+        alert('Please select an invoice first');
+        return;
+    }
+    
+    const amountDue = parseFloat(selected.getAttribute('data-amount-due'));
+    const currency = selected.getAttribute('data-currency');
+    
+    // Fill the amount field with remaining balance
+    document.getElementById('amount').value = parseFloat(amountDue).toFixed(2);
+    
+    // Visual feedback
+    document.getElementById('amount').classList.add('border-success');
+    document.getElementById('amount').style.borderWidth = '2px';
+    
+    // Scroll to payment method
+    document.getElementById('payment_method').focus();
+    
+    // Show a toast notification
+    showPaymentNotification(`Amount set to ${currency} ${parseFloat(amountDue).toFixed(2)}`);
+    
+    // Remove highlight after 3 seconds
+    setTimeout(() => {
+        document.getElementById('amount').classList.remove('border-success');
+        document.getElementById('amount').style.borderWidth = '1px';
+    }, 3000);
+}
+
+function showPaymentHistory(invoiceId) {
+    // Fetch payment history for this invoice
+    fetch(`/api/v1/invoices/${invoiceId}/payment_history/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.payments) {
+                let historyText = `Payment History for Invoice ${data.invoice_number}\n─────────────────────────────\n`;
+                
+                if (data.payments.length > 0) {
+                    data.payments.forEach(payment => {
+                        historyText += `${payment.date} - ${payment.method}: ${data.currency} ${parseFloat(payment.amount).toFixed(2)}`;
+                        if (payment.reference) {
+                            historyText += ` (Ref: ${payment.reference})`;
+                        }
+                        historyText += '\n';
+                    });
+                } else {
+                    historyText += 'No payments recorded yet.';
+                }
+                
+                historyText += `─────────────────────────────\nTotal Paid: ${data.currency} ${parseFloat(data.total_paid).toFixed(2)}\nRemaining: ${data.currency} ${parseFloat(data.total_due).toFixed(2)}`;
+                
+                alert(historyText);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading payment history:', error);
+            alert('Could not load payment history');
+        });
+}
+
+function showPaymentNotification(message) {
+    // Create a simple toast notification
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #28a745;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 5px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        z-index: 9999;
+        animation: slideIn 0.3s ease-in;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
+}
+
+function updatePaymentMethodInfo() {
+    const select = document.getElementById('payment_method');
+    const selected = select.options[select.selectedIndex];
+    
+    if (selected.value) {
+        const description = selected.getAttribute('data-description');
+        document.getElementById('method-description').textContent = description || 'No additional information';
+        document.getElementById('payment-method-info').style.display = 'block';
+    } else {
+        document.getElementById('payment-method-info').style.display = 'none';
+    }
+}
+
+// Add CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
+
+// Pre-fill if invoice was passed via query parameter or pre-selected in context
+document.addEventListener('DOMContentLoaded', function() {
+    const invoiceSelect = document.getElementById('invoice');
+    if (invoiceSelect.value) {
+        // Trigger the update to populate the breakdown card
+        updateInvoiceAmount();
+        
+        // Scroll to payment method section for better UX
+        setTimeout(function() {
+            document.getElementById('payment_method').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+    }
+});
+</script>
+{% endblock %}

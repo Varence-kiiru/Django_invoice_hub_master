@@ -1,0 +1,245 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Quotation Performance Report - Sales Analysis{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/icons.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/reports.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- ═══════════════════════ PAGE HEADER ═══════════════════════ -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="page-title">
+                <i class="icon-chart-bar"></i> Quotation Performance Report
+            </h1>
+            <p class="text-muted">Analyze quotation performance by client and time period</p>
+        </div>
+        <div class="col-md-4">
+            <div class="d-flex gap-2 justify-content-end flex-wrap">
+                <a href="{% url 'quotations:list' %}" class="btn btn-outline-secondary">
+                    <i class="icon-list"></i> Manage Quotes
+                </a>
+                <a href="{% url 'core:quotation-performance-report-pdf' %}?from_date={{ filters.date_from }}&to_date={{ filters.date_to }}" class="btn btn-danger">
+                    <i class="icon-file-pdf"></i> PDF
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reports Navigation Tabs -->
+    <div class="card mb-4 border-top border-primary border-3">
+        <div class="card-body p-2">
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'core:reports-quotations' %}" class="btn btn-sm btn-outline-primary">📄 Quotations</a>
+                <a href="{% url 'core:reports-quotation-pipeline' %}" class="btn btn-sm btn-outline-primary">🔄 Pipeline</a>
+                <a href="{% url 'core:reports-quotation-performance' %}" class="btn btn-sm btn-primary active">📊 Performance</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════ OVERALL STATISTICS ═══════════════════════ -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Total Quotations</h6>
+                    <h3 class="text-primary">{{ overall.total_quotes|default:0 }}</h3>
+                    <small class="text-muted"><i class="icon-cube"></i> Quotations created</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Total Value</h6>
+                    <h3 class="text-success">KES {{ overall.total_value|default:'0.00'|floatformat:2 }}</h3>
+                    <small class="text-muted"><i class="icon-calculator"></i> Grand total</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Converted</h6>
+                    <h3 class="text-info">{{ overall.converted|default:0 }}</h3>
+                    <small class="text-muted"><i class="icon-check"></i> {{ overall.conversion_rate|default:'0.0'|floatformat:1 }}%</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Status Summary</h6>
+                    <div style="font-size: 0.85rem; line-height: 1.6;">
+                        <div><span class="badge bg-secondary">Draft</span> {{ overall.draft|default:0 }}</div>
+                        <div><span class="badge bg-primary">Sent</span> {{ overall.sent|default:0 }}</div>
+                        <div><span class="badge bg-info">Viewed</span> {{ overall.viewed|default:0 }}</div>
+                        <div><span class="badge bg-success">Accepted</span> {{ overall.accepted|default:0 }}</div>
+                        <div><span class="badge bg-success">Converted</span> {{ overall.converted|default:0 }}</div>
+                        <div><span class="badge bg-warning">Expired</span> {{ overall.expired|default:0 }}</div>
+                        <div><span class="badge bg-danger">Rejected</span> {{ overall.rejected|default:0 }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════ FILTERS CARD ═══════════════════════ -->
+    <div class="card mb-4" id="filterCard">
+        <div class="card-header">
+            <h6 class="mb-0">
+                <i class="icon-filter"></i> Date Filter
+            </h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3" id="filterForm" name="filterForm">
+                <div class="col-md-3">
+                    <label for="dateFrom" class="form-label">From Date</label>
+                    <input type="date" class="form-control" id="dateFrom" name="from_date" 
+                           value="{{ filters.date_from|default:'' }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="dateTo" class="form-label">To Date</label>
+                    <input type="date" class="form-control" id="dateTo" name="to_date"
+                           value="{{ filters.date_to|default:'' }}">
+                </div>
+                <div class="col-md-6 d-flex gap-2 align-items-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="icon-search"></i> Apply Filters
+                    </button>
+                    <a href="?" class="btn btn-secondary">
+                        <i class="icon-times"></i> Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════ CLIENT PERFORMANCE TABLE ═══════════════════════ -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0"><i class="icon-table"></i> Performance by Client</h6>
+            <span class="badge bg-primary">{{ client_performance|length }} clients</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="clientPerformanceTable">
+                <thead>
+                    <tr>
+                        <th>Client</th>
+                        <th class="text-center">Total Quotes</th>
+                        <th class="text-end">Total Value</th>
+                        <th class="text-center">Converted</th>
+                        <th class="text-center">Conversion %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if client_performance %}
+                        {% for client in client_performance %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'clients:detail' client.client__id %}" 
+                                       class="text-decoration-none">
+                                        <strong>{{ client.client__name }}</strong>
+                                    </a>
+                                </td>
+                                <td class="text-center">
+                                    {{ client.total_quotes }}
+                                </td>
+                                <td class="text-end">
+                                    <strong>KES {{ client.total_value|default:'0.00'|floatformat:2 }}</strong>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-success">{{ client.converted }}</span>
+                                </td>
+                                <td class="text-center">
+                                    {% if client.conversion_rate %}
+                                        <span class="badge bg-info">{{ client.conversion_rate|floatformat:1 }}%</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">0%</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">
+                                <i class="icon-inbox" style="font-size: 2rem; opacity: 0.3;"></i>
+                                <p class="mt-2 mb-0">No client performance data available</p>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════ MONTHLY PERFORMANCE TABLE ═══════════════════════ -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0"><i class="icon-calendar"></i> Performance by Month</h6>
+            <span class="badge bg-primary">{{ month_performance|length }} months</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="monthPerformanceTable">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th class="text-center">Total Quotes</th>
+                        <th class="text-end">Total Value</th>
+                        <th class="text-center">Converted</th>
+                        <th class="text-center">Conversion %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if month_performance %}
+                        {% for month in month_performance %}
+                            <tr>
+                                <td>
+                                    <strong>{{ month.quote_date__month|add:"0"|stringformat:"02d" }}/{{ month.quote_date__year }}</strong>
+                                </td>
+                                <td class="text-center">
+                                    {{ month.total_quotes }}
+                                </td>
+                                <td class="text-end">
+                                    <strong>KES {{ month.total_value|default:'0.00'|floatformat:2 }}</strong>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-success">{{ month.converted }}</span>
+                                </td>
+                                <td class="text-center">
+                                    {% if month.total_quotes > 0 %}
+                                        {% widthratio month.converted month.total_quotes 100 as conversion_pct %}
+                                        <span class="badge bg-info">{{ conversion_pct }}%</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">0%</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">
+                                <i class="icon-inbox" style="font-size: 2rem; opacity: 0.3;"></i>
+                                <p class="mt-2 mb-0">No monthly performance data available</p>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// Add any interactive functionality here if needed
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Performance report loaded');
+});
+</script>
+
+{% endblock %}

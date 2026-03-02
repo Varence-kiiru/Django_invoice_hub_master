@@ -1,0 +1,314 @@
+<!-- Permissions Editor Modal -->
+<div id="permissions-modal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          📋 Edit Permissions: <span id="permissionRoleName"></span>
+        </h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="permissions-editor">
+          <!-- Tabs for Permission Categories -->
+          <ul class="nav nav-tabs mb-3" role="tablist" id="permissionTabs">
+            <li class="nav-item">
+              <a class="nav-link active" id="expenses-tab" data-toggle="tab" href="#expenses-perms">
+                Expenses (12)
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="invoices-tab" data-toggle="tab" href="#invoices-perms">
+                Invoices (6)
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="clients-tab" data-toggle="tab" href="#clients-perms">
+                Clients (3)
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="payments-tab" data-toggle="tab" href="#payments-perms">
+                Payments (4)
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="quotations-tab" data-toggle="tab" href="#quotations-perms">
+                Quotations (5)
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="users-tab" data-toggle="tab" href="#users-perms">
+                Users (4)
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="system-tab" data-toggle="tab" href="#system-perms">
+                System (4)
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="reports-tab" data-toggle="tab" href="#reports-perms">
+                Reports (3)
+              </a>
+            </li>
+          </ul>
+          
+          <!-- Tab Content -->
+          <div class="tab-content" id="permissionTabContent">
+            <!-- Permissions will be dynamically loaded here -->
+            <div id="loading-spinner" class="text-center">
+              <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Permission Summary -->
+          <div class="permission-summary mt-3 p-3 bg-light rounded">
+            <h5>Summary</h5>
+            <p>
+              <strong id="permissionCount">0</strong> permissions selected out of <strong id="totalCount">0</strong>
+            </p>
+            <div class="progress">
+              <div id="permissionProgressBar" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="savePermissionsBtn" onclick="saveRolePermissions()">
+          💾 Save Permissions
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Global variables for permission editing
+let currentEditingRoleId = null;
+let selectedPermissions = [];
+let allPermissionsData = {};
+
+// Show permission editor modal
+function editRolePermissions(roleId, roleName) {
+  currentEditingRoleId = roleId;
+  selectedPermissions = [];
+  
+  // Update modal title
+  document.getElementById('permissionRoleName').textContent = roleName;
+  
+  // Load permissions and current role permissions
+  loadPermissionsData();
+  loadRolePermissions(roleId);
+  
+  // Show modal
+  $('#permissions-modal').modal('show');
+}
+
+// Load all permissions from API
+function loadPermissionsData() {
+  fetch('/api/system/permissions/')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        allPermissionsData = data.permissions;
+        renderPermissionTabs();
+        document.getElementById('totalCount').textContent = data.total;
+      }
+    })
+    .catch(error => console.error('Error loading permissions:', error));
+}
+
+// Load current role permissions
+function loadRolePermissions(roleId) {
+  fetch(`/api/system/roles/${roleId}/permissions/`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        selectedPermissions = data.permissions;
+        updatePermissionCheckboxes();
+        updatePermissionSummary();
+      }
+    })
+    .catch(error => console.error('Error loading role permissions:', error));
+}
+
+// Render permission tabs with checkboxes
+function renderPermissionTabs() {
+  const tabContent = document.getElementById('permissionTabContent');
+  tabContent.innerHTML = '';
+  
+  const categories = [
+    'expenses', 'invoices', 'clients', 'payments', 
+    'quotations', 'users', 'system', 'reports'
+  ];
+  
+  categories.forEach(category => {
+    if (allPermissionsData[category]) {
+      const tabPane = document.createElement('div');
+      tabPane.className = 'tab-pane fade';
+      tabPane.id = `${category}-perms`;
+      if (category === 'expenses') tabPane.classList.add('show', 'active');
+      
+      const permsList = document.createElement('div');
+      permsList.className = 'permissions-checklist';
+      
+      Object.entries(allPermissionsData[category]).forEach(([code, description]) => {
+        const checkboxDiv = document.createElement('div');
+        checkboxDiv.className = 'custom-control custom-checkbox mb-2';
+        checkboxDiv.innerHTML = `
+          <input type="checkbox" class="custom-control-input permission-checkbox" 
+                 id="perm-${code}" value="${code}" 
+                 onchange="onPermissionToggled('${code}', this.checked)">
+          <label class="custom-control-label" for="perm-${code}">
+            <strong>${code.replace(/_/g, ' ')}</strong>
+            <br>
+            <small class="text-muted">${description}</small>
+          </label>
+        `;
+        permsList.appendChild(checkboxDiv);
+      });
+      
+      tabPane.appendChild(permsList);
+      tabContent.appendChild(tabPane);
+    }
+  });
+}
+
+// Update checkboxes based on selected permissions
+function updatePermissionCheckboxes() {
+  document.querySelectorAll('.permission-checkbox').forEach(checkbox => {
+    checkbox.checked = selectedPermissions.includes(checkbox.value);
+  });
+}
+
+// Handle permission checkbox toggle
+function onPermissionToggled(permissionCode, isChecked) {
+  if (isChecked) {
+    if (!selectedPermissions.includes(permissionCode)) {
+      selectedPermissions.push(permissionCode);
+    }
+  } else {
+    selectedPermissions = selectedPermissions.filter(p => p !== permissionCode);
+  }
+  updatePermissionSummary();
+}
+
+// Update permission summary statistics
+function updatePermissionSummary() {
+  const total = Object.values(allPermissionsData).reduce((sum, category) => sum + Object.keys(category).length, 0);
+  const selected = selectedPermissions.length;
+  const percentage = total > 0 ? Math.round((selected / total) * 100) : 0;
+  
+  document.getElementById('permissionCount').textContent = selected;
+  document.getElementById('totalCount').textContent = total;
+  
+  const progressBar = document.getElementById('permissionProgressBar');
+  progressBar.style.width = percentage + '%';
+  progressBar.textContent = percentage + '%';
+  
+  // Update save button state
+  document.getElementById('savePermissionsBtn').disabled = false;
+}
+
+// Save role permissions
+function saveRolePermissions() {
+  if (!currentEditingRoleId) {
+    alert('Error: No role selected');
+    return;
+  }
+  
+  const btn = document.getElementById('savePermissionsBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+  
+  fetch(`/api/system/roles/${currentEditingRoleId}/update-permissions/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCookie('csrftoken'),
+    },
+    body: JSON.stringify({
+      permissions: selectedPermissions
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      toastr.success(data.message);
+      $('#permissions-modal').modal('hide');
+      // Reload page to show updated permissions
+      setTimeout(() => location.reload(), 500);
+    } else {
+      toastr.error(data.error || 'Failed to save permissions');
+    }
+  })
+  .catch(error => {
+    toastr.error('Error saving permissions: ' + error);
+    console.error('Error:', error);
+  })
+  .finally(() => {
+    btn.disabled = false;
+    btn.innerHTML = '💾 Save Permissions';
+  });
+}
+
+// Helper function to get CSRF token
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+</script>
+
+<style>
+.permissions-editor {
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.permissions-checklist {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.custom-checkbox .custom-control-label {
+  margin-left: 5px;
+  padding-top: 2px;
+}
+
+.permission-summary {
+  border-left: 4px solid #417690;
+}
+
+.progress {
+  height: 25px;
+}
+
+.progress-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: white;
+  font-weight: bold;
+}
+</style>

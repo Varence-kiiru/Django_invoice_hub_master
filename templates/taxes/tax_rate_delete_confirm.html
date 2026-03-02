@@ -1,0 +1,126 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Deactivate Tax Rate{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <!-- Confirmation Card -->
+            <div class="card border-danger">
+                <div class="card-header bg-danger bg-opacity-10 border-danger">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="bi bi-exclamation-triangle text-danger" style="font-size: 2rem;"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0 text-danger">Deactivate Tax Rate</h4>
+                            <small class="text-muted">This action will mark the tax rate as inactive</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Tax Rate Details -->
+                    <div class="alert alert-light border">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="mb-2">
+                                    <small class="text-muted">Code</small>
+                                    <div class="h5 mb-0"><code>{{ tax_rate.code }}</code></div>
+                                </div>
+                                <div>
+                                    <small class="text-muted">Rate</small>
+                                    <div class="h6 mb-0">
+                                        <span class="badge bg-info">{{ tax_rate.rate_percentage }}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="mb-2">
+                                    <small class="text-muted">Name</small>
+                                    <div class="h6 mb-0">{{ tax_rate.name }}</div>
+                                </div>
+                                <div>
+                                    <small class="text-muted">Type</small>
+                                    <div class="h6 mb-0">
+                                        <span class="badge bg-primary">{{ tax_rate.get_tax_type_display }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-sm-6">
+                                <small class="text-muted">Country</small>
+                                <div class="h6 mb-0">{{ tax_rate.country }}</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <small class="text-muted">Current Status</small>
+                                <div class="h6 mb-0">
+                                    {% if tax_rate.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Impact Information -->
+                    <div class="alert alert-warning alert-soft mb-4">
+                        <h6 class="alert-heading"><i class="bi bi-info-circle"></i> Impact of Deactivation</h6>
+                        <ul class="mb-0 ps-3">
+                            <li>This tax rate will be marked as inactive</li>
+                            <li>It won't appear in tax rate selections on new invoices</li>
+                            <li>Existing invoices using this rate will <strong>not</strong> be affected</li>
+                            <li>The rate history is preserved for audit purposes</li>
+                        </ul>
+                    </div>
+
+                    <!-- Related Data Warning -->
+                    {% if related_count %}
+                    <div class="alert alert-info alert-soft mb-4">
+                        <h6 class="alert-heading"><i class="bi bi-diagram-3"></i> Related Data</h6>
+                        <p class="mb-0">
+                            This tax rate is associated with <strong>{{ related_count }} record(s)</strong> 
+                            in the system. These will remain intact but the rate will be marked as inactive.
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Confirmation Message -->
+                    <div class="alert alert-light border-start border-4 border-danger">
+                        <p class="mb-0">
+                            <strong>Are you absolutely sure?</strong> 
+                            This will set the effective deactivation date to today. You can reactivate it 
+                            by editing and updating the effective date, or by manually editing the database record.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-grid gap-2 d-sm-flex justify-content-center mt-4">
+                <a href="{% url 'taxes:detail' tax_rate.id %}" class="btn btn-lg btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Cancel - Go Back
+                </a>
+                <form method="POST" class="flex-grow-1" style="max-width: 300px;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-lg btn-danger w-100" onclick="return confirm('This action cannot be undone easily. Click OK to confirm.')">
+                        <i class="bi bi-trash"></i> Yes, Deactivate Rate
+                    </button>
+                </form>
+            </div>
+
+            <!-- Help Text -->
+            <div class="text-center mt-4">
+                <p class="text-muted small">
+                    <i class="bi bi-shield-check"></i> This is a reversible action. 
+                    Contact support if you need assistance.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,283 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Support Ticket Created - Invoice System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/help_support/support_form_success.css' %}">
+{% endblock %}
+
+<!-- Old styles block - to be removed in template
+<style>
+    .success-wrapper {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    .success-card {
+        background: white;
+        border: 2px solid #28a745;
+        border-radius: 8px;
+        padding: 40px 30px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.15);
+    }
+
+    .success-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        animation: scaleIn 0.5s ease-out;
+    }
+
+    @keyframes scaleIn {
+        from {
+            transform: scale(0);
+            opacity: 0;
+        }
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .success-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #28a745;
+        margin-bottom: 10px;
+    }
+
+    .success-message {
+        color: #666;
+        margin-bottom: 30px;
+        font-size: 1.05rem;
+    }
+
+    .ticket-info {
+        background: #f8f9fa;
+        border-radius: 6px;
+        padding: 20px;
+        margin-bottom: 30px;
+        text-align: left;
+    }
+
+    .ticket-info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .ticket-info-item:last-child {
+        border-bottom: none;
+    }
+
+    .ticket-info-label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .ticket-info-value {
+        color: #667eea;
+        font-weight: 700;
+        font-family: 'Courier New', monospace;
+    }
+
+    .ticket-number {
+        font-size: 1.2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 6px;
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+
+    .next-steps {
+        background: #e0e7ff;
+        border-left: 4px solid #667eea;
+        padding: 20px;
+        border-radius: 6px;
+        margin-bottom: 30px;
+        text-align: left;
+    }
+
+    .next-steps-title {
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 12px;
+    }
+
+    .next-steps-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .next-steps-list li {
+        padding: 8px 0;
+        color: #333;
+        position: relative;
+        padding-left: 25px;
+    }
+
+    .next-steps-list li::before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        color: #667eea;
+        font-weight: bold;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 30px;
+    }
+
+    .action-btn {
+        padding: 12px 25px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        text-align: center;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 1rem;
+    }
+
+    .action-btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .action-btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .action-btn-secondary {
+        background: white;
+        border: 2px solid #667eea;
+        color: #667eea;
+    }
+
+    .action-btn-secondary:hover {
+        background: #f5f7ff;
+    }
+
+    .support-email {
+        color: #667eea;
+        font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+        .ticket-info-item {
+            flex-direction: column;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .action-btn {
+            width: 100%;
+        }
+    }
+</style>
+-->
+
+{% block content %}
+<div class="container-fluid">
+    <div class="success-wrapper">
+        <div class="success-card">
+            <div class="success-icon">✅</div>
+            <h1 class="success-title">Support Request Submitted!</h1>
+            <p class="success-message">
+                Thank you for contacting us. Your support ticket has been created successfully.
+            </p>
+
+            <!-- Ticket Number -->
+            <div class="ticket-number">
+                Ticket #{{ ticket.ticket_number }}
+            </div>
+
+            <!-- Ticket Information -->
+            <div class="ticket-info">
+                <div class="ticket-info-item">
+                    <span class="ticket-info-label">📌 Ticket Number:</span>
+                    <span class="ticket-info-value">{{ ticket.ticket_number }}</span>
+                </div>
+                <div class="ticket-info-item">
+                    <span class="ticket-info-label">📧 Email:</span>
+                    <span class="ticket-info-value">{{ ticket.email }}</span>
+                </div>
+                <div class="ticket-info-item">
+                    <span class="ticket-info-label">📝 Subject:</span>
+                    <span class="ticket-info-value">{{ ticket.subject }}</span>
+                </div>
+                <div class="ticket-info-item">
+                    <span class="ticket-info-label">🎯 Priority:</span>
+                    <span class="ticket-info-value">{{ ticket.get_priority_display }}</span>
+                </div>
+                <div class="ticket-info-item">
+                    <span class="ticket-info-label">📊 Status:</span>
+                    <span class="ticket-info-value">{{ ticket.get_status_display }}</span>
+                </div>
+                <div class="ticket-info-item">
+                    <span class="ticket-info-label">⏰ Created:</span>
+                    <span class="ticket-info-value">{{ ticket.created_at|date:"M d, Y - H:i" }}</span>
+                </div>
+            </div>
+
+            <!-- Next Steps -->
+            <div class="next-steps">
+                <div class="next-steps-title">🎯 What Happens Next:</div>
+                <ul class="next-steps-list">
+                    <li>We've received your support ticket</li>
+                    <li>A confirmation email has been sent to <strong>{{ ticket.email }}</strong></li>
+                    <li>Our support team will review your request within 24 hours</li>
+                    <li>You'll receive updates via email at <strong>{{ ticket.email }}</strong></li>
+                    <li>Check your spam folder if you don't see the confirmation email</li>
+                </ul>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                {% if user.is_authenticated %}
+                <a href="{% url 'core:support-tickets' %}" class="action-btn action-btn-primary">
+                    🎫 View My Tickets
+                </a>
+                {% endif %}
+                <a href="{% url 'core:help-center' %}" class="action-btn action-btn-secondary">
+                    📚 Back to Help Center
+                </a>
+            </div>
+
+            <!-- Additional Info -->
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 6px; margin-top: 30px; text-align: left;">
+                <p style="margin-bottom: 12px; color: #333;">
+                    <strong>💡 Tip:</strong> Bookmark your ticket number <strong>{{ ticket.ticket_number }}</strong> to quickly track your support request.
+                </p>
+                <p style="margin: 0; color: #666; font-size: 0.95rem;">
+                    If you have an urgent issue, you can email us directly at <span class="support-email">support@invoice.local</span> with your ticket number.
+                </p>
+            </div>
+        </div>
+
+        <!-- Help Section -->
+        <div style="text-align: center; margin-top: 40px; padding: 20px;">
+            <p style="color: #666; margin-bottom: 15px;">
+                In the meantime, check out our documentation for immediate help
+            </p>
+            <a href="{% url 'core:help-articles' %}" style="color: #667eea; text-decoration: none; font-weight: 600;">
+                → Browse Documentation
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

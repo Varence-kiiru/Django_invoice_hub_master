@@ -1,0 +1,273 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Permission Matrix - Administration{% endblock %}
+
+{% block page_title %}Permission Matrix{% endblock %}
+{% block page_description %}View all permissions and their role assignments{% endblock %}
+
+{% block extra_css %}
+<style>
+  .matrix-container {
+    overflow-x: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 20px;
+  }
+
+  .permission-matrix {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+  }
+
+  .permission-matrix thead {
+    background: #34495e;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .permission-matrix th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid #2c3e50;
+  }
+
+  .permission-matrix td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ecf0f1;
+    vertical-align: middle;
+  }
+
+  .permission-matrix tbody tr:hover {
+    background: #f9f9f9;
+  }
+
+  .permission-name {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #2c3e50;
+    width: 250px;
+    word-break: break-word;
+  }
+
+  .permission-category {
+    font-size: 12px;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .permission-description {
+    font-size: 13px;
+    color: #55606d;
+    margin-top: 4px;
+  }
+
+  .role-column {
+    text-align: center;
+    width: 100px;
+  }
+
+  .check-icon {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .check-icon.allowed {
+    color: #27ae60;
+  }
+
+  .check-icon.denied {
+    color: #e74c3c;
+  }
+
+  .category-section {
+    background: linear-gradient(135deg, #ecf0f1 0%, #f5f5f5 100%);
+  }
+
+  .category-section td {
+    padding: 15px;
+    background: linear-gradient(135deg, #fff9f0 0%, #fff 100%);
+    font-weight: 600;
+    color: #2c3e50;
+    border-bottom: 2px solid #ddd;
+  }
+
+  .stats-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+
+  .stat-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    border-left: 4px solid #3498db;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .stat-card.admin { border-left-color: #e74c3c; }
+  .stat-card.manager { border-left-color: #f39c12; }
+  .stat-card.staff { border-left-color: #3498db; }
+  .stat-card.user { border-left-color: #27ae60; }
+
+  .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2c3e50;
+  }
+
+  .stat-label {
+    color: #7f8c8d;
+    font-size: 13px;
+    margin-top: 5px;
+    text-transform: uppercase;
+  }
+
+  .role-name {
+    font-weight: 600;
+    text-transform: capitalize;
+  }
+
+  .legend {
+    background: #ecf0f1;
+    padding: 15px;
+    border-radius: 6px;
+    margin-top: 20px;
+  }
+
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 25px;
+    margin-bottom: 10px;
+  }
+
+  .legend-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+  }
+
+  .legend-icon.allowed {
+    background: #27ae60;
+  }
+
+  .legend-icon.denied {
+    background: #e74c3c;
+  }
+
+  .export-btn {
+    margin-top: 20px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 1400px; margin: 0 auto;">
+  <!-- Header -->
+  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 8px; margin-bottom: 30px;">
+    <h1>📊 Permission Matrix</h1>
+    <p style="margin-bottom: 0;">Overview of all permissions by role</p>
+  </div>
+
+  <!-- Statistics -->
+  <div class="stats-section">
+    {% for role in roles %}
+      {% with admin_check=role.name|stringformat:'s' %}
+        <div class="stat-card {% if role.name == 'admin' %}admin{% elif role.name == 'manager' %}manager{% elif role.name == 'staff' %}staff{% else %}user{% endif %}">
+          <div class="role-name">{{ role.name|title }}</div>
+          <div class="stat-value" id="role-{{ role.name }}-count">
+            {% if role.permissions %}{{ role.permissions|length }}{% else %}0{% endif %}
+          </div>
+          <div class="stat-label">of {{ matrix|length }} permissions</div>
+        </div>
+      {% endwith %}
+    {% endfor %}
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <strong>Legend:</strong>
+    <div class="legend-item">
+      <span class="legend-icon allowed">✓</span>
+      <span>Permission Granted</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-icon denied">✗</span>
+      <span>Permission Denied</span>
+    </div>
+  </div>
+
+  <!-- Permission Matrix Table -->
+  <div class="matrix-container" style="margin-top: 30px;">
+    <table class="permission-matrix">
+      <thead>
+        <tr>
+          <th>Permission</th>
+          {% for role in roles %}
+            <th class="role-column">
+              <div class="role-name">{{ role.name|title }}</div>
+              <small style="color: #bbb; font-weight: normal;">
+                {% if role.permissions %}{{ role.permissions|length }}{% else %}0{% endif %}
+              </small>
+            </th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for category, category_perms in permission_groups.items %}
+          <tr class="category-section">
+            <td colspan="{{ roles|length|add:1 }}" style="text-transform: capitalize;">
+              📁 {{ category }} Category
+            </td>
+          </tr>
+          {% for perm_code, perm_desc in category_perms.items %}
+            <tr>
+              <td>
+                <div class="permission-category">{{ category }}</div>
+                <div class="permission-name">{{ perm_code }}</div>
+                <div class="permission-description">
+                  {% if perm_desc|dictsort %}
+                    {{ perm_desc.description }}
+                  {% else %}
+                    {{ perm_desc }}
+                  {% endif %}
+                </div>
+              </td>
+              {% for role in roles %}
+                <td class="role-column">
+                  {% if perm_code in role.permissions %}
+                    <span class="check-icon allowed">✓</span>
+                  {% else %}
+                    <span class="check-icon denied">✗</span>
+                  {% endif %}
+                </td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Export Options -->
+  <div style="margin-top: 30px; text-align: center;">
+    <a href="{% url 'permission_management' %}" class="btn btn-primary">← Back to Permission Management</a>
+  </div>
+</div>
+{% endblock %}

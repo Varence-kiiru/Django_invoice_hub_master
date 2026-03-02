@@ -1,0 +1,143 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Client Contacts - {{ client.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/clients.css' }">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Manage Contacts</h1>
+        <div class="breadcrumb">{{ client.name }}</div>
+    </div>
+    <a href="{% url 'clients:detail' client.id %}" class="btn btn-secondary">Back to Client</a>
+</div>
+
+<!-- Primary Contact -->
+<div class="section">
+    <div class="section-title">Primary Contact</div>
+    <div class="contact-card">
+        <div class="contact-card-content">
+            <div class="contact-name">{{ client.name }} <span style="color: #e74c3c; font-size: 0.8rem;">★ Primary</span></div>
+            <div class="contact-info">
+                {% if client.email %}
+                    📧 <a href="mailto:{{ client.email }}">{{ client.email }}</a><br>
+                {% endif %}
+                {% if client.phone %}
+                    📱 <a href="tel:{{ client.phone }}">{{ client.phone }}</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Current Contacts -->
+<div class="section">
+    <div class="section-title">Contacts on File</div>
+    
+    {% if contacts %}
+        {% for contact in contacts %}
+        <div class="contact-card">
+            <div class="contact-card-content">
+                <div class="contact-name">
+                    {{ contact.name }}
+                    {% if contact.is_primary %}<span style="color: #e74c3c; font-size: 0.8rem; margin-left: 8px;">★ Primary</span>{% endif %}
+                </div>
+                {% if contact.title %}
+                    <div class="contact-title">{{ contact.title }}</div>
+                {% endif %}
+                <div class="contact-info">
+                    {% if contact.email %}
+                        📧 <a href="mailto:{{ contact.email }}">{{ contact.email }}</a><br>
+                    {% endif %}
+                    {% if contact.phone %}
+                        📱 <a href="tel:{{ contact.phone }}">{{ contact.phone }}</a><br>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="contact-actions">
+                <a href="#edit-{{ contact.id }}" class="btn btn-primary btn-small" onclick="editContact({{ contact.id }})">Edit</a>
+                <form method="post" action="{% url 'clients:contact-delete' contact.id %}" style="display: inline;" onsubmit="return confirm('Delete this contact?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary btn-small" style="width: 100%; padding: 6px 12px;">Delete</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-message">No contacts recorded. Add one below.</div>
+    {% endif %}
+</div>
+
+<!-- Add/Edit Contact Form -->
+<div class="section">
+    <div class="section-title">
+        {% if editing %}
+            Edit Contact
+        {% else %}
+            Add New Contact
+        {% endif %}
+    </div>
+    
+    <form method="post" class="form-container">
+        {% csrf_token %}
+        
+        <div class="form-group required">
+            <label>{{ form.name.label }}</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+                <div class="form-error">{{ form.name.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label>{{ form.title.label }}</label>
+            {{ form.title }}
+            {% if form.title.errors %}
+                <div class="form-error">{{ form.title.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label>{{ form.email.label }}</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <div class="form-error">{{ form.email.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label>{{ form.phone.label }}</label>
+            {{ form.phone }}
+            {% if form.phone.errors %}
+                <div class="form-error">{{ form.phone.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label>
+                {{ form.is_primary }}
+                {{ form.is_primary.label }}
+            </label>
+            {% if form.is_primary.errors %}
+                <div class="form-error">{{ form.is_primary.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save Contact</button>
+            <a href="{% url 'clients:detail' client.id %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    function editContact(id) {
+        // Implementation: Load contact into form for editing
+        // This would be handled by the view passing in pre-filled form
+    }
+</script>
+{% endblock %}

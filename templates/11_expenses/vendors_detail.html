@@ -1,0 +1,371 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Vendor: {{ vendor.name }} - Invoicing App{% endblock %}
+
+{% block page_title %}Vendor: {{ vendor.name }}{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'expenses:vendors-edit' vendor.id %}" class="btn btn-warning">
+    <span aria-hidden="true">✏️</span> Edit
+</a>
+<a href="{% url 'expenses:vendors-list' %}" class="btn btn-secondary">
+    <span aria-hidden="true">←</span> Back
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="detail-container">
+        <!-- Vendor Header -->
+        <div class="vendor-header">
+            <h2 class="vendor-name">{{ vendor.name }}</h2>
+            <span class="badge {% if vendor.is_active %}badge-success{% else %}badge-secondary{% endif %}">
+                {% if vendor.is_active %}Active{% else %}Inactive{% endif %}
+            </span>
+        </div>
+
+        <!-- Vendor Info Grid -->
+        <div class="details-grid">
+            <!-- Contact Information -->
+            <div class="info-section">
+                <h3 class="section-title">Contact Information</h3>
+                
+                <div class="info-item">
+                    <span class="label">Email:</span>
+                    <span class="value">
+                        {% if vendor.contact_email %}
+                        <a href="mailto:{{ vendor.contact_email }}">{{ vendor.contact_email }}</a>
+                        {% else %}
+                        <span class="text-muted">Not provided</span>
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="info-item">
+                    <span class="label">Phone:</span>
+                    <span class="value">
+                        {% if vendor.contact_phone %}
+                        <a href="tel:{{ vendor.contact_phone }}">{{ vendor.contact_phone }}</a>
+                        {% else %}
+                        <span class="text-muted">Not provided</span>
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="info-item">
+                    <span class="label">Address:</span>
+                    <span class="value">
+                        {% if vendor.address %}
+                        {{ vendor.address|linebreaks }}
+                        {% else %}
+                        <span class="text-muted">Not provided</span>
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="info-item">
+                    <span class="label">Payment Terms:</span>
+                    <span class="value">
+                        {% if vendor.payment_terms %}
+                        {{ vendor.payment_terms }}
+                        {% else %}
+                        <span class="text-muted">Not specified</span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Financial Summary -->
+            <div class="info-section">
+                <h3 class="section-title">Financial Summary</h3>
+                
+                <div class="summary-stat">
+                    <div class="stat-label">Total Expenses</div>
+                    <div class="stat-value">{{ expenses.count }}</div>
+                </div>
+
+                <div class="summary-stat">
+                    <div class="stat-label">Total Spent</div>
+                    <div class="stat-value">{{ total_spent|floatformat:2 }}</div>
+                </div>
+
+                <div class="summary-stat">
+                    <div class="stat-label">Created</div>
+                    <div class="stat-value">{{ vendor.created_at|date:"M d, Y" }}</div>
+                </div>
+
+                <div class="summary-stat">
+                    <div class="stat-label">Last Modified</div>
+                    <div class="stat-value">{{ vendor.updated_at|date:"M d, Y" }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Expenses -->
+        {% if expenses %}
+        <div class="expenses-section">
+            <h3 class="section-title">Recent Expenses</h3>
+            
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'expenses:detail' expense.id %}">
+                                {{ expense.description }}
+                            </a>
+                        </td>
+                        <td>{{ expense.amount|floatformat:2 }}</td>
+                        <td>{{ expense.category.name }}</td>
+                        <td>{{ expense.expense_date|date:"M d, Y" }}</td>
+                        <td>
+                            <span class="badge badge-{{ expense.status|lower }}">
+                                {{ expense.status|title }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="expenses-footer">
+                <a href="{% url 'expenses:list' %}?vendor={{ vendor.id }}" class="btn btn-secondary">
+                    View All Expenses from This Vendor
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p class="empty-icon">📭</p>
+            <p class="empty-text">No expenses from this vendor yet</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.detail-container {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.vendor-header {
+    padding: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.vendor-name {
+    font-size: 1.75rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.badge-success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.badge-secondary {
+    background-color: #eeeeee;
+    color: #424242;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+.info-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.section-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-item .label {
+    font-weight: 500;
+    color: #666;
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.info-item .value {
+    color: #333;
+    line-height: 1.5;
+}
+
+.info-item a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.info-item a:hover {
+    text-decoration: underline;
+}
+
+.text-muted {
+    color: #999;
+}
+
+.summary-stat {
+    padding: 1rem;
+    background: #f9f9f9;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    border-left: 4px solid #667eea;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.expenses-section {
+    padding: 2rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+.table th {
+    background: #f9f9f9;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid #e0e0e0;
+    font-size: 0.9rem;
+}
+
+.table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.table a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.table a:hover {
+    text-decoration: underline;
+}
+
+.badge-draft {
+    background-color: #e9ecef;
+    color: #495057;
+}
+
+.badge-submitted {
+    background-color: #e3f2fd;
+    color: #1565c0;
+}
+
+.badge-approved {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.badge-paid {
+    background-color: #f3e5f5;
+    color: #6a1b9a;
+}
+
+.expenses-footer {
+    text-align: right;
+    padding-top: 1rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.empty-state {
+    padding: 3rem 2rem;
+    text-align: center;
+    color: #999;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+.empty-text {
+    font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+    .vendor-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .details-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .table {
+        font-size: 0.9rem;
+    }
+
+    .table th, .table td {
+        padding: 0.75rem;
+    }
+}
+</style>
+{% endblock %}

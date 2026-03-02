@@ -1,0 +1,321 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Send Invoice {{ invoice.invoice_number }} - Email{% endblock %}
+
+{% block page_title %}Send Invoice{% endblock %}
+{% block page_description %}Send invoice to client via email{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/invoices.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <div class="send-email-section" style="max-width: 700px; margin: 40px auto;">
+    <div class="section-header">
+      <h2>Send Invoice {{ invoice.invoice_number }}</h2>
+      <p>Send this invoice to {{ invoice.client.name }} via email</p>
+    </div>
+
+    <div class="email-content">
+      <div class="alert alert-info">
+        <strong>ℹ️ What will be sent:</strong>
+        <ul style="margin-top: 10px; margin-bottom: 0;">
+          <li>Invoice PDF attachment</li>
+          <li>Professional email message</li>
+          <li>Payment instructions</li>
+          <li>Invoice tracking link</li>
+        </ul>
+      </div>
+
+      <form method="post" id="send-email-form" class="email-form">
+        {% csrf_token %}
+
+        <div class="form-section">
+          <h3>Email Recipient</h3>
+          <div class="form-group">
+            <label for="recipient-email">To:</label>
+            <input type="email" value="{{ invoice.client.email }}" class="form-control" readonly>
+            <small class="form-text">Invoice will be sent to the client's email address</small>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Email Message</h3>
+          <div class="form-group">
+            <label for="email-subject">Subject:</label>
+            <input type="text" name="email-subject" id="email-subject" value="Invoice {{ invoice.invoice_number }}" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="email-message">Message:</label>
+            <textarea name="email-message" id="email-message" class="form-control" rows="8">Dear {{ invoice.client.name }},
+
+Please find attached invoice {{ invoice.invoice_number }} dated {{ invoice.invoice_date|date:"M d, Y" }}.
+
+Invoice Details:
+• Invoice Number: {{ invoice.invoice_number }}
+• Date: {{ invoice.invoice_date|date:"M d, Y" }}
+• Due Date: {{ invoice.due_date|date:"M d, Y" }}
+• Total Amount: {{ invoice.currency }} {{ invoice.total_amount|floatformat:2 }}
+
+Please arrange payment by the due date. If you have any questions, please don't hesitate to contact us.
+
+Thank you!</textarea>
+            <small class="form-text">Customize the email message as needed</small>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Invoice Summary</h3>
+          <div class="info-grid">
+            <div class="info-card">
+              <div class="info-label">Invoice #</div>
+              <div class="info-value">{{ invoice.invoice_number }}</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Amount</div>
+              <div class="info-value">{{ invoice.currency }} {{ invoice.total_amount|floatformat:2 }}</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Due</div>
+              <div class="info-value">{{ invoice.due_date|date:"M d, Y" }}</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Status</div>
+              <div class="info-value">{{ invoice.get_status_display }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <a href="{% url 'invoices:detail' invoice.id %}" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary" id="send-btn">
+            📧 Send Email
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  .send-email-section {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .section-header {
+    margin-bottom: 20px;
+  }
+
+  .section-header h2 {
+    margin: 0 0 5px 0;
+  }
+
+  .section-header p {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+
+  .form-section {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .form-section:last-child {
+    border-bottom: none;
+  }
+
+  .form-section h3 {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+</style>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.getElementById('send-email-form')?.addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevent default form submission
+    
+    const btn = document.getElementById('send-btn');
+    const form = document.getElementById('send-email-form');
+    const originalText = btn.innerHTML;
+    
+    // Show loading modal
+    showLoadingModal('Sending Invoice', 'Generating PDF and sending email...');
+    btn.innerHTML = '📧 Sending...';
+    btn.disabled = true;
+    
+    // Submit form via AJAX
+    fetch(form.action || window.location.href, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new FormData(form)
+    })
+    .then(response => response.json().catch(() => ({success: response.ok})))
+    .then(data => {
+      hideLoadingModal();
+      
+      if (data.success) {
+        // Show success message
+        showAlert('✅ Email Sent Successfully!', `Invoice has been sent to {{ invoice.client.email }}. Redirecting...`, 'success');
+        
+        // Redirect after 2 seconds
+        setTimeout(() => {
+          window.location.href = '{% url "invoices:detail" invoice.id %}';
+        }, 2000);
+      } else {
+        // Show error message
+        const errorMsg = data.message || 'Failed to send invoice. Please try again.';
+        showAlert('❌ Error Sending Email', errorMsg, 'error');
+        
+        // Reset button
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    })
+    .catch(error => {
+      hideLoadingModal();
+      showAlert('❌ Error', 'An error occurred while sending the email: ' + error.message, 'error');
+      
+      // Reset button
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    });
+  });
+  
+  function showLoadingModal(title, message) {
+    // Remove existing modal if present
+    const existing = document.getElementById('loading-modal');
+    if (existing) existing.remove();
+    
+    const modal = document.createElement('div');
+    modal.id = 'loading-modal';
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    `;
+    
+    modal.innerHTML = `
+      <div style="
+        background: white;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        min-width: 300px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      ">
+        <div style="margin-bottom: 15px;">
+          <div style="
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--color-primary);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+          "></div>
+        </div>
+        <h3 style="margin: 15px 0 8px 0; color: #333;">${title}</h3>
+        <p style="margin: 0; color: #666; font-size: 14px;">${message}</p>
+      </div>
+      <style>
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      </style>
+    `;
+    
+    document.body.appendChild(modal);
+  }
+  
+  function hideLoadingModal() {
+    const modal = document.getElementById('loading-modal');
+    if (modal) modal.remove();
+  }
+  
+  function showAlert(title, message, type) {
+    // Remove existing alert if present
+    const existing = document.getElementById('alert-modal');
+    if (existing) existing.remove();
+    
+    const modal = document.createElement('div');
+    modal.id = 'alert-modal';
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    `;
+    
+    const bgColor = type === 'success' ? '#d4edda' : '#f8d7da';
+    const borderColor = type === 'success' ? '#c3e6cb' : '#f5c6cb';
+    const textColor = type === 'success' ? '#155724' : '#721c24';
+    
+    modal.innerHTML = `
+      <div style="
+        background: white;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        min-width: 350px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      ">
+        <div style="
+          background: ${bgColor};
+          border: 1px solid ${borderColor};
+          border-radius: 8px;
+          padding: 20px;
+          margin-bottom: 20px;
+          color: ${textColor};
+        ">
+          <h3 style="margin: 0 0 10px 0; font-size: 18px;">${title}</h3>
+          <p style="margin: 0; font-size: 14px;">${message}</p>
+        </div>
+        <button onclick="document.getElementById('alert-modal').remove()" style="
+          background: var(--color-primary);
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+        ">OK</button>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+  }
+</script>
+{% endblock %}

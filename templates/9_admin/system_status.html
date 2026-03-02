@@ -1,0 +1,295 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}System Status - Administration{% endblock %}
+
+{% block page_title %}System Status{% endblock %}
+{% block page_description %}Real-time monitoring of system health and resources{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/system_status.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <!-- Action Result Alert -->
+  {% if action_result %}
+    <div class="alert alert-{{ action_result.type }} alert-dismissible">
+      <strong>{{ action_result.action }}:</strong> {{ action_result.message }}
+      <button type="button" class="close" onclick="this.parentElement.style.display='none';">&times;</button>
+    </div>
+  {% endif %}
+
+  <!-- Status Overview -->
+  <div class="status-grid">
+    <div class="status-card">
+      <div class="status-icon">✓</div>
+      <div class="status-content">
+        <h3>Database</h3>
+        <p class="status-indicator healthy">{{ db_status }}</p>
+      </div>
+    </div>
+
+    <div class="status-card">
+      <div class="status-icon">✓</div>
+      <div class="status-content">
+        <h3>Cache System</h3>
+        <p class="status-indicator healthy">{{ cache_status }}</p>
+      </div>
+    </div>
+
+    <div class="status-card">
+      <div class="status-icon">✓</div>
+      <div class="status-content">
+        <h3>Email Service</h3>
+        <p class="status-indicator healthy">{{ email_status }}</p>
+      </div>
+    </div>
+
+    <div class="status-card">
+      <div class="status-icon">✓</div>
+      <div class="status-content">
+        <h3>Storage</h3>
+        <p class="status-indicator healthy">{{ storage_status }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Metrics -->
+  <div class="metrics-section">
+    <h2>System Metrics</h2>
+
+    <div class="metrics-grid">
+      <!-- Database Metrics -->
+      <div class="metric-card">
+        <div class="metric-title">📊 Database</div>
+        <div class="metric-items">
+          <div class="metric-row">
+            <span class="metric-label">Tables</span>
+            <span class="metric-value">{{ table_count }}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Connections</span>
+            <span class="metric-value">{{ db_connections }}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Query Time</span>
+            <span class="metric-value">{{ query_time_ms }}ms</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Size</span>
+            <span class="metric-value">{{ db_size_mb }} MB</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cache Metrics -->
+      <div class="metric-card">
+        <div class="metric-title">⚡ Cache System</div>
+        <div class="metric-items">
+          <div class="metric-row">
+            <span class="metric-label">Type</span>
+            <span class="metric-value">{{ cache_type }}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Hit Rate</span>
+            <span class="metric-value">{{ cache_hit_rate }}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Memory Used</span>
+            <span class="metric-value">{{ cache_memory_mb }} MB</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Keys Stored</span>
+            <span class="metric-value">{{ cache_keys }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Application Metrics -->
+      <div class="metric-card">
+        <div class="metric-title">🚀 Application</div>
+        <div class="metric-items">
+          <div class="metric-row">
+            <span class="metric-label">Uptime</span>
+            <span class="metric-value">{{ uptime_days }} days</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Requests/sec</span>
+            <span class="metric-value">{{ requests_per_sec }}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Avg Response</span>
+            <span class="metric-value">{{ avg_response_ms }}ms</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Active Users</span>
+            <span class="metric-value">{{ active_users }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Security Metrics -->
+      <div class="metric-card">
+        <div class="metric-title">🔒 Security</div>
+        <div class="metric-items">
+          <div class="metric-row">
+            <span class="metric-label">Failed Logins (24h)</span>
+            <span class="metric-value">{{ failed_logins_24h }}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Active Sessions</span>
+            <span class="metric-value">{{ active_sessions }}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">SSL Status</span>
+            <span class="metric-value">{{ ssl_status }}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Last Backup</span>
+            <span class="metric-value">{{ last_backup }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Logs -->
+  <div class="logs-section">
+    <h2>Recent System Events</h2>
+    <div class="logs-container">
+      {% if recent_logs %}
+        {% for log in recent_logs %}
+          <div class="log-entry">
+            <span class="log-time">{{ log.timestamp|date:"M d, Y H:i" }}</span>
+            <span class="log-level {% if 'error' in log.action|lower %}error{% elif 'delete' in log.action|lower %}warning{% else %}info{% endif %}">{{ log.action|upper }}</span>
+            <span class="log-message">{{ log.action|title }} {{ log.entity_type }} (ID: {{ log.entity_id|default:"-" }}){% if log.actor %} by {{ log.actor.get_full_name|default:log.actor.username }}{% endif %}</span>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="log-entry">
+          <span class="log-time">—</span>
+          <span class="log-level info">INFO</span>
+          <span class="log-message">No recent system events</span>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- System Actions -->
+  <div class="actions-section">
+    <h2>System Actions</h2>
+    <form method="post" class="actions-form">
+      {% csrf_token %}
+    </form>
+    <div class="actions-grid">
+      <button type="button" class="btn btn-primary" id="clear-cache-btn">
+        🗑️ Clear Cache
+      </button>
+      <button type="button" class="btn btn-primary" id="optimize-db-btn">
+        ⚙️ Optimize Database
+      </button>
+      <a href="{% url 'core:audit-log' %}" class="btn btn-secondary">
+        📋 View Detailed Logs
+      </a>
+      <a href="{% url 'core:system-status-report' %}" class="btn btn-secondary" target="_blank">
+        � View Report
+      </a>
+      <a href="{% url 'core:system-status-report-pdf' %}" class="btn btn-secondary">
+        📥 Download PDF
+      </a>
+    </div>
+  </div>
+
+  <!-- Business Reports -->
+  <div class="actions-section">
+    <h2>📊 Business Reports</h2>
+    <div class="actions-grid">
+      <!-- Invoice Reports -->
+      <a href="{% url 'core:reports-invoices' %}" class="btn btn-outline-primary">
+        📄 Invoice Register
+      </a>
+      <a href="{% url 'core:reports-outstanding' %}" class="btn btn-outline-primary">
+        ⚠️ Outstanding Invoices
+      </a>
+      <a href="{% url 'core:reports-aging' %}" class="btn btn-outline-primary">
+        📈 Client Aging
+      </a>
+
+      <!-- Quotation Reports -->
+      <a href="{% url 'core:reports-quotations' %}" class="btn btn-outline-success">
+        📋 Quotation Register
+      </a>
+      <a href="{% url 'core:reports-quotation-pipeline' %}" class="btn btn-outline-success">
+        🔄 Pipeline Analysis
+      </a>
+      <a href="{% url 'core:reports-quotation-performance' %}" class="btn btn-outline-success">
+        📊 Performance Analysis
+      </a>
+
+      <!-- Financial Reports -->
+      <a href="{% url 'core:reports-payments' %}" class="btn btn-outline-info">
+        💰 Payment Register
+      </a>
+      <a href="{% url 'core:reports-vat' %}" class="btn btn-outline-info">
+        🏛️ VAT Report
+      </a>
+      <a href="{% url 'core:reports-tax' %}" class="btn btn-outline-info">
+        📋 Tax Report
+      </a>
+      <a href="{% url 'core:reports-monthly-summary' %}" class="btn btn-outline-info">
+        📅 Monthly Summary
+      </a>
+
+      <!-- Analysis Reports -->
+      <a href="{% url 'core:reports-product-sales' %}" class="btn btn-outline-secondary">
+        📦 Product Sales
+      </a>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const clearBtn = document.getElementById('clear-cache-btn');
+      const optimizeBtn = document.getElementById('optimize-db-btn');
+      const form = document.querySelector('.actions-form');
+      
+      async function handleAction(actionValue, confirmMessage) {
+        // Show confirmation dialog and AWAIT the user response
+        const confirmed = await confirm('Confirm Action', confirmMessage);
+        
+        if (confirmed) {
+          // Remove any existing action inputs
+          form.querySelectorAll('input[name="action"]').forEach(el => el.remove());
+          
+          // Create and add new action input
+          const actionInput = document.createElement('input');
+          actionInput.type = 'hidden';
+          actionInput.name = 'action';
+          actionInput.value = actionValue;
+          form.appendChild(actionInput);
+          
+          // Submit the form
+          form.submit();
+        }
+      }
+      
+      if (clearBtn) {
+        clearBtn.addEventListener('click', function(event) {
+          event.preventDefault();
+          event.stopPropagation();
+          handleAction('clear_cache', 'Clear all cached data? This may briefly impact performance.');
+        });
+      }
+      
+      if (optimizeBtn) {
+        optimizeBtn.addEventListener('click', function(event) {
+          event.preventDefault();
+          event.stopPropagation();
+          handleAction('optimize_db', 'Optimize database? This may take a moment.');
+        });
+      }
+    });
+  </script>
+</div>
+{% endblock %}

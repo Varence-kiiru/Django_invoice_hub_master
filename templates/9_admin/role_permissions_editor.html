@@ -1,0 +1,541 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Edit {{ role.name|title }} Permissions - Administration{% endblock %}
+
+{% block page_title %}Edit Permissions: {{ role.name|title }}{% endblock %}
+{% block page_description %}Customize permissions for the {{ role.name }} role{% endblock %}
+
+{% block extra_css %}
+<style>
+  .permission-editor-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .permissions-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+  }
+
+  .role-info {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border-left: 4px solid #667eea;
+  }
+
+  .role-stat {
+    display: inline-block;
+    background: #f5f5f5;
+    padding: 10px 20px;
+    border-radius: 4px;
+    margin-right: 15px;
+    margin-bottom: 10px;
+  }
+
+  .permission-category {
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .category-title {
+    background: #34495e;
+    color: white;
+    padding: 15px 20px;
+    font-weight: 600;
+    font-size: 16px;
+    text-transform: capitalize;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .category-count {
+    background: rgba(255,255,255,0.3);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .permission-list {
+    padding: 20px;
+  }
+
+  .permission-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px;
+    border-bottom: 1px solid #ecf0f1;
+    transition: all 0.2s ease;
+  }
+
+  .permission-item:last-child {
+    border-bottom: none;
+  }
+
+  .permission-item:hover {
+    background: #f9f9f9;
+  }
+
+  .permission-item input[type="checkbox"] {
+    margin-top: 4px;
+    margin-right: 15px;
+    cursor: pointer;
+  }
+
+  .permission-details {
+    flex: 1;
+  }
+
+  .permission-code {
+    font-weight: 600;
+    color: #2c3e50;
+    font-family: 'Courier New', monospace;
+    padding: 4px 8px;
+    background: #f0f0f0;
+    border-radius: 3px;
+    display: inline-block;
+    margin-bottom: 4px;
+  }
+
+  .permission-description {
+    color: #7f8c8d;
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  .summary-bar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    position: sticky;
+    top: 20px;
+    z-index: 10;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .summary-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .summary-stat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .summary-stat-label {
+    font-size: 13px;
+    opacity: 0.9;
+  }
+
+  .summary-stat-value {
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .progress {
+    height: 8px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    background: white;
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 30px;
+  }
+
+  .action-buttons .btn {
+    flex: 1;
+    max-width: 200px;
+  }
+
+  .select-controls {
+    padding: 15px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    gap: 10px;
+        flex-wrap: wrap;
+  }
+
+  .select-controls button {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="permission-editor-container">
+  <!-- Header -->
+  <div class="permissions-header">
+    <h1>🔐 Edit Permissions</h1>
+    <p style="margin-bottom: 0;">Configure permissions for the <strong>{{ role.name|title }}</strong> role</p>
+  </div>
+
+  <!-- Role Information -->
+  <div class="role-info">
+    <h4>{{ role.name|title }} Role</h4>
+    <p>{{ role.description }}</p>
+    <div>
+      <div class="role-stat">
+        <strong id="current-permissions">{{ role.permissions|length }}</strong> permissions assigned
+      </div>
+      <div class="role-stat">
+        <strong>{{ all_permissions|length }}</strong> permissions available
+      </div>
+    </div>
+  </div>
+
+  <!-- Controls for all permission categories -->
+  <div class="select-controls">
+    <button class="btn btn-sm btn-info" onclick="selectAllPermissions()">✓ Select All</button>
+    <button class="btn btn-sm btn-secondary" onclick="deselectAllPermissions()">✗ Deselect All</button>
+    <button class="btn btn-sm btn-light" onclick="resetToDefaults()">↻ Reset to Defaults</button>
+  </div>
+
+  <!-- Summary Bar (Sticky) -->
+  <div class="summary-bar">
+    <div class="summary-row">
+      <div>
+        <h5 style="margin: 0 0 10px 0;">Permission Summary</h5>
+      </div>
+    </div>
+    <div class="summary-row">
+      <div class="summary-stat">
+        <div>
+          <div class="summary-stat-label">Selected</div>
+          <div class="summary-stat-value" id="selected-count">{{ role.permissions|length }}</div>
+        </div>
+      </div>
+      <div class="summary-stat">
+        <div>
+          <div class="summary-stat-label">Total</div>
+          <div class="summary-stat-value">{{ total_permissions }}</div>
+        </div>
+      </div>
+      <div class="summary-stat">
+        <div>
+          <div class="summary-stat-label">Coverage</div>
+          <div class="summary-stat-value" id="coverage-percent">{{ coverage_percent }}%</div>
+        </div>
+      </div>
+    </div>
+    <div class="progress">
+      <div class="progress-bar" id="coverage-bar" style="width: {{ coverage_percent }}%;"></div>
+    </div>
+  </div>
+
+  <!-- Permission Categories -->
+  <form id="permission-form" method="post">
+    {% csrf_token %}
+    
+    <!-- Expenses Permissions -->
+    <div class="permission-category">
+      <div class="category-title">
+        <span>💰 Expenses</span>
+        <span class="category-count"><span class="category-selected-count-expenses">0</span>/{{ permission_groups.expenses|length }}</span>
+      </div>
+      <div class="permission-list">
+        {% for perm_code, perm_data in permission_groups.expenses.items %}
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox category-expenses" value="{{ perm_code }}" 
+                   id="perm-{{ perm_code }}" 
+                   {% if perm_code in role_permissions %}checked{% endif %}
+                   onchange="updateSummary()">
+            <div class="permission-details">
+              <div class="permission-code">{{ perm_code }}</div>
+              <div class="permission-description">{{ perm_data }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Invoices Permissions -->
+    <div class="permission-category">
+      <div class="category-title">
+        <span>📄 Invoices</span>
+        <span class="category-count"><span class="category-selected-count-invoices">0</span>/{{ permission_groups.invoices|length }}</span>
+      </div>
+      <div class="permission-list">
+        {% for perm_code, perm_data in permission_groups.invoices.items %}
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox category-invoices" value="{{ perm_code }}" 
+                   id="perm-{{ perm_code }}" 
+                   {% if perm_code in role_permissions %}checked{% endif %}
+                   onchange="updateSummary()">
+            <div class="permission-details">
+              <div class="permission-code">{{ perm_code }}</div>
+              <div class="permission-description">{{ perm_data }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Clients Permissions -->
+    <div class="permission-category">
+      <div class="category-title">
+        <span>👥 Clients</span>
+        <span class="category-count"><span class="category-selected-count-clients">0</span>/{{ permission_groups.clients|length }}</span>
+      </div>
+      <div class="permission-list">
+        {% for perm_code, perm_data in permission_groups.clients.items %}
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox category-clients" value="{{ perm_code }}" 
+                   id="perm-{{ perm_code }}" 
+                   {% if perm_code in role_permissions %}checked{% endif %}
+                   onchange="updateSummary()">
+            <div class="permission-details">
+              <div class="permission-code">{{ perm_code }}</div>
+              <div class="permission-description">{{ perm_data }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Payments Permissions -->
+    <div class="permission-category">
+      <div class="category-title">
+        <span>💳 Payments</span>
+        <span class="category-count"><span class="category-selected-count-payments">0</span>/{{ permission_groups.payments|length }}</span>
+      </div>
+      <div class="permission-list">
+        {% for perm_code, perm_data in permission_groups.payments.items %}
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox category-payments" value="{{ perm_code }}" 
+                   id="perm-{{ perm_code }}" 
+                   {% if perm_code in role_permissions %}checked{% endif %}
+                   onchange="updateSummary()">
+            <div class="permission-details">
+              <div class="permission-code">{{ perm_code }}</div>
+              <div class="permission-description">{{ perm_data }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Quotations Permissions -->
+    <div class="permission-category">
+      <div class="category-title">
+        <span>📋 Quotations</span>
+        <span class="category-count"><span class="category-selected-count-quotations">0</span>/{{ permission_groups.quotations|length }}</span>
+      </div>
+      <div class="permission-list">
+        {% for perm_code, perm_data in permission_groups.quotations.items %}
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox category-quotations" value="{{ perm_code }}" 
+                   id="perm-{{ perm_code }}" 
+                   {% if perm_code in role_permissions %}checked{% endif %}
+                   onchange="updateSummary()">
+            <div class="permission-details">
+              <div class="permission-code">{{ perm_code }}</div>
+              <div class="permission-description">{{ perm_data }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Users Permissions -->
+    <div class="permission-category">
+      <div class="category-title">
+        <span>👤 Users</span>
+        <span class="category-count"><span class="category-selected-count-users">0</span>/{{ permission_groups.users|length }}</span>
+      </div>
+      <div class="permission-list">
+        {% for perm_code, perm_data in permission_groups.users.items %}
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox category-users" value="{{ perm_code }}" 
+                   id="perm-{{ perm_code }}" 
+                   {% if perm_code in role_permissions %}checked{% endif %}
+                   onchange="updateSummary()">
+            <div class="permission-details">
+              <div class="permission-code">{{ perm_code }}</div>
+              <div class="permission-description">{{ perm_data }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- System Permissions -->
+    <div class="permission-category">
+      <div class="category-title">
+        <span>⚙️ System</span>
+        <span class="category-count"><span class="category-selected-count-system">0</span>/{{ permission_groups.system|length }}</span>
+      </div>
+      <div class="permission-list">
+        {% for perm_code, perm_data in permission_groups.system.items %}
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox category-system" value="{{ perm_code }}" 
+                   id="perm-{{ perm_code }}" 
+                   {% if perm_code in role_permissions %}checked{% endif %}
+                   onchange="updateSummary()">
+            <div class="permission-details">
+              <div class="permission-code">{{ perm_code }}</div>
+              <div class="permission-description">{{ perm_data }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Reports Permissions -->
+    <div class="permission-category">
+      <div class="category-title">
+        <span>📊 Reports</span>
+        <span class="category-count"><span class="category-selected-count-reports">0</span>/{{ permission_groups.reports|length }}</span>
+      </div>
+      <div class="permission-list">
+        {% for perm_code, perm_data in permission_groups.reports.items %}
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox category-reports" value="{{ perm_code }}" 
+                   id="perm-{{ perm_code }}" 
+                   {% if perm_code in role_permissions %}checked{% endif %}
+                   onchange="updateSummary()">
+            <div class="permission-details">
+              <div class="permission-code">{{ perm_code }}</div>
+              <div class="permission-description">{{ perm_data }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <a href="/system/roles/" class="btn btn-secondary">← Back</a>
+      <button type="button" class="btn btn-primary" id="save-btn" onclick="savePermissions()">
+        💾 Save Permissions
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function updateSummary() {
+    const allCheckboxes = document.querySelectorAll('.permission-checkbox');
+    const checkedCount = document.querySelectorAll('.permission-checkbox:checked').length;
+    const total = allCheckboxes.length;
+    const percentage = total > 0 ? Math.round((checkedCount / total) * 100) : 0;
+
+    document.getElementById('selected-count').textContent = checkedCount;
+    document.getElementById('coverage-percent').textContent = percentage + '%';
+    document.getElementById('coverage-bar').style.width = percentage + '%';
+    document.getElementById('current-permissions').textContent = checkedCount;
+
+    // Update category counts
+    const categories = ['expenses', 'invoices', 'clients', 'payments', 'quotations', 'users', 'system', 'reports'];
+    categories.forEach(category => {
+      const categoryCheckboxes = document.querySelectorAll(`.category-${category}:checked`).length;
+      document.querySelector(`.category-selected-count-${category}`).textContent = categoryCheckboxes;
+    });
+  }
+
+  function selectAllPermissions() {
+    document.querySelectorAll('.permission-checkbox').forEach(checkbox => {
+      checkbox.checked = true;
+    });
+    updateSummary();
+  }
+
+  function deselectAllPermissions() {
+    document.querySelectorAll('.permission-checkbox').forEach(checkbox => {
+      checkbox.checked = false;
+    });
+    updateSummary();
+  }
+
+  function resetToDefaults() {
+    if (confirm('Are you sure you want to reset to default permissions for this role?')) {
+      location.reload();
+    }
+  }
+
+  function savePermissions() {
+    const permissions = [];
+    document.querySelectorAll('.permission-checkbox:checked').forEach(checkbox => {
+      permissions.push(checkbox.value);
+    });
+
+    const btn = document.getElementById('save-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+    fetch(`/api/system/roles/{{ role.id }}/update-permissions/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken'),
+      },
+      body: JSON.stringify({ permissions: permissions })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Permissions saved successfully!');
+        window.location.href = '/system/roles/';
+      } else {
+        alert('Error: ' + (data.error || 'Unknown error'));
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred while saving permissions');
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.innerHTML = '💾 Save Permissions';
+    });
+  }
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  // Initialize summary on page load
+  document.addEventListener('DOMContentLoaded', updateSummary);
+</script>
+{% endblock %}

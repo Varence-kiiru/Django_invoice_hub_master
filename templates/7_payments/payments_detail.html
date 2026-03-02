@@ -1,0 +1,297 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Payment Details - Invoicing App{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/payments.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <div class="row">
+            <div class="col-md-8">
+                <h1 class="page-title">💰 Payment Details</h1>
+                <p class="text-muted">Payment #{{ payment.id }} - {{ payment.invoice.invoice_number }}</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{% url 'payments:list' %}" class="btn btn-outline-secondary">← Back to Payments</a>
+                <a href="{% url 'payments:receipt' payment.id %}" class="btn btn-primary">📄 View Receipt</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        <!-- Payment Details -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">📝 Payment Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Payment ID</label>
+                                <p class="form-control-plaintext">#{{ payment.id }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Payment Date</label>
+                                <p class="form-control-plaintext">{{ payment.payment_date|date:"F j, Y" }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Payment Method</label>
+                                <p class="form-control-plaintext">{{ payment.payment_method.name }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Transaction Reference</label>
+                                <p class="form-control-plaintext">{{ payment.transaction_reference|default:"—" }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Amount</label>
+                                <p class="form-control-plaintext fs-4 text-success">{{ payment.currency }} {{ payment.amount|floatformat:2 }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Status</label>
+                                {% if payment.status == 'confirmed' %}
+                                    <span class="badge bg-success">{{ payment.get_status_display }}</span>
+                                {% elif payment.status == 'failed' %}
+                                    <span class="badge bg-danger">{{ payment.get_status_display }}</span>
+                                {% elif payment.status == 'reversed' %}
+                                    <span class="badge bg-warning">{{ payment.get_status_display }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ payment.get_status_display }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Recorded By</label>
+                                <p class="form-control-plaintext">{{ payment.recorded_by.get_full_name|default:payment.recorded_by.username }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Recorded At</label>
+                                <p class="form-control-plaintext">{{ payment.created_at|date:"F j, Y H:i" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if payment.notes %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Notes</label>
+                            <p class="form-control-plaintext">{{ payment.notes }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Invoice Information -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">📄 Related Invoice</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Invoice Number</label>
+                                <p class="form-control-plaintext">
+                                    <a href="{% url 'invoices:detail' payment.invoice.id %}" class="text-decoration-none">
+                                        {{ payment.invoice.invoice_number }}
+                                    </a>
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Client</label>
+                                <p class="form-control-plaintext">
+                                    <a href="{% url 'clients:detail' payment.invoice.client.id %}" class="text-decoration-none">
+                                        {{ payment.invoice.client.name }}
+                                    </a>
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Invoice Date</label>
+                                <p class="form-control-plaintext">{{ payment.invoice.invoice_date|date:"F j, Y" }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Invoice Status</label>
+                                {% if payment.invoice.status == 'paid' %}
+                                    <span class="badge bg-success">{{ payment.invoice.get_status_display }}</span>
+                                {% elif payment.invoice.status == 'overdue' %}
+                                    <span class="badge bg-danger">{{ payment.invoice.get_status_display }}</span>
+                                {% elif payment.invoice.status == 'cancelled' %}
+                                    <span class="badge bg-dark">{{ payment.invoice.get_status_display }}</span>
+                                {% else %}
+                                    <span class="badge bg-primary">{{ payment.invoice.get_status_display }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Invoice Total</label>
+                                <p class="form-control-plaintext">{{ payment.invoice.currency }} {{ payment.invoice.total|floatformat:2 }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Amount Due</label>
+                                <p class="form-control-plaintext">{{ payment.invoice.currency }} {{ payment.invoice.amount_due|floatformat:2 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment History -->
+            {% if payment.invoice.payments.exists %}
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">💰 Payment History</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Method</th>
+                                        <th>Reference</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for payment_item in payment.invoice.payments.all %}
+                                        <tr>
+                                            <td>{{ payment_item.payment_date|date:"M j, Y" }}</td>
+                                            <td class="text-success fw-bold">{{ payment_item.currency }} {{ payment_item.amount|floatformat:2 }}</td>
+                                            <td>{{ payment_item.payment_method.name }}</td>
+                                            <td>{{ payment_item.transaction_reference|default:"—" }}</td>
+                                            <td>
+                                                {% if payment_item.status == 'confirmed' %}
+                                                    <span class="badge bg-success">{{ payment_item.get_status_display }}</span>
+                                                {% elif payment_item.status == 'failed' %}
+                                                    <span class="badge bg-danger">{{ payment_item.get_status_display }}</span>
+                                                {% elif payment_item.status == 'reversed' %}
+                                                    <span class="badge bg-warning">{{ payment_item.get_status_display }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">{{ payment_item.get_status_display }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'payments:detail' payment_item.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                                                <a href="{% url 'payments:receipt' payment_item.id %}" class="btn btn-sm btn-outline-secondary">Receipt</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-active">
+                                        <th>Total Payments</th>
+                                        <th class="text-success">{{ payment.invoice.currency }} {{ total_payments|floatformat:2 }}</th>
+                                        <th colspan="4">Remaining Balance: {{ payment.invoice.currency }} {{ payment.invoice.amount_due|floatformat:2 }}</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">⚡ Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'payments:receipt' payment.id %}" class="btn btn-primary">
+                            📄 View Receipt
+                        </a>
+                        <a href="{% url 'invoices:detail' payment.invoice.id %}" class="btn btn-outline-primary">
+                            📄 View Invoice
+                        </a>
+                        <a href="{% url 'clients:detail' payment.invoice.client.id %}" class="btn btn-outline-secondary">
+                            👥 View Client
+                        </a>
+                        <a href="{% url 'payments:create' %}?invoice={{ payment.invoice.id }}" class="btn btn-outline-success">
+                            ➕ Record Another Payment
+                        </a>
+                        
+                        {% if payment.status == 'pending' %}
+                            <a href="{% url 'payments:confirm' payment.id %}" class="btn btn-outline-success">
+                                ✅ Confirm Payment
+                            </a>
+                        {% elif payment.status == 'confirmed' %}
+                            <a href="{% url 'payments:reverse' payment.id %}" class="btn btn-outline-warning">
+                                🔄 Reverse Payment
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Summary -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">📊 Payment Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="p-2 border rounded">
+                                <small class="text-muted">Payment Amount</small>
+                                <div class="h5 mb-0 text-success">{{ payment.currency }} {{ payment.amount|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-2 border rounded">
+                                <small class="text-muted">Invoice Total</small>
+                                <div class="h5 mb-0">{{ payment.invoice.currency }} {{ payment.invoice.total|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="text-center">
+                        <small class="text-muted">Remaining Balance</small>
+                        <div class="h5 text-danger">{{ payment.invoice.currency }} {{ payment.invoice.amount_due|floatformat:2 }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Method Details -->
+            {% if payment.payment_method.description %}
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">💳 Payment Method Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">{{ payment.payment_method.description }}</p>
+                        {% if payment.payment_method.account_details %}
+                            <div class="alert alert-info">
+                                <strong>Account Details:</strong>
+                                <p class="mb-0">{{ payment.payment_method.account_details }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

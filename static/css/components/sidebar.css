@@ -1,0 +1,298 @@
+/* ==================== SIDEBAR COMPONENT ==================== */
+/* Styles for templates/1_base/sidebar.html */
+
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--color-sidebar-bg);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-sidebar-text);
+  min-height: 100vh;
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+  overflow-y: auto;
+}
+
+/* Nav Container */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Section */
+.sidebar-section {
+  padding: 0 var(--spacing-sm);
+}
+
+.sidebar-section-title {
+  font-size: var(--font-size-xs);
+  color: rgba(229, 231, 235, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--spacing-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Nav List */
+.sidebar-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.sidebar-nav-item {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Nav Links */
+.sidebar-nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-lg);
+  color: var(--color-sidebar-text);
+  text-decoration: none;
+  transition: all var(--transition-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+.sidebar-nav-link:hover {
+  background: var(--color-sidebar-hover);
+  color: var(--color-primary);
+}
+
+.sidebar-nav-link.active {
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.15), transparent);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: inset 3px 0 0 var(--color-primary);
+}
+
+/* Toggle Link (for submenu toggle) */
+.sidebar-toggle-link {
+  cursor: pointer;
+}
+
+/* Icon and Label */
+.icon {
+  font-size: 1.15rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  color: rgba(229, 231, 235, 0.7);
+  flex-shrink: 0;
+}
+
+.label {
+  flex: 1;
+  font-weight: var(--font-weight-medium);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Submenu Toggle Icon */
+.sidebar-toggle-icon {
+  margin-left: auto;
+  opacity: 0.7;
+  transition: transform var(--transition-base);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.sidebar-toggle-icon.open {
+  transform: rotate(180deg);
+}
+
+/* Submenu */
+.sidebar-submenu {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 calc(34px + var(--spacing-md));
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-submenu.open {
+  display: flex;
+}
+
+.sidebar-submenu[hidden] {
+  display: none;
+}
+
+.sidebar-submenu-item {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar-submenu-link {
+  display: block;
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius-md);
+  color: rgba(229, 231, 235, 0.7);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  transition: all var(--transition-base);
+}
+
+.sidebar-submenu-link:hover {
+  background: var(--color-sidebar-hover);
+  color: var(--color-primary);
+}
+
+.sidebar-submenu-link.active {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Bottom Links */
+.sidebar-bottom {
+  margin-top: auto;
+  padding: var(--spacing-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-bottom-link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm);
+  color: var(--color-sidebar-text);
+  text-decoration: none;
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-base);
+  font-size: var(--font-size-sm);
+}
+
+.sidebar-bottom-link:hover {
+  background: var(--color-sidebar-hover);
+  color: var(--color-primary);
+}
+
+/* Mobile Close Button for Sidebar - Hidden on desktop */
+.sidebar-close-btn {
+  display: none; /* Hidden by default on desktop */
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: auto;
+  right: auto;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: var(--color-sidebar-text);
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+  min-height: 40px;
+  min-width: 40px;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+}
+
+.sidebar-close-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: var(--color-primary);
+}
+
+.sidebar-close-btn:active {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--color-primary);
+  transform: scale(0.95);
+}
+
+/* Note: All responsive/mobile styles consolidated in responsive/mobile.css *
+/* All responsive and mobile sidebar styles have been consolidated in static/css/responsive/mobile.css
+   to avoid CSS cascade conflicts and maintain a single source of truth for responsive design */
+/* ==================== DARK THEME SUPPORT ==================== */
+[data-theme="dark"] .sidebar {
+  background: var(--color-sidebar-bg);
+  border-right-color: var(--color-border);
+  color: var(--color-sidebar-text);
+}
+
+[data-theme="dark"] .sidebar-section-title {
+  color: var(--color-text-secondary);
+}
+
+[data-theme="dark"] .sidebar-link {
+  color: var(--color-sidebar-text);
+  border-radius: var(--radius-md);
+}
+
+[data-theme="dark"] .sidebar-link:hover {
+  background: var(--color-sidebar-hover);
+  color: var(--color-sidebar-text);
+}
+
+[data-theme="dark"] .sidebar-link.active {
+  background: transparent;
+  color: var(--color-sidebar-active);
+  border-color: var(--color-sidebar-active);
+}
+
+[data-theme="dark"] .sidebar-icon {
+  color: inherit;
+}
+
+[data-theme="dark"] .sidebar-text {
+  color: inherit;
+}
+
+[data-theme="dark"] .sidebar-collapse-btn {
+  color: var(--color-sidebar-text);
+}
+
+/* Auto theme - system preference dark mode */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .sidebar {
+    background: var(--color-sidebar-bg);
+    border-right-color: var(--color-border);
+    color: var(--color-sidebar-text);
+  }
+
+  :root:not([data-theme="light"]) .sidebar-section-title {
+    color: var(--color-text-secondary);
+  }
+
+  :root:not([data-theme="light"]) .sidebar-link {
+    color: var(--color-sidebar-text);
+  }
+
+  :root:not([data-theme="light"]) .sidebar-link:hover {
+    background: var(--color-sidebar-hover);
+    color: var(--color-sidebar-text);
+  }
+
+  :root:not([data-theme="light"]) .sidebar-link.active {
+    background: transparent;
+    color: var(--color-sidebar-active);
+    border-color: var(--color-sidebar-active);
+  }
+}

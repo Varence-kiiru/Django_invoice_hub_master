@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block subject %}{% endblock %}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            border-collapse: collapse;
+        }
+        
+        .email-header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .email-header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .email-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .email-body {
+            padding: 30px;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #444;
+        }
+        
+        .email-body p {
+            margin-bottom: 15px;
+        }
+        
+        .email-body h3 {
+            color: #2c3e50;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .email-body a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .email-body a:hover {
+            text-decoration: underline;
+        }
+        
+        .email-footer {
+            background-color: #ecf0f1;
+            border-top: 1px solid #bdc3c7;
+            padding: 20px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+        
+        .email-footer p {
+            margin: 5px 0;
+        }
+        
+        .divider {
+            height: 1px;
+            background-color: #ecf0f1;
+            margin: 30px 0;
+        }
+        
+        .action-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .action-button:hover {
+            background-color: #2980b9;
+            text-decoration: none;
+        }
+        
+        .info-box {
+            background-color: #ecf0f1;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+        
+        .warning-box {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+            color: #856404;
+        }
+        
+        .success-box {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+            color: #155724;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        table th {
+            background-color: #f5f5f5;
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <table class="email-container" width="600" cellpadding="0" cellspacing="0">
+        <tr>
+            <td class="email-header">
+                <h1>{% block header_title %}Invoice Notification{% endblock %}</h1>
+                <p>{% block header_subtitle %}Your Professional Invoicing Solution{% endblock %}</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="email-body">
+                {% block content %}
+                <!-- Email content goes here -->
+                {% endblock %}
+            </td>
+        </tr>
+        <tr>
+            <td class="email-footer">
+                <p><strong>Your Company Name</strong></p>
+                <p>123 Business Street, City, State ZIP Code</p>
+                <p>Phone: +1-234-567-8900 | Email: info@yourcompany.com</p>
+                <p style="margin-top: 15px; font-size: 11px;">
+                    This is an automated message. Please do not reply directly to this email.
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

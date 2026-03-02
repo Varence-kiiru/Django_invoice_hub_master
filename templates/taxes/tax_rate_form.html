@@ -1,0 +1,306 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}
+    {% if action == 'edit' %}
+        Edit Tax Rate
+    {% else %}
+        Create New Tax Rate
+    {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-section { margin-bottom: 2rem; }
+    .form-section h6 { 
+        color: #495057; 
+        font-weight: 600; 
+        padding-bottom: 0.5rem; 
+        border-bottom: 2px solid #e9ecef;
+        margin-bottom: 1rem;
+    }
+    .help-text { font-size: 0.875rem; color: #6c757d; margin-top: 0.25rem; }
+    .field-group { margin-bottom: 1.5rem; }
+    .required::after { content: " *"; color: #dc3545; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="mb-4">
+        <h1>
+            {% if action == 'edit' %}
+                Edit Tax Rate: {{ tax_rate.name }}
+            {% else %}
+                Create New Tax Rate
+            {% endif %}
+        </h1>
+        <p class="text-muted">
+            {% if action == 'edit' %}
+                Update tax rate details
+            {% else %}
+                Add a new tax rate to your system
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Alert Messages -->
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <h5 class="alert-heading">Error</h5>
+        {% for error in form.non_field_errors %}
+            <div>{{ error }}</div>
+        {% endfor %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+
+    <!-- Form -->
+    <div class="row">
+        <div class="col-lg-8">
+            <form method="post" class="card">
+                {% csrf_token %}
+
+                <!-- Basic Information -->
+                <div class="card-body">
+                    <div class="form-section">
+                        <h6><i class="bi bi-info-circle"></i> Basic Information</h6>
+                        
+                        <div class="field-group">
+                            <label for="{{ form.code.id_for_label }}" class="form-label required">
+                                {{ form.code.label }}
+                            </label>
+                            {% if form.code.errors %}
+                                <div class="is-invalid">{{ form.code }}</div>
+                                <div class="invalid-feedback d-block">{{ form.code.errors.0 }}</div>
+                            {% else %}
+                                {{ form.code }}
+                            {% endif %}
+                            <div class="help-text">
+                                Unique code identifier (e.g., VAT16, VAT0, INCOME10)
+                            </div>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="{{ form.name.id_for_label }}" class="form-label required">
+                                {{ form.name.label }}
+                            </label>
+                            {% if form.name.errors %}
+                                <div class="is-invalid">{{ form.name }}</div>
+                                <div class="invalid-feedback d-block">{{ form.name.errors.0 }}</div>
+                            {% else %}
+                                {{ form.name }}
+                            {% endif %}
+                            <div class="help-text">
+                                Descriptive name (e.g., "Standard VAT - 16%")
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="field-group">
+                                    <label for="{{ form.rate_percentage.id_for_label }}" class="form-label required">
+                                        {{ form.rate_percentage.label }}
+                                    </label>
+                                    {% if form.rate_percentage.errors %}
+                                        <div class="is-invalid">{{ form.rate_percentage }}</div>
+                                        <div class="invalid-feedback d-block">{{ form.rate_percentage.errors.0 }}</div>
+                                    {% else %}
+                                        {{ form.rate_percentage }}
+                                    {% endif %}
+                                    <div class="help-text">
+                                        Enter as percentage (0-100)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="field-group">
+                                    <label for="{{ form.tax_type.id_for_label }}" class="form-label required">
+                                        {{ form.tax_type.label }}
+                                    </label>
+                                    {% if form.tax_type.errors %}
+                                        <div class="is-invalid">{{ form.tax_type }}</div>
+                                        <div class="invalid-feedback d-block">{{ form.tax_type.errors.0 }}</div>
+                                    {% else %}
+                                        {{ form.tax_type }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location & Dates -->
+                    <div class="form-section">
+                        <h6><i class="bi bi-geo-alt"></i> Location & Effective Dates</h6>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="field-group">
+                                    <label for="{{ form.country.id_for_label }}" class="form-label required">
+                                        {{ form.country.label }}
+                                    </label>
+                                    {% if form.country.errors %}
+                                        <div class="is-invalid">{{ form.country }}</div>
+                                        <div class="invalid-feedback d-block">{{ form.country.errors.0 }}</div>
+                                    {% else %}
+                                        {{ form.country }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="field-group">
+                                    <label for="{{ form.effective_from.id_for_label }}" class="form-label required">
+                                        {{ form.effective_from.label }}
+                                    </label>
+                                    {% if form.effective_from.errors %}
+                                        <div class="is-invalid">{{ form.effective_from }}</div>
+                                        <div class="invalid-feedback d-block">{{ form.effective_from.errors.0 }}</div>
+                                    {% else %}
+                                        {{ form.effective_from }}
+                                    {% endif %}
+                                    <div class="help-text">
+                                        When this rate becomes active
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="{{ form.effective_to.id_for_label }}" class="form-label">
+                                {{ form.effective_to.label }}
+                            </label>
+                            {% if form.effective_to.errors %}
+                                <div class="is-invalid">{{ form.effective_to }}</div>
+                                <div class="invalid-feedback d-block">{{ form.effective_to.errors.0 }}</div>
+                            {% else %}
+                                {{ form.effective_to }}
+                            {% endif %}
+                            <div class="help-text">
+                                Leave blank for rates that never expire
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Settings -->
+                    <div class="form-section">
+                        <h6><i class="bi bi-sliders"></i> Additional Settings</h6>
+                        
+                        <div class="field-group">
+                            <div class="form-check">
+                                {{ form.is_vat_applicable }}
+                                <label class="form-check-label" for="{{ form.is_vat_applicable.id_for_label }}">
+                                    {{ form.is_vat_applicable.label }}
+                                </label>
+                            </div>
+                            <div class="help-text">
+                                Whether VAT can be recovered on purchases with this rate
+                            </div>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="{{ form.kra_code.id_for_label }}" class="form-label">
+                                {{ form.kra_code.label }}
+                            </label>
+                            {% if form.kra_code.errors %}
+                                <div class="is-invalid">{{ form.kra_code }}</div>
+                                <div class="invalid-feedback d-block">{{ form.kra_code.errors.0 }}</div>
+                            {% else %}
+                                {{ form.kra_code }}
+                            {% endif %}
+                            <div class="help-text">
+                                KRA eTIMS code (if applicable)
+                            </div>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">
+                                {{ form.description.label }}
+                            </label>
+                            {% if form.description.errors %}
+                                <div class="is-invalid">{{ form.description }}</div>
+                                <div class="invalid-feedback d-block">{{ form.description.errors.0 }}</div>
+                            {% else %}
+                                {{ form.description }}
+                            {% endif %}
+                            <div class="help-text">
+                                Add any additional notes or details
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="card-footer bg-light d-flex gap-2 justify-content-between">
+                    <a href="{% url 'taxes:list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </a>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'taxes:list' %}" class="btn btn-secondary">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            {% if action == 'edit' %}
+                                <i class="bi bi-check-circle"></i> Save Changes
+                            {% else %}
+                                <i class="bi bi-plus-circle"></i> Create Tax Rate
+                            {% endif %}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Info Panel -->
+        <div class="col-lg-4">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="bi bi-lightbulb"></i> Tips</h6>
+                    <ul class="small list-unstyled">
+                        <li class="mb-2">
+                            <strong>Code:</strong> Use a unique identifier like VAT16 or INCOME10
+                        </li>
+                        <li class="mb-2">
+                            <strong>Effective From:</strong> Set the date when this rate becomes active
+                        </li>
+                        <li class="mb-2">
+                            <strong>Effective To:</strong> Optional - leave blank for rates that never expire
+                        </li>
+                        <li class="mb-2">
+                            <strong>VAT Applicable:</strong> Check if VAT can be recovered with this rate
+                        </li>
+                        <li>
+                            <strong>Description:</strong> Add notes about when this rate applies
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            {% if action == 'edit' and tax_rate %}
+            <div class="card mt-3 bg-info bg-opacity-10 border-info">
+                <div class="card-body small">
+                    <h6 class="card-title">Current Values</h6>
+                    <dl class="row mb-0" style="font-size: 0.85rem;">
+                        <dt class="col-6">Code:</dt>
+                        <dd class="col-6"><code>{{ tax_rate.code }}</code></dd>
+                        <dt class="col-6">Rate:</dt>
+                        <dd class="col-6"><strong>{{ tax_rate.rate_percentage }}%</strong></dd>
+                        <dt class="col-6">Type:</dt>
+                        <dd class="col-6">{{ tax_rate.get_tax_type_display }}</dd>
+                        <dt class="col-6">Active:</dt>
+                        <dd class="col-6">
+                            {% if tax_rate.is_active %}
+                                <span class="badge bg-success">Yes</span>
+                            {% else %}
+                                <span class="badge bg-secondary">No</span>
+                            {% endif %}
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

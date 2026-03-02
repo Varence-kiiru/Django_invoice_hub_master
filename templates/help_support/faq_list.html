@@ -1,0 +1,158 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Frequently Asked Questions - Invoice System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/help_support/faq_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="faq-header">
+        <h1>❓ Frequently Asked Questions</h1>
+        <p>Find quick answers to common questions about our invoicing system</p>
+    </div>
+
+    <!-- Controls -->
+    <div class="faq-controls">
+        <div class="faq-search">
+            <form method="GET" class="d-flex">
+                <input 
+                    type="text" 
+                    name="search" 
+                    placeholder="Search FAQs..." 
+                    value="{{ search_query }}"
+                >
+            </form>
+        </div>
+        <div class="faq-filters">
+            <a href="{% url 'core:faq' %}" class="filter-btn {% if not selected_category %}active{% endif %}">
+                All Categories
+            </a>
+            {% for key, label in categories %}
+            <a href="{% url 'core:faq' %}?category={{ key }}" class="filter-btn {% if selected_category == key %}active{% endif %}">
+                {{ label }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- FAQs -->
+    <div class="faq-container">
+        {% if faqs %}
+            {% for faq in faqs %}
+            <div class="faq-item">
+                <button class="faq-question" type="button" onclick="toggleFAQ(this);">
+                    <span>
+                        <div class="faq-category-label">{{ faq.get_category_display }}</div>
+                        {{ faq.question }}
+                    </span>
+                    <span class="faq-toggle">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        {{ faq.answer|safe }}
+
+                        <div class="faq-meta">
+                            <span>👁️ {{ faq.views_count }} views</span>
+                            <span>👍 {{ faq.helpful_yes }} helpful</span>
+                            {% if faq.updated_at %}
+                            <span>📅 Updated {{ faq.updated_at|date:"M d, Y" }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="faq-helpful">
+                            <button class="faq-helpful-btn" onclick="markHelpful({{ faq.id }}, true);">
+                                👍 Helpful
+                            </button>
+                            <button class="faq-helpful-btn" onclick="markHelpful({{ faq.id }}, false);">
+                                👎 Not Helpful
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <div class="pagination-wrapper">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                                First
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                                Previous
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                            {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                                    {{ num }}
+                                </a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                                Next
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                                Last
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        {% else %}
+        <div class="no-results">
+            <div class="no-results-icon">😕</div>
+            <h3>No FAQs Found</h3>
+            <p>Try adjusting your search terms or category filter</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- CTA Section -->
+    <div style="background: #f8f9fa; padding: 40px 30px; border-radius: 8px; margin-top: 50px; text-align: center;">
+        <h3 style="margin-bottom: 15px; color: #333;">Still need help?</h3>
+        <a href="{% url 'core:support-form' %}" class="btn btn-primary" style="padding: 10px 25px;">
+            Contact Our Support Team
+        </a>
+    </div>
+</div>
+
+<script>
+function toggleFAQ(button) {
+    const answer = button.nextElementSibling;
+    button.classList.toggle('active');
+    answer.classList.toggle('show');
+}
+
+function markHelpful(faqId, helpful) {
+    // In a production app, this would make an AJAX call
+    console.log('FAQ ' + faqId + ' marked as ' + (helpful ? 'helpful' : 'not helpful'));
+    alert('Thank you for your feedback!');
+}
+</script>
+{% endblock %}

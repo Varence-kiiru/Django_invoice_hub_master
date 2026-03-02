@@ -1,0 +1,35 @@
+<!-- Recent Payments Widget -->
+<div class="card card-widget">
+  <div class="card-header">
+    <h4 class="card-title">
+      <span aria-hidden="true">💵</span> Recent Payments
+    </h4>
+  </div>
+  <div class="card-body">
+    {% if recent_payments %}
+      <ul class="list-unstyled widget-list">
+        {% for payment in recent_payments|slice:":6" %}
+          <li class="widget-list-item">
+            <div class="item-header">
+              <strong>{{ payment.invoice.invoice_number }}</strong>
+              <span class="item-amount success">${{ payment.amount|floatformat:2 }}</span>
+            </div>
+            <div class="item-meta">
+              <small class="text-success">{{ payment.created_at|date:"M d" }}</small>
+              <span class="text-muted">{{ payment.invoice.client.name|truncatewords:2 }}</span>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="empty-state">
+        <p class="text-muted">
+          <span aria-hidden="true">📭</span> No recent payments
+        </p>
+      </div>
+    {% endif %}
+  </div>
+  <div class="card-footer">
+    <a href="{% url 'payments:list' %}" class="btn btn-sm btn-link">View All Payments</a>
+  </div>
+</div>

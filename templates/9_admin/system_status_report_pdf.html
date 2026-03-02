@@ -1,0 +1,87 @@
+{% extends "layouts/pdf_base.html" %}
+
+{% block title %}System Status Report{% endblock %}
+
+{% block content %}
+<div class="pdf-header">
+    {% if company_logo %}
+        <img src="{{ company_logo }}" alt="Logo" class="pdf-logo">
+    {% endif %}
+    <div class="company-info">
+        <h2>{{ company_name }}</h2>
+        <p>{{ company_address }}</p>
+        <p>Tel: {{ company_phone }}</p>
+        <p>Email: {{ company_email }}</p>
+        {% if company_tax_id %}
+        <p>Tax ID: {{ company_tax_id }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="report-title">System Status Report</div>
+<div class="report-subtitle">System health and performance metrics</div>
+
+<!-- Statistics -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Total Users</div>
+        <div class="stat-value">{{ total_users|default:0 }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Total Invoices</div>
+        <div class="stat-value">{{ total_invoices|default:0 }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Total Payments</div>
+        <div class="stat-value">{{ total_payments|default:0 }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Total Clients</div>
+        <div class="stat-value">{{ total_clients|default:0 }}</div>
+    </div>
+</div>
+
+<!-- Database Info -->
+<div class="section-title">Database Information</div>
+<table class="summary-table">
+    <tr>
+        <td class="label">Engine:</td>
+        <td class="value">{{ db_info.engine }}</td>
+    </tr>
+    <tr>
+        <td class="label">Database:</td>
+        <td class="value">{{ db_info.name }}</td>
+    </tr>
+    <tr>
+        <td class="label">Host:</td>
+        <td class="value">{{ db_info.host }}</td>
+    </tr>
+</table>
+
+<!-- Recent Activity -->
+<div class="section-title">Recent Audit Logs</div>
+{% if recent_logs %}
+<table>
+    <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th>User</th>
+            <th>Action</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for log in recent_logs %}
+        <tr>
+            <td>{{ log.timestamp|date:"d/m/Y H:i" }}</td>
+            <td>{{ log.user.username }}</td>
+            <td>{{ log.action }}</td>
+            <td>{{ log.details|truncatewords:10 }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="no-data">No recent logs found</div>
+{% endif %}
+{% endblock %}

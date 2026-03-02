@@ -1,0 +1,163 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Products{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/products.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="products-header">
+        <h1>Products</h1>
+        <div>
+            <a href="{% url 'products:create' %}" class="btn-create">+ New Product</a>
+            <a href="{% url 'products:import' %}" class="btn-create" style="background-color: #3498db;">Import CSV</a>
+            <a href="{% url 'products:export' %}" class="btn-create" style="background-color: #f39c12;">⬇ Export CSV</a>
+        </div>
+    </div>
+    
+    <div class="products-toolbar">
+        <div class="search-box">
+            <form method="get" style="display: flex; gap: 10px;">
+                <input type="text" name="search" placeholder="Search by SKU, name, or description..." value="{{ search_query }}">
+                <button type="submit" class="btn-small" style="background-color: #3498db; color: white;">Search</button>
+                {% if search_query %}
+                    <a href="{% url 'products:list' %}" class="btn-small" style="background-color: #95a5a6; color: white;">Clear</a>
+                {% endif %}
+            </form>
+        </div>
+        
+        <select name="category" class="filter-select" onchange="window.location.href='?category=' + this.value + (new URLSearchParams(window.location.search).get('search') ? '&search=' + new URLSearchParams(window.location.search).get('search') : '')">
+            <option value="">All Categories</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if category.id == category_filter %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    
+    {% if products %}
+    <table class="products-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Unit</th>
+                <th style="text-align: right;">Unit Price</th>
+                <th style="text-align: right;">Usage</th>
+                <th style="text-align: right;">Total Revenue</th>
+                <th>Status</th>
+                <th style="width: 120px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>
+                    <div class="product-name">{{ product.name }}</div>
+                    <div class="product-sku">{{ product.sku }}</div>
+                </td>
+                <td>{{ product.category.name|default:"—" }}</td>
+                <td>{{ product.get_unit_display }}</td>
+                <td class="amount-text">{{ product.unit_price }}</td>
+                <td style="text-align: right;">{{ product.usage_count|default:"0" }}</td>
+                <td class="amount-text">{{ product.revenue|default:"0.00" }}</td>
+                <td>
+                    <span class="status-badge {% if product.is_active %}status-active{% else %}status-inactive{% endif %}" data-product-id="{{ product.id }}" style="cursor: pointer;" onclick="toggleProductStatus(this, {{ product.id }})">
+                        {% if product.is_active %}Active{% else %}Inactive{% endif %}
+                    </span>
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <a href="{% url 'products:detail' product.id %}" class="btn-small btn-view">View</a>
+                        <a href="{% url 'products:edit' product.id %}" class="btn-small btn-edit">Edit</a>
+                        <a href="{% url 'products:delete' product.id %}" class="btn-small btn-delete">Delete</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if page_obj.has_other_pages %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Previous</a>
+        {% endif %}
+        
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <span class="current">{{ num }}</span>
+            {% else %}
+                <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">Last</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <div class="no-data">
+        <p>No products found</p>
+        <a href="{% url 'products:create' %}" class="btn-create">Create your first product</a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+<script>
+// Get CSRF token from cookie
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function toggleProductStatus(element, productId) {
+    const csrftoken = getCookie('csrftoken');
+    
+    fetch(`/products/${productId}/toggle-status/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Toggle the badge appearance
+            if (data.is_active) {
+                element.textContent = 'Active';
+                element.className = 'status-badge status-active';
+            } else {
+                element.textContent = 'Inactive';
+                element.className = 'status-badge status-inactive';
+            }
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to toggle status');
+    });
+}
+</script>

@@ -1,0 +1,282 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Data Import & Analytics Dashboard - Invoice System v3.0.0{% endblock %}
+
+{% block content %}
+<div class="container-fluid pt-4 pb-4">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <h1 class="h3 text-dark font-weight-bold">
+        <i class="fas fa-database"></i> Data Management
+      </h1>
+      <p class="text-muted">Import data, manage entities, and view analytics</p>
+    </div>
+    <div class="col-md-6 text-right">
+      <!-- Import Data Button -->
+      <button type="button" class="btn btn-primary btn-lg" id="showDataImportBtn">
+        <i class="fas fa-file-import"></i> Import Data
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card shadow-sm border-left-primary">
+        <div class="card-body">
+          <div class="text-primary font-weight-bold text-uppercase mb-1">Total Invoices</div>
+          <div class="h3 mb-0" id="totalInvoices">0</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-left-success">
+        <div class="card-body">
+          <div class="text-success font-weight-bold text-uppercase mb-1">Total Payments</div>
+          <div class="h3 mb-0" id="totalPayments">0</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-left-info">
+        <div class="card-body">
+          <div class="text-info font-weight-bold text-uppercase mb-1">Active Clients</div>
+          <div class="h3 mb-0" id="totalClients">0</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-left-warning">
+        <div class="card-body">
+          <div class="text-warning font-weight-bold text-uppercase mb-1">Pending Quotations</div>
+          <div class="h3 mb-0" id="totalQuotations">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Imports / Activity -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white border-bottom">
+          <h5 class="mb-0">
+            <i class="fas fa-list"></i> Recent Import Activity
+          </h5>
+        </div>
+        <div class="card-body">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Date</th>
+                <th>Entity Type</th>
+                <th>Records Imported</th>
+                <th>Status</th>
+                <th>User</th>
+              </tr>
+            </thead>
+            <tbody id="importActivityTable">
+              <tr>
+                <td colspan="5" class="text-center text-muted py-4">
+                  <i class="fas fa-inbox"></i> No imports yet. Start by clicking "Import Data" button.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-light border-bottom">
+          <h5 class="mb-0">
+            <i class="fas fa-download"></i> Download Templates
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted">Download sample CSV files to prepare your data for import:</p>
+          <div class="list-group list-group-flush">
+            <a href="#" onclick="downloadTemplate('invoice')" class="list-group-item list-group-item-action">
+              <i class="fas fa-file-csv text-success"></i> Invoice Template
+            </a>
+            <a href="#" onclick="downloadTemplate('payment')" class="list-group-item list-group-item-action">
+              <i class="fas fa-file-csv text-success"></i> Payment Template
+            </a>
+            <a href="#" onclick="downloadTemplate('client')" class="list-group-item list-group-item-action">
+              <i class="fas fa-file-csv text-success"></i> Client Template
+            </a>
+            <a href="#" onclick="downloadTemplate('quotation')" class="list-group-item list-group-item-action">
+              <i class="fas fa-file-csv text-success"></i> Quotation Template
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-light border-bottom">
+          <h5 class="mb-0">
+            <i class="fas fa-info-circle"></i> Import Guide
+          </h5>
+        </div>
+        <div class="card-body">
+          <ol class="pl-3">
+            <li class="mb-2"><strong>Download Template:</strong> Get a sample CSV file</li>
+            <li class="mb-2"><strong>Fill Data:</strong> Add your records to the template</li>
+            <li class="mb-2"><strong>Click Import:</strong> Select file and entity type</li>
+            <li class="mb-2"><strong>Preview:</strong> Review data before importing</li>
+            <li class="mb-2"><strong>Confirm:</strong> Start import process</li>
+            <li><strong>Review Results:</strong> Check import summary and errors</li>
+          </ol>
+          <hr>
+          <div class="alert alert-info mb-0">
+            <small>
+              <i class="fas fa-lightbulb"></i>
+              <strong>Tip:</strong> The import system validates all required fields. Check the error details if some rows fail.
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Include the Data Import Modal from this template file -->
+{% include '10_modals/data_import_modal.html' %}
+
+<!-- Additional Scripts -->
+<script>
+  /**
+   * Load dashboard metrics on page load
+   */
+  document.addEventListener('DOMContentLoaded', function() {
+    // Load statistics
+    loadDashboardMetrics();
+    
+    // Optional: Load recent import activity
+    loadImportActivity();
+  });
+
+  /**
+   * Load dashboard metrics from API
+   */
+  function loadDashboardMetrics() {
+    // Fetch metrics from the analytics API endpoint
+    const endpoint = '/api/analytics/summary/';
+    
+    fetch(endpoint, {
+      credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const metrics = data.data;
+        document.getElementById('totalInvoices').textContent = metrics.total_invoices || '0';
+        document.getElementById('totalPayments').textContent = metrics.total_payments || '0';
+        document.getElementById('totalClients').textContent = metrics.active_clients || '0';
+        document.getElementById('totalQuotations').textContent = metrics.pending_quotations || '0';
+      }
+    })
+    .catch(error => console.error('Error loading metrics:', error));
+  }
+
+  /**
+   * Load recent import activity
+   */
+  function loadImportActivity() {
+    const endpoint = '/api/import/history/';
+    
+    fetch(endpoint, {
+      credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && data.data.length > 0) {
+        const tbody = document.getElementById('importActivityTable');
+        tbody.innerHTML = data.data.map(item => `
+          <tr>
+            <td>${formatDate(item.created_at)}</td>
+            <td><span class="badge badge-info">${item.entity_type}</span></td>
+            <td>${item.records_count}</td>
+            <td>
+              ${item.status === 'success' 
+                ? '<span class="badge badge-success">Success</span>' 
+                : '<span class="badge badge-warning">Partial</span>'}
+            </td>
+            <td>${item.user || 'System'}</td>
+          </tr>
+        `).join('');
+      }
+    })
+    .catch(error => console.error('Error loading import activity:', error));
+  }
+
+  /**
+   * Download template for entity type
+   */
+  function downloadTemplate(entityType) {
+    if (window.dataImporter) {
+      document.getElementById('entityType').value = entityType;
+      window.dataImporter.downloadTemplate();
+    } else {
+      alert('DataImporter not initialized. Please refresh the page.');
+    }
+  }
+
+  /**
+   * Format date string
+   */
+  function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+  }
+
+  /**
+   * Optional: Auto-refresh metrics every 30 seconds
+   */
+  // setInterval(loadDashboardMetrics, 30000);
+</script>
+
+<style>
+  /* Cards with colored left border */
+  .border-left-primary {
+    border-left: 4px solid #007bff;
+  }
+  .border-left-success {
+    border-left: 4px solid #28a745;
+  }
+  .border-left-info {
+    border-left: 4px solid #17a2b8;
+  }
+  .border-left-warning {
+    border-left: 4px solid #ffc107;
+  }
+
+  /* Table styling */
+  .table-hover tbody tr:hover {
+    background-color: #f8f9ff;
+  }
+
+  /* List group styling */
+  .list-group-item {
+    padding: 12px 15px;
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .list-group-item:hover {
+    background-color: #f8f9fa;
+  }
+
+  .list-group-item i {
+    margin-right: 10px;
+  }
+</style>
+{% endblock %}

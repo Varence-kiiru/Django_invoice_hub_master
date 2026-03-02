@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Report{% endblock %}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            font-family: Arial, sans-serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            color: #000;
+            background: white;
+        }
+
+        /* Page Layout */
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .page {
+            width: 100%;
+            position: relative;
+        }
+
+        .page-content {
+            width: 100%;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+
+        /* Header */
+        .pdf-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10mm;
+            margin-bottom: 10mm;
+            border-bottom: 2px solid #38b6ff;
+            padding-bottom: 8mm;
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        .pdf-logo {
+            max-width: 60mm;
+            max-height: 40mm;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .company-info {
+            flex: 1;
+            text-align: right;
+        }
+
+        .company-info h2 {
+            font-size: 24pt;
+            color: #38b6ff;
+            margin-bottom: 4mm;
+            margin-top: 0;
+            font-weight: bold;
+        }
+
+        .company-info p {
+            font-size: 11pt;
+            color: #000;
+            margin: 1mm 0;
+            font-weight: 500;
+        }
+
+        /* Report Title */
+        .report-title {
+            font-size: 18pt;
+            font-weight: bold;
+            color: #38b6ff;
+            margin: 8mm 0 2mm 0;
+            border-bottom: 2px solid #38b6ff;
+            padding-bottom: 3mm;
+        }
+
+        .report-subtitle {
+            font-size: 11pt;
+            color: #666;
+            margin-bottom: 6mm;
+        }
+
+        /* Filters Box */
+        .filters-box {
+            background-color: #f9f9f9;
+            border-left: 2mm solid #38b6ff;
+            padding: 5mm;
+            margin-bottom: 8mm;
+            font-size: 10pt;
+        }
+
+        .filters-box strong {
+            color: #38b6ff;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5mm;
+            margin-bottom: 10mm;
+            width: 100%;
+        }
+
+        .stat-card {
+            background: #f9f9f9;
+            border: 1px solid #ecf0f1;
+            border-left: 2mm solid #38b6ff;
+            padding: 5mm;
+            text-align: center;
+            page-break-inside: avoid;
+        }
+
+        .stat-card .stat-label {
+            font-size: 9pt;
+            color: #38b6ff;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 2mm;
+        }
+
+        .stat-card .stat-value {
+            font-size: 16pt;
+            font-weight: bold;
+            color: #38b6ff;
+        }
+
+        .stat-card .stat-detail {
+            font-size: 8pt;
+            color: #999;
+            margin-top: 1mm;
+        }
+
+        /* Section Title */
+        .section-title {
+            font-size: 11pt;
+            font-weight: 600;
+            color: #38b6ff;
+            border-bottom: 2px solid #38b6ff;
+            padding-bottom: 1.5mm;
+            margin: 8mm 0 4mm 0;
+            page-break-after: avoid;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 6mm;
+            table-layout: fixed;
+            max-width: 100%;
+        }
+
+        table thead {
+            background-color: #ecf0f1;
+            border-bottom: 2px solid #38b6ff;
+        }
+
+        table th {
+            padding: 3mm 3mm;
+            text-align: left;
+            font-weight: bold;
+            color: #38b6ff;
+            font-size: 10pt;
+            word-wrap: break-word;
+        }
+
+        table tbody tr {
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        table tbody tr:last-child {
+            border-bottom: 2px solid #2c3e50;
+        }
+
+        table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table td {
+            padding: 3mm 3mm;
+            border: none;
+            font-size: 10pt;
+            word-wrap: break-word;
+        }
+
+        /* Summary Table */
+        .summary-table {
+            width: 100%;
+            margin-top: 6mm;
+            border-collapse: collapse;
+        }
+
+        .summary-table td {
+            padding: 2mm 3mm;
+            border: none;
+            border-bottom: 1px solid #ddd;
+            font-size: 10pt;
+        }
+
+        .summary-table .label {
+            font-weight: 600;
+            width: 40%;
+        }
+
+        .summary-table .value {
+            text-align: right;
+            font-weight: 600;
+            color: #38b6ff;
+        }
+
+        /* Footer */
+        .pdf-footer {
+            position: running(reportFooter);
+            border-top: 2px solid #38b6ff;
+            font-size: 8pt;
+            color: #666;
+            padding-top: 3mm;
+            background: white;
+            width: 100%;
+        }
+
+        .pdf-footer p {
+            margin: 1mm 0;
+            line-height: 1.3;
+        }
+
+        /* No Data */
+        .no-data {
+            text-align: center;
+            padding: 20mm;
+            color: #999;
+            font-style: italic;
+        }
+
+        /* Text Utilities */
+        .text-primary {
+            color: #38b6ff;
+        }
+
+        .text-success {
+            color: #28a745;
+        }
+
+        .text-warning {
+            color: #ffc107;
+        }
+
+        .text-danger {
+            color: #dc3545;
+        }
+
+        .text-muted {
+            color: #999;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .amount {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 2mm 4mm;
+            border-radius: 2mm;
+            font-size: 8pt;
+            font-weight: 600;
+        }
+
+        .status-paid {
+            background-color: #ccffcc;
+            color: #00aa00;
+            border: 1px solid #00aa00;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #ff9800;
+            border: 1px solid #ff9800;
+        }
+
+        .status-overdue {
+            background-color: #ffcccc;
+            color: #cc0000;
+            border: 1px solid #cc0000;
+        }
+
+        .status-draft {
+            background-color: #ecf0f1;
+            color: #666;
+            border: 1px solid #999;
+        }
+
+        .status-unpaid {
+            background-color: #ffcccc;
+            color: #cc0000;
+            border: 1px solid #cc0000;
+        }
+
+        .status-partial {
+            background-color: #fff3cd;
+            color: #ff9800;
+            border: 1px solid #ff9800;
+        }
+
+        /* Page Counter */
+        .page-counter::before {
+            content: counter(page) " of " counter(pages);
+        }
+
+        @page {
+            size: A4 portrait;
+            margin: 15mm;
+
+            @bottom-left {
+                content: element(reportFooter);
+                width: 100%;
+            }
+        }
+
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Running Footer Definition -->
+    {% block footer %}
+    <div class="pdf-footer">
+        <p>Generated on {{ generated_date|date:"d M Y H:i" }} | {{ company_name }} | {{ company_email }} | Page <span class="page-counter"></span></p>
+    </div>
+    {% endblock %}
+
+    {% block content %}{% endblock %}
+</body>
+</html>

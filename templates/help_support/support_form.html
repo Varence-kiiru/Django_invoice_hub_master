@@ -1,0 +1,391 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Contact Support - Invoice System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/help_support/support_form.css' %}">
+{% endblock %}
+
+<!-- Old styles block - to be removed in template
+<style>
+    .support-form-wrapper {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .support-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px 30px;
+        border-radius: 8px;
+        margin-bottom: 40px;
+        text-align: center;
+    }
+
+    .support-header h1 {
+        font-size: 2rem;
+        margin: 0 0 10px 0;
+    }
+
+    .support-header p {
+        margin: 0;
+        opacity: 0.95;
+    }
+
+    .support-form-card {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #333;
+        font-size: 0.95rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        width: 100%;
+        padding: 10px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-family: inherit;
+        transition: all 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 150px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .form-group-help {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 5px;
+    }
+
+    .form-divider {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .form-errors {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 6px;
+        padding: 15px;
+        margin-bottom: 20px;
+        color: #721c24;
+    }
+
+    .form-errors h4 {
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+
+    .form-errors ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+
+    .form-errors li {
+        margin-bottom: 5px;
+    }
+
+    .form-success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        border-radius: 6px;
+        padding: 15px;
+        margin-bottom: 20px;
+        color: #155724;
+    }
+
+    .form-submit {
+        display: flex;
+        gap: 10px;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 30px;
+    }
+
+    .form-submit button {
+        padding: 12px 30px;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    .btn-cancel {
+        background: white;
+        border: 2px solid #e0e0e0;
+        color: #333;
+    }
+
+    .btn-cancel:hover {
+        background: #f8f9fa;
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+    .support-tips {
+        background: #e0e7ff;
+        border-left: 4px solid #667eea;
+        padding: 20px;
+        border-radius: 6px;
+        margin-bottom: 30px;
+    }
+
+    .support-tips-title {
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 10px;
+    }
+
+    .support-tips ul {
+        margin: 0;
+        padding-left: 20px;
+        color: #333;
+    }
+
+    .support-tips li {
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+
+    @media (max-width: 768px) {
+        .support-form-wrapper {
+            padding: 0 15px;
+        }
+
+        .form-row,
+        .form-divider {
+            grid-template-columns: 1fr;
+        }
+
+        .form-submit {
+            flex-direction: column;
+        }
+
+        .form-submit button {
+            width: 100%;
+        }
+    }
+</style>
+-->
+
+{% block content %}
+<div class="container-fluid">
+    <div class="support-form-wrapper">
+        <!-- Header -->
+        <div class="support-header">
+            <h1>💬 Contact Support</h1>
+            <p>We're here to help. Send us a message and we'll get back to you as soon as possible.</p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="support-form-card">
+            {% if errors %}
+            <div class="form-errors">
+                <h4>⚠️ Please fix the following errors:</h4>
+                <ul>
+                    {% for error in errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- Tips -->
+            <div class="support-tips">
+                <div class="support-tips-title">💡 Tips for Best Results:</div>
+                <ul>
+                    <li>Be specific and clear about your issue</li>
+                    <li>Include any relevant invoice numbers or dates</li>
+                    <li>If possible, describe the steps to reproduce the problem</li>
+                    <li>We typically respond within 24 hours</li>
+                </ul>
+            </div>
+
+            <!-- Form -->
+            <form method="POST" novalidate>
+                {% csrf_token %}
+
+                <!-- Name and Email Row -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Your Name *</label>
+                        <input 
+                            type="text" 
+                            id="name" 
+                            name="name" 
+                            required
+                            value="{{ form_data.name|default:'' }}"
+                            placeholder="Enter your full name"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            required
+                            value="{{ form_data.email|default:'' }}"
+                            placeholder="your@email.com"
+                        >
+                    </div>
+                </div>
+
+                <!-- Subject -->
+                <div class="form-group">
+                    <label for="subject">Subject *</label>
+                    <input 
+                        type="text" 
+                        id="subject" 
+                        name="subject" 
+                        required
+                        value="{{ form_data.subject|default:'' }}"
+                        placeholder="Brief description of your issue"
+                        maxlength="300"
+                    >
+                </div>
+
+                <!-- Category and Priority Row -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" name="category">
+                            <option value="general" {% if form_data.category == 'general' %}selected{% endif %}>
+                                General Inquiry
+                            </option>
+                            <option value="invoicing" {% if form_data.category == 'invoicing' %}selected{% endif %}>
+                                Invoicing Issue
+                            </option>
+                            <option value="payments" {% if form_data.category == 'payments' %}selected{% endif %}>
+                                Payment Issue
+                            </option>
+                            <option value="clients" {% if form_data.category == 'clients' %}selected{% endif %}>
+                                Client Management
+                            </option>
+                            <option value="reports" {% if form_data.category == 'reports' %}selected{% endif %}>
+                                Reports & Analytics
+                            </option>
+                            <option value="technical" {% if form_data.category == 'technical' %}selected{% endif %}>
+                                Technical Issue
+                            </option>
+                            <option value="feature_request" {% if form_data.category == 'feature_request' %}selected{% endif %}>
+                                Feature Request
+                            </option>
+                            <option value="other" {% if form_data.category == 'other' %}selected{% endif %}>
+                                Other
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="priority">Priority</label>
+                        <select id="priority" name="priority">
+                            <option value="low" {% if form_data.priority == 'low' %}selected{% endif %}>
+                                🟢 Low - General questions
+                            </option>
+                            <option value="medium" {% if form_data.priority == 'medium' %}selected{% endif %} selected>
+                                🟡 Medium - Affecting productivity
+                            </option>
+                            <option value="high" {% if form_data.priority == 'high' %}selected{% endif %}>
+                                🟠 High - Critical issue
+                            </option>
+                            <option value="urgent" {% if form_data.priority == 'urgent' %}selected{% endif %}>
+                                🔴 Urgent - System down
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Message -->
+                <div class="form-group">
+                    <label for="message">Message *</label>
+                    <textarea 
+                        id="message" 
+                        name="message" 
+                        required
+                        placeholder="Please describe your issue in detail. The more information you provide, the faster we can help you."
+                    >{{ form_data.message|default:'' }}</textarea>
+                    <div class="form-group-help">Minimum 10 characters required</div>
+                </div>
+
+                <!-- Submit -->
+                <div class="form-submit">
+                    <button type="submit" class="form-submit button btn-submit">
+                        📤 Send Support Request
+                    </button>
+                    <a href="{% url 'core:help-center' %}" class="btn-cancel" style="padding: 12px 30px; text-decoration: none; display: inline-block;">
+                        Cancel
+                    </a>
+                </div>
+
+                <!-- Form Note -->
+                <p style="text-align: center; margin-top: 20px; color: #999; font-size: 0.9rem;">
+                    * Required fields. We'll never share your email address.
+                </p>
+            </form>
+        </div>
+
+        <!-- FAQ Link -->
+        <div style="text-align: center; margin-top: 30px;">
+            <p style="color: #666; margin-bottom: 15px;">
+                You might find the answer in our FAQ first
+            </p>
+            <a href="{% url 'core:faq' %}" style="color: #667eea; text-decoration: none; font-weight: 600;">
+                → Browse FAQs
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h2 mb-2">Client Contact Details</h1>
+            <p class="text-muted">Add or edit contact person information</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'clients:detail' client.id %}" class="btn btn-outline-secondary">Back to Client</a>
+        </div>
+    </div>
+
+    <!-- Contact Form -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="post" class="needs-validation">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">First Name *</label>
+                                <input type="text" name="first_name" class="form-control" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Last Name *</label>
+                                <input type="text" name="last_name" class="form-control" required />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Title/Position</label>
+                            <input type="text" name="title" class="form-control" placeholder="e.g., Manager, Director" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" name="email" class="form-control" />
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" name="phone" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Mobile Number</label>
+                                <input type="tel" name="mobile" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Contact Type</label>
+                            <select name="contact_type" class="form-select">
+                                <option value="primary">Primary Contact</option>
+                                <option value="secondary">Secondary Contact</option>
+                                <option value="billing">Billing Contact</option>
+                                <option value="technical">Technical Contact</option>
+                            </select>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="is_primary" id="is_primary" />
+                            <label class="form-check-label" for="is_primary">
+                                Set as primary contact for invoices
+                            </label>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">Save Contact</button>
+                            <a href="{% url 'clients:detail' client.id %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Sidebar -->
+        <div class="col-md-4">
+            <div class="card bg-light border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold mb-2">Contact Types</h6>
+                    <p class="small"><strong>Primary:</strong> Main contact person</p>
+                    <p class="small"><strong>Secondary:</strong> Backup contact</p>
+                    <p class="small"><strong>Billing:</strong> For payment matters</p>
+                    <p class="small"><strong>Technical:</strong> For product support</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

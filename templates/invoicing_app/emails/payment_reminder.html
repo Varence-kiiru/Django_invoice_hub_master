@@ -1,0 +1,52 @@
+{% extends "email_base.html" %}
+
+{% block subject %}Payment Reminder: Invoice {{ invoice.invoice_number }} - Now Due{% endblock %}
+
+{% block content %}
+<p>Hello {{ client_name }},</p>
+
+<p>This is a friendly reminder that the following invoice is now overdue:</p>
+
+<table style="width: 100%; margin: 20px 0; border-collapse: collapse;">
+    <tr style="background-color: #f5f5f5;">
+        <td style="padding: 10px; border: 1px solid #ddd;"><strong>Invoice Number</strong></td>
+        <td style="padding: 10px; border: 1px solid #ddd;">{{ invoice.invoice_number }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 10px; border: 1px solid #ddd;"><strong>Original Due Date</strong></td>
+        <td style="padding: 10px; border: 1px solid #ddd;">{{ invoice.due_date|date:"M d, Y" }}</td>
+    </tr>
+    <tr style="background-color: #f5f5f5;">
+        <td style="padding: 10px; border: 1px solid #ddd;"><strong>Days Overdue</strong></td>
+        <td style="padding: 10px; border: 1px solid #ddd;">{{ days_overdue }} days</td>
+    </tr>
+    <tr>
+        <td style="padding: 10px; border: 1px solid #ddd;"><strong>Outstanding Amount</strong></td>
+        <td style="padding: 10px; border: 1px solid #ddd;"><strong style="color: #e74c3c;">{{ company_settings.currency_symbol }}{{ invoice.amount_due|floatformat:2 }}</strong></td>
+    </tr>
+</table>
+
+<p style="margin: 20px 0;">
+    <a href="{{ invoice_url }}" style="background-color: #e74c3c; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+        Pay Now
+    </a>
+</p>
+
+<div style="background-color: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0; border-radius: 3px;">
+    <p style="margin: 0; color: #856404;">
+        <strong>Payment Required</strong><br>
+        Please remit payment immediately to avoid further delays. If payment has already been sent, please disregard this notice.
+    </p>
+</div>
+
+<h3 style="color: #2c3e50; margin-top: 30px;">Invoice Details</h3>
+<ul style="margin-left: 20px;">
+    <li>Invoice Date: {{ invoice.invoice_date|date:"M d, Y" }}</li>
+    <li>Total Amount Due: {{ company_settings.currency_symbol }}{{ invoice.amount_due|floatformat:2 }}</li>
+</ul>
+
+<p style="margin-top: 20px;">
+    If you have already sent payment or have questions about this invoice, please contact our accounting department.
+</p>
+
+{% endblock %}

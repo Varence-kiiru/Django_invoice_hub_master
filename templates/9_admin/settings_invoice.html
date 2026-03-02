@@ -1,0 +1,44 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Invoice Settings - Administration{% endblock %}
+
+{% block page_title %}Invoice Settings{% endblock %}
+{% block page_description %}Configure invoice formatting and defaults{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/settings_invoice.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <!-- Page Header -->
+  <div class="settings-header">
+    <h2>Invoice Settings</h2>
+    <p class="text-muted">Configure invoice templates, numbering, and formatting</p>
+  </div>
+
+  <!-- Info Alert -->
+  <div class="alert alert-info" role="alert">
+    <strong>📋 Note:</strong> Invoice settings (prefix, payment terms, footer message) are managed in <strong>General Settings</strong> under "Company Information". This ensures all settings are maintained in one place.
+  </div>
+
+  <!-- Placeholder for Future Features -->
+  <div class="card">
+    <div class="card-header">
+      <h5>Coming Soon</h5>
+    </div>
+    <div class="card-body">
+      <p class="text-muted">Advanced invoice management features including:</p>
+      <ul>
+        <li>Multiple invoice templates</li>
+        <li>Custom branding options</li>
+        <li>Recurring invoice templates</li>
+        <li>Invoice PDF customization</li>
+        <li>Email template management</li>
+      </ul>
+      <p class="text-muted mt-3">These features will be available in a future update.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

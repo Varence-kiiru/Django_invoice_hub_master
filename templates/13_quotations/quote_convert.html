@@ -1,0 +1,153 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Convert Quotation to Invoice - {{ quote.quote_number }}{% endblock %}
+
+{% block page_title %}Convert Quotation to Invoice{% endblock %}
+{% block page_description %}Convert accepted quotation {{ quote.quote_number }} to invoice{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/quotations.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <!-- Alerts -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb-nav" aria-label="breadcrumb">
+    <a href="{% url 'core:dashboard' %}">Dashboard</a> 
+    <span>/</span> 
+    <a href="{% url 'quotations:list' %}">Quotations</a> 
+    <span>/</span> 
+    <a href="{% url 'quotations:detail' quote.id %}">{{ quote.quote_number }}</a> 
+    <span>/</span> 
+    <span>Convert to Invoice</span>
+  </nav>
+
+  <div class="quote-form-section">
+    <div class="form-header">
+      <h2>Convert Quotation to Invoice</h2>
+      <p class="section-subtitle">Review the details and set invoice dates</p>
+    </div>
+
+    <!-- Quotation Summary -->
+    <div class="info-card">
+      <h3>Quotation Details</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Quotation #</span>
+          <span class="info-value">{{ quote.quote_number }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Client</span>
+          <span class="info-value">{{ quote.client.name }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Original Amount</span>
+          <span class="info-value">{{ quote.currency }} {{ quote.total_amount|floatformat:2 }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Line Items</span>
+          <span class="info-value">{{ quote.line_items.count }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Payment Terms</span>
+          <span class="info-value">{{ payment_terms_days }} days</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conversion Form -->
+    <form method="post" id="convert-form" class="quote-form">
+      {% csrf_token %}
+
+      <div class="form-section">
+        <h3 class="section-title">Invoice Details</h3>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="invoice_date">Invoice Date <span class="required">*</span></label>
+            <input type="date" name="invoice_date" id="invoice_date" required class="form-control"
+                   value="{{ today|date:'Y-m-d' }}">
+            <small class="form-text">Date when the invoice is issued</small>
+          </div>
+
+          <div class="form-group">
+            <label for="due_date">Due Date <span class="required">*</span></label>
+            <input type="date" name="due_date" id="due_date" required class="form-control"
+                   value="{{ default_due_date|date:'Y-m-d' }}">
+            <small class="form-text">
+              When should this invoice be paid? 
+              (automatically calculated as {{ payment_terms_days }} days from issue date)
+            </small>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="description">Invoice Notes (Optional)</label>
+            <textarea name="description" id="description" rows="3" class="form-control"></textarea>
+            <small class="form-text">Additional notes for the invoice</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirmation Alert -->
+      <div class="alert alert-info">
+        <strong>⚠️ Please Note:</strong>
+        <ul>
+          <li>This quotation will be marked as <strong>Converted</strong></li>
+          <li>A new invoice will be created with the same line items and amounts</li>
+          <li>The quotation will be linked to the invoice for reference</li>
+          <li>You can still view and manage the quotation after conversion</li>
+        </ul>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <a href="{% url 'quotations:detail' quote.id %}" class="btn btn-secondary">
+          ← Cancel
+        </a>
+        <button type="submit" class="btn btn-primary btn-lg">
+          🔄 Convert to Invoice
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// Auto-calculate due date based on invoice date and payment terms
+const paymentTerms = {{ payment_terms_days }};
+const invoiceDateInput = document.getElementById('invoice_date');
+const dueDateInput = document.getElementById('due_date');
+
+function calculateDueDate() {
+  if (!invoiceDateInput.value) return;
+  
+  const invoiceDate = new Date(invoiceDateInput.value);
+  const dueDate = new Date(invoiceDate);
+  dueDate.setDate(dueDate.getDate() + paymentTerms);
+  
+  // Format date as YYYY-MM-DD for input field
+  const year = dueDate.getFullYear();
+  const month = String(dueDate.getMonth() + 1).padStart(2, '0');
+  const day = String(dueDate.getDate()).padStart(2, '0');
+  dueDateInput.value = `${year}-${month}-${day}`;
+}
+
+// Listen for changes to invoice date
+invoiceDateInput.addEventListener('change', calculateDueDate);
+</script>
+{% endblock %}

@@ -1,0 +1,133 @@
+{% comment %}
+Professional Navigation Bar Component
+Styles are in static/css/components/navbar.css
+{% endcomment %}
+{% load static %}
+
+<nav id="navbar" class="navbar" role="navigation" aria-label="Main navigation">
+  <div class="navbar-inner">
+    <!-- Brand -->
+    <a href="{% url 'core:dashboard' %}" class="navbar-brand">💼 <span class="brand-text">Invoicing App</span></a>
+
+    <!-- Mobile toggle button -->
+    <button class="navbar-toggle" id="sidebar-toggle" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle navigation menu">
+      <span class="hamburger-icon" aria-hidden="true">☰</span>
+      <span class="sr-only">Menu</span>
+    </button>
+
+    <!-- Search -->
+    <form class="navbar-search" role="search" method="get" action="{% url 'invoices:list' %}">
+      <label for="global-search" class="sr-only">Search invoices, clients, products</label>
+      <input id="global-search" type="search" name="q" placeholder="Search invoices, clients, products..." aria-label="Search" />
+      <button type="submit" class="search-btn" aria-label="Search">🔍</button>
+    </form>
+
+    <!-- Actions -->
+    <div class="navbar-actions">
+      <!-- Notifications -->
+      <div class="notifications-widget">
+        <button class="navbar-btn notification-btn" id="notification-toggle" title="View notifications" aria-haspopup="true" aria-expanded="false" aria-label="Notifications">
+          <span aria-hidden="true">🔔</span>
+          {% if unread_notifications > 0 %}
+          <span class="notification-badge" id="notification-count">{{ unread_notifications }}</span>
+          {% endif %}
+        </button>
+        <div class="notification-panel" id="notification-panel" role="region" aria-label="Notifications" aria-hidden="true">
+          <div class="notification-header">Notifications</div>
+          <div class="notification-list" id="notification-list">
+            <div class="no-notifications">No new notifications</div>
+          </div>
+          <div class="notification-footer"><a href="#">View all</a></div>
+        </div>
+      </div>
+
+      <!-- User menu -->
+      {% if user.is_authenticated %}
+      <div class="user-menu" id="user-menu">
+        <button class="user-toggle" id="user-toggle" aria-haspopup="true" aria-expanded="false">
+          <span class="user-avatar" aria-hidden="true" title="{{ user.get_full_name|default:'User' }}">{{ user.first_name|default:'U'|first|upper }}</span>
+          <span class="user-name">{{ user.first_name|default:'User' }}</span>
+          <span class="dropdown-caret" aria-hidden="true">▼</span>
+        </button>
+        <div class="user-dropdown" id="user-dropdown" role="menu" aria-hidden="true">
+          <div class="user-info-header">
+            <strong>{{ user.get_full_name|default:'Account' }}</strong>
+            <small>{{ user.email }}</small>
+          </div>
+          <div class="dropdown-divider" role="separator"></div>
+          <a role="menuitem" href="{% url 'core:profile' %}" class="dropdown-item">👤 My Profile</a>
+          {% if can_manage_settings or is_admin %}
+          <a role="menuitem" href="{% url 'core:settings' %}" class="dropdown-item">⚙️ Settings</a>
+          {% endif %}
+          {% if can_view_reports %}
+          <a role="menuitem" href="{% url 'core:reports-invoices' %}" class="dropdown-item">📊 Reports</a>
+          {% endif %}
+          <a role="menuitem" href="{% url 'core:help-center' %}" class="dropdown-item">❓ Help & Support</a>
+          <div class="dropdown-divider" role="separator"></div>
+          <a role="menuitem" href="{% url 'core:logout_confirm' %}" class="dropdown-item logout-item">🚪 Logout</a>
+        </div>
+      </div>
+      {% else %}
+      <div class="user-menu">
+        <a href="{% url 'core:login' %}" class="navbar-btn navbar-link" title="Sign in to your account" aria-label="Sign In">👤 Sign In</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<script>
+  (function(){
+    // User menu toggle
+    const userToggle = document.getElementById('user-toggle');
+    const userDropdown = document.getElementById('user-dropdown');
+    if (userToggle && userDropdown) {
+      userToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        const expanded = userToggle.getAttribute('aria-expanded') === 'true';
+        userToggle.setAttribute('aria-expanded', String(!expanded));
+        userDropdown.setAttribute('aria-hidden', String(expanded));
+        userDropdown.classList.toggle('show');
+      });
+      document.addEventListener('click', (e) => {
+        if (!userToggle.contains(e.target) && !userDropdown.contains(e.target)) {
+          userToggle.setAttribute('aria-expanded', 'false');
+          userDropdown.setAttribute('aria-hidden', 'true');
+          userDropdown.classList.remove('show');
+        }
+      });
+    }
+
+    // Notification panel toggle
+    const notifToggle = document.getElementById('notification-toggle');
+    const notifPanel = document.getElementById('notification-panel');
+    if (notifToggle && notifPanel) {
+      notifToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        const expanded = notifToggle.getAttribute('aria-expanded') === 'true';
+        notifToggle.setAttribute('aria-expanded', String(!expanded));
+        notifPanel.setAttribute('aria-hidden', String(expanded));
+        notifPanel.classList.toggle('show');
+      });
+      document.addEventListener('click', (e) => {
+        if (!notifToggle.contains(e.target) && !notifPanel.contains(e.target)) {
+          notifToggle.setAttribute('aria-expanded', 'false');
+          notifPanel.setAttribute('aria-hidden', 'true');
+          notifPanel.classList.remove('show');
+        }
+      });
+    }
+
+    // Sidebar toggle
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
+    if (sidebarToggle && sidebar) {
+      sidebarToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        const expanded = sidebarToggle.getAttribute('aria-expanded') === 'true';
+        sidebarToggle.setAttribute('aria-expanded', String(!expanded));
+        sidebar.classList.toggle('open');
+      });
+    }
+  })();
+</script>

@@ -1,0 +1,102 @@
+<!-- Delete Backup Confirmation Modal -->
+<div id="delete-backup-modal" class="modal" style="display: none;">
+  <div class="modal-overlay" onclick="closeDeleteBackupModal()"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Delete Backup</h2>
+      <button class="modal-close" onclick="closeDeleteBackupModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-warning">
+        <strong>⚠️ Warning:</strong> This action will permanently delete the backup file from storage and cannot be undone.
+      </div>
+      
+      <div style="background-color: rgba(0, 0, 0, 0.02); padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
+        <p style="margin: 0 0 0.5rem 0; font-weight: 600; color: var(--text-primary);">Backup File:</p>
+        <p style="margin: 0;"><code id="delete-filename" style="background-color: rgba(0, 0, 0, 0.1); padding: 0.5rem; border-radius: 4px; word-break: break-all; display: block;"></code></p>
+      </div>
+
+      <div class="alert alert-danger" style="margin-bottom: 0;">
+        <strong>🔴 Important:</strong> Once deleted, this backup cannot be recovered. Ensure you have backup copies before proceeding.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeDeleteBackupModal()">Cancel</button>
+      <button class="btn btn-danger" id="delete-confirm-btn" onclick="confirmDeleteBackup()">
+        ✓ Delete Permanently
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let deleteBackupId = null;
+  let deleteBackupFilename = null;
+
+  function showDeleteBackupModal(backupId, filename) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    deleteBackupId = backupId;
+    deleteBackupFilename = filename;
+    document.getElementById('delete-filename').textContent = filename;
+    document.getElementById('delete-backup-modal').style.display = 'flex';
+  }
+
+  function closeDeleteBackupModal() {
+    document.getElementById('delete-backup-modal').style.display = 'none';
+    deleteBackupId = null;
+    deleteBackupFilename = null;
+  }
+
+  function confirmDeleteBackup() {
+    if (!deleteBackupId) {
+      console.error('No backup ID provided');
+      return;
+    }
+
+    // Show loading indicator
+    showLoadingIndicator('Deleting backup... Please wait');
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+    if (!csrfToken) {
+      console.error('CSRF token not found');
+      hideLoadingIndicator();
+      alert('Security error: CSRF token not found. Please refresh the page and try again.');
+      return;
+    }
+    
+    // Create and submit form
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = window.location.pathname;
+    form.style.display = 'none';
+    
+    form.innerHTML = `
+      <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+      <input type="hidden" name="action" value="delete_backup">
+      <input type="hidden" name="backup_id" value="${deleteBackupId}">
+    `;
+    
+    document.body.appendChild(form);
+    
+    // Submit with a small delay to ensure modal closes gracefully
+    setTimeout(() => {
+      form.submit();
+    }, 100);
+  }
+
+  // Close modal when clicking on the overlay
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('delete-backup-modal');
+    
+    if (modal) {
+      modal.addEventListener('click', function(e) {
+        if (e.target === this) {
+          closeDeleteBackupModal();
+        }
+      });
+    }
+  });
+</script>

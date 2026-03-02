@@ -1,0 +1,114 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Payments - Invoicing App{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/payments.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container" data-entity-type="payments">
+    <div class="payments-header">
+        <h1>Payments</h1>
+        <a href="{% url 'payments:create' %}" class="btn-create">+ Record Payment</a>
+    </div>
+    
+    {% include "10_modals/filter_form_payments.html" %}
+    {% include "10_modals/bulk_actions_modal.html" %}
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <!-- Bulk Actions Toolbar -->
+    <div class="bulk-actions">
+        <span class="bulk-count">0 selected</span>
+        <button class="bulk-status-update">Update Status</button>
+        <button class="bulk-send-email">Send Email</button>
+        <button class="bulk-delete">Delete</button>
+    </div>
+    
+    {% if payments %}
+    <table class="payments-table">
+        <thead>
+            <tr>
+                <th style="width: 40px;"><input type="checkbox" class="bulk-select-all" title="Select all"></th>
+                <th>Payment ID</th>
+                <th>Invoice</th>
+                <th>Client</th>
+                <th style="text-align: right;">Amount</th>
+                <th>Method</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th style="width: 120px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payment in payments %}
+            <tr>
+                <td><input type="checkbox" class="bulk-select-item" data-id="{{ payment.id }}"></td>
+                <td>
+                    <div class="payment-id">#{{ payment.id }}</div>
+                </td>
+                <td>{{ payment.invoice.invoice_number }}</td>
+                <td>{{ payment.invoice.client.name }}</td>
+                <td class="amount-text">{{ payment.currency }} {{ payment.amount|floatformat:2 }}</td>
+                <td>{{ payment.payment_method.name }}</td>
+                <td>{{ payment.payment_date|date:"M d, Y" }}</td>
+                <td>
+                    <span class="status-badge status-{{ payment.status }}">
+                        {% if payment.status == 'confirmed' %}Confirmed{% elif payment.status == 'failed' %}Failed{% elif payment.status == 'reversed' %}Reversed{% else %}Pending{% endif %}
+                    </span>
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <a href="{% url 'payments:detail' payment.id %}" class="btn-small btn-view">View</a>
+                        <a href="{% url 'payments:receipt' payment.id %}" class="btn-small btn-view">Receipt</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if payments.has_other_pages %}
+    <div class="pagination">
+        {% if payments.has_previous %}
+            <a href="?page=1{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">First</a>
+            <a href="?page={{ payments.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">Previous</a>
+        {% endif %}
+        
+        {% for num in payments.paginator.page_range %}
+            {% if payments.number == num %}
+                <span class="current">{{ num }}</span>
+            {% else %}
+                <a href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+        
+        {% if payments.has_next %}
+            <a href="?page={{ payments.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">Next</a>
+            <a href="?page={{ payments.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">Last</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <div class="no-data">
+        <p>No payments found</p>
+        <a href="{% url 'payments:create' %}" class="btn-create">Record your first payment</a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/filter_system.js' %}"></script>
+<script src="{% static 'js/bulk_operations.js' %}"></script>
+{% endblock %}

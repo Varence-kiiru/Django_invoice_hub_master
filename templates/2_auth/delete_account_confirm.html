@@ -1,0 +1,120 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Delete Account{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <div class="settings-header">
+        <h1>⚠️ Delete Account</h1>
+        <p>Permanently delete your account and all associated data</p>
+    </div>
+
+    <!-- Warning Alert -->
+    <div class="alert alert-danger" style="margin-bottom: 30px;">
+        <strong>⚠️ Warning:</strong> This action cannot be undone. Deleting your account will:
+        <ul style="margin-top: 10px; margin-bottom: 0;">
+            <li>Permanently delete your account and all user data</li>
+            <li>Remove access to all invoices and reports</li>
+            <li>Delete saved preferences and settings</li>
+            <li>Cannot be reversed</li>
+        </ul>
+    </div>
+
+    <!-- Confirmation Card -->
+    <div class="settings-card">
+        <h3>Are you absolutely sure?</h3>
+        <p>Please read the following carefully before proceeding:</p>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h4>Account Information to be Deleted:</h4>
+            <ul>
+                <li><strong>Name:</strong> {{ user.first_name }} {{ user.last_name }}</li>
+                <li><strong>Email:</strong> {{ user.email }}</li>
+                <li><strong>Username:</strong> {{ user.username }}</li>
+                <li><strong>Account Created:</strong> {{ user.date_joined|date:"M d, Y" }}</li>
+            </ul>
+        </div>
+
+        <p style="color: #666; margin: 20px 0;">
+            To proceed with deletion, you must confirm by clicking the "Permanently Delete My Account" button below.
+            This will immediately close your account.
+        </p>
+
+        <!-- Deletion Form -->
+        <form method="POST" style="margin-top: 30px;">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="confirm_delete" required>
+                    <strong>I understand that this action cannot be undone and permanently deletes my account</strong>
+                </label>
+            </div>
+
+            <div class="form-actions" style="gap: 10px;">
+                <button type="submit" class="btn btn-danger" style="background: #dc2626; color: white;">
+                    🗑️ Permanently Delete My Account
+                </button>
+                <a href="{% url 'core:settings' %}" class="btn btn-secondary">
+                    Cancel and Go Back
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Additional Info -->
+    <div class="settings-card" style="background: #f0f4ff; border-left: 4px solid #3b82f6;">
+        <h4 style="color: #3b82f6; margin-top: 0;">📋 What happens to your data?</h4>
+        <p>When you delete your account:</p>
+        <ul style="margin: 10px 0;">
+            <li>Your login credentials are permanently removed</li>
+            <li>Your profile and preferences are deleted</li>
+            <li>Historical records remain for audit and compliance purposes (read-only)</li>
+            <li>You will no longer have access to this system</li>
+        </ul>
+        <p style="margin: 20px 0 0 0; color: #666; font-size: 13px;">
+            If you want to temporarily disable your account instead, please contact support.
+        </p>
+    </div>
+</div>
+
+<style>
+.alert-danger {
+    background: #fee2e2;
+    border-left: 4px solid #dc2626;
+    padding: 15px 20px;
+    border-radius: 8px;
+    color: #991b1b;
+}
+
+.alert-danger ul {
+    list-style: disc;
+    margin-left: 20px;
+}
+
+.btn-danger {
+    background: #dc2626 !important;
+    color: white !important;
+    border: none !important;
+}
+
+.btn-danger:hover {
+    background: #b91c1c !important;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.form-actions .btn {
+    flex: 1;
+    padding: 12px 20px;
+}
+</style>
+{% endblock %}

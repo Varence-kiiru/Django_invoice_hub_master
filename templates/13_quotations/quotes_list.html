@@ -1,0 +1,125 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Quotations - Quote Management{% endblock %}
+
+{% block page_title %}Quotations{% endblock %}
+{% block page_description %}Manage quotations, track conversions, and monitor client responses{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/quotations.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container" data-entity-type="quotations">
+    <div class="quotations-header">
+        <h1>Quotations</h1>
+        <a href="{% url 'quotations:create' %}" class="btn-create">+ Create Quotation</a>
+    </div>
+    
+    {% include "10_modals/filter_form_quotations.html" %}
+    {% include "10_modals/bulk_actions_modal.html" %}
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <!-- Bulk Actions Toolbar -->
+    <div class="bulk-actions">
+        <span class="bulk-count">0 selected</span>
+        <button class="bulk-status-update">Update Status</button>
+        <button class="bulk-send-email">Send Email</button>
+        <button class="bulk-delete">Delete</button>
+    </div>
+    
+    {% if quotes %}
+    <table class="quotations-table">
+        <thead>
+            <tr>
+                <th style="width: 40px;"><input type="checkbox" class="bulk-select-all" title="Select all"></th>
+                <th>Quote #</th>
+                <th>Client</th>
+                <th style="text-align: right;">Amount</th>
+                <th>Status</th>
+                <th style="text-align: right;">Valid Until</th>
+                <th style="width: 120px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for quote in quotes %}
+            <tr>
+                <td><input type="checkbox" class="bulk-select-item" data-id="{{ quote.id }}"></td>
+                <td>
+                    <div class="quote-number">{{ quote.quote_number }}</div>
+                </td>
+                <td>
+                    <div>{{ quote.client.name }}</div>
+                </td>
+                <td class="amount-text">{{ quote.currency }} {{ quote.total_amount|floatformat:2 }}</td>
+                <td>
+                    <span class="status-badge status-{{ quote.status }}">
+                        {% if quote.status == 'draft' %}Draft{% elif quote.status == 'issued' %}Issued{% elif quote.status == 'sent' %}Sent{% elif quote.status == 'viewed' %}Viewed{% elif quote.status == 'accepted' %}Accepted{% elif quote.status == 'rejected' %}Rejected{% elif quote.status == 'converted' %}Converted{% elif quote.status == 'expired' %}Expired{% else %}{{ quote.get_status_display }}{% endif %}
+                    </span>
+                </td>
+                <td class="amount-text">
+                    {% if quote.is_expired %}<strong style="color: var(--color-danger);">EXPIRED</strong><br>{% endif %}
+                    {{ quote.valid_until|date:"M d, Y" }}
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <a href="{% url 'quotations:detail' quote.id %}" class="btn-small btn-view">View</a>
+                        {% if quote.status == 'draft' %}
+                            <a href="{% url 'quotations:edit' quote.id %}" class="btn-small btn-edit">Edit</a>
+                        {% endif %}
+                        {% if quote.status == 'accepted' %}
+                            <a href="{% url 'quotations:convert' quote.id %}" class="btn-small btn-view">Convert</a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">Previous</a>
+        {% endif %}
+        
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <span class="current">{{ num }}</span>
+            {% else %}
+                <a href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">Last</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <div class="no-data">
+        <p>No quotations found</p>
+        <a href="{% url 'quotations:create' %}" class="btn-create">Create your first quotation</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/filter_system.js' %}"></script>
+<script src="{% static 'js/bulk_operations.js' %}"></script>
+{% endblock %}

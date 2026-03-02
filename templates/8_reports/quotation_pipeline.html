@@ -1,0 +1,262 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Quotation Pipeline Report - Sales Analysis{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/icons.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/reports.css' %}">
+<style>
+    .pipeline-stage {
+        text-align: center;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 10px 5px;
+    }
+    
+    .pipeline-stage h4 {
+        margin: 10px 0 5px 0;
+        font-weight: 600;
+    }
+    
+    .pipeline-stage .stage-value {
+        font-size: 1.4rem;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+    
+    .pipeline-stage .stage-rate {
+        font-size: 0.9rem;
+        color: #666;
+    }
+    
+    .conversion-arrow {
+        font-size: 1.8rem;
+        color: #007bff;
+        margin: 0 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .pipeline-container {
+        display: flex;
+        align-items: center;
+        overflow-x: auto;
+        padding: 20px 0;
+    }
+    
+    .stage-box {
+        flex: 1;
+        min-width: 150px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- ═══════════════════════ PAGE HEADER ═══════════════════════ -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="page-title">
+                <i class="icon-chart-funnel"></i> Quotation Pipeline Report
+            </h1>
+            <p class="text-muted">Sales pipeline analysis and conversion funnel tracking</p>
+        </div>
+        <div class="col-md-4">
+            <div class="d-flex gap-2 justify-content-end flex-wrap">
+                <a href="{% url 'quotations:list' %}" class="btn btn-outline-secondary">
+                    <i class="icon-list"></i> Manage Quotes
+                </a>
+                <a href="{% url 'core:quotation-pipeline-report-pdf' %}" class="btn btn-danger">
+                    <i class="icon-file-pdf"></i> PDF
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reports Navigation Tabs -->
+    <div class="card mb-4 border-top border-primary border-3">
+        <div class="card-body p-2">
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'core:reports-quotations' %}" class="btn btn-sm btn-outline-primary">📄 Quotations</a>
+                <a href="{% url 'core:reports-quotation-pipeline' %}" class="btn btn-sm btn-primary active">🔄 Pipeline</a>
+                <a href="{% url 'core:reports-quotation-performance' %}" class="btn btn-sm btn-outline-primary">📊 Performance</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════ CONVERSION FLOWS ═══════════════════════ -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="icon-chart-line"></i> Conversion Pipeline</h6>
+        </div>
+        <div class="card-body">
+            <div class="pipeline-container">
+                <!-- Draft Stage -->
+                <div class="stage-box pipeline-stage" style="background-color: #f8f9fa; border: 2px solid #6c757d;">
+                    <h4>📝 Draft</h4>
+                    <div class="stage-value text-secondary">{{ pipeline.draft }}</div>
+                    <div class="stage-rate">KES {{ stage_values.draft|floatformat:2 }}</div>
+                </div>
+                
+                <!-- Arrow -->
+                <div class="conversion-arrow">→</div>
+                
+                <!-- Issued/Sent Stage -->
+                <div class="stage-box pipeline-stage" style="background-color: #e7f3ff; border: 2px solid #0d6efd;">
+                    <h4>📤 Issued/Sent</h4>
+                    <div class="stage-value text-info">{{ pipeline.issued }}</div>
+                    <div class="stage-rate">KES {{ stage_values.issued|floatformat:2 }}</div>
+                    <small>{% if pipeline.draft > 0 %}{{ conversion_rates.draft_to_issued|floatformat:1 }}% from draft{% endif %}</small>
+                </div>
+                
+                <!-- Arrow -->
+                <div class="conversion-arrow">→</div>
+                
+                <!-- Viewed/Accepted Stage -->
+                <div class="stage-box pipeline-stage" style="background-color: #fff3cd; border: 2px solid #ffc107;">
+                    <h4>✅ Viewed/Accepted</h4>
+                    <div class="stage-value text-warning">{{ pipeline.viewed }}</div>
+                    <div class="stage-rate">KES {{ stage_values.viewed|floatformat:2 }}</div>
+                    <small>{% if pipeline.issued > 0 %}{{ conversion_rates.issued_to_viewed|floatformat:1 }}% from issued{% endif %}</small>
+                </div>
+                
+                <!-- Arrow -->
+                <div class="conversion-arrow">→</div>
+                
+                <!-- Converted Stage -->
+                <div class="stage-box pipeline-stage" style="background-color: #d1e7dd; border: 2px solid #198754;">
+                    <h4>🔄 Converted</h4>
+                    <div class="stage-value text-success">{{ pipeline.converted }}</div>
+                    <div class="stage-rate">KES {{ stage_values.converted|floatformat:2 }}</div>
+                    <small>{% if pipeline.viewed > 0 %}{{ conversion_rates.viewed_to_converted|floatformat:1 }}% from viewed{% endif %}</small>
+                </div>
+            </div>
+
+            <!-- Lost/Expired -->
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #dee2e6;">
+                <h6 class="mb-3"><i class="icon-times-circle"></i> Lost Pipeline Items</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="alert alert-danger" role="alert">
+                            <h6 class="mb-2">⏰ Expired Quotations</h6>
+                            <h3 class="text-danger mb-1">{{ pipeline.expired }}</h3>
+                            <p class="mb-0">Value: <strong>KES {{ stage_values.expired|floatformat:2 }}</strong></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="alert alert-info" role="alert">
+                            <h6 class="mb-2">📊 Overall Conversion Rate</h6>
+                            <h3 class="text-info mb-1">{{ conversion_rates.overall|floatformat:1 }}%</h3>
+                            <p class="mb-0">{{ pipeline.converted }} converted from {{ total_pipeline_value|length }} quotations</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════ PIPELINE STATISTICS ═══════════════════════ -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Total Pipeline Value</h6>
+                    <h3 class="text-primary">KES {{ total_pipeline_value|floatformat:2 }}</h3>
+                    <small class="text-muted"><i class="icon-chart-bar"></i> Across all stages</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Total Pipeline Items</h6>
+                    <h3 class="text-success">{{ pipeline.draft|add:pipeline.issued|add:pipeline.viewed }}</h3>
+                    <small class="text-muted"><i class="icon-cube"></i> In active pipeline</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Loss Rate</h6>
+                    <h3 class="text-danger">
+                        {% if total_pipeline_value > 0 %}
+                            {{ pipeline.expired|add:stage_values.expired|floatformat:1 }}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </h3>
+                    <small class="text-muted"><i class="icon-trending-down"></i> Expired/Lost</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Conversion Rate</h6>
+                    <h3 class="text-info">{{ conversion_rates.overall|floatformat:1 }}%</h3>
+                    <small class="text-muted"><i class="icon-check-circle"></i> Success rate</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════ RECENTLY CONVERTED QUOTATIONS ═══════════════════════ -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0"><i class="icon-table"></i> Recently Converted to Invoices</h6>
+            <span class="badge bg-success">{{ converted_quotes|length }} records</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Quote #</th>
+                        <th>Client</th>
+                        <th>Quote Date</th>
+                        <th>Converted Date</th>
+                        <th class="text-end">Quote Amount</th>
+                        <th class="text-center">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if converted_quotes %}
+                        {% for quote in converted_quotes %}
+                            <tr>
+                                <td>
+                                    <strong>{{ quote.quote_number }}</strong>
+                                </td>
+                                <td>
+                                    <a href="{% url 'clients:detail' quote.client.id %}" 
+                                       class="text-decoration-none">
+                                        {{ quote.client.name }}
+                                    </a>
+                                </td>
+                                <td>{{ quote.quote_date|date:"d M Y" }}</td>
+                                <td>{{ quote.converted_at|default:'—'|date:"d M Y" }}</td>
+                                <td class="text-end">
+                                    <strong>KES {{ quote.total_amount|floatformat:2 }}</strong>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-success">🔄 Converted</span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                <i class="icon-inbox" style="font-size: 2rem; opacity: 0.3;"></i>
+                                <p class="mt-2 mb-0">No converted quotations yet</p>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

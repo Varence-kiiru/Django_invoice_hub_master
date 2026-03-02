@@ -1,0 +1,131 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h2 mb-2">Outstanding Invoices</h1>
+            <p class="text-muted">List of all unpaid and partially paid invoices</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'core:reports-invoices' %}" class="btn btn-outline-secondary">Back to Reports</a>
+        </div>
+    </div>
+
+    <!-- Reports Navigation Tabs -->
+    <div class="card mb-4 border-top border-primary border-3">
+        <div class="card-body p-2">
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'core:reports-invoices' %}" class="btn btn-sm btn-outline-primary">📄 Invoices</a>
+                <a href="{% url 'core:reports-payments' %}" class="btn btn-sm btn-outline-primary">💰 Payments</a>
+                <a href="{% url 'core:reports-vat' %}" class="btn btn-sm btn-outline-primary">🏛️ VAT</a>
+                <a href="{% url 'core:reports-aging' %}" class="btn btn-sm btn-outline-primary">📈 Aging</a>
+                <a href="{% url 'core:reports-outstanding' %}" class="btn btn-sm btn-primary active">⚠️ Outstanding</a>
+                <a href="{% url 'core:reports-product-sales' %}" class="btn btn-sm btn-outline-primary">📊 Sales</a>
+                <a href="{% url 'core:reports-monthly-summary' %}" class="btn btn-sm btn-outline-primary">📅 Monthly</a>
+                <a href="{% url 'core:reports-tax' %}" class="btn btn-sm btn-outline-primary">📋 Tax</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Card -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-muted mb-2">Total Outstanding Invoices</h6>
+                    <h3 class="mb-0 text-primary">{{ invoices|length }}</h3>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-muted mb-2">Total Amount Due</h6>
+                    <h3 class="mb-0 text-danger">
+                        KES {% for inv in invoices %}{% if forloop.first %}{{ inv.total_amount|floatformat:2 }}{% endif %}{% endfor %}
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Outstanding Invoices Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h6 class="mb-0 fw-bold">Outstanding Invoices</h6>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Invoice #</th>
+                        <th>Client</th>
+                        <th>Invoice Date</th>
+                        <th>Due Date</th>
+                        <th class="text-end">Total Amount</th>
+                        <th class="text-end">Amount Paid</th>
+                        <th class="text-end">Amount Due</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invoice in invoices %}
+                    <tr>
+                        <td><strong>{{ invoice.invoice_number }}</strong></td>
+                        <td>{{ invoice.client.name }}</td>
+                        <td>{{ invoice.invoice_date|date:"d M Y" }}</td>
+                        <td>
+                            {% if invoice.due_date < today %}
+                                <span class="badge bg-danger">{{ invoice.due_date|date:"d M Y" }}</span>
+                            {% else %}
+                                {{ invoice.due_date|date:"d M Y" }}
+                            {% endif %}
+                        </td>
+                        <td class="text-end">KES {{ invoice.total_amount|floatformat:2 }}</td>
+                        <td class="text-end">KES {{ invoice.amount_paid|floatformat:2 }}</td>
+                        <td class="text-end"><strong>KES {{ invoice.amount_due|floatformat:2 }}</strong></td>
+                        <td>
+                            {% if invoice.status == 'overdue' %}
+                                <span class="badge bg-danger">Overdue</span>
+                            {% elif invoice.status == 'issued' %}
+                                <span class="badge bg-warning">Issued</span>
+                            {% elif invoice.status == 'sent' %}
+                                <span class="badge bg-info">Sent</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ invoice.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'invoices:detail' invoice.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-4">
+                            <i class="bi bi-check-circle"></i> No outstanding invoices
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Print Button -->
+    <div class="d-flex justify-content-end gap-2 mt-4">
+        <button onclick="location.href='{% url 'core:outstanding-report-pdf' %}'" class="btn btn-outline-secondary">
+            <i class="bi bi-printer"></i> Download PDF
+        </button>
+        <a href="{% url 'core:reports-invoices' %}" class="btn btn-secondary">Back</a>
+    </div>
+</div>
+
+<style>
+    @media print {
+        .btn, .row:has(.col-md-4) { display: none !important; }
+        .card { box-shadow: none !important; border: 1px solid #ccc !important; }
+    }
+</style>
+{% endblock %}

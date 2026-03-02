@@ -1,0 +1,116 @@
+<!-- Restore Warning Modal -->
+<div id="restore-warning-modal" class="modal" style="display: none;">
+  <div class="modal-overlay" onclick="closeRestoreWarningModal()"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>⚠️ Critical: Restore Database</h2>
+      <button class="modal-close" onclick="closeRestoreWarningModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-danger" style="margin-bottom: 1.5rem;">
+        <strong>IMPORTANT:</strong> This action will replace all current database data with the selected backup. <strong>This cannot be undone!</strong>
+      </div>
+
+      <div style="background-color: rgba(231, 76, 60, 0.05); padding: 1rem; border-left: 4px solid #e74c3c; border-radius: 4px; margin-bottom: 1.5rem;">
+        <h4 style="margin-top: 0; color: #e74c3c;">Before proceeding, please confirm:</h4>
+        <div class="checklist">
+          <label class="checkbox-item">
+            <input type="checkbox" id="restore-backup">
+            <span>I have backed up my current database</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="restore-notify">
+            <span>I have notified all users about the downtime</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="restore-schedule">
+            <span>This restore is scheduled during a maintenance window</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="restore-accept">
+            <span>I accept full responsibility for this action and understand it cannot be undone</span>
+          </label>
+        </div>
+      </div>
+
+      <div style="background-color: rgba(0, 0, 0, 0.02); padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
+        <p><strong>Backup File:</strong></p>
+        <p style="margin: 0.5rem 0;"><code id="restore-filename" style="background-color: rgba(0, 0, 0, 0.1); padding: 0.5rem; border-radius: 4px;"></code></p>
+        <p><strong>File Size:</strong> <span id="restore-filesize"></span></p>
+      </div>
+
+      <p style="color: #666; font-size: 0.85rem; margin: 0;">
+        <strong>Note:</strong> The restore process may take several minutes depending on the backup size. Do not close this page or refresh until the operation completes.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeRestoreWarningModal()">Cancel</button>
+      <button class="btn btn-danger" id="restore-warning-btn" onclick="confirmRestoreWarning()" disabled>
+        ⚠️ Proceed with Restore
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showRestoreWarningModal(filename, filesize) {
+    document.getElementById('restore-filename').textContent = filename;
+    document.getElementById('restore-filesize').textContent = filesize;
+    document.getElementById('restore-warning-modal').style.display = 'flex';
+    
+    // Reset checkboxes
+    document.getElementById('restore-backup').checked = false;
+    document.getElementById('restore-notify').checked = false;
+    document.getElementById('restore-schedule').checked = false;
+    document.getElementById('restore-accept').checked = false;
+    updateRestoreButton();
+  }
+
+  function closeRestoreWarningModal() {
+    document.getElementById('restore-warning-modal').style.display = 'none';
+    document.getElementById('restore-backup').checked = false;
+    document.getElementById('restore-notify').checked = false;
+    document.getElementById('restore-schedule').checked = false;
+    document.getElementById('restore-accept').checked = false;
+    updateRestoreButton();
+  }
+
+  // Update restore button state
+  document.getElementById('restore-backup')?.addEventListener('change', updateRestoreButton);
+  document.getElementById('restore-notify')?.addEventListener('change', updateRestoreButton);
+  document.getElementById('restore-schedule')?.addEventListener('change', updateRestoreButton);
+  document.getElementById('restore-accept')?.addEventListener('change', updateRestoreButton);
+
+  function updateRestoreButton() {
+    const allChecked = 
+      document.getElementById('restore-backup')?.checked &&
+      document.getElementById('restore-notify')?.checked &&
+      document.getElementById('restore-schedule')?.checked &&
+      document.getElementById('restore-accept')?.checked;
+    document.getElementById('restore-warning-btn').disabled = !allChecked;
+  }
+
+  function confirmRestoreWarning() {
+    showLoadingIndicator('Restoring backup... This may take a few minutes.');
+    
+    const fileInput = document.getElementById('file-input');
+    if (!fileInput || !fileInput.files[0]) {
+      hideLoadingIndicator();
+      alert('Please select a backup file');
+      return;
+    }
+    
+    closeRestoreWarningModal();
+    
+    setTimeout(() => {
+      document.getElementById('upload-form').submit();
+    }, 500);
+  }
+
+  // Close modal when clicking outside
+  document.getElementById('restore-warning-modal')?.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal-overlay')) {
+      closeRestoreWarningModal();
+    }
+  });
+</script>

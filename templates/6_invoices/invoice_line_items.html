@@ -1,0 +1,237 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Line Items - Invoice {{ invoice.invoice_number }}{% endblock %}
+
+{% block page_title %}Manage Line Items{% endblock %}
+{% block page_description %}Add, edit, and manage line items for invoice {{ invoice.invoice_number }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/invoices.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/invoice_line_items.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container" data-invoice-id="{{ invoice.id }}">
+  <!-- Alerts -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Info Alert -->
+  {% if invoice.status != 'draft' %}
+    <div class="alert alert-info">
+      <strong>ℹ️ Note:</strong> This invoice cannot be modified as it is no longer in draft status.
+    </div>
+  {% endif %}
+
+  <div class="line-items-section">
+    <div class="section-header">
+      <h2>Line Items for {{ invoice.invoice_number }}</h2>
+      <p>Invoice for {{ invoice.client.name }} • Created {{ invoice.created_at|date:"M d, Y" }}</p>
+    </div>
+
+    <!-- Edit Item Modal -->
+    {% if invoice.status == 'draft' %}
+    <div id="edit-line-item-modal" class="modal" style="display: none;">
+      <div class="modal-overlay"></div>
+      <div class="modal-content modal-large">
+        <div class="modal-header">
+          <h2>Edit Line Item</h2>
+          <button class="modal-close" onclick="closeEditLineItemModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="edit-line-item-form" method="post">
+            {% csrf_token %}
+            <input type="hidden" id="edit-item-id" name="item_id">
+
+            <div class="form-group">
+              <label for="edit-modal-description">Description</label>
+              <input type="text" id="edit-modal-description" name="description" placeholder="Item description" class="form-control">
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="edit-modal-quantity">Quantity</label>
+                <input type="number" id="edit-modal-quantity" name="quantity" value="1" min="0.01" step="0.01" class="form-control">
+              </div>
+
+              <div class="form-group">
+                <label for="edit-modal-unit-price">Unit Price</label>
+                <input type="number" id="edit-modal-unit-price" name="unit_price" value="0" min="0" step="0.01" class="form-control">
+              </div>
+
+              <div class="form-group">
+                <label for="edit-modal-tax-rate">Tax Rate %</label>
+                <input type="number" id="edit-modal-tax-rate" name="tax_rate" value="0" min="0" max="100" step="0.01" class="form-control">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Line Total</label>
+              <div style="background: rgba(0,0,0,0.05); padding: 12px; border-radius: 4px; font-size: 16px; font-weight: bold;">
+                <span id="edit-modal-line-total-currency">KES</span>&nbsp;<span id="edit-modal-line-total">0.00</span>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeEditLineItemModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="submitEditLineItem()">✓ Save Changes</button>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Add Item Form -->
+    {% if invoice.status == 'draft' %}
+      <div class="add-item-section">
+        <h3>Add Line Item</h3>
+        <form method="post" id="add-item-form" class="add-item-form">
+          {% csrf_token %}
+          <div class="form-row">
+            <div class="form-group">
+              <label for="product">Product/Service</label>
+              <select name="product" id="product" onchange="updateProductInfo()" class="form-control">
+                <option value="">--- Select or Enter Description ---</option>
+                {% for product in products %}
+                  <option value="{{ product.id }}" 
+                          data-description="{{ product.description|default:product.name|escapejs }}" 
+                          data-price="{{ product.unit_price }}" 
+                          data-tax-rate-type="{{ product.tax_class.rate_type }}">{{ product.code }} - {{ product.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            
+            <!-- Tax class to rate mapping for JavaScript -->
+            <script type="application/json" id="tax-class-rate-map">
+              {{ tax_class_rate_map|safe }}
+            </script>
+
+            <div class="form-group">
+              <label for="description">Description</label>
+              <input type="text" name="description" id="description" placeholder="Item description" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="quantity">Quantity</label>
+              <input type="number" name="quantity" id="quantity" value="1" min="1" step="0.01" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label for="unit-price">Unit Price</label>
+              <input type="number" name="unit_price" id="unit-price" value="0" min="0" step="0.01" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label for="tax_rate">Tax Rate</label>
+              <select name="tax_rate" id="tax_rate" class="form-control">
+                <option value="0">No Tax</option>
+                {% for rate in tax_rates %}
+                  <option value="{{ rate.rate_percentage }}">{{ rate.name }} ({{ rate.rate_percentage }}%)</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="line-total">Line Total</label>
+              <input type="text" id="line-total" disabled class="form-control line-total-disabled">
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">➕ Add Item</button>
+          </div>
+        </form>
+      </div>
+    {% endif %}
+
+    <!-- Line Items List -->
+    <div class="line-items-list">
+      <h3>Items</h3>
+      {% if line_items %}
+        <div class="admin-table-wrapper">
+          <table class="admin-table invoice-items-table">
+            <thead>
+              <tr>
+                <th class="col-description">Description</th>
+                <th class="col-qty">Qty</th>
+                <th class="col-unit-price">Unit Price</th>
+                <th class="col-tax">Tax</th>
+                <th class="col-total">Total</th>
+                {% if invoice.status == 'draft' %}<th class="col-actions">Actions</th>{% endif %}
+              </tr>
+            </thead>
+            <tbody id="items-tbody">
+              {% for item in line_items %}
+                <tr class="invoice-item-row" data-item-id="{{ item.id }}">
+                  <td class="col-description">
+                    <strong>{{ item.description }}</strong>
+                    {% if item.product %}<br><small>{{ item.product.code }}</small>{% endif %}
+                  </td>
+                  <td class="col-qty">{{ item.quantity|floatformat:2 }}</td>
+                  <td class="col-unit-price">{{ invoice.currency }} {{ item.unit_price|floatformat:2 }}</td>
+                  <td class="col-tax">{{ item.tax_amount|floatformat:2 }}</td>
+                  <td class="col-total"><strong>{{ invoice.currency }} {{ item.line_total|floatformat:2 }}</strong></td>
+                  {% if invoice.status == 'draft' %}
+                    <td class="col-actions">
+                      <button type="button" onclick="editLineItem({{ item.id }})" class="btn-action" title="Edit">✏️</button>
+                      <button type="button" onclick="deleteLineItem({{ item.id }})" class="btn-action btn-danger" title="Delete">🗑️</button>
+                    </td>
+                  {% endif %}
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Totals -->
+        <div class="line-items-totals">
+          <div class="totals-row">
+            <span>Subtotal:</span>
+            <span>{{ invoice.currency }} {{ invoice.subtotal_amount|floatformat:2 }}</span>
+          </div>
+          <div class="totals-row">
+            <span>Total Tax:</span>
+            <span>{{ invoice.currency }} {{ invoice.tax_amount|floatformat:2 }}</span>
+          </div>
+          <div class="totals-row highlight">
+            <span><strong>Total Amount:</strong></span>
+            <span><strong>{{ invoice.currency }} {{ invoice.total_amount|floatformat:2 }}</strong></span>
+          </div>
+        </div>
+      {% else %}
+        <div class="empty-state-compact">
+          <p>No line items added yet.</p>
+          {% if invoice.status == 'draft' %}
+            <p>Add items using the form above.</p>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions" style="margin-top: 30px;">
+      <a href="{% url 'invoices:detail' invoice.id %}" class="btn btn-secondary">← Back to Invoice</a>
+      {% if invoice.status == 'draft' and line_items %}
+        <a href="{% url 'invoices:issue' invoice.id %}" class="btn btn-primary">✓ Ready to Issue</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pages/invoices.js' %}"></script>
+<script src="{% static 'js/pages/invoice_line_items.js' %}"></script>
+{% endblock %}

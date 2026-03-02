@@ -1,0 +1,224 @@
+{% load static %}
+
+<!-- Advanced Filter Form for Payments -->
+<div class="filter-section">
+    <div class="filter-header">
+        <button class="filter-toggle" onclick="toggleAdvancedFilter('payment-filters')">
+            <span class="toggle-icon">▼</span>
+            <span>Advanced Filters</span>
+            {% if current_filters %}
+                <span class="filter-badge">{{ current_filters|length }} active</span>
+            {% endif %}
+        </button>
+    </div>
+    
+    <div id="payment-filters" class="filter-panel" {% if not request.GET.keys|length %}style="display: none;"{% endif %}>
+        <form method="get" action="" class="filter-form">
+            <div class="filter-grid">
+                <!-- Status Filter -->
+                <div class="filter-group">
+                    <label>Payment Status</label>
+                    <select name="status" multiple class="filter-input">
+                        <option value="">All Statuses</option>
+                        <option value="pending" {% if 'pending' in status_list %}selected{% endif %}>Pending</option>
+                        <option value="successful" {% if 'successful' in status_list %}selected{% endif %}>Successful</option>
+                        <option value="failed" {% if 'failed' in status_list %}selected{% endif %}>Failed</option>
+                        <option value="refunded" {% if 'refunded' in status_list %}selected{% endif %}>Refunded</option>
+                    </select>
+                </div>
+                
+                <!-- Payment Method Filter -->
+                <div class="filter-group">
+                    <label>Payment Method</label>
+                    <select name="method" multiple class="filter-input">
+                        <option value="">All Methods</option>
+                        <option value="bank_transfer" {% if 'bank_transfer' in method_list %}selected{% endif %}>Bank Transfer</option>
+                        <option value="credit_card" {% if 'credit_card' in method_list %}selected{% endif %}>Credit Card</option>
+                        <option value="check" {% if 'check' in method_list %}selected{% endif %}>Check</option>
+                        <option value="cash" {% if 'cash' in method_list %}selected{% endif %}>Cash</option>
+                        <option value="online_payment" {% if 'online_payment' in method_list %}selected{% endif %}>Online Payment</option>
+                    </select>
+                </div>
+                
+                <!-- Client Filter -->
+                <div class="filter-group">
+                    <label>Client</label>
+                    <input type="text" name="client_name" placeholder="Client name..." value="{{ client_name }}" class="filter-input">
+                </div>
+                
+                <!-- Invoice Filter -->
+                <div class="filter-group">
+                    <label>Invoice #</label>
+                    <input type="text" name="invoice_number" placeholder="Invoice number..." value="{{ invoice_number }}" class="filter-input">
+                </div>
+                
+                <!-- Amount Range -->
+                <div class="filter-group">
+                    <label>Amount Range</label>
+                    <div class="filter-range">
+                        <input type="number" name="min_amount" placeholder="Min" value="{{ min_amount }}" class="filter-input range-input">
+                        <span class="range-separator">-</span>
+                        <input type="number" name="max_amount" placeholder="Max" value="{{ max_amount }}" class="filter-input range-input">
+                    </div>
+                </div>
+                
+                <!-- Payment Date Range -->
+                <div class="filter-group">
+                    <label>Payment Date</label>
+                    <div class="filter-range">
+                        <input type="date" name="from_date" value="{{ from_date }}" class="filter-input range-input date-picker">
+                        <span class="range-separator">to</span>
+                        <input type="date" name="to_date" value="{{ to_date }}" class="filter-input range-input date-picker">
+                    </div>
+                </div>
+                
+                <!-- Full-Text Search -->
+                <div class="filter-group full-width">
+                    <label>Search All Fields</label>
+                    <input type="text" name="q" placeholder="Search receipt, invoice, client, notes..." value="{{ search_query }}" class="filter-input">
+                </div>
+            </div>
+            
+            <!-- Filter Actions -->
+            <div class="filter-actions">
+                <button type="submit" class="btn-filter-apply">
+                    <span class="icon">🔍</span> Apply Filters
+                </button>
+                {% if current_filters %}
+                    <a href="?page=1" class="btn-filter-clear">Clear All</a>
+                {% endif %}
+                <button type="button" class="btn-filter-save" onclick="openSaveFilterModal('payment')">
+                    <span class="icon">💾</span> Save Filter
+                </button>
+                {% if user_filters %}
+                    <select class="btn-filter-preset" onchange="loadSavedFilter(this.value)">
+                        <option value="">Load Saved Filter...</option>
+                        {% for filter in user_filters %}
+                            <option value="{{ filter.id }}">{{ filter.name }}</option>
+                        {% endfor %}
+                    </select>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.filter-section { margin-bottom: 20px; }
+.filter-header { display: flex; align-items: center; margin-bottom: 10px; }
+.filter-toggle { 
+    background: #f5f5f5; 
+    border: 1px solid #ddd; 
+    padding: 10px 15px; 
+    cursor: pointer; 
+    border-radius: 4px;
+    font-weight: 500;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.filter-toggle:hover { background: #eeeeee; }
+.toggle-icon { font-size: 12px; transition: transform 0.2s; }
+.filter-toggle.open .toggle-icon { transform: rotate(180deg); }
+.filter-badge { 
+    background: #3498db; 
+    color: white; 
+    padding: 2px 8px; 
+    border-radius: 12px; 
+    font-size: 11px; 
+    font-weight: 600;
+}
+
+.filter-panel { 
+    background: #f9f9f9; 
+    border: 1px solid #ddd; 
+    border-top: none;
+    padding: 20px; 
+    border-radius: 0 0 4px 4px;
+    display: none;
+}
+.filter-panel.open { display: block; }
+
+.filter-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+    gap: 15px; 
+    margin-bottom: 15px;
+}
+.filter-grid .full-width { grid-column: 1 / -1; }
+
+.filter-group { display: flex; flex-direction: column; }
+.filter-group label { 
+    font-weight: 600; 
+    margin-bottom: 5px; 
+    font-size: 12px; 
+    text-transform: uppercase;
+    color: #555;
+}
+.filter-input { 
+    padding: 8px 10px; 
+    border: 1px solid #ddd; 
+    border-radius: 4px;
+    font-size: 13px;
+}
+.filter-input:focus { outline: none; border-color: #3498db; background: #f0f8ff; }
+
+.filter-range { display: flex; gap: 8px; align-items: center; }
+.range-input { flex: 1; }
+.range-separator { color: #999; font-weight: 500; }
+
+.filter-actions { 
+    display: flex; 
+    gap: 10px; 
+    flex-wrap: wrap; 
+    margin-top: 15px;
+    border-top: 1px solid #ddd;
+    padding-top: 15px;
+}
+
+.btn-filter-apply, .btn-filter-clear, .btn-filter-save, .btn-filter-preset {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.btn-filter-apply { 
+    background: #3498db; 
+    color: white;
+}
+.btn-filter-apply:hover { background: #2980b9; }
+
+.btn-filter-clear { 
+    background: #e74c3c; 
+    color: white;
+    text-decoration: none;
+}
+.btn-filter-clear:hover { background: #c0392b; }
+
+.btn-filter-save { 
+    background: #27ae60; 
+    color: white;
+}
+.btn-filter-save:hover { background: #229954; }
+
+.btn-filter-preset {
+    background: #f39c12;
+    color: white;
+    padding: 8px 14px;
+}
+.btn-filter-preset:hover { background: #d68910; }
+
+.icon { font-size: 14px; }
+
+@media (max-width: 768px) {
+    .filter-grid { grid-template-columns: 1fr; }
+    .filter-actions { flex-direction: column; }
+    .btn-filter-apply, .btn-filter-clear, .btn-filter-save, .btn-filter-preset { width: 100%; justify-content: center; }
+}
+</style>

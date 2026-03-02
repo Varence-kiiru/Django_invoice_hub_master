@@ -1,0 +1,101 @@
+{% extends "layouts/pdf_base.html" %}
+
+{% block title %}Monthly Summary Report{% endblock %}
+
+{% block content %}
+<div class="pdf-header">
+    {% if company_logo %}
+        <img src="{{ company_logo }}" alt="Logo" class="pdf-logo">
+    {% endif %}
+    <div class="company-info">
+        <h2>{{ company_name }}</h2>
+        <p>{{ company_address }}</p>
+        <p>Tel: {{ company_phone }}</p>
+        <p>Email: {{ company_email }}</p>
+        {% if company_tax_id %}
+        <p>Tax ID: {{ company_tax_id }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="report-title">Monthly Financial Summary</div>
+<div class="report-subtitle">Month-over-month financial overview</div>
+
+<!-- Statistics Table (WeasyPrint compatible) -->
+<table style="width: 100%; margin-bottom: 20px; border-collapse: collapse;">
+    <tr>
+        <td style="border: 1px solid #ddd; padding: 15px; background: #f9f9f9; text-align: center;">
+            <div style="font-size: 11px; color: #666; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Total Invoices</div>
+            <div style="font-size: 18px; font-weight: bold; color: #0066cc;">{{ total_invoices|default:0 }}</div>
+            <div style="font-size: 10px; color: #999; margin-top: 5px;">All time</div>
+        </td>
+        <td style="border: 1px solid #ddd; padding: 15px; background: #f9f9f9; text-align: center;">
+            <div style="font-size: 11px; color: #666; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Total Revenue</div>
+            <div style="font-size: 18px; font-weight: bold; color: #0066cc;">KES {{ total_revenue|default:'0.00' }}</div>
+            <div style="font-size: 10px; color: #999; margin-top: 5px;">Collected</div>
+        </td>
+        <td style="border: 1px solid #ddd; padding: 15px; background: #f9f9f9; text-align: center;">
+            <div style="font-size: 11px; color: #666; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Outstanding</div>
+            <div style="font-size: 18px; font-weight: bold; color: #0066cc;">KES {{ total_outstanding|default:'0.00' }}</div>
+            <div style="font-size: 10px; color: #999; margin-top: 5px;">Unpaid</div>
+        </td>
+        <td style="border: 1px solid #ddd; padding: 15px; background: #f9f9f9; text-align: center;">
+            <div style="font-size: 11px; color: #666; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Total Clients</div>
+            <div style="font-size: 18px; font-weight: bold; color: #0066cc;">{{ total_clients|default:0 }}</div>
+            <div style="font-size: 10px; color: #999; margin-top: 5px;">Active</div>
+        </td>
+    </tr>
+</table>
+
+<!-- Monthly Breakdown -->
+<div class="section-title">Monthly Breakdown</div>
+
+{% if monthly_data %}
+<table>
+    <thead>
+        <tr>
+            <th>Month</th>
+            <th>Invoices</th>
+            <th>Revenue</th>
+            <th>Payments</th>
+            <th>Outstanding</th>
+            <th>VAT Collected</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in monthly_data %}
+        <tr>
+            <td><strong>{{ data.month|date:"M Y" }}</strong></td>
+            <td class="amount">{{ data.invoices }}</td>
+            <td class="amount">KES {{ data.revenue|floatformat:2 }}</td>
+            <td class="amount">KES {{ data.payments|floatformat:2 }}</td>
+            <td class="amount">KES {{ data.outstanding|floatformat:2 }}</td>
+            <td class="amount">KES {{ data.vat|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="no-data">No monthly data available</div>
+{% endif %}
+
+<!-- Summary -->
+<table class="summary-table">
+    <tr>
+        <td class="label">Total Invoices:</td>
+        <td class="value">{{ total_invoices|default:0 }}</td>
+    </tr>
+    <tr>
+        <td class="label">Total Revenue:</td>
+        <td class="value">KES {{ total_revenue|default:'0.00' }}</td>
+    </tr>
+    <tr>
+        <td class="label">Outstanding:</td>
+        <td class="value">KES {{ total_outstanding|default:'0.00' }}</td>
+    </tr>
+    <tr>
+        <td class="label">Total Clients:</td>
+        <td class="value">{{ total_clients|default:0 }}</td>
+    </tr>
+</table>
+{% endblock %}

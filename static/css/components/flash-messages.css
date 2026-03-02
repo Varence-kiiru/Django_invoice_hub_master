@@ -1,0 +1,107 @@
+/* Flash Messages and Alerts Styling */
+
+.flash-container {
+  position: fixed;
+  top: calc(var(--navbar-height, 72px) + 12px);
+  right: var(--spacing-lg, 16px);
+  z-index: 11000;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md, 12px);
+  animation: slideIn 260ms ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+.alert-message {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(6px);
+  opacity: 0.98;
+}
+
+.alert-message.success {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border: 1px solid #6ee7b7;
+  color: #065f46;
+}
+
+.alert-message.error {
+  background: linear-gradient(135deg, #fee2e2 0%, #fca5a5 100%);
+  border: 1px solid #f87171;
+  color: #7f1d1d;
+}
+
+.alert-message.warning {
+  background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%);
+  border: 1px solid #fbbf24;
+  color: #92400e;
+}
+
+.alert-message.info {
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  border: 1px solid #a5b4fc;
+  color: #3730a3;
+}
+
+.alert-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.alert-content {
+  flex: 1;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.5;
+}
+
+.alert-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem;
+  opacity: 0.7;
+  transition: opacity var(--duration-200) ease;
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 0;
+  line-height: 1;
+}
+
+.alert-close:hover {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .flash-container {
+    left: var(--spacing-lg);
+    right: var(--spacing-lg);
+    max-width: none;
+    top: 80px;
+  }
+}
+/* JS should remove message nodes after timeout; no forced auto-slide-out here */

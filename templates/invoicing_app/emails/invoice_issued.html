@@ -1,0 +1,48 @@
+{% extends "email_base.html" %}
+
+{% block subject %}Invoice {{ invoice.invoice_number }} from {{ company_name }}{% endblock %}
+
+{% block content %}
+<p>Hello {{ client_name }},</p>
+
+<p>Thank you for your business! We've attached an invoice{{ invoice.invoice_number }} for your review.</p>
+
+<table style="width: 100%; margin: 20px 0; border-collapse: collapse;">
+    <tr style="background-color: #f5f5f5;">
+        <td style="padding: 10px; border: 1px solid #ddd;"><strong>Invoice Number</strong></td>
+        <td style="padding: 10px; border: 1px solid #ddd;">{{ invoice.invoice_number }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 10px; border: 1px solid #ddd;"><strong>Invoice Date</strong></td>
+        <td style="padding: 10px; border: 1px solid #ddd;">{{ invoice.invoice_date|date:"M d, Y" }}</td>
+    </tr>
+    <tr style="background-color: #f5f5f5;">
+        <td style="padding: 10px; border: 1px solid #ddd;"><strong>Due Date</strong></td>
+        <td style="padding: 10px; border: 1px solid #ddd;">{{ invoice.due_date|date:"M d, Y" }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 10px; border: 1px solid #ddd;"><strong>Total Amount</strong></td>
+        <td style="padding: 10px; border: 1px solid #ddd;"><strong>{{ company_settings.currency_symbol }}{{ invoice.total_amount|floatformat:2 }}</strong></td>
+    </tr>
+</table>
+
+<p style="margin: 20px 0;">
+    <a href="{{ invoice_url }}" style="background-color: #2c3e50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+        View Invoice
+    </a>
+</p>
+
+<h3 style="color: #2c3e50; margin-top: 30px;">Invoice Summary</h3>
+<ul style="margin-left: 20px;">
+    <li>Subtotal: {{ company_settings.currency_symbol }}{{ invoice.subtotal_amount|floatformat:2 }}</li>
+    {% if invoice.total_tax_amount %}
+    <li>Tax: {{ company_settings.currency_symbol }}{{ invoice.total_tax_amount|floatformat:2 }}</li>
+    {% endif %}
+    <li><strong>Total Due: {{ company_settings.currency_symbol }}{{ invoice.total_amount|floatformat:2 }}</strong></li>
+</ul>
+
+<p style="margin-top: 20px;">
+    If you have any questions about this invoice, please don't hesitate to contact us.
+</p>
+
+{% endblock %}

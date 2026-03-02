@@ -1,0 +1,190 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Accountant - Invoicing App{% endblock %}
+
+{% block page_title %}Accountant Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/components/cards.css' %}">
+<link rel="stylesheet" href="{% static 'css/components/tables.css' %}">
+<link rel="stylesheet" href="{% static 'css/components/badges.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Page Header -->
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">Accounting Dashboard</h1>
+    <p class="dashboard-subtitle">Financial overview and reconciliation</p>
+  </div>
+
+  <!-- Key Financial Metrics -->
+  <div class="dashboard-grid">
+    <!-- Total Revenue -->
+    <div class="kpi-card">
+      <div class="kpi-label">💰 Total Revenue</div>
+      <div class="kpi-value kpi-large">{{ company_settings.currency_symbol }}{{ total_revenue|default:'0'|floatformat:2 }}</div>
+    </div>
+
+    <!-- Outstanding Revenue -->
+    <div class="kpi-card">
+      <div class="kpi-label">⏳ Outstanding</div>
+      <div class="kpi-value kpi-large">{{ company_settings.currency_symbol }}{{ outstanding_revenue|default:'0'|floatformat:2 }}</div>
+      <div class="kpi-minor-label">
+        (From issued invoices not yet paid)
+      </div>
+    </div>
+
+    <!-- Monthly Revenue -->
+    <div class="kpi-card">
+      <div class="kpi-label">📈 This Month</div>
+      <div class="kpi-value kpi-large">{{ company_settings.currency_symbol }}{{ month_revenue|default:'0'|floatformat:2 }}</div>
+    </div>
+
+    <!-- Overdue -->
+    <div class="kpi-card">
+      <div class="kpi-label">⚠️ Requires Action</div>
+      <div class="kpi-value {% if overdue_count > 0 %}kpi-alert{% else %}kpi-success{% endif %}">
+        {{ overdue_count|default:'0' }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Accounting Reconciliation Section -->
+  <div class="dashboard-section">
+    <div class="dashboard-section-title">Reconciliation Panel</div>
+    <div class="accounting-grid">
+      <!-- Invoice Summary -->
+      <div class="accounting-panel">
+        <div class="accounting-panel-title">Invoice Summary</div>
+        <div class="amount-line">
+          <span class="amount-label">Total Invoices</span>
+          <span class="amount-value">{{ total_invoices|default:'0' }}</span>
+        </div>
+        <div class="amount-line">
+          <span class="amount-label">Draft</span>
+          <span class="amount-value">{{ draft_invoices|default:'0' }}</span>
+        </div>
+        <div class="amount-line">
+          <span class="amount-label">Issued</span>
+          <span class="amount-value">{{ issued_invoices|default:'0' }}</span>
+        </div>
+        <div class="amount-line">
+          <span class="amount-label">Paid</span>
+          <span class="amount-value">{{ paid_invoices|default:'0' }}</span>
+        </div>
+      </div>
+
+      <!-- Quotation Summary -->
+      <div class="accounting-panel">
+        <div class="accounting-panel-title">Quotation Summary</div>
+        <div class="amount-line">
+          <span class="amount-label">Total Quotations</span>
+          <span class="amount-value">{{ total_quotations|default:'0' }}</span>
+        </div>
+        <div class="amount-line">
+          <span class="amount-label">Accepted</span>
+          <span class="amount-value">{{ accepted_quotations|default:'0' }}</span>
+        </div>
+        <div class="amount-line">
+          <span class="amount-label">Converted</span>
+          <span class="amount-value">{{ converted_quotations|default:'0' }}</span>
+        </div>
+        <div class="amount-line">
+          <span class="amount-label">Expired</span>
+          <span class="amount-value">{{ expired_quotations|default:'0' }}</span>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="accounting-panel">
+        <div class="accounting-panel-title">Quick Actions</div>
+        <div class="dashboard-flex-column">
+          <a href="{% url 'payments:reconciliation' %}" class="btn btn-primary btn-sm">Reconcile Payments</a>
+          <a href="{% url 'core:reports-vat' %}" class="btn btn-secondary btn-sm">VAT Report</a>
+          <a href="{% url 'core:reports-aging' %}" class="btn btn-secondary btn-sm">Aging Report</a>
+          <a href="{% url 'invoices:list' %}?status=issued" class="btn btn-secondary btn-sm">Outstanding</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Transactions -->
+  <div class="dashboard-section">
+    <div class="dashboard-section-title">Recent Activity</div>
+    
+    <div class="dashboard-grid-2col">
+      <!-- Recent Invoices -->
+      <div class="dashboard-card">
+        <div class="dashboard-card-header">
+          Recent Invoices
+        </div>
+        {% if recent_invoices %}
+          <table class="recent-table">
+            <tbody>
+              {% for invoice in recent_invoices %}
+                <tr>
+                  <td>#INV-{{ invoice.id|stringformat:'04d' }}</td>
+                  <td class="table-right">{{ company_settings.currency_symbol }}{{ invoice.total|default:'0'|floatformat:2 }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="dashboard-card-empty">
+            No invoices
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Recent Quotations -->
+      <div class="dashboard-card">
+        <div class="dashboard-card-header">
+          Recent Quotations
+        </div>
+        {% if recent_quotations %}
+          <table class="recent-table">
+            <tbody>
+              {% for quote in recent_quotations %}
+                <tr>
+                  <td>{{ quote.quote_number }}</td>
+                  <td class="table-right">{{ quote.currency }} {{ quote.total_amount|default:'0'|floatformat:2 }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="dashboard-card-empty">
+            No quotations
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Recent Payments -->
+      <div class="dashboard-card">
+        <div class="dashboard-card-header">
+          Recent Payments
+        </div>
+        {% if recent_payments %}
+          <table class="recent-table">
+            <tbody>
+              {% for payment in recent_payments %}
+                <tr>
+                  <td>#PAY-{{ payment.id|stringformat:'04d' }}</td>
+                  <td class="table-right">{{ company_settings.currency_symbol }}{{ payment.amount|floatformat:2 }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="dashboard-card-empty">
+            No payments
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

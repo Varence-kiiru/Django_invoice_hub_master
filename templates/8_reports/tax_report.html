@@ -1,0 +1,136 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h2 mb-2">Tax Compliance Report</h1>
+            <p class="text-muted">Tax liability and VAT reconciliation</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'core:reports-invoices' %}" class="btn btn-outline-secondary">Back to Reports</a>
+        </div>
+    </div>
+
+    <!-- Reports Navigation Tabs -->
+    <div class="card mb-4 border-top border-primary border-3">
+        <div class="card-body p-2">
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'core:reports-invoices' %}" class="btn btn-sm btn-outline-primary">📄 Invoices</a>
+                <a href="{% url 'core:reports-payments' %}" class="btn btn-sm btn-outline-primary">💰 Payments</a>
+                <a href="{% url 'core:reports-vat' %}" class="btn btn-sm btn-outline-primary">🏛️ VAT</a>
+                <a href="{% url 'core:reports-aging' %}" class="btn btn-sm btn-outline-primary">📈 Aging</a>
+                <a href="{% url 'core:reports-outstanding' %}" class="btn btn-sm btn-outline-primary">⚠️ Outstanding</a>
+                <a href="{% url 'core:reports-product-sales' %}" class="btn btn-sm btn-outline-primary">📊 Sales</a>
+                <a href="{% url 'core:reports-monthly-summary' %}" class="btn btn-sm btn-outline-primary">📅 Monthly</a>
+                <a href="{% url 'core:reports-tax' %}" class="btn btn-sm btn-primary active">📋 Tax</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tax Summary -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card bg-light border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Total VAT Liability</h6>
+                    <h3 class="mb-0 text-danger">KES 0.00</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-light border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Tax Rate</h6>
+                    <h3 class="mb-0 text-primary">16%</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tax Breakdown -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h6 class="mb-0 fw-bold">Tax Classification</h6>
+        </div>
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tax Category</th>
+                        <th class="text-end">Taxable Amount</th>
+                        <th class="text-end">Tax Rate</th>
+                        <th class="text-end">Tax Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Standard Rate</strong></td>
+                        <td class="text-end">KES 0.00</td>
+                        <td class="text-end">16%</td>
+                        <td class="text-end"><strong>KES 0.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Zero Rated</strong></td>
+                        <td class="text-end">KES 0.00</td>
+                        <td class="text-end">0%</td>
+                        <td class="text-end"><strong>KES 0.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Exempt</strong></td>
+                        <td class="text-end">KES 0.00</td>
+                        <td class="text-end">N/A</td>
+                        <td class="text-end"><strong>KES 0.00</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tax Rules -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h6 class="mb-0 fw-bold">Active Tax Rules</h6>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 small">
+                <thead class="table-light">
+                    <tr>
+                        <th>Rule Name</th>
+                        <th>Tax Type</th>
+                        <th>Rate</th>
+                        <th>Effective From</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            <i class="bi bi-inbox"></i> No tax rules configured
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Print Button -->
+    <div class="d-flex justify-content-end gap-2 mt-4">
+        <button onclick="location.href='{% url 'core:tax-report-pdf' %}'" class="btn btn-outline-secondary">
+            <i class="bi bi-printer"></i> Download PDF
+        </button>
+        <a href="{% url 'core:reports-invoices' %}" class="btn btn-secondary">Back</a>
+    </div>
+</div>
+
+<style>
+    @media print {
+        .btn, .row:has(.col-md-4) { display: none !important; }
+        .card { box-shadow: none !important; border: 1px solid #ccc !important; }
+    }
+</style>
+{% endblock %}

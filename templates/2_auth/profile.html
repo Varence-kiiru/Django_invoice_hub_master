@@ -1,0 +1,123 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <div class="settings-header">
+        <h1>My Profile</h1>
+        <p>View and manage your profile information</p>
+    </div>
+
+    <!-- Alert Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Profile Information -->
+    <div class="settings-card">
+        <div class="profile-section">
+            <div class="profile-avatar">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</div>
+            <div class="profile-info">
+                <h3>{{ user.first_name }} {{ user.last_name }}</h3>
+                <p>{{ user.email }}</p>
+                <p style="font-size: 12px; margin-top: 8px;">Member since {{ user.date_joined|date:"M d, Y" }}</p>
+                {% if user.invoicing_profile.role %}
+                <p style="font-size: 12px; margin-top: 4px;">Role: <strong>{{ user.invoicing_profile.role.name|title }}</strong></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Details -->
+    <div class="settings-card">
+        <h4 class="settings-card-title">Profile Details</h4>
+        <div class="profile-details">
+            <div class="detail-row">
+                <span class="detail-label">First Name:</span>
+                <span class="detail-value">{{ user.first_name|default:"Not set" }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Last Name:</span>
+                <span class="detail-value">{{ user.last_name|default:"Not set" }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Email:</span>
+                <span class="detail-value">{{ user.email }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Username:</span>
+                <span class="detail-value">{{ user.username }}</span>
+            </div>
+            {% if user.invoicing_profile %}
+            <div class="detail-row">
+                <span class="detail-label">Department:</span>
+                <span class="detail-value">{% if user.invoicing_profile.phone %}{{ user.invoicing_profile.phone }}{% else %}Not set{% endif %}</span>
+            </div>
+            {% endif %}
+            <div class="detail-row">
+                <span class="detail-label">Account Status:</span>
+                <span class="detail-value">{% if user.is_active %}<span style="color: green;">◉ Active</span>{% else %}<span style="color: red;">◌ Inactive</span>{% endif %}</span>
+            </div>
+        </div>
+        <div class="form-actions">
+            <a href="{% url 'core:settings' %}" class="btn btn-primary">Edit Profile</a>
+            <a href="{% url 'core:dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Account Activity -->
+    <div class="settings-card">
+        <h4 class="settings-card-title">Account Activity</h4>
+        <div class="profile-details">
+            <div class="detail-row">
+                <span class="detail-label">Last Login:</span>
+                <span class="detail-value">{% if user.last_login %}{{ user.last_login|date:"M d, Y \a\t g:i A" }}{% else %}Never{% endif %}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Account Created:</span>
+                <span class="detail-value">{{ user.date_joined|date:"M d, Y \a\t g:i A" }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.profile-details {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-secondary);
+    flex: 0 0 150px;
+}
+
+.detail-value {
+    color: var(--color-text-primary);
+}
+</style>
+{% endblock %}

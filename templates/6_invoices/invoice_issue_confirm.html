@@ -1,0 +1,117 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Confirm - Issue Invoice {{ invoice.invoice_number }}{% endblock %}
+
+{% block page_title %}Issue Invoice{% endblock %}
+{% block page_description %}Confirm issuing this invoice{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/invoices.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <div class="confirm-section" style="max-width: 700px; margin: 40px auto;">
+    <div class="confirm-header">
+      <h2>Issue Invoice {{ invoice.invoice_number }}</h2>
+      <p>Once issued, the invoice status will change and it can be sent to the client.</p>
+    </div>
+
+    <div class="confirm-content">
+      <div class="alert alert-info">
+        <strong>ℹ️ What happens when you issue:</strong>
+        <ul style="margin-top: 10px; margin-bottom: 0;">
+          <li>Invoice status changes from <strong>Draft</strong> to <strong>Issued</strong></li>
+          <li>Invoice date becomes the current date</li>
+          <li>The invoice can no longer be edited (except by admins)</li>
+          <li>You can send it to the client via email</li>
+          <li>All changes will be recorded in the audit log</li>
+        </ul>
+      </div>
+
+      <div class="invoice-summary-box">
+        <h3>Invoice Summary:</h3>
+        <div class="summary-grid">
+          <div>
+            <p><strong>Invoice Number:</strong> {{ invoice.invoice_number }}</p>
+            <p><strong>Client:</strong> {{ invoice.client.name }}</p>
+            <p><strong>Invoice Date:</strong> {{ invoice.invoice_date|date:"M d, Y" }}</p>
+          </div>
+          <div>
+            <p><strong>Due Date:</strong> {{ invoice.due_date|date:"M d, Y" }}</p>
+            <p><strong>Total Amount:</strong> <span style="font-weight: bold; color: var(--success-color);">{{ invoice.currency }} {{ invoice.total_amount|floatformat:2 }}</span></p>
+            <p><strong>Line Items:</strong> {{ invoice.line_items.count }} item{{ invoice.line_items.count|pluralize }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-warning">
+        <strong>⚠️ Important:</strong> Make sure all information is correct before issuing. 
+        <a href="{% url 'invoices:detail' invoice.id %}">Review details</a>
+      </div>
+    </div>
+
+    <div class="confirm-actions">
+      <a href="{% url 'invoices:detail' invoice.id %}" class="btn btn-secondary">Cancel</a>
+      <form method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">
+          ✓ Issue Invoice
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  .confirm-section {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .confirm-header h2 {
+    margin: 0 0 10px 0;
+    font-size: 24px;
+  }
+
+  .confirm-header p {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+
+  .confirm-content {
+    margin: 20px 0;
+  }
+
+  .invoice-summary-box {
+    background: rgba(0,0,0,0.02);
+    padding: 15px;
+    border-radius: 6px;
+    margin: 15px 0;
+  }
+
+  .invoice-summary-box h3 {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .summary-grid p {
+    margin: 0 0 8px 0;
+  }
+
+  .confirm-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+</style>
+{% endblock %}

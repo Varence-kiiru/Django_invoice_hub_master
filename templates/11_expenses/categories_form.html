@@ -1,0 +1,203 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}{% if action == 'Edit' %}Edit{% else %}Create{% endif %} Category - Invoicing App{% endblock %}
+
+{% block page_title %}{% if action == 'Edit' %}Edit{% else %}Create New{% endif %} Category{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <form method="post" class="category-form">
+            {% csrf_token %}
+
+            <div class="form-section">
+                <h3 class="section-title">Category Information</h3>
+
+                <div class="form-group">
+                    <label for="{{ form.name.id_for_label }}" class="form-label">
+                        Category Name <span class="required">*</span>
+                    </label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<div class="form-error">{{ form.name.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}<div class="form-error">{{ form.description.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="form-group form-check">
+                    {{ form.is_active }}
+                    <label for="{{ form.is_active.id_for_label }}" class="form-check-label">
+                        Category is active
+                    </label>
+                </div>
+            </div>
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <div>{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <span aria-hidden="true">💾</span> Save Category
+                </button>
+                <a href="{% url 'expenses:categories-list' %}" class="btn btn-secondary btn-lg">
+                    <span aria-hidden="true">❌</span> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.form-container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.form-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+}
+
+.section-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.required {
+    color: #d32f2f;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-error {
+    color: #d32f2f;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+}
+
+.form-check-input {
+    width: 18px;
+    height: 18px;
+    margin-right: 0.5rem;
+}
+
+.form-check-label {
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.btn {
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-primary {
+    background-color: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #5568d3;
+}
+
+.btn-secondary {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background-color: #d0d0d0;
+}
+
+.alert-danger {
+    background-color: #ffebee;
+    color: #c62828;
+    border-left: 4px solid #d32f2f;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 4px;
+}
+
+@media (max-width: 600px) {
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn-lg {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}

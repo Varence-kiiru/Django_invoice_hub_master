@@ -1,0 +1,251 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Tax Rates Management{% endblock %}
+
+{% block page_title %}Tax Rates{% endblock %}
+{% block page_description %}Manage all applicable tax rates for your invoices{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/management.css' %}">
+<style>
+    .status-cell { text-align: center; min-width: 100px; }
+    .rate-badge { font-weight: 600; font-size: 1.1em; }
+    .quick-actions { min-width: 140px; }
+    .modal-body { padding: 2rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h1>Tax Rates Management</h1>
+            <p class="text-muted">Create and manage tax rates applied to your invoices</p>
+        </div>
+        <a href="{% url 'taxes:create' %}" class="btn btn-success btn-lg">
+            <i class="bi bi-plus-circle"></i> New Tax Rate
+        </a>
+    </div>
+
+    <!-- Search & Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="search" 
+                           placeholder="Search by code, name, or country..." 
+                           value="{{ search_query }}" />
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="tax_type" onchange="this.form.submit()">
+                        <option value="">All Tax Types</option>
+                        {% for value, label in tax_types %}
+                            <option value="{{ value }}" {% if tax_type_filter == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="status" onchange="this.form.submit()">
+                        <option value="">All Status</option>
+                        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active Only</option>
+                        <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive Only</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary bg-opacity-10">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Total Rates</h6>
+                    <h3 class="mb-0">{{ page_obj.paginator.count }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success bg-opacity-10">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Standard Rate</h6>
+                    <h3 class="mb-0">{{ standard_rate|default:"—" }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info bg-opacity-10">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Tax Types</h6>
+                    <h3 class="mb-0">{{ tax_types|length }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning bg-opacity-10">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Expired Rates</h6>
+                    <h3 class="mb-0">0</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tax Rates Table -->
+    <div class="card">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">
+                <i class="bi bi-percent"></i> All Tax Rates
+                {% if search_query %}<span class="badge bg-info">{{ page_obj|length }} results</span>{% endif %}
+            </h5>
+        </div>
+        
+        {% if tax_rates %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th class="text-center">Rate</th>
+                        <th>Type</th>
+                        <th>Country</th>
+                        <th>Effective From</th>
+                        <th class="status-cell">Status</th>
+                        <th class="quick-actions">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rate in tax_rates %}
+                    <tr>
+                        <td>
+                            <strong class="text-primary">{{ rate.code }}</strong>
+                        </td>
+                        <td>
+                            <span class="text-break">{{ rate.name }}</span>
+                            {% if rate.description %}
+                                <div class="small text-muted mt-1">{{ rate.description|truncatewords:10 }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-info rate-badge">{{ rate.rate_percentage }}%</span>
+                        </td>
+                        <td>{{ rate.get_tax_type_display }}</td>
+                        <td>{{ rate.country }}</td>
+                        <td>
+                            <small>{{ rate.effective_from|date:"d M Y" }}</small>
+                            {% if rate.effective_to %}
+                                <div><small class="text-danger">Ends: {{ rate.effective_to|date:"d M Y" }}</small></div>
+                            {% endif %}
+                        </td>
+                        <td class="status-cell">
+                            {% if rate.is_active %}
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle"></i> Active
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary">
+                                    <i class="bi bi-circle"></i> Inactive
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="quick-actions">
+                            <a href="{% url 'taxes:detail' rate.id %}" 
+                               class="btn btn-sm btn-outline-primary" title="View details">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{% url 'taxes:edit' rate.id %}" 
+                               class="btn btn-sm btn-outline-info" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'taxes:delete' rate.id %}" 
+                               class="btn btn-sm btn-outline-danger" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="card-footer bg-light d-flex justify-content-center">
+            <nav aria-label="Page navigation">
+                <ul class="pagination mb-0">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">
+                                First
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+                                Previous
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">
+                                    {{ num }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+                                Next
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">
+                                Last
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="card-body text-center py-5">
+            <div class="text-muted mb-3">
+                <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+            </div>
+            <h5 class="text-muted mb-2">No tax rates found</h5>
+            <p class="text-muted mb-4">
+                {% if search_query %}
+                    Try adjusting your search criteria
+                {% else %}
+                    Create your first tax rate to get started
+                {% endif %}
+            </p>
+            <a href="{% url 'taxes:create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Create Tax Rate
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

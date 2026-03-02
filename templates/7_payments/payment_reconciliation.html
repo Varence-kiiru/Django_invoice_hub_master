@@ -1,0 +1,196 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Payment Reconciliation - Invoicing App{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/payments.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <div class="row">
+            <div class="col-md-8">
+                <h1 class="page-title">💰 Payment Reconciliation</h1>
+                <p class="text-muted">Match payments to invoices and reconcile transactions</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{% url 'payments:list' %}" class="btn btn-outline-secondary">← Back to Payments</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <h6 class="card-title">Pending Payments</h6>
+                    <h3 class="mb-0">{{ pending_payments.count }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h6 class="card-title">Today's Payments</h6>
+                    <h3 class="mb-0">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h6 class="card-title">Completed</h6>
+                    <h3 class="mb-0">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body text-center">
+                    <h6 class="card-title">Issues</h6>
+                    <h3 class="mb-0">0</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Payments Table -->
+    {% if pending_payments %}
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">📋 Pending Payments to Reconcile</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Payment ID</th>
+                                <th>Invoice</th>
+                                <th>Client</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Date</th>
+                                <th>Reference</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in pending_payments %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'payments:detail' payment.id %}" class="text-decoration-none fw-bold">
+                                            #{{ payment.id }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'invoices:detail' payment.invoice.id %}" class="text-decoration-none">
+                                            {{ payment.invoice.invoice_number }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'clients:detail' payment.invoice.client.id %}" class="text-decoration-none">
+                                            {{ payment.invoice.client.name }}
+                                        </a>
+                                    </td>
+                                    <td class="text-success fw-bold">{{ payment.currency }} {{ payment.amount|floatformat:2 }}</td>
+                                    <td>{{ payment.payment_method.name }}</td>
+                                    <td>{{ payment.payment_date|date:"M j, Y" }}</td>
+                                    <td>{{ payment.transaction_reference|default:"—" }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{% url 'payments:detail' payment.id %}" class="btn btn-outline-primary">
+                                                👁️ View
+                                            </a>
+                                            <a href="{% url 'payments:matching' payment.id %}" class="btn btn-outline-warning">
+                                                🔗 Match
+                                            </a>
+                                            <a href="{% url 'payments:receipt' payment.id %}" class="btn btn-outline-secondary">
+                                                📄 Receipt
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <div class="mb-3">
+                    <i class="bi bi-check-circle" style="font-size: 3rem; color: #198754;"></i>
+                </div>
+                <h5 class="text-success">All payments are reconciled!</h5>
+                <p class="text-muted">No pending payments require reconciliation at this time.</p>
+                <a href="{% url 'payments:list' %}" class="btn btn-primary">View All Payments</a>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Reconciliation Tips -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">💡 Reconciliation Tips</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6>🔍 Match by Reference</h6>
+                            <p class="text-muted">Use transaction references (M-Pesa codes, cheque numbers, bank references) to match payments to invoices.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>💰 Match by Amount</h6>
+                            <p class="text-muted">Look for payments that match invoice totals exactly, or partial payments that add up to the total.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>📅 Match by Date</h6>
+                            <p class="text-muted">Consider the timing - payments are usually made within a few days of invoice issuance.</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>⚠️ Common Issues</h6>
+                            <ul class="text-muted">
+                                <li>Partial payments not recorded</li>
+                                <li>Multiple invoices paid with one transaction</li>
+                                <li>Incorrect transaction references</li>
+                                <li>Bank fees reducing payment amount</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>✅ Best Practices</h6>
+                            <ul class="text-muted">
+                                <li>Reconcile payments daily</li>
+                                <li>Keep bank statements organized</li>
+                                <li>Verify client information</li>
+                                <li>Document reconciliation decisions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

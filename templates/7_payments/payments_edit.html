@@ -1,0 +1,206 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Edit Payment - Invoicing App{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/payments.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <div class="row">
+            <div class="col-md-8">
+                <h1 class="page-title">✏️ Edit Payment</h1>
+                <p class="text-muted">Edit payment #{{ payment.id }} - {{ payment.invoice.invoice_number }}</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{% url 'payments:detail' payment.id %}" class="btn btn-outline-secondary">← Back to Payment</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        <!-- Payment Form -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">📝 Payment Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Amount -->
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">Payment Amount <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">{{ payment.currency }}</span>
+                                <input type="number" name="amount" id="amount" class="form-control" 
+                                    value="{{ payment.amount }}" step="0.01" min="0" required>
+                            </div>
+                            <small class="form-text text-muted">Amount received from the client</small>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="mb-3">
+                            <label for="payment_method" class="form-label">Payment Method <span class="text-danger">*</span></label>
+                            <select name="payment_method" id="payment_method" class="form-control" required>
+                                <option value="">-- Select Payment Method --</option>
+                                {% for method in payment_methods %}
+                                    <option value="{{ method.id }}" {% if payment.payment_method.id == method.id %}selected{% endif %}>
+                                        {{ method.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">Choose how the payment was made</small>
+                        </div>
+
+                        <!-- Payment Date -->
+                        <div class="mb-3">
+                            <label for="payment_date" class="form-label">Payment Date <span class="text-danger">*</span></label>
+                            <input type="date" name="payment_date" id="payment_date" class="form-control" 
+                                value="{{ payment.payment_date|date:'Y-m-d' }}" required>
+                            <small class="form-text text-muted">When payment was received</small>
+                        </div>
+
+                        <!-- Transaction Reference -->
+                        <div class="mb-3">
+                            <label for="reference" class="form-label">Transaction Reference</label>
+                            <input type="text" name="reference" id="reference" class="form-control" 
+                                value="{{ payment.transaction_reference }}" 
+                                placeholder="e.g., Cheque #123, M-Pesa code, Bank ref">
+                            <small class="form-text text-muted">Transaction ID, check number, M-Pesa code, bank reference, etc.</small>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea name="notes" id="notes" class="form-control" rows="3" 
+                                placeholder="Any additional notes about this payment">{{ payment.notes }}</textarea>
+                            <small class="form-text text-muted">Optional: Any remarks or notes</small>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                💾 Update Payment
+                            </button>
+                            <a href="{% url 'payments:detail' payment.id %}" class="btn btn-outline-secondary btn-lg">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Important Notice -->
+            <div class="card mt-4">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0">⚠️ Important Notice</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        <strong>Note:</strong> Editing payment information may affect invoice balances and financial reports. 
+                        Please ensure all changes are accurate and properly documented.
+                    </p>
+                    <ul class="text-muted">
+                        <li>Changes to payment amount will update the invoice balance</li>
+                        <li>Payment method changes may affect reconciliation</li>
+                        <li>Transaction reference changes may affect bank reconciliation</li>
+                        <li>All changes are logged in the audit trail</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Summary -->
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">📊 Payment Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="p-2 border rounded">
+                                <small class="text-muted">Current Amount</small>
+                                <div class="h5 mb-0 text-success">{{ payment.currency }} {{ payment.amount|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-2 border rounded">
+                                <small class="text-muted">Invoice Total</small>
+                                <div class="h5 mb-0">{{ payment.invoice.currency }} {{ payment.invoice.total|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="text-center">
+                        <small class="text-muted">Remaining Balance</small>
+                        <div class="h5 text-danger">{{ payment.invoice.currency }} {{ payment.invoice.amount_due|floatformat:2 }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Related Information -->
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">📄 Related Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Invoice</label>
+                        <p class="form-control-plaintext">
+                            <a href="{% url 'invoices:detail' payment.invoice.id %}" class="text-decoration-none">
+                                {{ payment.invoice.invoice_number }}
+                            </a>
+                        </p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Client</label>
+                        <p class="form-control-plaintext">
+                            <a href="{% url 'clients:detail' payment.invoice.client.id %}" class="text-decoration-none">
+                                {{ payment.invoice.client.name }}
+                            </a>
+                        </p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Recorded By</label>
+                        <p class="form-control-plaintext">{{ payment.recorded_by.get_full_name|default:payment.recorded_by.username }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Recorded At</label>
+                        <p class="form-control-plaintext">{{ payment.created_at|date:"F j, Y H:i" }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Status</label>
+                        {% if payment.status == 'confirmed' %}
+                            <span class="badge bg-success">{{ payment.get_status_display }}</span>
+                        {% elif payment.status == 'failed' %}
+                            <span class="badge bg-danger">{{ payment.get_status_display }}</span>
+                        {% elif payment.status == 'reversed' %}
+                            <span class="badge bg-warning">{{ payment.get_status_display }}</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ payment.get_status_display }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

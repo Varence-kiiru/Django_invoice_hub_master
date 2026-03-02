@@ -1,0 +1,259 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}{% if pk %}Edit User{% else %}Create User{% endif %} - Administration{% endblock %}
+
+{% block page_title %}{% if pk %}Edit User{% else %}Create New User{% endif %}{% endblock %}
+{% block page_description %}Manage user account details and permissions{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/users_create_edit.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <div class="form-card">
+    <div class="form-header">
+      <h2>{% if pk %}Edit User #{{ pk }}{% else %}Create New User{% endif %}</h2>
+      <p class="form-description">{% if pk %}Update user account details and permissions{% else %}Add a new user to the system{% endif %}</p>
+    </div>
+
+    <form method="POST" class="user-form">
+      {% csrf_token %}
+      
+      <div class="form-grid">
+        <!-- Basic Information Section -->
+        <div class="form-section">
+          <h3>Basic Information</h3>
+          
+          <div class="form-group">
+            <label for="first-name">First Name: <span class="required">*</span></label>
+            <input type="text" id="first-name" name="first_name" class="form-control" placeholder="John" value="{% if pk %}{{ user.first_name }}{% endif %}" required>
+          </div>
+
+          <div class="form-group">
+            <label for="last-name">Last Name: <span class="required">*</span></label>
+            <input type="text" id="last-name" name="last_name" class="form-control" placeholder="Doe" value="{% if pk %}{{ user.last_name }}{% endif %}" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address: <span class="required">*</span></label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="john.doe@example.com" value="{% if pk %}{{ user.email }}{% endif %}" required>
+          </div>
+
+          <div class="form-group">
+            <label for="username">Username: <span class="required">*</span></label>
+            <input type="text" id="username" name="username" class="form-control" placeholder="johndoe" value="{% if pk %}{{ user.username }}{% endif %}" required>
+            <small class="form-hint">Username for login - must be unique</small>
+          </div>
+        </div>
+
+        <!-- Account Settings Section -->
+        <div class="form-section">
+          <h3>Account Settings</h3>
+
+          <div class="form-group">
+            <label for="role">Role: <span class="required">*</span></label>
+            <select id="role" name="role" class="form-control" required>
+              <option value="">-- Select Role --</option>
+              {% for role in available_roles %}
+              <option value="{{ role.id }}" {% if pk and user.invoicing_profile and user.invoicing_profile.role.id == role.id %}selected{% endif %}>
+                {{ role.get_icon }} {{ role.name|title }}
+              </option>
+              {% endfor %}
+            </select>
+            <small class="form-hint">Role determines user permissions and access level</small>
+          </div>
+
+          <div class="form-group">
+            <label for="status">Status: <span class="required">*</span></label>
+            <select id="status" name="status" class="form-control" required>
+              <option value="active" {% if pk and user.is_active or not pk %}selected{% endif %}>◉ Active</option>
+              <option value="inactive" {% if pk and not user.is_active %}selected{% endif %}>◌ Inactive</option>
+            </select>
+          </div>
+
+          <!-- Password Section (only for new users) -->
+          {% if not pk %}
+          <div class="password-section">
+            <h4>Set Password</h4>
+            <div class="form-group">
+              <label for="password">Password: <span class="required">*</span></label>
+              <div class="password-input-wrapper">
+                <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+                <button type="button" class="password-toggle" id="password-toggle" aria-label="Show/hide password" title="Show/hide password">
+                  <span class="toggle-icon">👁️</span>
+                </button>
+              </div>
+              <small class="form-hint">Minimum 8 characters recommended</small>
+            </div>
+
+            <div class="form-group">
+              <label for="confirm-password">Confirm Password: <span class="required">*</span></label>
+              <div class="password-input-wrapper">
+                <input type="password" id="confirm-password" name="confirm_password" class="form-control" placeholder="••••••••" required>
+                <button type="button" class="password-toggle" id="confirm-password-toggle" aria-label="Show/hide password" title="Show/hide password">
+                  <span class="toggle-icon">👁️</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <div class="password-section">
+            <h4>Change Password</h4>
+            <div class="form-group">
+              <label for="new-password">New Password (optional):</label>
+              <div class="password-input-wrapper">
+                <input type="password" id="new-password" name="new_password" class="form-control" placeholder="Leave blank to keep current password">
+                <button type="button" class="password-toggle" id="new-password-toggle" aria-label="Show/hide password" title="Show/hide password">
+                  <span class="toggle-icon">👁️</span>
+                </button>
+              </div>
+              <small class="form-hint">Leave blank to keep the current password</small>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Additional Information Section -->
+        <div class="form-section">
+          <h3>Additional Information</h3>
+
+          <div class="form-group">
+            <label for="department">Department:</label>
+            <input type="text" id="department" name="department" class="form-control" placeholder="Sales, Finance, etc." value="{% if pk and user.userprofile %}{{ user.userprofile.department }}{% endif %}">
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone Number:</label>
+            <input type="tel" id="phone" name="phone" class="form-control" placeholder="+1 (555) 000-0000" value="{% if pk and user.userprofile %}{{ user.userprofile.phone }}{% endif %}">
+          </div>
+
+          <div class="form-group">
+            <label>
+              <input type="checkbox" name="send_welcome_email" {% if not pk %}checked{% endif %}>
+              Send welcome email to user
+            </label>
+          </div>
+        </div>
+
+        <!-- Permissions Section -->
+        <div class="form-section permissions-section">
+          <h3>Assign Permissions</h3>
+          <p class="form-hint">Select which features this user can access</p>
+          
+          <div class="permissions-grid">
+            <div class="permission-item">
+              <input type="checkbox" id="perm-invoices" name="perm_invoices" checked>
+              <label for="perm-invoices">
+                <strong>📄 Manage Invoices</strong><br>
+                <small>Create, view, and edit invoices</small>
+              </label>
+            </div>
+            <div class="permission-item">
+              <input type="checkbox" id="perm-clients" name="perm_clients" checked>
+              <label for="perm-clients">
+                <strong>👥 Manage Clients</strong><br>
+                <small>Create and edit client information</small>
+              </label>
+            </div>
+            <div class="permission-item">
+              <input type="checkbox" id="perm-products" name="perm_products">
+              <label for="perm-products">
+                <strong>📦 Manage Products</strong><br>
+                <small>Create and edit products/services</small>
+              </label>
+            </div>
+            <div class="permission-item">
+              <input type="checkbox" id="perm-reports" name="perm_reports" checked>
+              <label for="perm-reports">
+                <strong>📊 View Reports</strong><br>
+                <small>Access system reports and analytics</small>
+              </label>
+            </div>
+            <div class="permission-item">
+              <input type="checkbox" id="perm-payments" name="perm_payments" checked>
+              <label for="perm-payments">
+                <strong>💳 Manage Payments</strong><br>
+                <small>Record and track payments</small>
+              </label>
+            </div>
+            <div class="permission-item">
+              <input type="checkbox" id="perm-settings" name="perm_settings">
+              <label for="perm-settings">
+                <strong>⚙️ Modify Settings</strong><br>
+                <small>Access system configuration</small>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-lg">
+          {% if pk %}💾 Save Changes{% else %}✓ Create User{% endif %}
+        </button>
+        <a href="{% url 'core:users-management' %}" class="btn btn-secondary btn-lg">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Password visibility toggle
+  function setupPasswordToggle(toggleButtonId, inputId) {
+    const toggleBtn = document.getElementById(toggleButtonId);
+    const inputField = document.getElementById(inputId);
+    
+    if (toggleBtn && inputField) {
+      toggleBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const isPassword = inputField.type === 'password';
+        inputField.type = isPassword ? 'text' : 'password';
+        toggleBtn.classList.toggle('visible');
+        toggleBtn.setAttribute('aria-pressed', !isPassword);
+      });
+    }
+  }
+
+  // Setup all password toggles
+  setupPasswordToggle('password-toggle', 'password');
+  setupPasswordToggle('confirm-password-toggle', 'confirm-password');
+  setupPasswordToggle('new-password-toggle', 'new-password');
+
+  // Form validation
+  document.querySelector('.user-form').addEventListener('submit', function(e) {
+    const password = document.getElementById('password')?.value;
+    const confirmPassword = document.getElementById('confirm-password')?.value;
+    const newPassword = document.getElementById('new-password')?.value;
+    
+    // Check password match for new users
+    if (password && password !== confirmPassword) {
+      e.preventDefault();
+      alert('Passwords do not match!');
+      return false;
+    }
+
+    // Check password length for new users
+    if (password && password.length < 8) {
+      e.preventDefault();
+      alert('Password must be at least 8 characters long!');
+      return false;
+    }
+
+    // Check password length for existing users (if changing password)
+    if (newPassword && newPassword.length < 8) {
+      e.preventDefault();
+      alert('New password must be at least 8 characters long!');
+      return false;
+    }
+
+    // Show confirmation message
+    alert('User {% if pk %}updated{% else %}created{% endif %} successfully!');
+  });
+
+  // Auto-focus on first name field
+  document.getElementById('first-name').focus();
+</script>
+{% endblock %}

@@ -1,0 +1,338 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Analytics Dashboard - Invoice System v3.0.0{% endblock %}
+
+{% block content %}
+<div class="container-fluid pt-4 pb-4">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <h1 class="h3 text-dark font-weight-bold">
+        <i class="fas fa-chart-bar"></i> Analytics Dashboard
+      </h1>
+      <p class="text-muted">Real-time business metrics and insights</p>
+    </div>
+    <div class="col-md-6 text-right">
+      <!-- Date Range Selector -->
+      <div class="btn-group" role="group">
+        <button type="button" class="btn btn-outline-primary active" data-period="30">30 Days</button>
+        <button type="button" class="btn btn-outline-primary" data-period="90">90 Days</button>
+        <button type="button" class="btn btn-outline-primary" data-period="365">1 Year</button>
+      </div>
+      <button type="button" class="btn btn-primary ml-2" id="refreshBtn">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div id="loadingSpinner" class="text-center" style="display: none;">
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <p class="mt-2 text-muted">Loading analytics...</p>
+  </div>
+
+  <!-- Error Alert -->
+  <div id="errorAlert" class="alert alert-danger alert-dismissible fade show" style="display: none;">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <strong>Error Loading Analytics:</strong> <span id="errorMessage"></span>
+  </div>
+
+  <!-- Financial Summary Cards -->
+  <div class="row mb-4" id="financialCards">
+    <!-- Card 1: Total Revenue -->
+    <div class="col-md-3 mb-3">
+      <div class="card shadow-sm h-100 border-left-primary">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="text-primary font-weight-bold text-uppercase small mb-1">
+                Total Revenue
+              </div>
+              <div class="h4 mb-0" id="totalRevenue">$0.00</div>
+              <small class="text-muted" id="revenueChange">↑ 0% vs last period</small>
+            </div>
+            <div class="text-primary text-opacity-20" style="font-size: 2em;">
+              <i class="fas fa-dollar-sign"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Outstanding Receivables -->
+    <div class="col-md-3 mb-3">
+      <div class="card shadow-sm h-100 border-left-warning">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="text-warning font-weight-bold text-uppercase small mb-1">
+                Outstanding A/R
+              </div>
+              <div class="h4 mb-0" id="outstandingAR">$0.00</div>
+              <small class="text-muted" id="arPercentage">0% of revenue</small>
+            </div>
+            <div class="text-warning text-opacity-20" style="font-size: 2em;">
+              <i class="fas fa-hourglass-half"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Average Transaction -->
+    <div class="col-md-3 mb-3">
+      <div class="card shadow-sm h-100 border-left-success">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="text-success font-weight-bold text-uppercase small mb-1">
+                Avg Transaction
+              </div>
+              <div class="h4 mb-0" id="avgTransaction">$0.00</div>
+              <small class="text-muted" id="transactionCount">0 invoices</small>
+            </div>
+            <div class="text-success text-opacity-20" style="font-size: 2em;">
+              <i class="fas fa-calculator"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4: Conversion Rate -->
+    <div class="col-md-3 mb-3">
+      <div class="card shadow-sm h-100 border-left-info">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="text-info font-weight-bold text-uppercase small mb-1">
+                Payment Rate
+              </div>
+              <div class="h4 mb-0" id="paymentRate">0%</div>
+              <small class="text-muted" id="paymentStats">0 / 0 paid</small>
+            </div>
+            <div class="text-info text-opacity-20" style="font-size: 2em;">
+              <i class="fas fa-check-circle"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="row mb-4">
+    <!-- Timeline Chart: Invoices -->
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white border-bottom">
+          <h5 class="mb-0">
+            <i class="fas fa-file-invoice-dollar"></i> Invoice Timeline
+          </h5>
+          <small class="text-muted">Invoices created over time</small>
+        </div>
+        <div class="card-body">
+          <canvas id="invoiceTimelineChart" height="80"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline Chart: Payments -->
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white border-bottom">
+          <h5 class="mb-0">
+            <i class="fas fa-credit-card"></i> Payment Timeline
+          </h5>
+          <small class="text-muted">Payments received over time</small>
+        </div>
+        <div class="card-body">
+          <canvas id="paymentTimelineChart" height="80"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Aging Report Widget -->
+  <div class="row mb-4">
+    <div class="col-lg-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white border-bottom">
+          <h5 class="mb-0">
+            <i class="fas fa-history"></i> Aging Report
+          </h5>
+          <small class="text-muted">Accounts receivable breakdown by days overdue</small>
+        </div>
+        <div class="card-body">
+          <div id="agingReportContainer">
+            <div class="row">
+              <!-- Current (0-30 days) -->
+              <div class="col-md-6 mb-3">
+                <div class="aging-group">
+                  <div class="aging-label">
+                    <strong>Current (0-30)</strong>
+                    <span class="badge badge-success float-right" id="current-count">0</span>
+                  </div>
+                  <div class="aging-bar">
+                    <div class="aging-fill aging-fill-success" id="current-bar" style="width: 0%"></div>
+                  </div>
+                  <div class="aging-amount" id="current-amount">$0.00</div>
+                </div>
+              </div>
+
+              <!-- 31-60 days -->
+              <div class="col-md-6 mb-3">
+                <div class="aging-group">
+                  <div class="aging-label">
+                    <strong>31-60 Days</strong>
+                    <span class="badge badge-info float-right" id="30-60-count">0</span>
+                  </div>
+                  <div class="aging-bar">
+                    <div class="aging-fill aging-fill-info" id="30-60-bar" style="width: 0%"></div>
+                  </div>
+                  <div class="aging-amount" id="30-60-amount">$0.00</div>
+                </div>
+              </div>
+
+              <!-- 61-90 days -->
+              <div class="col-md-6 mb-3">
+                <div class="aging-group">
+                  <div class="aging-label">
+                    <strong>61-90 Days</strong>
+                    <span class="badge badge-warning float-right" id="60-90-count">0</span>
+                  </div>
+                  <div class="aging-bar">
+                    <div class="aging-fill aging-fill-warning" id="60-90-bar" style="width: 0%"></div>
+                  </div>
+                  <div class="aging-amount" id="60-90-amount">$0.00</div>
+                </div>
+              </div>
+
+              <!-- 90+ days -->
+              <div class="col-md-6 mb-3">
+                <div class="aging-group">
+                  <div class="aging-label">
+                    <strong>90+ Days</strong>
+                    <span class="badge badge-danger float-right" id="90plus-count">0</span>
+                  </div>
+                  <div class="aging-bar">
+                    <div class="aging-fill aging-fill-danger" id="90plus-bar" style="width: 0%"></div>
+                  </div>
+                  <div class="aging-amount" id="90plus-amount">$0.00</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total AR -->
+            <hr>
+            <div class="row">
+              <div class="col-md-6">
+                <small class="text-muted">Total A/R</small>
+              </div>
+              <div class="col-md-6 text-right">
+                <strong id="total-ar">$0.00</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Method Breakdown -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white border-bottom">
+          <h5 class="mb-0">
+            <i class="fas fa-credit-card"></i> Payment Methods
+          </h5>
+          <small class="text-muted">Distribution of payments by method</small>
+        </div>
+        <div class="card-body">
+          <canvas id="paymentMethodChart" height="80"></canvas>
+          <hr>
+          <div id="paymentMethodLegend" class="small">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Clients Widget -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white border-bottom">
+          <h5 class="mb-0">
+            <i class="fas fa-users"></i> Top Clients
+          </h5>
+          <small class="text-muted">Clients by total invoice amount</small>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 40px;">#</th>
+                  <th>Client Name</th>
+                  <th class="text-right">Total Revenue</th>
+                  <th class="text-right">Invoice Count</th>
+                  <th class="text-right">Avg Invoice</th>
+                  <th class="text-center">Payment Rate</th>
+                  <th class="text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody id="topClientsTable">
+                <tr>
+                  <td colspan="7" class="text-center text-muted py-4">
+                    <i class="fas fa-inbox"></i> Loading top clients...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Required Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+<!-- Dashboard Analytics Module -->
+<script src="{% static 'js/modules/dashboard_analytics.js' %}"></script>
+
+<!-- Dashboard Styles -->
+<link rel="stylesheet" href="{% static 'css/dashboard_analytics.css' %}">
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize dashboard
+    const dashboard = new DashboardAnalytics({
+      period: 30,
+      autoRefresh: true,
+      refreshInterval: 5 * 60 * 1000 // 5 minutes
+    });
+
+    // Period selector buttons
+    document.querySelectorAll('.btn-group .btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.btn-group .btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        const period = parseInt(this.dataset.period);
+        dashboard.setPeriod(period);
+        dashboard.refresh();
+      });
+    });
+
+    // Refresh button
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+      dashboard.refresh();
+    });
+  });
+</script>
+{% endblock %}

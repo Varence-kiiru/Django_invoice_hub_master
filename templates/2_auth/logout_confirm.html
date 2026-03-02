@@ -1,0 +1,50 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Confirm Logout - Invoicing App{% endblock %}
+
+{% block page_title %}Confirm Logout{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+{% block content %}
+<div class="modal-overlay">
+  <div class="modal-card">
+    <!-- Icon -->
+    <div class="modal-icon">
+      👋
+    </div>
+
+    <!-- Title -->
+    <h1 class="modal-title">Confirm Logout</h1>
+
+    <!-- Message -->
+    <p class="modal-text">
+      Are you sure you want to logout? You will need to sign in again to access your account.
+    </p>
+
+    <!-- Messages -->
+    {% include '1_base/flash_messages.html' %}
+
+    <!-- Actions -->
+    <form method="post" style="margin-bottom: 0;">
+      {% csrf_token %}
+      
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-danger">
+          Yes, Logout
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="window.history.back();">
+          Keep Me Signed In
+        </button>
+      </div>
+    </form>
+
+    <!-- Info Banner -->
+    <div class="info-banner">
+      ✓ Your data is safe and secure. Your session will be automatically cleared.
+    </div>
+  </div>
+</div>
+{% endblock %}

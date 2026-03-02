@@ -1,0 +1,36 @@
+<!-- Role Members Modal -->
+<div id="members-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Members of <span id="roleName"></span> Role</h2>
+      <button class="modal-close" onclick="closeMembersModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="members-controls">
+        <input type="text" id="memberSearch" placeholder="Search members..." class="form-control" onkeyup="filterMembers()">
+      </div>
+      <div class="members-list">
+        <table class="members-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Last Login</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="membersTableBody">
+            <!-- Members will be inserted here -->
+          </tbody>
+        </table>
+        <div id="noMembers" class="empty-state">
+          <p>No members found in this role.</p>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeMembersModal()">Close</button>
+    </div>
+  </div>
+</div>

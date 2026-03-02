@@ -1,0 +1,347 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Edit Line Item - Quotation {{ quote.quote_number }}{% endblock %}
+
+{% block page_title %}Edit Line Item{% endblock %}
+{% block page_description %}Update product/service details{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/quotations.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <!-- Alerts -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="invoice-form-section">
+    <div class="form-header">
+      <h2>Edit Line Item</h2>
+      <p class="section-subtitle">Update product/service in {{ quote.quote_number }}</p>
+    </div>
+
+    <form method="post" id="edit-line-item-form" class="invoice-form">
+      {% csrf_token %}
+
+      <div class="form-section">
+        <h3 class="section-title">Item Details</h3>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="product">Product/Service</label>
+            <select name="product" id="product" class="form-control" onchange="updateProductInfo()">
+              <option value="">-- Select Product --</option>
+              {% for product in products %}
+                <option value="{{ product.id }}" 
+                        data-description="{{ product.description|default:product.name|escapejs }}" 
+                        data-price="{{ product.unit_price }}"
+                        data-tax-rate-type="{% if product.tax_class %}{{ product.tax_class.rate_type }}{% endif %}"
+                        {% if line_item.product.id == product.id %}selected{% endif %}>
+                  {{ product.name }} - {{ product.sku }}
+                </option>
+              {% endfor %}
+            </select>
+            <small class="form-text">Optional: Select from existing products</small>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description <span class="required">*</span></label>
+            <input type="text" name="description" id="description" required class="form-control" value="{{ line_item.description }}">
+            <small class="form-text">Item description</small>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="quantity">Quantity <span class="required">*</span></label>
+            <input type="number" name="quantity" id="quantity" required class="form-control" value="{{ line_item.quantity }}" min="0.01" step="0.01">
+            <small class="form-text">How many units?</small>
+          </div>
+
+          <div class="form-group">
+            <label for="unit_price">Unit Price <span class="required">*</span></label>
+            <input type="number" name="unit_price" id="unit_price" required class="form-control" value="{{ line_item.unit_price }}" min="0" step="0.01">
+            <small class="form-text">Price per unit</small>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="tax_rate_display">Tax Rate (%)</label>
+            <input type="number" name="tax_rate_display" id="tax_rate_display" class="form-control" disabled placeholder="0.00" step="0.01" value="{{ current_tax_rate_percentage }}">
+            <!-- Hidden field for actual tax_rate_id to submit -->
+            <input type="hidden" name="tax_rate" id="tax_rate" value="{{ current_tax_rate_id }}">
+            <small class="form-text">Auto-populated from product's tax class</small>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="total-amount">
+            <strong>Total: <span id="line-total">0.00</span></strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a href="{% url 'quotations:detail' quote.id %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">
+          💾 Update Item
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Tax class rate map for auto-population - MUST be before JavaScript that uses it -->
+<script type="application/json" id="tax-class-rate-map">
+{{ tax_class_rate_map|safe }}
+</script>
+
+<script>
+// ============================================================================
+// TAX RATE AUTOPOPULATION - COMPLETELY REWRITTEN FOR RELIABILITY
+// ============================================================================
+
+// Global tax rate map (loaded from template data)
+let TAX_CLASS_RATE_MAP = {};
+
+/**
+ * Initialize the tax rate system when DOM is ready
+ */
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('[QUOTATION-EDIT] ========== TAX AUTOPOPULATION INIT ==========');
+  
+  // Step 1: Load and parse tax class rate map
+  try {
+    const mapElement = document.getElementById('tax-class-rate-map');
+    if (!mapElement) {
+      console.error('[QUOTATION-EDIT] ERROR: tax-class-rate-map element not found!');
+      return;
+    }
+    
+    const mapText = mapElement.textContent.trim();
+    console.log('[QUOTATION-EDIT] Raw map text:', mapText);
+    
+    if (!mapText || mapText === '{}') {
+      console.warn('[QUOTATION-EDIT] WARNING: tax-class-rate-map is empty!');
+      TAX_CLASS_RATE_MAP = {};
+    } else {
+      TAX_CLASS_RATE_MAP = JSON.parse(mapText);
+      console.log('[QUOTATION-EDIT] Successfully loaded tax map:', TAX_CLASS_RATE_MAP);
+    }
+  } catch (e) {
+    console.error('[QUOTATION-EDIT] ERROR parsing tax-class-rate-map:', e);
+    TAX_CLASS_RATE_MAP = {};
+  }
+  
+  // Step 2: Attach event listeners
+  console.log('[QUOTATION-EDIT] Attaching event listeners...');
+  
+  const productSelect = document.getElementById('product');
+  const quantityInput = document.getElementById('quantity');
+  const unitPriceInput = document.getElementById('unit_price');
+  
+  if (productSelect) {
+    productSelect.addEventListener('change', function() {
+      console.log('[QUOTATION-EDIT] Product selection changed');
+      updateProductInfo();
+    });
+    console.log('[QUOTATION-EDIT] - Product select listener attached');
+  }
+  
+  if (quantityInput) {
+    quantityInput.addEventListener('input', function() {
+      calculateLineTotal();
+    });
+    console.log('[QUOTATION-EDIT] - Quantity listener attached');
+  }
+  
+  if (unitPriceInput) {
+    unitPriceInput.addEventListener('input', function() {
+      calculateLineTotal();
+    });
+    console.log('[QUOTATION-EDIT] - Unit price listener attached');
+  }
+  
+  // Step 3: Initial calculation
+  calculateLineTotal();
+  console.log('[QUOTATION-EDIT] ========== TAX AUTOPOPULATION READY ==========\n');
+});
+
+/**
+ * Update product information when product is selected
+ * Populates: description, unit price, tax rate
+ */
+function updateProductInfo() {
+  console.log('[updateProductInfo] START');
+  
+  const productSelect = document.getElementById('product');
+  if (!productSelect) {
+    console.error('[updateProductInfo] ERROR: product select element not found');
+    return;
+  }
+  
+  const selectedOption = productSelect.options[productSelect.selectedIndex];
+  console.log('[updateProductInfo] Selected option value:', selectedOption.value);
+  
+  // Get all the data from the option element
+  const productId = selectedOption.value;
+  const description = selectedOption.getAttribute('data-description') || '';
+  const price = selectedOption.getAttribute('data-price') || '0';
+  const taxRateType = selectedOption.getAttribute('data-tax-rate-type') || '';
+  
+  console.log('[updateProductInfo] Extracted data:', {
+    productId: productId,
+    description: description,
+    price: price,
+    taxRateType: taxRateType
+  });
+  
+  // Handle empty selection
+  if (!productId) {
+    console.log('[updateProductInfo] No product selected - clearing fields');
+    clearProductFields();
+    return;
+  }
+  
+  // Set description field
+  const descriptionInput = document.getElementById('description');
+  if (descriptionInput && description) {
+    descriptionInput.value = description;
+    console.log('[updateProductInfo] Description set to:', description);
+  }
+  
+  // Set price field
+  const priceInput = document.getElementById('unit_price');
+  if (priceInput && price) {
+    const priceValue = parseFloat(price).toFixed(2);
+    priceInput.value = priceValue;
+    console.log('[updateProductInfo] Unit price set to:', priceValue);
+  }
+  
+  // Set tax rate field
+  if (taxRateType) {
+    console.log('[updateProductInfo] Tax rate type from product:', taxRateType);
+    console.log('[updateProductInfo] Looking up in tax map...');
+    console.log('[updateProductInfo] Current tax map:', TAX_CLASS_RATE_MAP);
+    
+    if (TAX_CLASS_RATE_MAP && TAX_CLASS_RATE_MAP[taxRateType]) {
+      const rateInfo = TAX_CLASS_RATE_MAP[taxRateType];
+      console.log('[updateProductInfo] FOUND tax rate:', rateInfo);
+      
+      // Set hidden field with rate ID
+      const hiddenRateField = document.getElementById('tax_rate');
+      if (hiddenRateField) {
+        hiddenRateField.value = rateInfo.rate_id;
+        console.log('[updateProductInfo] Hidden tax_rate field set to:', rateInfo.rate_id);
+      }
+      
+      // Set display field with percentage
+      const displayRateField = document.getElementById('tax_rate_display');
+      if (displayRateField) {
+        const percentageValue = parseFloat(rateInfo.percentage).toFixed(2);
+        displayRateField.value = percentageValue;
+        console.log('[updateProductInfo] Tax rate display set to:', percentageValue + '%');
+      }
+    } else {
+      console.warn('[updateProductInfo] WARNING: Tax rate NOT found for type:', taxRateType);
+      console.warn('[updateProductInfo] Available types in map:', Object.keys(TAX_CLASS_RATE_MAP));
+      clearTaxRateField();
+    }
+  } else {
+    console.log('[updateProductInfo] No tax rate type on product - clearing tax field');
+    clearTaxRateField();
+  }
+  
+  // Recalculate total
+  calculateLineTotal();
+  console.log('[updateProductInfo] END\n');
+}
+
+/**
+ * Clear all product fields to defaults
+ */
+function clearProductFields() {
+  document.getElementById('description').value = '';
+  document.getElementById('unit_price').value = '';
+  clearTaxRateField();
+  calculateLineTotal();
+}
+
+/**
+ * Clear tax rate fields
+ */
+function clearTaxRateField() {
+  const displayRateField = document.getElementById('tax_rate_display');
+  const hiddenRateField = document.getElementById('tax_rate');
+  
+  if (displayRateField) {
+    displayRateField.value = '';
+  }
+  if (hiddenRateField) {
+    hiddenRateField.value = '';
+  }
+}
+
+/**
+ * Calculate and display the line total
+ * Formula: (Quantity × Unit Price) × (1 + Tax Rate %)
+ */
+function calculateLineTotal() {
+  console.log('[calculateLineTotal] START');
+  
+  try {
+    // Get form values
+    const quantityInput = document.getElementById('quantity');
+    const unitPriceInput = document.getElementById('unit_price');
+    const taxRateInput = document.getElementById('tax_rate_display');
+    const lineTotalDisplay = document.getElementById('line-total');
+    
+    const quantity = parseFloat(quantityInput?.value) || 0;
+    const unitPrice = parseFloat(unitPriceInput?.value) || 0;
+    const taxPercentage = parseFloat(taxRateInput?.value) || 0;
+    
+    console.log('[calculateLineTotal] Values:', {
+      quantity: quantity,
+      unitPrice: unitPrice,
+      taxPercentage: taxPercentage + '%'
+    });
+    
+    // Calculate totals
+    const subtotal = quantity * unitPrice;
+    const taxAmount = subtotal * (taxPercentage / 100);
+    const total = subtotal + taxAmount;
+    
+    // Display result
+    if (lineTotalDisplay) {
+      lineTotalDisplay.textContent = total.toFixed(2);
+      console.log('[calculateLineTotal] Total calculated:', {
+        subtotal: subtotal.toFixed(2),
+        tax: taxAmount.toFixed(2),
+        total: total.toFixed(2)
+      });
+    }
+  } catch (e) {
+    console.error('[calculateLineTotal] ERROR:', e);
+  }
+  
+  console.log('[calculateLineTotal] END\n');
+}
+
+// Log when script is loaded
+console.log('[QUOTATION-EDIT] Tax autopopulation script loaded');
+</script>
+{% endblock %}

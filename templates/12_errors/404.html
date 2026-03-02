@@ -1,0 +1,37 @@
+<!-- 404 Not Found Error Page -->
+{% extends "layouts/base.html" %}
+
+{% block title %}Page Not Found (404){% endblock %}
+
+{% block content %}
+<div class="error-container error-404">
+  <div class="error-content">
+    <div class="error-code" aria-hidden="true">404</div>
+    
+    <h1 class="error-title">Page Not Found</h1>
+    
+    <p class="error-message">
+      The page you're looking for doesn't exist or has been moved. Let's get you back on track.
+    </p>
+
+    <div class="error-actions">
+      <a href="{% url 'core:dashboard' %}" class="btn btn-primary btn-lg">
+        <span aria-hidden="true">🏠</span> Go to Dashboard
+      </a>
+      <a href="{% url 'clients:list' %}" class="btn btn-outline-primary btn-lg">
+        <span aria-hidden="true">👥</span> View Clients
+      </a>
+    </div>
+
+    <div class="error-suggestions">
+      <h3>What you can do:</h3>
+      <ul>
+        <li><a href="{% url 'invoices:list' %}">View Your Invoices</a></li>
+        <li><a href="{% url 'payments:list' %}">Check Payments</a></li>
+        <li><a href="{% url 'products:list' %}">Browse Products</a></li>
+        <li><a href="/api/schema/">API Documentation</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

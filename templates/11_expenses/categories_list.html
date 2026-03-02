@@ -1,0 +1,267 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Expense Categories - Invoicing App{% endblock %}
+
+{% block page_title %}Expense Categories{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header with Create Button -->
+    <div class="categories-header">
+        <h2>Expense Categories</h2>
+        <a href="{% url 'expenses:categories-create' %}" class="btn btn-primary btn-create">
+            <span aria-hidden="true">➕</span> Create Category
+        </a>
+    </div>
+
+    <!-- Categories Grid -->
+    <div class="categories-grid">
+        {% for category in categories %}
+        <div class="category-card">
+            <div class="category-header">
+                <h3 class="category-name">{{ category.name }}</h3>
+                <span class="badge {% if category.is_active %}badge-success{% else %}badge-secondary{% endif %}">
+                    {% if category.is_active %}Active{% else %}Inactive{% endif %}
+                </span>
+            </div>
+
+            <div class="category-description">
+                {{ category.description|truncatewords:20 }}
+            </div>
+
+            <div class="category-stats">
+                <div class="stat">
+                    <div class="stat-value">{{ category.expense_count|default:0 }}</div>
+                    <div class="stat-label">Expenses</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">{{ category.total_spent|default:0|floatformat:2 }}</div>
+                    <div class="stat-label">Total Spent</div>
+                </div>
+            </div>
+
+            <div class="category-actions">
+                <a href="{% url 'expenses:list' %}?category={{ category.id }}" class="btn btn-small btn-primary">
+                    View Expenses
+                </a>
+                <a href="{% url 'expenses:categories-edit' category.id %}" class="btn btn-small btn-warning">
+                    ✏️ Edit
+                </a>
+                <a href="{% url 'expenses:categories-delete' category.id %}" class="btn btn-small btn-danger">
+                    🗑️ Delete
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-message">
+            <p>No expense categories found.</p>
+            <p class="help-text">Categories help organize and track your expenses.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.categories-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+}
+
+.categories-header h2 {
+    margin: 0;
+    font-size: 1.75rem;
+    color: #333;
+    flex: 1;
+}
+
+.btn-create {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    background-color: #667eea;
+    color: white;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.btn-create:hover {
+    background-color: #5568d3;
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    padding: 1rem 0;
+}
+
+.category-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.category-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.category-header {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.category-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    flex: 1;
+}
+
+.badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.badge-success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.badge-secondary {
+    background-color: #eeeeee;
+    color: #424242;
+}
+
+.category-description {
+    padding: 1rem 1.5rem;
+    color: #666;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #e0e0e0;
+    flex: 1;
+    min-height: 50px;
+}
+
+.category-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: #f9f9f9;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: bold;
+    color: #667eea;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: #999;
+    font-weight: 500;
+}
+
+.category-actions {
+    padding: 1rem 1.5rem;
+    text-align: center;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-primary {
+    background-color: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #5568d3;
+}
+
+.btn-warning {
+    background-color: #ff9800;
+    color: white;
+}
+
+.btn-warning:hover {
+    background-color: #e68900;
+}
+
+.btn-danger {
+    background-color: #d32f2f;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #b71c1c;
+}
+
+.empty-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #999;
+}
+
+.help-text {
+    font-size: 0.95rem;
+    color: #bbb;
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 600px) {
+    .categories-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .category-header {
+        flex-direction: column;
+    }
+
+    .category-name {
+        font-size: 1.1rem;
+    }
+}
+</style>
+{% endblock %}

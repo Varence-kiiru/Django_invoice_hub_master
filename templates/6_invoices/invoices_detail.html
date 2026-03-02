@@ -1,0 +1,423 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+{% load tz_filters %}
+
+{% block title %}Invoice {{ invoice.invoice_number }} - Details{% endblock %}
+
+{% block page_title %}Invoice {{ invoice.invoice_number }}{% endblock %}
+{% block page_description %}View invoice details, line items, and payment status{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/invoices.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="invoice-detail-container" data-invoice-id="{{ invoice.id }}">
+  <!-- Alerts -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Invoice Header -->
+  <div class="invoice-header">
+    <div class="invoice-title-section">
+      <h1 class="invoice-number">{{ invoice.invoice_number }}</h1>
+      <span class="status-badge status-{{ invoice.status }}">
+        {% if invoice.status == 'draft' %}📝{% elif invoice.status == 'issued' %}✓{% elif invoice.status == 'sent' %}📤{% elif invoice.status == 'viewed' %}👁️{% elif invoice.status == 'paid' %}✅{% elif invoice.status == 'overdue' %}⚠️{% else %}❌{% endif %}
+        {{ invoice.get_status_display }}
+      </span>
+    </div>
+
+    <div class="invoice-actions">
+      {% if invoice.status == 'draft' %}
+        <a href="{% url 'invoices:edit' invoice.id %}" class="btn btn-secondary">✏️ Edit</a>
+        <a href="{% url 'invoices:issue' invoice.id %}" class="btn btn-primary">▶️ Issue</a>
+        <button onclick="window.showLineItemsModal()" class="btn btn-info">➕ Add Item</button>
+      {% elif invoice.status != 'cancelled' %}
+        <a href="{% url 'invoices:send' invoice.id %}" class="btn btn-primary">📧 Send Email</a>
+        <a href="{% url 'invoices:clone' invoice.id %}" class="btn btn-secondary">📋 Clone</a>
+      {% else %}
+        <a href="{% url 'invoices:clone' invoice.id %}" class="btn btn-secondary">📋 Clone</a>
+      {% endif %}
+      
+      {% if invoice.amount_due > 0 and invoice.status != 'cancelled' %}
+        <a href="{% url 'payments:create' %}?invoice={{ invoice.id }}" class="btn btn-success">💰 Record Payment</a>
+      {% elif invoice.amount_due <= 0 and invoice.status != 'paid' and invoice.status != 'cancelled' %}
+        <a href="{% url 'invoices:mark-paid' invoice.id %}" class="btn btn-success">✅ Mark as Paid</a>
+      {% endif %}
+      
+      {% if invoice.status != 'cancelled' %}
+        <a href="{% url 'invoices:cancel' invoice.id %}" class="btn btn-secondary">❌ Cancel</a>
+      {% endif %}
+      <a href="{% url 'invoices:display' invoice.id %}" class="btn btn-secondary" target="_blank">📄 View PDF</a>
+      <a href="{% url 'invoices:pdf' invoice.id %}" class="btn btn-secondary">📥 Download PDF</a>
+      <a href="{% url 'invoices:history' invoice.id %}" class="btn btn-secondary">📋 History</a>
+      <a href="{% url 'invoices:list' %}" class="btn btn-secondary">← Back</a>
+    </div>
+  </div>
+
+  <!-- Invoice Details Grid -->
+  <div class="invoice-details-grid">
+    <div class="details-card">
+      <h4>Client</h4>
+      <p class="detail-value">
+        <a href="{% url 'clients:detail' invoice.client.id %}">{{ invoice.client.name }}</a>
+      </p>
+      {% if invoice.client.email %}
+        <p class="detail-email">{{ invoice.client.email }}</p>
+      {% endif %}
+    </div>
+
+    <div class="details-card">
+      <h4>Invoice Date</h4>
+      <p class="detail-value">{{ invoice.invoice_date|date:"M d, Y" }}</p>
+      <p class="detail-secondary">{{ invoice.invoice_date|date:"l" }}</p>
+    </div>
+
+    <div class="details-card">
+      <h4>Due Date</h4>
+      <p class="detail-value {% if invoice.is_overdue %}overdue{% endif %}">
+        {% if invoice.is_overdue %}<strong>OVERDUE - </strong>{% endif %}
+        {{ invoice.due_date|date:"M d, Y" }}
+      </p>
+      <p class="detail-secondary">
+        {% if invoice.is_overdue %}
+          {{ invoice.days_overdue }} day{{ invoice.days_overdue|pluralize }} overdue
+        {% else %}
+          {{ invoice.days_until_due }} day{{ invoice.days_until_due|pluralize }} remaining
+        {% endif %}
+      </p>
+    </div>
+
+    <div class="details-card">
+      <h4>Currency</h4>
+      <p class="detail-value">{{ invoice.currency }}</p>
+    </div>
+  </div>
+
+  <!-- Invoice Items Section -->
+  <div class="invoice-items-section">
+    <div class="section-header">
+      <h3>Invoice Items</h3>
+      {% if can_edit %}
+        <button onclick="window.showLineItemsModal()" class="btn btn-sm btn-secondary">➕ Add Item</button>
+      {% endif %}
+    </div>
+
+    {% if line_items %}
+      <div class="table-wrapper">
+        <table class="invoice-items-table">
+          <thead>
+            <tr>
+              <th class="col-description">Description</th>
+              <th class="col-qty">Qty</th>
+              <th class="col-unit-price">Unit Price</th>
+              <th class="col-tax">Tax</th>
+              <th class="col-total">Total</th>
+              {% if can_edit %}<th class="col-actions">Actions</th>{% endif %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in line_items %}
+              <tr class="invoice-item-row" 
+                  data-item-id="{{ item.id }}"
+                  data-description="{{ item.description }}"
+                  data-quantity="{{ item.quantity }}"
+                  data-unit-price="{{ item.unit_price }}"
+                  data-tax-amount="{{ item.tax_amount }}"
+                  data-line-total="{{ item.line_total }}">
+                <td class="col-description">
+                  <div class="item-description">
+                    {% if item.product %}
+                      <strong>{{ item.product.name }}</strong>
+                      <div class="text-muted small">{{ item.description }}</div>
+                    {% else %}
+                      <strong>{{ item.description }}</strong>
+                    {% endif %}
+                  </div>
+                </td>
+                <td class="col-qty">{{ item.quantity|floatformat:2 }}</td>
+                <td class="col-unit-price">
+                  {{ invoice.currency }} {{ item.unit_price|floatformat:2 }}
+                </td>
+                <td class="col-tax">
+                  {{ item.tax_amount|floatformat:2 }}
+                  {% if item.tax_rate %}
+                    <small>({{ item.tax_rate.rate_percentage }}%)</small>
+                  {% endif %}
+                </td>
+                <td class="col-total">
+                  <strong>{{ invoice.currency }} {{ item.line_total|floatformat:2 }}</strong>
+                </td>
+                {% if can_edit %}
+                  <td class="col-actions">
+                    <button onclick="editLineItem({{ item.id }})" class="btn-action">✏️</button>
+                    <button onclick="deleteLineItem({{ item.id }})" class="btn-action btn-danger">🗑️</button>
+                  </td>
+                {% endif %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <p>No items added to this invoice yet.</p>
+        {% if can_edit %}
+          <button onclick="window.showLineItemsModal()" class="btn btn-sm btn-primary">➕ Add First Item</button>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Totals Section -->
+  <div class="invoice-totals-section">
+    <div class="totals-grid">
+      <div class="totals-card">
+        <h4>Subtotal</h4>
+        <p class="total-value">{{ invoice.currency }} {{ invoice.subtotal_amount|floatformat:2 }}</p>
+      </div>
+
+      <div class="totals-card">
+        <h4>Tax</h4>
+        <p class="total-value">{{ invoice.currency }} {{ invoice.vat_amount|floatformat:2 }}</p>
+      </div>
+
+      <div class="totals-card highlight">
+        <h4>Total Amount</h4>
+        <p class="total-value large">{{ invoice.currency }} {{ invoice.total_amount|floatformat:2 }}</p>
+      </div>
+
+      <div class="totals-card">
+        <h4>Paid</h4>
+        <p class="total-value">{{ invoice.currency }} {{ invoice.amount_paid|floatformat:2 }}</p>
+      </div>
+
+      <div class="totals-card {% if invoice.amount_due > 0 %}warning{% else %}success{% endif %}">
+        <h4>Balance Due</h4>
+        <p class="total-value">{{ invoice.currency }} {{ invoice.amount_due|floatformat:2 }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payments Section -->
+  {% if payments %}
+    <div class="payments-section">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">Payment History</h3>
+        {% if invoice.amount_due > 0 and invoice.status != 'cancelled' %}
+          <a href="{% url 'payments:create' %}?invoice={{ invoice.id }}" class="btn btn-success btn-sm">
+            <i class="icon-plus"></i> Record Payment
+          </a>
+        {% endif %}
+      </div>
+      <div class="table-wrapper">
+        <table class="payments-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Method</th>
+              <th>Amount</th>
+              <th>Reference</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for payment in payments %}
+              <tr>
+                <td>{{ payment.payment_date|date:"M d, Y" }}</td>
+                <td>{{ payment.payment_method }}</td>
+                <td><strong>{{ invoice.currency }} {{ payment.amount|floatformat:2 }}</strong></td>
+                <td>{{ payment.transaction_reference }}</td>
+                <td>
+                  <span class="status-badge status-{{ payment.status }}">
+                    {{ payment.get_status_display }}
+                  </span>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% elif invoice.amount_due > 0 and invoice.status != 'cancelled' %}
+    <!-- Show payment button if no payment history but amount is due -->
+    <div class="payments-section">
+      <div class="alert alert-info">
+        <h4>💰 No Payments Recorded Yet</h4>
+        <p>Amount Due: <strong>{{ invoice.currency }} {{ invoice.amount_due|floatformat:2 }}</strong></p>
+        <a href="{% url 'payments:create' %}?invoice={{ invoice.id }}" class="btn btn-success btn-sm mt-2">
+          <i class="icon-plus"></i> Record First Payment
+        </a>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Invoice Notes -->
+  {% if invoice.description %}
+    <div class="invoice-notes-section">
+      <h3>Notes</h3>
+      <div class="notes-box">
+        {{ invoice.description }}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Timeline -->
+  <div class="invoice-timeline-section">
+    <h3>Timeline</h3>
+    <div class="timeline">
+      <div class="timeline-item {% if invoice.status != 'draft' %}completed{% endif %}">
+        <div class="timeline-marker">📝</div>
+        <div class="timeline-content">
+          <h4>Draft Created</h4>
+          <p>{{ invoice.created_at|company_datetime:"M d, Y" }} at {{ invoice.created_at|company_datetime:"H:i" }}</p>
+        </div>
+      </div>
+
+      <div class="timeline-item {% if invoice.status != 'draft' %}completed{% endif %}">
+        <div class="timeline-marker">✓</div>
+        <div class="timeline-content">
+          <h4>Invoice Issued</h4>
+          <p>{% if invoice.issued_at %}{{ invoice.issued_at|company_datetime:"M d, Y" }} at {{ invoice.issued_at|company_datetime:"H:i" }}{% else %}Pending...{% endif %}</p>
+        </div>
+      </div>
+
+      <div class="timeline-item {% if invoice.status in 'sent,viewed,paid' %}completed{% endif %}">
+        <div class="timeline-marker">📤</div>
+        <div class="timeline-content">
+          <h4>Sent to Client</h4>
+          <p>{% if invoice.sent_at %}{{ invoice.sent_at|company_datetime:"M d, Y" }} at {{ invoice.sent_at|company_datetime:"H:i" }}{% else %}Pending...{% endif %}</p>
+        </div>
+      </div>
+
+      <div class="timeline-item {% if invoice.status == 'paid' %}completed{% endif %}">
+        <div class="timeline-marker">✅</div>
+        <div class="timeline-content">
+          <h4>Paid</h4>
+          <p>{% if invoice.paid_at %}{{ invoice.paid_at|company_datetime:"M d, Y" }} at {{ invoice.paid_at|company_datetime:"H:i" }}{% else %}Pending...{% endif %}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include "10_modals/invoice_line_items_modal.html" %}
+
+<!-- Edit Line Item Modal - Matches add modal structure -->
+<div id="edit-line-item-modal" class="modal" style="display: none;">
+  <div class="modal-overlay"></div>
+  <div class="modal-content modal-large">
+    <div class="modal-header">
+      <h2>Edit Line Item</h2>
+      <button class="modal-close" onclick="closeEditLineItemModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="edit-line-item-form" method="post">
+        {% csrf_token %}
+        <input type="hidden" id="edit-item-id" name="item_id">
+
+        <div class="form-group">
+          <label for="edit-modal-description">Description</label>
+          <input type="text" id="edit-modal-description" name="description" placeholder="Item description" class="form-control">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="edit-modal-quantity">Quantity</label>
+            <input type="number" id="edit-modal-quantity" name="quantity" value="1" min="0.01" step="0.01" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="edit-modal-unit-price">Unit Price</label>
+            <input type="number" id="edit-modal-unit-price" name="unit_price" value="0" min="0" step="0.01" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="edit-modal-tax-rate">Tax Rate %</label>
+            <input type="number" id="edit-modal-tax-rate" name="tax_rate" value="0" min="0" max="100" step="0.01" class="form-control">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Line Total</label>
+          <div style="background: rgba(0,0,0,0.05); padding: 12px; border-radius: 4px; font-size: 16px; font-weight: bold;">
+            <span id="edit-modal-line-total-currency">KES</span>&nbsp;<span id="edit-modal-line-total">0.00</span>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeEditLineItemModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitEditLineItem()">✓ Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .modal-large {
+    max-width: 600px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+  }
+
+  @media (max-width: 768px) {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pages/invoices.js' %}"></script>
+<script>
+  // ========== EVENT LISTENERS FOR EDIT/DELETE MODALS ==========
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add real-time calculation listeners for edit form
+    const editQuantityInput = document.getElementById('edit-modal-quantity');
+    const editPriceInput = document.getElementById('edit-modal-unit-price');
+    const editTaxRateInput = document.getElementById('edit-modal-tax-rate');
+
+    [editQuantityInput, editPriceInput, editTaxRateInput].forEach(input => {
+      if (input) {
+        input.addEventListener('input', calculateEditLineItemTotal);
+        input.addEventListener('change', calculateEditLineItemTotal);
+      }
+    });
+
+    // Close modal on escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        const modal = document.getElementById('edit-line-item-modal');
+        if (modal && modal.style.display === 'flex') {
+          closeEditLineItemModal();
+        }
+      }
+    });
+
+    // Close modal on overlay click
+    const modalOverlay = document.querySelector('#edit-line-item-modal .modal-overlay');
+    if (modalOverlay) {
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === this) {
+          closeEditLineItemModal();
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

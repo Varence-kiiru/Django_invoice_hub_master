@@ -1,0 +1,257 @@
+/* Help Articles - Styles */
+
+.articles-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px 30px;
+    border-radius: 8px;
+    margin-bottom: 40px;
+}
+
+.articles-header h1 {
+    font-size: 2rem;
+    margin: 0;
+    margin-bottom: 10px;
+}
+
+.articles-header p {
+    margin: 0;
+    opacity: 0.95;
+}
+
+.articles-controls {
+    background: white;
+    padding: 20px;
+    border-radius: 6px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.articles-search {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.articles-search input {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.articles-search input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.articles-search button {
+    padding: 10px 25px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.articles-search button:hover {
+    background: #764ba2;
+}
+
+.category-pills {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.category-pill {
+    display: inline-block;
+    padding: 8px 15px;
+    border: 2px solid #e0e0e0;
+    background: white;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    color: #333;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.category-pill:hover,
+.category-pill.active {
+    border-color: #667eea;
+    background: #f5f7ff;
+    color: #667eea;
+}
+
+.articles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.article-card {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.article-card:hover {
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+    transform: translateY(-5px);
+    border-color: #667eea;
+}
+
+.article-card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    font-size: 2rem;
+    text-align: center;
+}
+
+.article-card-featured {
+    position: relative;
+}
+
+.article-card-featured::before {
+    content: '⭐ Featured';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ffc107;
+    color: #000;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.article-card-content {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.article-card-category {
+    display: inline-block;
+    background: #e0e7ff;
+    color: #667eea;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    width: fit-content;
+}
+
+.article-card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #333;
+    line-height: 1.4;
+    flex-grow: 1;
+}
+
+.article-card-excerpt {
+    color: #666;
+    font-size: 0.95rem;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.article-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+    font-size: 0.85rem;
+    color: #999;
+}
+
+.article-card-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.article-card-link:hover {
+    color: #764ba2;
+}
+
+.articles-sidebar {
+    background: white;
+    padding: 20px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+
+.sidebar-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.sidebar-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.sidebar-item:last-child {
+    border-bottom: none;
+}
+
+.sidebar-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.sidebar-link:hover {
+    color: #764ba2;
+    padding-left: 5px;
+}
+
+.no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    grid-column: 1 / -1;
+}
+
+.no-results-icon {
+    font-size: 4rem;
+    margin-bottom: 15px;
+}
+
+@media (max-width: 768px) {
+    .articles-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .articles-search {
+        flex-direction: column;
+    }
+
+    .category-pills {
+        justify-content: center;
+    }
+}

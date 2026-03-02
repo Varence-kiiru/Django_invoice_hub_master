@@ -1,0 +1,142 @@
+{% extends "layouts/pdf_base.html" %}
+
+{% block title %}Quotation Performance Report{% endblock %}
+
+{% block content %}
+<div class="pdf-header">
+    {% if company_logo %}
+        <img src="{{ company_logo }}" alt="Logo" class="pdf-logo">
+    {% endif %}
+    <div class="company-info">
+        <h2>{{ company_name }}</h2>
+        <p>{{ company_address }}</p>
+        <p>Tel: {{ company_phone }}</p>
+        <p>Email: {{ company_email }}</p>
+        {% if company_tax_id %}
+        <p>Tax ID: {{ company_tax_id }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="report-title">Quotation Performance Report</div>
+<div class="report-subtitle">Client and sales performance analysis</div>
+
+{% if from_date or to_date %}
+<div class="filters-box">
+    <strong>Filter Period:</strong>
+    {% if from_date %}{{ from_date }}{% endif %}
+    {% if from_date and to_date %} to {% endif %}
+    {% if to_date %}{{ to_date }}{% endif %}
+</div>
+{% endif %}
+
+<!-- Overall Summary -->
+<div class="section-title">Overall Performance Summary</div>
+<table class="summary-table">
+    <tr>
+        <td class="label">Total Quotations:</td>
+        <td class="value">{{ overall.total_quotes|default:0 }}</td>
+    </tr>
+    <tr>
+        <td class="label">Total Value:</td>
+        <td class="value">KES {{ overall.total_value|floatformat:2|default:'0.00' }}</td>
+    </tr>
+    <tr>
+        <td class="label">Converted Quotations:</td>
+        <td class="value">{{ overall.converted|default:0 }}</td>
+    </tr>
+    <tr style="background-color: #e8f4f8; font-weight: bold;">
+        <td class="label">Overall Conversion Rate:</td>
+        <td class="value">{{ overall.conversion_rate|floatformat:1|default:'0' }}%</td>
+    </tr>
+</table>
+
+<!-- Client Performance -->
+<div class="section-title">Client Performance Analysis</div>
+
+{% if client_performance %}
+<table>
+    <thead>
+        <tr>
+            <th>Client Name</th>
+            <th>Total Quotes</th>
+            <th>Total Value</th>
+            <th>Converted</th>
+            <th>Conversion Rate</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for client in client_performance %}
+        <tr>
+            <td><strong>{{ client.client__name }}</strong></td>
+            <td>{{ client.total_quotes|default:0 }}</td>
+            <td>KES {{ client.total_value|floatformat:2|default:'0.00' }}</td>
+            <td>{{ client.converted|default:0 }}</td>
+            <td>{{ client.conversion_rate|floatformat:1|default:'0' }}%</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="no-data">No client performance data available</div>
+{% endif %}
+
+<!-- Top Performing Clients -->
+<div class="page-break"></div>
+<div class="section-title">Performance Insights</div>
+<table class="summary-table">
+    <tr>
+        <td class="label">Report Period:</td>
+        <td class="value">
+            {% if from_date %}{{ from_date }}{% else %}All Time{% endif %}
+            {% if to_date %} to {{ to_date }}{% endif %}
+        </td>
+    </tr>
+    <tr>
+        <td class="label">Total Clients:</td>
+        <td class="value">{{ client_performance|length }}</td>
+    </tr>
+    <tr>
+        <td class="label">Average Quotes per Client:</td>
+        <td class="value">{{ overall.avg_quotes_per_client|default:'0.0' }}</td>
+    </tr>
+</table>
+
+<!-- Key Metrics -->
+<div class="section-title">Key Performance Indicators</div>
+<table>
+    <thead>
+        <tr>
+            <th>Metric</th>
+            <th>Value</th>
+            <th>Interpretation</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Total Quotation Value</strong></td>
+            <td>KES {{ overall.total_value_formatted|default:'0.00' }}</td>
+            <td>Total potential revenue from all quotations</td>
+        </tr>
+        <tr>
+            <td><strong>Conversion Rate</strong></td>
+            <td>{{ overall.conversion_rate|floatformat:1|default:'0' }}%</td>
+            <td>Percentage of quotations converted to invoices</td>
+        </tr>
+        <tr>
+            <td><strong>Converted Value</strong></td>
+            <td>KES {{ overall.converted_value|floatformat:2|default:'0.00' }}</td>
+            <td>Revenue realized from converted quotations</td>
+        </tr>
+        <tr style="background-color: #fff3cd;">
+            <td><strong>Potential Unrealized</strong></td>
+            <td>KES {{ overall.unrealized_value|floatformat:2|default:'0.00' }}</td>
+            <td>Revenue from non-converted quotations</td>
+        </tr>
+    </tbody>
+</table>
+
+<div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; text-align: center; color: #666;">
+    <p>Report generated on {{ "now"|date:"d M Y, H:i" }}</p>
+</div>
+{% endblock %}

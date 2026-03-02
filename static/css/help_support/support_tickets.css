@@ -1,0 +1,240 @@
+/* Support Tickets List - Styles */
+
+.tickets-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px 30px;
+    border-radius: 8px;
+    margin-bottom: 40px;
+}
+
+.tickets-header h1 {
+    font-size: 2rem;
+    margin: 0;
+    margin-bottom: 10px;
+}
+
+.tickets-header p {
+    margin: 0;
+    opacity: 0.95;
+}
+
+.tickets-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.tickets-filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    border: 2px solid #e0e0e0;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+    border-color: #667eea;
+    background: #f5f7ff;
+    color: #667eea;
+}
+
+.cta-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    margin-left: auto;
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    color: white;
+}
+
+.tickets-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.ticket-card {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.ticket-card:hover {
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    border-color: #667eea;
+}
+
+.ticket-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.ticket-number {
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    color: #667eea;
+    font-size: 1.05rem;
+}
+
+.ticket-status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-open {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.status-in-progress {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.status-resolved {
+    background: #e8f5e9;
+    color: #388e3c;
+}
+
+.status-closed {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.ticket-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.ticket-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.ticket-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.priority-high {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.priority-medium {
+    color: #f57c00;
+    font-weight: 600;
+}
+
+.priority-low {
+    color: #388e3c;
+    font-weight: 600;
+}
+
+.priority-urgent {
+    color: #c62828;
+    font-weight: 700;
+}
+
+.ticket-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e0e0e0;
+    font-size: 0.9rem;
+    color: #999;
+}
+
+.ticket-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.ticket-link:hover {
+    text-decoration: underline;
+}
+
+.no-tickets {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+.no-tickets-icon {
+    font-size: 4rem;
+    margin-bottom: 15px;
+}
+
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+@media (max-width: 768px) {
+    .tickets-controls {
+        flex-direction: column-reverse;
+    }
+
+    .cta-button {
+        margin-left: 0;
+        width: 100%;
+        text-align: center;
+    }
+
+    .ticket-card-header {
+        flex-direction: column;
+    }
+
+    .ticket-meta {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .ticket-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
