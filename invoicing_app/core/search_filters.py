@@ -315,7 +315,7 @@ class FullTextSearch:
             Q(invoice_number__icontains=query) |
             Q(client__name__icontains=query) |
             Q(description__icontains=query) |
-            Q(lines__description__icontains=query)
+            Q(line_items__description__icontains=query)
         ).distinct()
     
     @staticmethod
@@ -360,7 +360,7 @@ class FullTextSearch:
             Q(quote_number__icontains=query) |
             Q(client__name__icontains=query) |
             Q(description__icontains=query) |
-            Q(lines__description__icontains=query)
+            Q(line_items__description__icontains=query)
         ).distinct()
 
 
