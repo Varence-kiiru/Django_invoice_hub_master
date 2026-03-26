@@ -1,0 +1,503 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }} - InvoiceHub{% endblock %}
+
+{% block content %}
+<div class="search-results-container">
+  <div class="search-header">
+    <h1>Search Results</h1>
+    <div class="search-info">
+      {% if query %}
+        <p class="search-query">
+          Results for: <strong>"{{ query }}"</strong>
+          {% if result_counts.total > 0 %}
+            <span class="result-count">({{ result_counts.total }} result{{ result_counts.total|pluralize }})</span>
+          {% else %}
+            <span class="no-results">No results found</span>
+          {% endif %}
+        </p>
+      {% else %}
+        <p class="search-placeholder">Enter a search query to find invoices, quotations, clients, and more.</p>
+      {% endif %}
+    </div>
+
+    <!-- New Search Form -->
+    <form class="search-form" method="get">
+      <div class="search-input-group">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search across all items..." class="search-input" />
+        <button type="submit" class="search-btn">🔍 Search</button>
+      </div>
+    </form>
+  </div>
+
+  {% if result_counts.total > 0 %}
+    <div class="search-results">
+      <!-- Invoices Results -->
+      {% if results.invoices %}
+        <div class="result-section">
+          <div class="result-section-header">
+            <h2>Invoices <span class="result-badge">{{ result_counts.invoices }}</span></h2>
+          </div>
+          <div class="result-items">
+            {% for invoice in results.invoices %}
+              <div class="result-item invoice-item">
+                <div class="result-item-header">
+                  <a href="{% url 'invoices:detail' invoice.id %}" class="result-item-title">
+                    Invoice #{{ invoice.invoice_number }}
+                  </a>
+                  <span class="status-badge status-{{ invoice.status|lower }}">{{ invoice.get_status_display }}</span>
+                </div>
+                <div class="result-item-details">
+                  <p class="client-name">📧 {{ invoice.client.name }}</p>
+                  <p class="amount">💰 {{ invoice.total_amount }} {{ invoice.currency }}</p>
+                  <p class="date">📅 {{ invoice.invoice_date|date:"M d, Y" }}</p>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          {% if result_counts.invoices > 10 %}
+            <a href="{% url 'invoices:list' %}?q={{ query }}" class="view-all-link">View all invoices ({{ result_counts.invoices }} total)</a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <!-- Quotations Results -->
+      {% if results.quotations %}
+        <div class="result-section">
+          <div class="result-section-header">
+            <h2>Quotations <span class="result-badge">{{ result_counts.quotations }}</span></h2>
+          </div>
+          <div class="result-items">
+            {% for quote in results.quotations %}
+              <div class="result-item quote-item">
+                <div class="result-item-header">
+                  <a href="{% url 'quotations:detail' quote.id %}" class="result-item-title">
+                    Quote #{{ quote.quote_number }}
+                  </a>
+                  <span class="status-badge status-{{ quote.status|lower }}">{{ quote.get_status_display }}</span>
+                </div>
+                <div class="result-item-details">
+                  <p class="client-name">📧 {{ quote.client.name }}</p>
+                  <p class="amount">💰 {{ quote.total_amount }} {{ quote.currency }}</p>
+                  <p class="date">📅 {{ quote.quote_date|date:"M d, Y" }}</p>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          {% if result_counts.quotations > 10 %}
+            <a href="{% url 'quotations:list' %}?q={{ query }}" class="view-all-link">View all quotations ({{ result_counts.quotations }} total)</a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <!-- Clients Results -->
+      {% if results.clients %}
+        <div class="result-section">
+          <div class="result-section-header">
+            <h2>Clients <span class="result-badge">{{ result_counts.clients }}</span></h2>
+          </div>
+          <div class="result-items">
+            {% for client in results.clients %}
+              <div class="result-item client-item">
+                <div class="result-item-header">
+                  <a href="{% url 'clients:detail' client.id %}" class="result-item-title">
+                    {{ client.name }}
+                  </a>
+                  <span class="status-badge status-{{ client.status|lower }}">{{ client.get_status_display }}</span>
+                </div>
+                <div class="result-item-details">
+                  {% if client.email %}<p class="email">✉️ {{ client.email }}</p>{% endif %}
+                  {% if client.phone %}<p class="phone">📱 {{ client.phone }}</p>{% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          {% if result_counts.clients > 10 %}
+            <a href="{% url 'clients:list' %}?q={{ query }}" class="view-all-link">View all clients ({{ result_counts.clients }} total)</a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <!-- Payments Results -->
+      {% if results.payments %}
+        <div class="result-section">
+          <div class="result-section-header">
+            <h2>Payments <span class="result-badge">{{ result_counts.payments }}</span></h2>
+          </div>
+          <div class="result-items">
+            {% for payment in results.payments %}
+              <div class="result-item payment-item">
+                <div class="result-item-header">
+                  <a href="{% url 'payments:detail' payment.id %}" class="result-item-title">
+                    Payment #{{ payment.receipt_number }}
+                  </a>
+                  <span class="status-badge status-{{ payment.status|lower }}">{{ payment.get_status_display }}</span>
+                </div>
+                <div class="result-item-details">
+                  {% if payment.invoice %}<p class="invoice">📄 Invoice #{{ payment.invoice.invoice_number }}</p>{% endif %}
+                  <p class="amount">💰 {{ payment.amount }} {{ payment.currency }}</p>
+                  <p class="date">📅 {{ payment.payment_date|date:"M d, Y" }}</p>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          {% if result_counts.payments > 10 %}
+            <a href="{% url 'payments:list' %}?q={{ query }}" class="view-all-link">View all payments ({{ result_counts.payments }} total)</a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <!-- Products Results -->
+      {% if results.products %}
+        <div class="result-section">
+          <div class="result-section-header">
+            <h2>Products <span class="result-badge">{{ result_counts.products }}</span></h2>
+          </div>
+          <div class="result-items">
+            {% for product in results.products %}
+              <div class="result-item product-item">
+                <div class="result-item-header">
+                  <a href="{% url 'products:detail' product.id %}" class="result-item-title">
+                    {{ product.name }}
+                  </a>
+                </div>
+                <div class="result-item-details">
+                  {% if product.sku %}<p class="sku">🏷️ SKU: {{ product.sku }}</p>{% endif %}
+                  {% if product.description %}<p class="description">{{ product.description|truncatewords:15 }}</p>{% endif %}
+                  <p class="price">💵 {{ product.unit_price }} per unit</p>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          {% if result_counts.products > 10 %}
+            <a href="{% url 'products:list' %}?q={{ query }}" class="view-all-link">View all products ({{ result_counts.products }} total)</a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <!-- Expenses Results -->
+      {% if results.expenses %}
+        <div class="result-section">
+          <div class="result-section-header">
+            <h2>Expenses <span class="result-badge">{{ result_counts.expenses }}</span></h2>
+          </div>
+          <div class="result-items">
+            {% for expense in results.expenses %}
+              <div class="result-item expense-item">
+                <div class="result-item-header">
+                  <a href="{% url 'expenses:detail' expense.id %}" class="result-item-title">
+                    {{ expense.description }}
+                  </a>
+                </div>
+                <div class="result-item-details">
+                  <p class="category">📂 {{ expense.category }}</p>
+                  <p class="amount">💰 {{ expense.amount }} {{ expense.currency }}</p>
+                  <p class="date">📅 {{ expense.expense_date|date:"M d, Y" }}</p>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          {% if result_counts.expenses > 10 %}
+            <a href="{% url 'expenses:list' %}?q={{ query }}" class="view-all-link">View all expenses ({{ result_counts.expenses }} total)</a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <!-- Deliveries Results -->
+      {% if results.deliveries %}
+        <div class="result-section">
+          <div class="result-section-header">
+            <h2>Deliveries <span class="result-badge">{{ result_counts.deliveries }}</span></h2>
+          </div>
+          <div class="result-items">
+            {% for delivery in results.deliveries %}
+              <div class="result-item delivery-item">
+                <div class="result-item-header">
+                  <a href="{% url 'deliveries:detail' delivery.id %}" class="result-item-title">
+                    Delivery #{{ delivery.delivery_number }}
+                  </a>
+                  <span class="status-badge status-{{ delivery.status|lower }}">{{ delivery.get_status_display }}</span>
+                </div>
+                <div class="result-item-details">
+                  {% if delivery.invoice %}<p class="invoice">📄 Invoice #{{ delivery.invoice.invoice_number }}</p>{% endif %}
+                  {% if delivery.notes %}<p class="notes">📝 {{ delivery.notes|truncatewords:20 }}</p>{% endif %}
+                  <p class="date">📅 {{ delivery.delivery_date|date:"M d, Y" }}</p>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          {% if result_counts.deliveries > 10 %}
+            <a href="{% url 'deliveries:list' %}?q={{ query }}" class="view-all-link">View all deliveries ({{ result_counts.deliveries }} total)</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  {% elif query %}
+    <div class="no-results-container">
+      <p class="no-results-message">
+        No results found for "<strong>{{ query }}</strong>"
+      </p>
+      <p class="no-results-hint">
+        Try a different search term or <a href="{% url 'core:global-search' %}">clear your search</a>
+      </p>
+    </div>
+  {% endif %}
+</div>
+
+<style>
+.search-results-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.search-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.search-header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-primary);
+}
+
+.search-info {
+  margin-bottom: 1rem;
+}
+
+.search-query {
+  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+}
+
+.result-count {
+  background: var(--color-bg-light);
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  margin-left: 0.5rem;
+}
+
+.no-results {
+  color: var(--color-danger);
+  font-weight: 500;
+}
+
+.search-form {
+  margin-top: 1.5rem;
+}
+
+.search-input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.search-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.search-btn {
+  padding: 0.75rem 1.5rem;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.search-btn:hover {
+  background: var(--color-secondary);
+}
+
+.search-results {
+  display: space-y 2rem;
+}
+
+.result-section {
+  margin-bottom: 3rem;
+  padding: 1.5rem;
+  background: var(--color-bg-light);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+}
+
+.result-section-header {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.result-section-header h2 {
+  font-size: 1.3rem;
+  margin: 0;
+  color: var(--color-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.result-badge {
+  background: var(--color-primary);
+  color: var(--color-white);
+  padding: 0.25rem 0.6rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.result-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.result-item {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.result-item:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.15);
+}
+
+.result-item-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.result-item-title {
+  font-weight: 600;
+  color: var(--color-secondary);
+  text-decoration: none;
+  flex: 1;
+  word-break: break-word;
+}
+
+.result-item-title:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.status-badge {
+  padding: 0.25rem 0.6rem;
+  border-radius: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--color-bg-light);
+  color: var(--color-text-muted);
+}
+
+.status-draft { background: #f3f4f6; color: #6b7280; }
+.status-sent { background: #dbeafe; color: #1e40af; }
+.status-issued { background: #dbeafe; color: #1e40af; }
+.status-viewed { background: #dcfce7; color: #166534; }
+.status-paid { background: #dcfce7; color: #166534; }
+.status-accepted { background: #dcfce7; color: #166534; }
+.status-overdue { background: #fee2e2; color: #991b1b; }
+.status-declined { background: #fee2e2; color: #991b1b; }
+.status-active { background: #dcfce7; color: #166534; }
+.status-inactive { background: #f3f4f6; color: #6b7280; }
+
+.result-item-details {
+  display: space-y 0.5rem;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.result-item-details p {
+  margin: 0.25rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.view-all-link {
+  display: inline-block;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.5rem 1rem;
+  background: rgba(212, 175, 55, 0.1);
+  border-radius: 0.4rem;
+  transition: all 0.2s;
+}
+
+.view-all-link:hover {
+  background: rgba(212, 175, 55, 0.2);
+  text-decoration: underline;
+}
+
+.no-results-container {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.no-results-message {
+  font-size: 1.2rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 1rem;
+}
+
+.no-results-hint {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+}
+
+.no-results-hint a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.no-results-hint a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .result-items {
+    grid-template-columns: 1fr;
+  }
+
+  .search-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .search-input-group {
+    flex-direction: column;
+  }
+
+  .search-input,
+  .search-btn {
+    width: 100%;
+  }
+}
+</style>
+{% endblock %}

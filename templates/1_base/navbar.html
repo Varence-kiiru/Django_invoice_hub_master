@@ -16,7 +16,7 @@ Styles are in static/css/components/navbar.css
     </button>
 
     <!-- Search -->
-    <form class="navbar-search" role="search" method="get" action="{% url 'invoices:list' %}">
+    <form class="navbar-search" role="search" method="get" action="{% url 'core:global-search' %}">
       <label for="global-search" class="sr-only">Search invoices, clients, products</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
       <input id="global-search" type="search" name="q" placeholder="Search invoices, clients, products..." aria-label="Search" autocomplete="off" />
