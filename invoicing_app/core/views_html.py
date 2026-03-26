@@ -578,6 +578,134 @@ def dashboard_view(request):
 
 
 @login_required
+def global_search_view(request):
+    """
+    Global search across all entity types.
+    Searches: invoices, quotations, clients, payments, products, expenses, deliveries.
+    """
+    from invoicing_app.core.search_filters import FullTextSearch
+    
+    query = request.GET.get('q', '').strip()
+    page_num = request.GET.get('page', 1)
+    
+    # Initialize result dictionaries
+    results = {
+        'invoices': [],
+        'quotations': [],
+        'clients': [],
+        'payments': [],
+        'products': [],
+        'expenses': [],
+        'deliveries': [],
+    }
+    
+    result_counts = {
+        'invoices': 0,
+        'quotations': 0,
+        'clients': 0,
+        'payments': 0,
+        'products': 0,
+        'expenses': 0,
+        'deliveries': 0,
+        'total': 0,
+    }
+    
+    if query and len(query) >= 2:  # Minimum 2 characters for search
+        # Search invoices
+        invoice_results = FullTextSearch.search_invoices(
+            Invoice.objects.filter(is_active=True),
+            query
+        )
+        results['invoices'] = invoice_results[:10]  # Limit to top 10
+        result_counts['invoices'] = invoice_results.count()
+        
+        # Search quotations
+        quotation_results = FullTextSearch.search_quotations(
+            Quote.objects.filter(is_active=True),
+            query
+        )
+        results['quotations'] = quotation_results[:10]
+        result_counts['quotations'] = quotation_results.count()
+        
+        # Search clients
+        client_results = FullTextSearch.search_clients(
+            Client.objects.filter(is_active=True),
+            query
+        )
+        results['clients'] = client_results[:10]
+        result_counts['clients'] = client_results.count()
+        
+        # Search payments
+        payment_results = FullTextSearch.search_payments(
+            Payment.objects.all(),
+            query
+        )
+        results['payments'] = payment_results[:10]
+        result_counts['payments'] = payment_results.count()
+        
+        # Search products
+        product_results = Product.objects.filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query) |
+            Q(sku__icontains=query),
+            is_active=True
+        )[:10]
+        results['products'] = product_results
+        result_counts['products'] = Product.objects.filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query) |
+            Q(sku__icontains=query),
+            is_active=True
+        ).count()
+        
+        # Search expenses
+        expense_results = Expense.objects.filter(
+            Q(description__icontains=query) |
+            Q(reference_number__icontains=query),
+            is_active=True
+        )[:10]
+        results['expenses'] = expense_results
+        result_counts['expenses'] = Expense.objects.filter(
+            Q(description__icontains=query) |
+            Q(reference_number__icontains=query),
+            is_active=True
+        ).count()
+        
+        # Search deliveries
+        delivery_results = Delivery.objects.filter(
+            Q(delivery_number__icontains=query) |
+            Q(notes__icontains=query),
+            is_active=True
+        )[:10]
+        results['deliveries'] = delivery_results
+        result_counts['deliveries'] = Delivery.objects.filter(
+            Q(delivery_number__icontains=query) |
+            Q(notes__icontains=query),
+            is_active=True
+        ).count()
+        
+        # Calculate total results
+        result_counts['total'] = sum([
+            result_counts['invoices'],
+            result_counts['quotations'],
+            result_counts['clients'],
+            result_counts['payments'],
+            result_counts['products'],
+            result_counts['expenses'],
+            result_counts['deliveries'],
+        ])
+    
+    context = {
+        'page_title': f'Search Results: "{query}"' if query else 'Global Search',
+        'query': query,
+        'results': results,
+        'result_counts': result_counts,
+    }
+    
+    return render(request, '3_dashboard/global_search_results.html', context)
+
+
+@login_required
 def analytics_dashboard_view(request):
     """Analytics dashboard with financial summaries and charts."""
     context = {'page_title': 'Analytics Dashboard'}
