@@ -41,3 +41,8 @@ EMAIL_BACKEND = get_env("EMAIL_BACKEND", "django.core.mail.backends.console.Emai
 
 # Static/media served from disk in development
 STATICFILES_DIRS = [BASE_DIR / "static"]
+
+# Use local file storage in development instead of S3
+DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"

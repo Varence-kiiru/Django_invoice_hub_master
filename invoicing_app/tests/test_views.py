@@ -9,11 +9,11 @@ class HtmlViewsTest(TestCase):
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='pass12345')
 
     def test_login_page_get(self):
-        resp = self.client.get(reverse('core:login'))
+        resp = self.client.get(reverse('organizations:login'))
         self.assertEqual(resp.status_code, 200)
 
     def test_login_post_invalid(self):
-        resp = self.client.post(reverse('core:login'), {'email': 'nope@example.com', 'password': 'x'})
+        resp = self.client.post(reverse('organizations:login'), {'email': 'nope@example.com', 'password': 'x'})
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, 'Invalid email or password', status_code=200)
 

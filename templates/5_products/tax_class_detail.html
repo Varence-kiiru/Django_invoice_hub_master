@@ -1,0 +1,647 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}{{ tax_class.name }} - Tax Classes{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/taxes.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <!-- Header Section -->
+    <div class="detail-header">
+        <div class="detail-header-title">
+            <h1><i class="bi bi-tags-fill"></i> {{ tax_class.name }}</h1>
+            <p class="text-muted mb-0">{{ tax_class.get_rate_type_display }}</p>
+        </div>
+        
+        <div class="detail-header-info">
+            <div class="detail-header-item">
+                <label>Status</label>
+                <span class="status {% if tax_class.is_active %}active{% else %}inactive{% endif %}">
+                    {% if tax_class.is_active %}
+                        <i class="bi bi-check-circle"></i> Active
+                    {% else %}
+                        <i class="bi bi-circle"></i> Inactive
+                    {% endif %}
+                </span>
+            </div>
+            <div class="detail-header-item">
+                <label>Rate Type</label>
+                <span class="rate-type">{{ tax_class.get_rate_type_display }}</span>
+            </div>
+            <div class="detail-header-item">
+                <label>Created</label>
+                <span>{{ tax_class.created_at|date:"M d, Y" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="detail-header-actions">
+        <a href="{% url 'products:tax-class-edit' tax_class.id %}" class="btn btn-primary">
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+        <a href="{% url 'products:tax-class-delete' tax_class.id %}" class="btn btn-outline-danger">
+            <i class="bi bi-trash"></i> Delete
+        </a>
+        <a href="{% url 'products:tax-classes-list' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <!-- Statistics Grid -->
+    <div class="stats-grid mb-4">
+        <div class="stat-card">
+            <div class="stat-icon primary"><i class="bi bi-box"></i></div>
+            <div class="stat-content">
+                <div class="stat-label">Associated Products</div>
+                <div class="stat-value">{{ product_count }}</div>
+                <div class="stat-detail">{{ active_products }} active</div>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon info"><i class="bi bi-percent"></i></div>
+            <div class="stat-content">
+                <div class="stat-label">VAT Rules</div>
+                <div class="stat-value">{{ vat_rule_count }}</div>
+                <div class="stat-detail">{{ active_vat_rules }} active</div>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon success"><i class="bi bi-receipt"></i></div>
+            <div class="stat-content">
+                <div class="stat-label">Invoice Usage</div>
+                <div class="stat-value">{{ invoice_usage }}</div>
+                <div class="stat-detail">line items</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Two Column Layout -->
+    <div class="detail-columns">
+        <!-- Left Column: Associated Products -->
+        <div class="detail-card">
+            <div class="detail-card-header">
+                <h3><i class="bi bi-box"></i> Associated Products</h3>
+                <span class="badge">{{ product_count }}</span>
+            </div>
+            
+            {% if products %}
+            <div class="detail-card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>SKU</th>
+                                <th style="text-align: center;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'products:detail' product.id %}" class="link">
+                                        <strong>{{ product.name }}</strong>
+                                    </a>
+                                </td>
+                                <td>
+                                    <code>{{ product.sku }}</code>
+                                </td>
+                                <td style="text-align: center;">
+                                    {% if product.is_active %}
+                                        <span class="status-badge active"><i class="bi bi-check-circle"></i></span>
+                                    {% else %}
+                                        <span class="status-badge inactive"><i class="bi bi-circle"></i></span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+            <div class="detail-card-body empty-state">
+                <i class="bi bi-inbox"></i>
+                <p>No products assigned to this tax class</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Column: VAT Rules && Summary Info -->
+        <div class="detail-sidebar">
+            <!-- Tax Class Information -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <h3><i class="bi bi-info-circle"></i> Tax Class Information</h3>
+                </div>
+                
+                <div class="detail-card-body">
+                    <div class="info-item">
+                        <label>Name</label>
+                        <strong>{{ tax_class.name }}</strong>
+                    </div>
+                    
+                    <div class="info-item">
+                        <label>Rate Type</label>
+                        <span class="rate-type-badge">{{ tax_class.get_rate_type_display }}</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <label>Status</label>
+                        {% if tax_class.is_active %}
+                            <span class="status-badge active"><i class="bi bi-check-circle"></i> Active</span>
+                        {% else %}
+                            <span class="status-badge inactive"><i class="bi bi-circle"></i> Inactive</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="info-item">
+                        <label>Created Date</label>
+                        <span>{{ tax_class.created_at|date:"M d, Y \a\t H:i" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VAT Rules -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <h3><i class="bi bi-percent"></i> VAT Rules</h3>
+                    <span class="badge">{{ vat_rule_count }}</span>
+                </div>
+                
+                {% if vat_rules %}
+                <div class="detail-card-body">
+                    <div class="rules-list">
+                        {% for rule in vat_rules %}
+                        <div class="rule-item">
+                            <div class="rule-header">
+                                <strong>{{ rule.name }}</strong>
+                                {% if rule.is_active %}
+                                    <span class="status-badge small active"><i class="bi bi-check"></i></span>
+                                {% else %}
+                                    <span class="status-badge small inactive"><i class="bi bi-x"></i></span>
+                                {% endif %}
+                            </div>
+                            <div class="rule-details">
+                                <span class="tax-rate">Tax Rate: {{ rule.tax_rate.code }} ({{ rule.tax_rate.rate_percentage }}%)</span>
+                                {% if rule.priority %}
+                                    <span class="priority">Priority: {{ rule.priority }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="detail-card-body empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <p>No VAT rules configured</p>
+                    <p class="text-muted small">VAT rules define how taxes are applied under specific conditions</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="detail-card outline">
+                <div class="detail-card-header">
+                    <h3><i class="bi bi-lightning"></i> Quick Actions</h3>
+                </div>
+                
+                <div class="detail-card-body">
+                    <div class="action-links">
+                        <a href="{% url 'products:tax-class-edit' tax_class.id %}" class="action-link">
+                            <i class="bi bi-pencil"></i> Edit Tax Class
+                        </a>
+                        <a href="{% url 'products:list' %}?tax_class={{ tax_class.id }}" class="action-link">
+                            <i class="bi bi-box"></i> View Products
+                        </a>
+                        <a href="{% url 'products:tax-classes-list' %}" class="action-link">
+                            <i class="bi bi-list"></i> Back to All Classes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.detail-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--color-border);
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.detail-header-title h1 {
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.detail-header-info {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.detail-header-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: right;
+}
+
+.detail-header-item label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.detail-header-item .status {
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+}
+
+.detail-header-item .status.active {
+    color: #28a745;
+}
+
+.detail-header-item .status.inactive {
+    color: #999;
+}
+
+.detail-header-item .rate-type {
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.detail-header-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: var(--color-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-outline-danger {
+    border: 1px solid #dc3545;
+    color: #dc3545;
+    background: transparent;
+}
+
+.btn-outline-danger:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.detail-columns {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .detail-columns {
+        grid-template-columns: 1fr;
+    }
+}
+
+.detail-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.detail-card.outline {
+    border: 2px dashed var(--color-border);
+}
+
+.detail-card-header {
+    background: #f8f9fa;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.detail-card-header h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.badge {
+    background: var(--color-primary);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.detail-card-body {
+    padding: 1.5rem;
+}
+
+.detail-card-body.empty-state {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    color: #6c757d;
+}
+
+.detail-card-body.empty-state i {
+    font-size: 2.5rem;
+    color: #ddd;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+}
+
+.table thead tr {
+    background: #f8f9fa;
+}
+
+.table th {
+    padding: 0.75rem;
+    font-weight: 600;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.link {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+
+code {
+    background: #f8f9fa;
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.85rem;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-badge.active {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.inactive {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+.status-badge.small {
+    padding: 0.15rem 0.4rem;
+    font-size: 0.75rem;
+}
+
+.rate-type-badge {
+    background: #e7f3ff;
+    color: var(--color-primary);
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.info-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.info-item label {
+    display: block;
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.info-item strong {
+    display: block;
+    color: var(--color-text);
+}
+
+.rules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.rule-item {
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border-left: 3px solid var(--color-primary);
+}
+
+.rule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.rule-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.tax-rate, .priority {
+    display: inline-block;
+    background: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+}
+
+.action-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.action-link {
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    color: var(--color-primary);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+}
+
+.action-link:hover {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+}
+
+.stat-icon {
+    font-size: 1.75rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+}
+
+.stat-icon.primary {
+    background: #e7f3ff;
+    color: var(--color-primary);
+}
+
+.stat-icon.info {
+    background: #e7f7ff;
+    color: #00bcd4;
+}
+
+.stat-icon.success {
+    background: #d4edda;
+    color: #28a745;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.stat-detail {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+</style>
+
+{% endblock %}

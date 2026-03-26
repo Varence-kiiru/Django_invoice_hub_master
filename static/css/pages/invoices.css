@@ -575,6 +575,61 @@
     background: var(--color-gray-600);
 }
 
+/* ============ DELIVERY STATUSES ============ */
+.status-scheduled {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.status-scheduled::before {
+    background: #3b82f6;
+}
+
+.status-in_transit {
+    background: rgba(212, 175, 55, 0.1);
+    color: var(--color-primary);
+}
+
+.status-in_transit::before {
+    background: var(--color-primary);
+}
+
+.status-delivered {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-success);
+}
+
+.status-delivered::before {
+    background: var(--color-success);
+}
+
+.status-partially_delivered {
+    background: rgba(249, 115, 22, 0.1);
+    color: #f97316;
+}
+
+.status-partially_delivered::before {
+    background: #f97316;
+}
+
+.status-failed {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--color-danger);
+}
+
+.status-failed::before {
+    background: var(--color-danger);
+}
+
+.status-returned {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+}
+
+.status-returned::before {
+    background: #8b5cf6;
+}
+
 /* ============ ACTION BUTTONS ============ */
 .action-buttons {
     display: flex;

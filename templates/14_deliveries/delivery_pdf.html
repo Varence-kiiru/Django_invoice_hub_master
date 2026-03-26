@@ -1,0 +1,517 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Delivery {{ delivery.delivery_number }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            color: #000;
+            background: white;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .page {
+            width: 100%;
+            position: relative;
+        }
+        
+        .page-content {
+            width: 100%;
+        }
+        
+        .page-break {
+            page-break-after: always;
+        }
+        
+        /* Header */
+        .delivery-header {
+            display: block;
+            margin-bottom: 10mm;
+            border-bottom: 2px solid #38b6ff;
+            padding-bottom: 8mm;
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10mm;
+            margin-bottom: 8mm;
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        .header-left {
+            flex: 1;
+        }
+        
+        .company-logo {
+            flex-shrink: 0;
+            text-align: right;
+        }
+        
+        .company-logo img {
+            max-width: 60mm;
+            max-height: 40mm;
+            object-fit: contain;
+        }
+        
+        .company-info {
+            flex: 1;
+            text-align: right;
+        }
+        
+        .company-info h1 {
+            font-size: 24pt;
+            color: #38b6ff;
+            margin-bottom: 4mm;
+            margin-top: 0;
+            font-weight: bold;
+        }
+        
+        .company-info p {
+            font-size: 11pt;
+            color: #000;
+            margin: 1mm 0;
+            font-weight: 500;
+        }
+        
+        .delivery-details {
+            text-align: left;
+        }
+        
+        .delivery-details h2 {
+            display: flex;
+            align-items: center;
+            gap: 8mm;
+            margin: 0 0 2mm 0;
+            font-size: 12pt;
+            color: #38b6ff;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 2mm 4mm;
+            border-radius: 2mm;
+            font-size: 9pt;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        
+        .delivery-details-row {
+            display: flex;
+            justify-content: flex-start;
+            gap: 5mm;
+            margin: 1mm 0;
+            font-size: 10pt;
+        }
+        
+        .label {
+            font-weight: bold;
+            color: #000;
+            width: 40mm;
+            flex-shrink: 0;
+        }
+        
+        .value {
+            text-align: left;
+        }
+        
+        /* Billing Section */
+        .billing-section {
+            display: flex;
+            gap: 10mm;
+            margin-bottom: 6mm;
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        .billing-block {
+            flex: 1;
+            margin-bottom: 4mm;
+        }
+        
+        .billing-block h3 {
+            font-size: 10pt;
+            font-weight: bold;
+            color: #38b6ff;
+            margin-bottom: 2mm;
+            margin-top: 0;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 1mm;
+        }
+        
+        .billing-block p {
+            font-size: 10pt;
+            margin: 0.5mm 0;
+        }
+        
+        /* Items Table */
+        .items-section {
+            margin-bottom: 8mm;
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 6mm;
+            table-layout: fixed;
+            max-width: 100%;
+        }
+        
+        table thead {
+            background-color: #ecf0f1;
+            border-bottom: 2px solid #38b6ff;
+        }
+        
+        table th {
+            padding: 3mm 3mm;
+            text-align: left;
+            font-weight: bold;
+            color: #38b6ff;
+            font-size: 10pt;
+            word-wrap: break-word;
+        }
+        
+        table tbody tr {
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        table tbody tr:last-child {
+            border-bottom: 2px solid #2c3e50;
+        }
+        
+        table td {
+            padding: 3mm 3mm;
+            font-size: 10pt;
+            word-wrap: break-word;
+        }
+        
+        .text-right {
+            text-align: right;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        /* Totals */
+        .totals-section {
+            display: block;
+            margin-bottom: 4mm;
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        
+        .notes {
+            margin-bottom: 4mm;
+            font-size: 9pt;
+            color: #000;
+        }
+        
+        .notes h4 {
+            font-weight: bold;
+            margin-bottom: 1mm;
+            margin-top: 0;
+            color: #38b6ff;
+        }
+        
+        .totals {
+            width: 100%;
+            max-width: 130mm;
+            margin-left: auto;
+            margin-right: 0;
+            text-align: right;
+        }
+        
+        .totals-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 2mm 4mm;
+            font-size: 10pt;
+            gap: 4mm;
+        }
+        
+        .totals-row span:first-child {
+            flex: 1;
+            text-align: left;
+        }
+        
+        .totals-row span:last-child {
+            min-width: 25mm;
+            text-align: right;
+        }
+        
+        .totals-row.subtotal {
+            border-top: 1px solid #ddd;
+        }
+        
+        .totals-row.total {
+            border-top: 2px solid #38b6ff;
+            border-bottom: 2px solid #38b6ff;
+            font-weight: bold;
+            font-size: 10pt;
+            color: #38b6ff;
+            padding: 3mm 4mm;
+            background-color: #ecf0f1;
+            margin: 3mm 0;
+        }
+        
+        /* Footer */
+        .delivery-footer {
+            position: running(deliveryFooter);
+            border-top: 2px solid #38b6ff;
+            font-size: 9pt;
+            color: #000;
+            padding-top: 3mm;
+            background: white;
+            padding-bottom: 2mm;
+            width: 100%;
+        }
+        
+        .delivery-footer-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 5mm;
+            margin-bottom: 3mm;
+        }
+        
+        .delivery-footer-item {
+            font-size: 8pt;
+        }
+        
+        .delivery-footer-item-label {
+            font-weight: bold;
+            color: #38b6ff;
+            font-size: 8pt;
+            margin-bottom: 1mm;
+        }
+        
+        .delivery-footer-item-value {
+            color: #000;
+            font-size: 8pt;
+            line-height: 1.3;
+        }
+        
+        .delivery-footer-disclaimer {
+            font-size: 8pt;
+            color: #666;
+            text-align: center;
+            margin-top: 3mm;
+            padding-top: 3mm;
+            border-top: 1px solid #ddd;
+        }
+        
+        .page-counter::before {
+            content: counter(page) " of " counter(pages);
+        }
+
+        @page {
+            size: A4 portrait;
+            margin: 15mm;
+
+            @bottom-left {
+                content: element(deliveryFooter);
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Running Footer Definition -->
+    <div id="deliveryFooter" class="delivery-footer">
+        <div class="delivery-footer-content">
+            <div class="delivery-footer-item">
+                <div class="delivery-footer-item-label">Delivery No</div>
+                <div class="delivery-footer-item-value">{{ delivery.delivery_number }}</div>
+            </div>
+            <div class="delivery-footer-item">
+                <div class="delivery-footer-item-label">Scheduled Date</div>
+                <div class="delivery-footer-item-value">{{ delivery.scheduled_date|date:"d M Y" }}</div>
+            </div>
+            <div class="delivery-footer-item">
+                <div class="delivery-footer-item-label">Delivered To</div>
+                <div class="delivery-footer-item-value">{{ invoice.client.name }}</div>
+            </div>
+            <div class="delivery-footer-item">
+                <div class="delivery-footer-item-label">Page</div>
+                <div class="delivery-footer-item-value page-counter"></div>
+            </div>
+        </div>
+        <div class="delivery-footer-disclaimer">
+            This is an automatically generated delivery challan, no signature is required.
+        </div>
+    </div>
+
+    <div class="page">
+        <div class="page-content">
+            <!-- Header -->
+            <div class="delivery-header">
+                <div class="header-top">
+                    <div class="header-left">
+                        <div class="delivery-details">
+                            <h2>
+                                DELIVERY CHALLAN
+                                {% if delivery.status == 'delivered' %}
+                                <span class="status-badge" style="background-color: #ccffcc; color: #00aa00; border: 1px solid #00aa00;">Delivered</span>
+                                {% elif delivery.status == 'partially_delivered' %}
+                                <span class="status-badge" style="background-color: #fff3cd; color: #ff9800; border: 1px solid #ff9800;">Partial</span>
+                                {% elif delivery.status == 'in_transit' %}
+                                <span class="status-badge" style="background-color: #fff3cd; color: #ff9800; border: 1px solid #ff9800;">In Transit</span>
+                                {% else %}
+                                <span class="status-badge" style="background-color: #ffcccc; color: #cc0000; border: 1px solid #cc0000;">Draft</span>
+                                {% endif %}
+                            </h2>
+                            <div class="delivery-details-row">
+                                <span class="label">Delivery #:</span>
+                                <span class="value">{{ delivery.delivery_number }}</span>
+                            </div>
+                            <div class="delivery-details-row">
+                                <span class="label">Tracking #:</span>
+                                <span class="value">{{ delivery.tracking_number }}</span>
+                            </div>
+                            <div class="delivery-details-row">
+                                <span class="label">Invoice #:</span>
+                                <span class="value">{{ invoice.invoice_number }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% if company_logo %}
+                    <div class="company-logo">
+                        <img src="{{ company_logo }}" alt="{{ company_name }} logo">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Delivery From / Deliver To -->
+            <div class="billing-section">
+                <div class="billing-block">
+                    <h3>DELIVERED FROM</h3>
+                    <p><strong>{{ company_name }}</strong></p>
+                    {% if company_address %}
+                        <p>{{ company_address }}</p>
+                    {% endif %}
+                    {% if company_phone %}
+                        <p>Phone: {{ company_phone }}</p>
+                    {% endif %}
+                    {% if company_email %}
+                        <p>Email: {{ company_email }}</p>
+                    {% endif %}
+                </div>
+                <div class="billing-block">
+                    <h3>DELIVER TO</h3>
+                    <p><strong>{{ delivery.recipient_name }}</strong></p>
+                    {% if delivery.delivery_location %}
+                        <p>{{ delivery.delivery_location }}</p>
+                    {% endif %}
+                    <p><strong>Client:</strong> {{ invoice.client.name }}</p>
+                    {% if invoice.client.phone %}
+                        <p>Phone: {{ invoice.client.phone }}</p>
+                    {% endif %}
+                    {% if invoice.client.email %}
+                        <p>Email: {{ invoice.client.email }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Line Items -->
+            <div class="items-section">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 40%">Description</th>
+                            <th style="width: 15%" class="text-right">Qty Scheduled</th>
+                            <th style="width: 15%" class="text-right">Qty Delivered</th>
+                            <th style="width: 15%" class="text-center">Unit</th>
+                            <th style="width: 15%" class="text-right">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in line_items %}
+                        <tr>
+                            <td><strong>{{ item.product.name }}</strong></td>
+                            <td class="text-right">{{ item.quantity_scheduled }}</td>
+                            <td class="text-right">{{ item.quantity_delivered }}</td>
+                            <td class="text-center">{{ item.unit }}</td>
+                            <td class="text-right">
+                                {% if item.quantity_delivered == item.quantity_scheduled %}
+                                <strong style="color: #00aa00;">✓ Full</strong>
+                                {% elif item.quantity_delivered > 0 %}
+                                <strong style="color: #ff9800;">⚠ Partial</strong>
+                                {% else %}
+                                <strong style="color: #999;">○ None</strong>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">No items in this delivery</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Delivery Summary and Notes -->
+            <div class="totals-section">
+                {% if delivery.notes or delivery.condition_notes %}
+                <div class="notes">
+                    {% if delivery.condition_notes %}
+                    <h4>Condition Notes</h4>
+                    <p>{{ delivery.condition_notes }}</p>
+                    {% endif %}
+                    {% if delivery.notes %}
+                    <h4>Additional Notes</h4>
+                    <p>{{ delivery.notes }}</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+                <div class="totals">
+                    <div class="totals-row subtotal">
+                        <span>Total Items Scheduled:</span>
+                        <span>{{ delivery.total_items_scheduled }}</span>
+                    </div>
+                    <div class="totals-row subtotal">
+                        <span>Total Items Delivered:</span>
+                        <span>{{ delivery.total_items_delivered }}</span>
+                    </div>
+                    <div class="totals-row total">
+                        <span>Delivery Status:</span>
+                        <span>
+                            {% if delivery.is_fully_delivered %}✓ Full Delivery{% elif delivery.is_partially_delivered %}⚠ Partial Delivery{% else %}○ Not Delivered{% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terms and Conditions -->
+            {% if company_settings.terms_and_conditions %}
+            <div class="section-break">
+                <h4 style="margin: 1.5rem 0 1rem 0; font-size: 1.1rem; font-weight: 600; border-bottom: 2px solid #0066cc; padding-bottom: 0.5rem;">TERMS AND CONDITIONS</h4>
+                <div style="white-space: pre-line; line-height: 1.6; font-size: 0.9rem; color: #333;">{{ company_settings.terms_and_conditions }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

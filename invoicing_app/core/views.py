@@ -1,7 +1,50 @@
 """Core views for the invoicing application."""
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, permissions
+from rest_framework import viewsets
+from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    """Read-only viewset for users - used for transfer ownership dropdown."""
+    queryset = User.objects.all().order_by('email')
+    permission_classes = [permissions.IsAuthenticated]  # Require authentication
+    
+    def get_queryset(self):
+        # Only allow superusers or staff to see all users
+        if self.request.user.is_superuser or self.request.user.is_staff:
+            return User.objects.all().order_by('email')
+        return User.objects.none()
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        data = []
+        for user in queryset:
+            data.append({
+                'id': user.id,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'username': user.username,
+                'is_active': user.is_active,
+            })
+        return Response({'results': data})
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        data = []
+        for user in queryset:
+            data.append({
+                'id': user.id,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'username': user.username,
+                'is_active': user.is_active,
+            })
+        return Response({'results': data})
 
 
 @api_view(['GET'])

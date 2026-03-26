@@ -466,7 +466,7 @@
 <body>
 
     <!-- Running Footer Definition -->
-    <div class="invoice-footer">
+    <div id="invoiceFooter" class="invoice-footer">
         <div class="invoice-footer-content">
             <div class="invoice-footer-item">
                 <div class="invoice-footer-item-label">Invoice No</div>
@@ -580,10 +580,12 @@
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 40%">Description</th>
-                            <th style="width: 15%" class="text-right">Quantity</th>
-                            <th style="width: 22.5%" class="text-right">Unit Price</th>
-                            <th style="width: 22.5%" class="text-right">Total</th>
+                            <th style="width: 30%">Description</th>
+                            <th style="width: 10%" class="text-right">Qty</th>
+                            <th style="width: 10%" class="text-right">Unit</th>
+                            <th style="width: 15%" class="text-right">Unit Price ({{ invoice.currency }})</th>
+                            <th style="width: 15%" class="text-right">Tax Amount ({{ invoice.currency }})</th>
+                            <th style="width: 20%" class="text-right">Total ({{ invoice.currency }})</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -595,13 +597,15 @@
                                     <br><span style="color: #999; font-size: 9pt;">{{ item.description }}</span>
                                 {% endif %}
                             </td>
-                            <td class="text-right">{{ item.quantity|floatformat:2 }} {{ item.product.unit }}</td>
-                            <td class="text-right">{{ invoice.currency }} {{ item.unit_price|floatformat:2 }}</td>
-                            <td class="text-right"><strong>{{ invoice.currency }} {{ item.line_total|floatformat:2 }}</strong></td>
+                            <td class="text-right">{{ item.quantity|floatformat:0 }}</td>
+                            <td class="text-right">{{ item.product.unit }}</td>
+                            <td class="text-right">{{ item.unit_price|floatformat:2 }}</td>
+                            <td class="text-right">{{ item.tax_amount|floatformat:2 }}</td>
+                            <td class="text-right"><strong>{{ item.line_total|floatformat:2 }}</strong></td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="4" class="text-right">No line items</td>
+                            <td colspan="6" class="text-right">No line items</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -717,6 +721,14 @@
                     {% endif %}
                 </div>
                 {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Terms and Conditions -->
+            {% if company_settings.terms_and_conditions %}
+            <div class="section-break">
+                <h4 style="margin: 1.5rem 0 1rem 0; font-size: 1.1rem; font-weight: 600; border-bottom: 2px solid #0066cc; padding-bottom: 0.5rem;">TERMS AND CONDITIONS</h4>
+                <div style="white-space: pre-line; line-height: 1.6; font-size: 0.9rem; color: #333;">{{ company_settings.terms_and_conditions }}</div>
             </div>
             {% endif %}
         </div>

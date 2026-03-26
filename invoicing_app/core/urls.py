@@ -14,14 +14,8 @@ urlpatterns = [
     # ━━━ Root URL - Redirect to dashboard ━━━
     path('', RedirectView.as_view(url=reverse_lazy('core:dashboard'), permanent=False), name='home'),
     
-    # ━━━ Authentication ━━━
-    path('auth/login/', views_html.login_view, name='login'),
-    path('auth/register/', views_html.register_view, name='register'),
-    path('auth/password-reset/', views_html.password_reset_view, name='password_reset'),
-    path('auth/password-reset/<uidb64>/<token>/', views_html.password_reset_confirm_view, name='password_reset_confirm'),
-    path('auth/logout-confirm/', views_html.logout_confirm_view, name='logout_confirm'),
-    path('auth/profile/', views_html.profile_view, name='profile'),
-    path('auth/settings/', views_html.settings_view, name='settings'),
+    # ━━━ User Account ━━━
+    path('profile/', views_html.profile_view, name='profile'),
     
     # ━━━ Dashboard ━━━
     path('dashboard/', views_html.dashboard_view, name='dashboard'),
@@ -76,6 +70,9 @@ urlpatterns = [
     path('settings/account/create-api-key/', views_html.create_api_key, name='create_api_key'),
     path('settings/account/export-data/', views_html.export_data, name='export_data'),
     path('settings/account/delete/', views_html.delete_account_confirm, name='delete_account_confirm'),
+    
+    # ━━━ Team & Organization Settings ━━━
+    path('settings/team-members/', views_html.team_members_view, name='team-members'),
     
     # ━━━ Admin Management ━━━
     path('system/users/', views_html.users_management_view, name='users-management'),

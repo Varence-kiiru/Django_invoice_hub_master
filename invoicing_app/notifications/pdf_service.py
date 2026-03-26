@@ -595,6 +595,80 @@ class PDFService:
             logger.error(f"Error generating {report_type} report PDF: {str(e)}")
             raise
 
+    @staticmethod
+    def generate_delivery_pdf(delivery_id, save=True):
+        """
+        Generate PDF for delivery challan using template rendering.
+        Matches invoice PDF formatting.
+        
+        Args:
+            delivery_id: ID of delivery to generate PDF for
+            save: Whether to save PDF to storage
+        
+        Returns:
+            String path to PDF file (if save=True) or BytesIO object (if save=False)
+        """
+        try:
+            from invoicing_app.deliveries.models import Delivery
+            
+            delivery = Delivery.objects.select_related(
+                'invoice',
+                'invoice__client'
+            ).prefetch_related(
+                'line_items'
+            ).get(id=delivery_id)
+            
+            # Check if PDF already exists in database
+            if save and hasattr(delivery, 'delivery_pdf') and delivery.delivery_pdf and default_storage.exists(delivery.delivery_pdf.name):
+                logger.info(f"Using cached PDF for delivery {delivery.delivery_number}")
+                return delivery.delivery_pdf.name
+            
+            # Get company settings
+            company_settings = CompanySettings.get_settings()
+            
+            # Get logo as base64 data URI for embedding in PDF
+            logo_data_uri = PDFService._get_logo_data_uri()
+            
+            # Prepare context
+            context = {
+                'delivery': delivery,
+                'invoice': delivery.invoice,
+                'line_items': delivery.line_items.all(),
+                'company_name': company_settings.company_name,
+                'company_address': company_settings.company_address,
+                'company_phone': company_settings.company_phone,
+                'company_email': company_settings.company_email,
+                'company_logo': logo_data_uri if logo_data_uri else None,  # Use data URI for PDF
+                'company_tax_id': company_settings.tax_id,
+            }
+            
+            # Render HTML template
+            html_string = render_to_string(
+                '14_deliveries/delivery_pdf.html',
+                context
+            )
+            
+            # Generate PDF
+            pdf_content = PDFService._html_to_pdf(html_string)
+            
+            if save:
+                # Save to storage
+                filename = f'deliveries/pdfs/{delivery.delivery_number}.pdf'
+                path = default_storage.save(filename, ContentFile(pdf_content))
+                
+                logger.info(f"Saved PDF for delivery {delivery.delivery_number} to {path}")
+                return path
+            else:
+                # Return BytesIO object
+                return BytesIO(pdf_content)
+        
+        except Delivery.DoesNotExist:
+            logger.error(f"Delivery {delivery_id} not found")
+            raise
+        except Exception as e:
+            logger.error(f"Error generating PDF for delivery {delivery_id}: {str(e)}")
+            raise
+
 
 # Create singleton instance
 pdf_service = PDFService()

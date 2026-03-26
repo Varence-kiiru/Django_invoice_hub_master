@@ -59,6 +59,7 @@ INSTALLED_APPS = [
 
     # Invoicing App Modules
     "invoicing_app.core.apps.CoreConfig",
+    "invoicing_app.organizations.apps.OrganizationsConfig",
     "invoicing_app.user_management.apps.UserManagementConfig",
     "invoicing_app.clients.apps.ClientsConfig",
     "invoicing_app.products.apps.ProductsConfig",
@@ -66,6 +67,7 @@ INSTALLED_APPS = [
     "invoicing_app.taxes.apps.TaxesConfig",
     "invoicing_app.payments.apps.PaymentsConfig",
     "invoicing_app.quotations.apps.QuotationsConfig",
+    "invoicing_app.deliveries.apps.DeliveriesConfig",
     "invoicing_app.audit.apps.AuditConfig",
     "invoicing_app.notifications.apps.NotificationsConfig",
     "invoicing_app.expenses.apps.ExpensesConfig",
@@ -340,3 +342,45 @@ EMAIL_USE_TLS = get_env("EMAIL_USE_TLS", "False").lower() == "true"
 EMAIL_HOST_USER = get_env("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = get_env("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = get_env("DEFAULT_FROM_EMAIL", "")
+
+
+# ============================================================================
+# Stripe Payment Processing (SaaS Commercialization)
+# ============================================================================
+
+STRIPE_API_KEY = get_env("STRIPE_API_KEY", "sk_test_YOUR_KEY_HERE")
+STRIPE_WEBHOOK_SECRET = get_env("STRIPE_WEBHOOK_SECRET", "whsec_test_YOUR_SECRET_HERE")
+STRIPE_PUBLISHABLE_KEY = get_env("STRIPE_PUBLISHABLE_KEY", "pk_test_YOUR_KEY_HERE")
+
+# ============================================================================
+# Security Middleware (Production)
+# ============================================================================
+
+SECURITY_MIDDLEWARE_ENABLED = get_env("SECURITY_MIDDLEWARE_ENABLED", "True").lower() == "true"
+
+if SECURITY_MIDDLEWARE_ENABLED:
+    MIDDLEWARE.insert(0, "invoicing_app.organizations.security.RateLimitMiddleware")
+    MIDDLEWARE.insert(1, "invoicing_app.organizations.security.SecurityHeadersMiddleware")
+    MIDDLEWARE.insert(2, "invoicing_app.organizations.security.CSPMiddleware")
+
+# ============================================================================
+# CORS Configuration (API Access)
+# ============================================================================
+
+CORS_ALLOWED_ORIGINS = get_env("CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8000").split(",")
+CORS_ALLOW_CREDENTIALS = True
+
+# ============================================================================
+# Multi-Tenancy Configuration
+# ============================================================================
+
+MULTI_TENANCY_ENABLED = get_env("MULTI_TENANCY_ENABLED", "True").lower() == "true"
+ORGANIZATION_REQUIRED_APPS = [
+    "invoicing_app.invoices",
+    "invoicing_app.deliveries",
+    "invoicing_app.quotations",
+    "invoicing_app.payments",
+    "invoicing_app.expenses",
+    "invoicing_app.clients",
+    "invoicing_app.products",
+]

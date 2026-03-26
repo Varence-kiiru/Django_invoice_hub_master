@@ -6,12 +6,13 @@ from invoicing_app.products.models import Product
 from invoicing_app.taxes.models import TaxRate
 from invoicing_app.payments.models import Payment
 from .serializers import InvoiceSerializer, InvoiceLineItemSerializer
+from invoicing_app.organizations.drf_permissions import InvoiceCreatePermission
 
 
 class InvoiceViewSet(viewsets.ModelViewSet):
     queryset = Invoice.objects.all().order_by('-invoice_date')
     serializer_class = InvoiceSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, InvoiceCreatePermission]
     filterset_fields = ['invoice_number', 'client', 'status', 'invoice_date']
     search_fields = ['invoice_number', 'description']
     

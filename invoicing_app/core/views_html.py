@@ -30,6 +30,7 @@ from invoicing_app.quotations.models import Quote
 from invoicing_app.expenses.models import Expense
 from invoicing_app.audit.models import AuditLog
 from invoicing_app.core.models import CompanySettings, EmailConfiguration
+from invoicing_app.deliveries.models import Delivery
 
 
 # ━━━━━ LOGGER SETUP ━━━━━
@@ -67,7 +68,7 @@ def role_required(*allowed_roles):
         @wraps(view_func)
         def wrapper(request, *args, **kwargs):
             if not request.user.is_authenticated:
-                return redirect('core:login')
+                return redirect('organizations:login')
             role = _get_user_role(request)
             if role not in allowed_roles:
                 messages.error(request, 'You do not have permission to access this page.')
@@ -255,7 +256,7 @@ def password_reset_confirm_view(request, uidb64, token):
             return render(request, '2_auth/password_reset_confirm.html', context)
         
         messages.success(request, 'Password reset successful!')
-        return redirect('core:login')
+        return redirect('organizations:login')
     
     context = {'uidb64': uidb64, 'token': token}
     return render(request, '2_auth/password_reset_confirm.html', context)
@@ -267,7 +268,7 @@ def logout_confirm_view(request):
     if request.method == 'POST':
         logout(request)
         messages.success(request, 'You have been logged out.')
-        return redirect('core:login')
+        return redirect('organizations:login')
     return render(request, '2_auth/logout_confirm.html')
 
 
@@ -405,6 +406,45 @@ def dashboard_view(request):
     else:
         profit_margin = 0
     
+    # === DELIVERY METRICS ===
+    total_deliveries = Delivery.objects.filter(is_active=True).count()
+    
+    # Pending deliveries (not yet delivered)
+    pending_deliveries = Delivery.objects.filter(
+        is_active=True,
+        status__in=['draft', 'scheduled', 'in_transit', 'partially_delivered']
+    ).count()
+    
+    # Deliveries this month
+    month_deliveries = Delivery.objects.filter(
+        is_active=True,
+        created_at__gte=first_of_month
+    ).count()
+    
+    # Delivery status breakdown
+    delivery_stats = Delivery.objects.filter(is_active=True).aggregate(
+        draft=Count('id', filter=Q(status='draft')),
+        scheduled=Count('id', filter=Q(status='scheduled')),
+        in_transit=Count('id', filter=Q(status='in_transit')),
+        delivered=Count('id', filter=Q(status='delivered')),
+        partially_delivered=Count('id', filter=Q(status='partially_delivered')),
+        failed=Count('id', filter=Q(status='failed')),
+        returned=Count('id', filter=Q(status='returned')),
+        cancelled=Count('id', filter=Q(status='cancelled')),
+    )
+    
+    # Recent deliveries
+    recent_deliveries = Delivery.objects.filter(is_active=True).select_related(
+        'invoice', 'invoice__client'
+    ).order_by('-created_at')[:5]
+    
+    # Overdue deliveries (scheduled but not yet delivered)
+    overdue_deliveries = Delivery.objects.filter(
+        is_active=True,
+        scheduled_date__lt=today,
+        status__in=['scheduled', 'in_transit']
+    ).select_related('invoice', 'invoice__client').order_by('scheduled_date')[:3]
+    
     # Get user permissions for dynamic dashboard
     from invoicing_app.core.permissions import (
         get_user_permissions, user_has_permission,
@@ -412,9 +452,51 @@ def dashboard_view(request):
         QUOTATION_PERMISSIONS, CLIENT_PERMISSIONS, USER_PERMISSIONS,
         SYSTEM_PERMISSIONS, REPORT_PERMISSIONS
     )
+    from invoicing_app.organizations.plan_enforcer import PlanEnforcer
+    from invoicing_app.organizations.models import Subscription
+    from invoicing_app.organizations.views_billing import get_user_organization
     
     user_permissions = get_user_permissions(request.user)
     is_admin = request.user.is_superuser or _get_user_role(request) == 'Admin'
+    
+    # Get plan and subscription info
+    organization = get_user_organization(request.user)
+    subscription = None
+    trial_days_remaining = 0
+    current_usage = {}
+    
+    if organization:
+        try:
+            subscription = Subscription.objects.get(organization=organization)
+        except Subscription.DoesNotExist:
+            subscription = None
+        
+        # Get usage info
+        if subscription:
+            current_usage = PlanEnforcer.get_invoice_count_this_month(organization)
+            plan_limits = {
+                'free': 50,
+                'starter': 1000,
+                'professional': None,
+                'enterprise': None
+            }
+            limit = plan_limits.get(subscription.plan, 50)
+            
+            if limit:
+                percentage = int((current_usage / limit) * 100)
+            else:
+                percentage = 0
+            
+            current_usage = {
+                'invoices': current_usage,
+                'invoices_limit': limit if limit else 'Unlimited',
+                'percentage_used': min(100, percentage)
+            }
+            
+            # Calculate trial days
+            if subscription.current_period_end:
+                days_remaining = (subscription.current_period_end - timezone.now().date()).days
+                trial_days_remaining = max(0, days_remaining)
     
     context = {
         'page_title': 'Dashboard',
@@ -445,15 +527,27 @@ def dashboard_view(request):
         'total_expenses': total_expenses,
         'month_expenses': month_expenses,
         'profit_margin': profit_margin,
+        # Delivery metrics
+        'total_deliveries': total_deliveries,
+        'pending_deliveries': pending_deliveries,
+        'month_deliveries': month_deliveries,
+        'draft_deliveries': delivery_stats.get('draft', 0),
+        'scheduled_deliveries': delivery_stats.get('scheduled', 0),
+        'in_transit_deliveries': delivery_stats.get('in_transit', 0),
+        'delivered_deliveries': delivery_stats.get('delivered', 0),
+        'partially_delivered_deliveries': delivery_stats.get('partially_delivered', 0),
+        'failed_deliveries': delivery_stats.get('failed', 0),
         # Client metrics
         'total_clients': total_clients,
         # Recent items
         'recent_invoices': recent_invoices,
         'recent_quotations': recent_quotations,
         'recent_payments': recent_payments,
+        'recent_deliveries': recent_deliveries,
         # Alerts
         'overdue_invoices': overdue_invoices,
         'expiring_quotations': expiring_quotations,
+        'overdue_deliveries': overdue_deliveries,
         'system_status': system_status,
         'role': _get_user_role(request),
         # ===== PERMISSION-BASED DYNAMIC DASHBOARD =====
@@ -469,6 +563,12 @@ def dashboard_view(request):
         'can_manage_users': user_has_permission(request.user, 'manage_users') or is_admin,
         'can_manage_roles': user_has_permission(request.user, 'manage_roles') or is_admin,
         'can_manage_settings': user_has_permission(request.user, 'configure_settings') or is_admin,
+        'can_view_deliveries': user_has_permission(request.user, 'view_deliveries') or is_admin,
+        # Subscription/Plan info
+        'subscription': subscription,
+        'organization': organization,
+        'current_usage': current_usage,
+        'trial_days_remaining': trial_days_remaining,
     }
     
     # Use unified dynamic dashboard for all roles
@@ -1669,6 +1769,7 @@ def settings_general_view(request):
             settings.invoice_prefix = request.POST.get('invoice_prefix', settings.invoice_prefix)
             settings.payment_prefix = request.POST.get('payment_prefix', settings.payment_prefix)
             settings.quote_prefix = request.POST.get('quote_prefix', settings.quote_prefix)
+            settings.delivery_prefix = request.POST.get('delivery_prefix', settings.delivery_prefix)
             # Default payment terms
             settings.default_payment_terms = request.POST.get('default_payment_terms', settings.default_payment_terms)
             
@@ -2069,20 +2170,148 @@ def settings_company_view(request):
 @login_required
 @role_required('Admin')
 def users_management_view(request):
-    """User management."""
-    users = User.objects.all()
-    context = {'page_title': 'Users', 'users': users}
+    """
+    User management view with proper tenant scoping.
+    
+    - ONLY Superusers can access this view (system-wide user management)
+    - Regular admins use /settings/team-members/ for their organization
+    
+    Superusers see ALL users across ALL organizations.
+    """
+    # Only superusers can see all users across all organizations
+    if not request.user.is_superuser:
+        messages.warning(request, 'Access restricted. Use Team Members to manage your organization users.')
+        return redirect('core:team-members')
+    
+    from invoicing_app.organizations.views_billing import get_user_organization
+    from invoicing_app.organizations.models import OrganizationMember
+    
+    admin_org = get_user_organization(request.user)
+    users = User.objects.all().order_by('-date_joined')
+    
+    # Enrich users with organization information
+    users_with_org = []
+    for user in users:
+        memberships = OrganizationMember.objects.filter(user=user).select_related('organization')
+        organizations = [
+            {
+                'name': m.organization.name,
+                'slug': m.organization.slug,
+                'role': m.role,
+                'is_primary': m.is_primary
+            }
+            for m in memberships
+        ]
+        users_with_org.append({
+            'user': user,
+            'organizations': organizations,
+            'org_count': len(organizations)
+        })
+    
+    context = {
+        'page_title': 'Users', 
+        'users_data': users_with_org,
+        'admin_organization': admin_org,
+        'view_mode': 'system_admin',
+    }
     return render(request, '9_admin/users_management.html', context)
+
+
+@login_required
+def team_members_view(request):
+    """Organization team members management."""
+    from invoicing_app.organizations.views_billing import get_user_organization
+    from invoicing_app.organizations.models import OrganizationMember
+    
+    organization = get_user_organization(request.user)
+    if not organization:
+        messages.error(request, 'No organization found. Please contact support.')
+        return redirect('core:dashboard')
+    
+    # Get all members of this organization
+    members = OrganizationMember.objects.filter(
+        organization=organization
+    ).select_related('user').order_by('-is_primary', '-joined_at')
+    
+    # Handle member removal
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        member_id = request.POST.get('member_id')
+        action = request.POST.get('action')
+        
+        try:
+            member = OrganizationMember.objects.get(id=member_id, organization=organization)
+            
+            if action == 'remove':
+                # Can't remove primary owner
+                if member.is_primary:
+                    return JsonResponse({'error': 'Cannot remove primary owner'}, status=400)
+                
+                # Can't remove yourself (check permissions)
+                if member.user == request.user:
+                    return JsonResponse({'error': 'Cannot remove yourself from the organization'}, status=400)
+                
+                member.delete()
+                logger.info(f"User {member.user.username} removed from organization {organization.slug}")
+                return JsonResponse({'success': True})
+            
+            elif action == 'change_role':
+                new_role = request.POST.get('role')
+                valid_roles = ['owner', 'admin', 'manager', 'accountant', 'staff', 'viewer']
+                
+                if new_role not in valid_roles:
+                    return JsonResponse({'error': 'Invalid role'}, status=400)
+                
+                member.role = new_role
+                member.save()
+                return JsonResponse({'success': True})
+        
+        except OrganizationMember.DoesNotExist:
+            return JsonResponse({'error': 'Member not found'}, status=404)
+        except Exception as e:
+            logger.error(f"Error managing team member: {str(e)}")
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    context = {
+        'page_title': 'Team Members',
+        'organization': organization,
+        'members': members,
+        'current_user': request.user,
+    }
+    return render(request, 'settings/team_members.html', context)
 
 
 @login_required
 @role_required('Admin')
 def users_create_edit_view(request, pk=None):
-    """Create/edit user."""
-    user = None
+    """
+    Create/edit user with proper tenant scoping.
+    
+    - Regular admins can only create/edit users in their organization
+    - Superusers can create/edit users in any organization
+    """
+    from invoicing_app.organizations.models import Organization, OrganizationMember
+    from invoicing_app.organizations.views_billing import get_user_organization
+    
+    # Debug authentication status
+    logger.info(f"users_create_edit_view called - user authenticated: {request.user.is_authenticated}, user: {request.user}, method: {request.method}")
+    if request.user.is_authenticated:
+        logger.info(f"Authenticated user: {request.user.username}, is_superuser: {request.user.is_superuser}")
+    
+    edit_user = None
     if pk:
         # Fetch the Django User object, not CustomUser
-        user = get_object_or_404(User, pk=pk)
+        edit_user = get_object_or_404(User, pk=pk)
+        
+        # Enforce tenant scoping: check if user is in admin's organization
+        if not request.user.is_superuser:
+            admin_org = get_user_organization(request.user)
+            user_in_admin_org = OrganizationMember.objects.filter(
+                user=edit_user,
+                organization=admin_org
+            ).exists()
+            if not user_in_admin_org:
+                messages.error(request, 'Access denied. User is not in your organization.')
+                return redirect('core:users-management')
     
     if request.method == 'POST':
         # Extract form data
@@ -2096,6 +2325,7 @@ def users_create_edit_view(request, pk=None):
         password = request.POST.get('password', '').strip()
         confirm_password = request.POST.get('confirm_password', '').strip()
         new_password = request.POST.get('new_password', '').strip()
+        organization_id = request.POST.get('organization')
         
         # Validation
         if not all([first_name, last_name, email, username, role_id]):
@@ -2106,7 +2336,7 @@ def users_create_edit_view(request, pk=None):
                 return redirect('core:users-create-edit')
         
         # For new users, validate password
-        if not pk:
+        if not edit_user:
             if password != confirm_password:
                 messages.error(request, 'Passwords do not match.')
                 return redirect('core:users-create-edit')
@@ -2115,9 +2345,9 @@ def users_create_edit_view(request, pk=None):
                 return redirect('core:users-create-edit')
         
         try:
-            if not user:
+            if not edit_user:
                 # Create new user
-                user = User.objects.create_user(
+                new_user = User.objects.create_user(
                     username=username,
                     email=email,
                     first_name=first_name,
@@ -2125,29 +2355,69 @@ def users_create_edit_view(request, pk=None):
                     password=password,
                     is_active=(status == 'active')
                 )
-                # Create CustomUser profile
+                # Create CustomUser profile with selected role
                 role = UserRole.objects.get(pk=role_id)
                 CustomUser.objects.create(
-                    user=user,
+                    user=new_user,
                     role=role,
                     phone=phone
                 )
+
+                # determine organization to assign
+                if request.user.is_superuser and organization_id:
+                    org = Organization.objects.filter(id=organization_id).first()
+                else:
+                    # For regular admins, use their organization
+                    org = get_user_organization(request.user)
+                
+                # If no org found and this is a new user creation, create org from company settings
+                if not org and not pk:
+                    from invoicing_app.core.models import CompanySettings
+                    company_settings = CompanySettings.get_settings()
+                    if company_settings.company_name:
+                        # Create organization from company settings
+                        org, created = Organization.objects.get_or_create(
+                            name=company_settings.company_name,
+                            defaults={
+                                'slug': company_settings.company_name.lower().replace(' ', '-').replace('_', '-'),
+                                'admin_email': company_settings.company_email or new_user.email,
+                                'plan': 'free',
+                                'status': 'active',
+                            }
+                        )
+                        logger.info(f"Created organization '{org.name}' from company settings for user {username}")
+                
+                if org:
+                    # clear any existing primary flags for this user
+                    OrganizationMember.objects.filter(user=new_user).update(is_primary=False)
+                    OrganizationMember.objects.update_or_create(
+                        user=new_user,
+                        organization=org,
+                        defaults={
+                            'role': role.name.lower() if role and role.name else 'staff',
+                            'is_primary': True
+                        }
+                    )
+                    logger.info(f"User {username} assigned to organization {org.slug} as primary")
+                else:
+                    logger.warning(f"No organization available when creating user {username}")
+
                 messages.success(request, f'User {username} created successfully.')
             else:
                 # Update existing user
-                user.first_name = first_name
-                user.last_name = last_name
-                user.email = email
-                user.username = username
-                user.is_active = (status == 'active')
-                user.save()
+                edit_user.first_name = first_name
+                edit_user.last_name = last_name
+                edit_user.email = email
+                edit_user.username = username
+                edit_user.is_active = (status == 'active')
+                edit_user.save()
                 
                 # Update CustomUser profile
                 try:
-                    profile = user.invoicing_profile
+                    profile = edit_user.invoicing_profile
                 except CustomUser.DoesNotExist:
                     # Create profile if it doesn't exist
-                    profile = CustomUser.objects.create(user=user)
+                    profile = CustomUser.objects.create(user=edit_user)
                 
                 profile.role = UserRole.objects.get(pk=role_id)
                 profile.phone = phone
@@ -2155,8 +2425,44 @@ def users_create_edit_view(request, pk=None):
                 
                 # Change password if new one provided
                 if new_password:
-                    user.set_password(new_password)
-                    user.save()
+                    edit_user.set_password(new_password)
+                    edit_user.save()
+
+                # determine organization to assign on edit
+                if request.user.is_superuser and organization_id:
+                    org = Organization.objects.filter(id=organization_id).first()
+                else:
+                    # For regular admins, use their organization
+                    org = get_user_organization(request.user)
+                
+                # If no org found and this is an edit, create org from company settings
+                if not org:
+                    from invoicing_app.core.models import CompanySettings
+                    company_settings = CompanySettings.get_settings()
+                    if company_settings.company_name:
+                        # Create organization from company settings
+                        org, created = Organization.objects.get_or_create(
+                            name=company_settings.company_name,
+                            defaults={
+                                'slug': company_settings.company_name.lower().replace(' ', '-').replace('_', '-'),
+                                'admin_email': company_settings.company_email or edit_user.email,
+                                'plan': 'free',
+                                'status': 'active',
+                            }
+                        )
+                        logger.info(f"Created organization '{org.name}' from company settings for user {username}")
+
+                if org:
+                    OrganizationMember.objects.filter(user=edit_user).update(is_primary=False)
+                    OrganizationMember.objects.update_or_create(
+                        user=edit_user,
+                        organization=org,
+                        defaults={
+                            'role': role.name.lower() if role and role.name else 'staff',
+                            'is_primary': True
+                        }
+                    )
+                    logger.info(f"User {username} membership updated to organization {org.slug}")
                 
                 messages.success(request, f'User {username} updated successfully.')
         
@@ -2167,11 +2473,26 @@ def users_create_edit_view(request, pk=None):
         return redirect('core:users-management')
     
     available_roles = UserRole.objects.filter(is_active=True).order_by('name')
+    admin_org = get_user_organization(request.user)
+    
+    # Build organization list for selector
+    if request.user.is_superuser:
+        organizations = Organization.objects.all().order_by('name')
+    else:
+        organizations = Organization.objects.filter(id=admin_org.id) if admin_org else Organization.objects.none()
+
+    selected_organization = None
+    if edit_user:
+        selected_organization = get_user_organization(edit_user)
+
     context = {
         'page_title': 'Create/Edit User', 
         'pk': pk, 
-        'user': user,
-        'available_roles': available_roles
+        'edit_user': edit_user,  # Renamed from 'user' to avoid conflict with auth context processor
+        'available_roles': available_roles,
+        'admin_organization': admin_org,
+        'organizations': organizations,
+        'selected_organization': selected_organization,
     }
     return render(request, '9_admin/users_create_edit.html', context)
 
@@ -3143,7 +3464,7 @@ def change_password(request):
             user.set_password(new_password)
             user.save()
             messages.success(request, 'Password changed successfully. Please log in again.')
-            return redirect('core:login')
+            return redirect('organizations:login')
     
     context = {'page_title': 'Account Settings'}
     return render(request, '2_auth/settings.html', context)
@@ -3300,7 +3621,7 @@ def delete_account_confirm(request):
         user.delete()
         
         messages.success(request, 'Your account has been permanently deleted.')
-        return redirect('core:login')
+        return redirect('organizations:login')
     
     # Show confirmation page
     context = {'page_title': 'Delete Account', 'user': request.user}
@@ -3946,10 +4267,24 @@ def update_role_permissions_api(request, role_id):
 
 @login_required
 @role_required('Admin')
+@require_http_methods(["DELETE"])
 def delete_user_api(request, user_id):
     """
     API endpoint to delete a user.
+    
+    Tenant-scoped: Regular admins can only delete users in their organization.
+    Superusers can delete any user.
+    
+    Handles:
+    - Prevents deleting yourself
+    - Prevents deleting primary owner of an organization
+    - Removes user from all organization memberships
+    - Proper cascade deletion with logging
+    - Tenant isolation (regular admins only see their org users)
     """
+    # Debug logging
+    logger.info(f"Delete user API called - user authenticated: {request.user.is_authenticated}, user: {request.user}, method: {request.method}")
+    
     # Check HTTP method
     if request.method != 'DELETE':
         return JsonResponse({'success': False, 'error': 'Method not allowed'}, status=405)
@@ -3957,15 +4292,71 @@ def delete_user_api(request, user_id):
     try:
         user = get_object_or_404(User, id=user_id)
         
+        # Debug logging
+        logger.info(f"Delete user API called by {request.user} (id: {request.user.id}, superuser: {request.user.is_superuser}) for user {user} (id: {user.id})")
+        
         # Prevent deleting the current user
         if user.id == request.user.id:
+            logger.warning(f"User {request.user} attempted to delete themselves")
             return JsonResponse({
                 'success': False,
                 'error': 'Cannot delete your own user account'
             }, status=400)
         
+        # Tenant scoping: Check if regular admin is trying to delete user from another org
+        from invoicing_app.organizations.models import OrganizationMember
+        from invoicing_app.organizations.views_billing import get_user_organization
+        
+        if not request.user.is_superuser:
+            admin_org = get_user_organization(request.user)
+            if not admin_org:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'No organization found for your account'
+                }, status=403)
+            
+            # Check if user being deleted is in admin's organization
+            user_in_admin_org = OrganizationMember.objects.filter(
+                user=user,
+                organization=admin_org
+            ).exists()
+            
+            if not user_in_admin_org:
+                logger.warning(f"User {request.user.email} attempted to delete user {user.email} from different organization")
+                return JsonResponse({
+                    'success': False,
+                    'error': 'You can only manage users in your organization'
+                }, status=403)
+        
+        # Check if user is primary owner of any organization
+        primary_memberships = OrganizationMember.objects.filter(
+            user=user,
+            is_primary=True
+        )
+        
+        if primary_memberships.exists():
+            orgs = [m.organization.name for m in primary_memberships]
+            logger.warning(f"User {request.user} attempted to delete primary owner {user} of organizations: {orgs}")
+            return JsonResponse({
+                'success': False,
+                'error': f'Cannot delete primary owner. User is primary owner of: {", ".join(orgs)}. Transfer ownership first.'
+            }, status=400)
+        
+        # Remove user from all organizations first (soft delete from orgs)
+        OrganizationMember.objects.filter(user=user).delete()
+        logger.info(f"Removed user {user.username} from all organization memberships")
+        
+        # Delete related profiles and data
+        try:
+            user.invoicing_profile.delete()
+        except:
+            pass
+        
         user_name = user.get_full_name() or user.username
+        user_email = user.email
         user.delete()
+        
+        logger.info(f"User {user_name} ({user_email}) deleted by {request.user.email}")
         
         return JsonResponse({
             'success': True,
@@ -3977,6 +4368,7 @@ def delete_user_api(request, user_id):
             'error': 'User not found'
         }, status=404)
     except Exception as e:
+        logger.error(f"Error deleting user {user_id}: {str(e)}")
         return JsonResponse({
             'success': False,
             'error': str(e)

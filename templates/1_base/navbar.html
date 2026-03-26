@@ -56,6 +56,7 @@ Styles are in static/css/components/navbar.css
           </div>
           <div class="dropdown-divider" role="separator"></div>
           <a role="menuitem" href="{% url 'core:profile' %}" class="dropdown-item">👤 My Profile</a>
+          <a role="menuitem" href="{% url 'organizations:billing_dashboard' %}" class="dropdown-item">💳 Billing & Subscription</a>
           {% if can_manage_settings or is_admin %}
           <a role="menuitem" href="{% url 'core:settings' %}" class="dropdown-item">⚙️ Settings</a>
           {% endif %}
@@ -64,12 +65,15 @@ Styles are in static/css/components/navbar.css
           {% endif %}
           <a role="menuitem" href="{% url 'core:help-center' %}" class="dropdown-item">❓ Help & Support</a>
           <div class="dropdown-divider" role="separator"></div>
-          <a role="menuitem" href="{% url 'core:logout_confirm' %}" class="dropdown-item logout-item">🚪 Logout</a>
+          <form method="post" action="{% url 'organizations:logout' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" role="menuitem" class="dropdown-item logout-item" style="width: 100%; text-align: left; border: none; background: none; padding: inherit; cursor: pointer;">🚪 Logout</button>
+          </form>
         </div>
       </div>
       {% else %}
       <div class="user-menu">
-        <a href="{% url 'core:login' %}" class="navbar-btn navbar-link" title="Sign in to your account" aria-label="Sign In">👤 Sign In</a>
+        <a href="{% url 'organizations:login' %}" class="navbar-btn navbar-link" title="Sign in to your account" aria-label="Sign In">👤 Sign In</a>
       </div>
       {% endif %}
     </div>

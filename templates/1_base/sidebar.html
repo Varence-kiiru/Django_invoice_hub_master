@@ -87,6 +87,11 @@ Styles are in static/css/components/sidebar.css
                 📁 Categories
               </a>
             </li>
+            <li class="sidebar-submenu-item">
+              <a href="{% url 'products:tax-classes-list' %}" class="sidebar-submenu-link {% if 'tax-class' in request.path %}active{% endif %}">
+                🏷️ Tax Classes
+              </a>
+            </li>
           </ul>
         </li>
 
@@ -135,6 +140,27 @@ Styles are in static/css/components/sidebar.css
           </ul>
         </li>
         {% endif %}
+
+        <!-- Deliveries -->
+        <li class="sidebar-nav-item">
+          <a href="#" class="sidebar-nav-link sidebar-toggle-link" data-toggle="deliveries-menu" aria-expanded="false">
+            <span class="icon" aria-hidden="true">📦</span>
+            <span class="label">Deliveries</span>
+            <span class="sidebar-toggle-icon" id="deliveries-icon" aria-hidden="true">▼</span>
+          </a>
+          <ul class="sidebar-submenu" id="deliveries-menu" hidden>
+            <li class="sidebar-submenu-item">
+              <a href="{% url 'deliveries:list' %}" class="sidebar-submenu-link {% if 'deliveries' in request.path and 'create' not in request.path %}active{% endif %}">
+                📋 All Deliveries
+              </a>
+            </li>
+            <li class="sidebar-submenu-item">
+              <a href="{% url 'deliveries:create' %}" class="sidebar-submenu-link">
+                ➕ New Delivery
+              </a>
+            </li>
+          </ul>
+        </li>
       </ul>
     </div>
 
@@ -326,10 +352,32 @@ Styles are in static/css/components/sidebar.css
     <!-- Bottom Links -->
     <div class="sidebar-bottom">
       {% if can_manage_settings or is_admin %}
-      <a href="{% url 'core:settings' %}" class="sidebar-bottom-link">
+      <a href="#" class="sidebar-nav-link sidebar-toggle-link" data-toggle="settings-menu" aria-expanded="false">
         <span class="icon" aria-hidden="true">⚙️</span>
         <span class="label">Settings</span>
+        <span class="sidebar-toggle-icon" id="settings-icon" aria-hidden="true">▼</span>
       </a>
+      <ul class="sidebar-submenu" id="settings-menu" hidden>
+        <li class="sidebar-submenu-item">
+          <a href="{% url 'core:settings' %}" class="sidebar-submenu-link">
+            👤 Account Settings
+          </a>
+        </li>
+        {% if is_admin %}
+        <li class="sidebar-submenu-item">
+          <a href="{% url 'core:team-members' %}" class="sidebar-submenu-link {% if 'team-members' in request.path %}active{% endif %}">
+            👥 Team Members
+          </a>
+        </li>
+        {% endif %}
+        {% if can_manage_settings %}
+        <li class="sidebar-submenu-item">
+          <a href="{% url 'core:settings-general' %}" class="sidebar-submenu-link">
+            🏢 Company Settings
+          </a>
+        </li>
+        {% endif %}
+      </ul>
       {% endif %}
       <a href="{% url 'core:help-center' %}" class="sidebar-bottom-link">
         <span class="icon" aria-hidden="true">❓</span>

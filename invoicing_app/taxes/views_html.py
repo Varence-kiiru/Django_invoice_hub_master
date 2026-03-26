@@ -199,11 +199,10 @@ def vat_rules_list(request):
     elif status_filter == 'inactive':
         vat_rules_qs = vat_rules_qs.filter(is_active=False)
     
-    # Calculate stats
-    all_rules = VATRule.objects.all()
-    total_rules = all_rules.count()
-    active_rules = all_rules.filter(is_active=True).count()
-    inactive_rules = all_rules.filter(is_active=False).count()
+    # Calculate stats on ALL rules (not filtered, for dashboard overview)
+    total_rules = VATRule.objects.count()
+    active_rules = VATRule.objects.filter(is_active=True).count()
+    inactive_rules = VATRule.objects.filter(is_active=False).count()
     
     # Get tax classes count
     from invoicing_app.products.models import ProductTaxClass

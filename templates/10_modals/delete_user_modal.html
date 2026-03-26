@@ -6,15 +6,29 @@
       <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
     </div>
     <div class="modal-body">
-      <p><strong>⚠️ Warning:</strong> This action cannot be undone.</p>
       <p>Are you sure you want to delete <strong id="deleteUserName"></strong>? All associated data will be preserved but the user account will be permanently removed.</p>
-      <div class="modal-warning">
-        <strong>Before deleting:</strong>
+      
+      <div id="delete-warning-section" class="modal-warning">
+        <strong>⚠️ Warning:</strong> This action cannot be undone.
         <ul>
           <li>Ensure no active sessions are using this account</li>
           <li>Reassign any pending invoices or tasks</li>
           <li>Archive user data if needed</li>
         </ul>
+      </div>
+      
+      <div id="transfer-ownership-section" style="display: none;" class="transfer-ownership-section">
+        <h4>🔄 Transfer Ownership</h4>
+        <p>This user is the primary owner of one or more organizations. Select a new owner:</p>
+        <div class="form-group">
+          <label for="transfer-owner-select">New Primary Owner:</label>
+          <select id="transfer-owner-select" class="form-control">
+            <option value="">-- Select New Owner --</option>
+          </select>
+        </div>
+        <div class="transfer-warning">
+          <strong>Note:</strong> The selected user will become the primary owner and have full control of the organization(s).
+        </div>
       </div>
     </div>
     <div class="modal-footer">

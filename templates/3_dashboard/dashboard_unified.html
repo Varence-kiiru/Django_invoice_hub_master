@@ -16,6 +16,9 @@
     <p class="dashboard-subtitle">Here's your business overview for today</p>
   </div>
 
+  <!-- Plan Status Banner -->
+  {% include 'components/plan_status.html' %}
+
   <!-- Admin Control Panel (Shown only if user has admin permissions) -->
   {% if can_manage_users or can_manage_roles or can_manage_settings %}
   <div class="dashboard-section">
@@ -215,6 +218,37 @@
       </div>
     </div>
     {% endif %}
+
+    <!-- Deliveries (show if user has view_deliveries permission) -->
+    {% if can_view_deliveries %}
+    <!-- Total Deliveries -->
+    <div class="kpi-card" role="article">
+      <div class="kpi-label" id="kpi-deliveries-label">🚚 Total Deliveries</div>
+      <div class="kpi-value" aria-labelledby="kpi-deliveries-label" role="status">{{ total_deliveries|default:'0' }}</div>
+      <div class="kpi-change {% if month_deliveries > 0 %}positive{% else %}neutral{% endif %}">
+        <span aria-hidden="true">{{ month_deliveries|default:'0' }}</span> 
+        <span>this month</span>
+      </div>
+    </div>
+
+    <!-- Pending Deliveries -->
+    <div class="kpi-card" role="article">
+      <div class="kpi-label" id="kpi-pending-deliveries-label">⏳ Pending Deliveries</div>
+      <div class="kpi-value {% if pending_deliveries > 0 %}kpi-alert{% else %}kpi-success{% endif %}" aria-labelledby="kpi-pending-deliveries-label" role="status">{{ pending_deliveries|default:'0' }}</div>
+      <div class="kpi-change">
+        <span>Scheduled or in transit</span>
+      </div>
+    </div>
+    
+    <!-- Delivered This Month -->
+    <div class="kpi-card" role="article">
+      <div class="kpi-label" id="kpi-delivered-label">✓ Delivered This Month</div>
+      <div class="kpi-value kpi-success" aria-labelledby="kpi-delivered-label" role="status">{{ delivered_deliveries|default:'0' }}</div>
+      <div class="kpi-change">
+        <span>Successfully delivered</span>
+      </div>
+    </div>
+    {% endif %}
   </div>
 
   <!-- Invoice Status Breakdown (only if can_view_invoices) -->
@@ -271,8 +305,41 @@
   </div>
   {% endif %}
 
+  <!-- Delivery Status Breakdown (only if can_view_deliveries) -->
+  {% if can_view_deliveries %}
+  <div class="dashboard-section">
+    <div class="dashboard-section-title">🚚 Delivery Status Breakdown</div>
+    <div class="revenue-breakdown">
+      <div class="breakdown-item">
+        <div class="breakdown-label">Scheduled</div>
+        <div class="breakdown-value">{{ scheduled_deliveries|default:'0' }}</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-label">In Transit</div>
+        <div class="breakdown-value">{{ in_transit_deliveries|default:'0' }}</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-label">Delivered</div>
+        <div class="breakdown-value">{{ delivered_deliveries|default:'0' }}</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-label">Partial</div>
+        <div class="breakdown-value">{{ partially_delivered_deliveries|default:'0' }}</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-label">Failed</div>
+        <div class="breakdown-value">{{ failed_deliveries|default:'0' }}</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-label">Draft</div>
+        <div class="breakdown-value">{{ draft_deliveries|default:'0' }}</div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
   <!-- Alerts Section (only if can_view_invoices or can_view_quotations) -->
-  {% if overdue_invoices or expiring_quotations %}
+  {% if overdue_invoices or expiring_quotations or overdue_deliveries %}
   <div class="dashboard-section">
     <div class="dashboard-section-title">⚠️ Alerts & Notifications</div>
     
@@ -299,6 +366,20 @@
           <div class="alert-item alert-warning">
             <strong>{{ quote.quote_number }}</strong> - {{ quote.client.name|default:'Client' }}
             <br><small>Expires: {{ quote.valid_until|date:'M d, Y' }} | Value: {{ quote.currency }} {{ quote.total_amount|floatformat:2 }}</small>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if overdue_deliveries and can_view_deliveries %}
+      <div class="dashboard-panel">
+        <h3 class="dashboard-panel-title">Overdue Deliveries</h3>
+        <div class="dashboard-flex-column">
+          {% for delivery in overdue_deliveries %}
+          <div class="alert-item alert-critical">
+            <strong>{{ delivery.delivery_number }}</strong> - {{ delivery.invoice.client.name|default:'Client' }}
+            <br><small>Scheduled: {{ delivery.scheduled_date|date:'M d, Y' }} | Status: {{ delivery.status|upper }}</small>
           </div>
           {% endfor %}
         </div>
@@ -440,6 +521,59 @@
       {% else %}
         <div class="dashboard-card-empty">
           No payments recorded yet.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Recent Deliveries (only if can_view_deliveries) -->
+  {% if can_view_deliveries %}
+  <div class="dashboard-section">
+    <div class="dashboard-flex-row">
+      <div class="dashboard-section-title">🚚 Recent Deliveries</div>
+      <a href="{% url 'deliveries:list' %}" class="btn btn-secondary btn-sm">View All →</a>
+    </div>
+
+    <div class="dashboard-card">
+      {% if recent_deliveries %}
+        <table class="recent-table">
+          <thead>
+            <tr>
+              <th>Delivery #</th>
+              <th>Client</th>
+              <th>Invoice</th>
+              <th>Status</th>
+              <th>Scheduled</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for delivery in recent_deliveries %}
+              <tr>
+                <td>
+                  <a href="{% url 'deliveries:detail' delivery.id %}" style="color: inherit; text-decoration: none; font-weight: bold;">
+                    {{ delivery.delivery_number }}
+                  </a>
+                </td>
+                <td>{{ delivery.invoice.client.name|default:'N/A' }}</td>
+                <td>
+                  <a href="{% url 'invoices:detail' delivery.invoice.id %}" style="color: inherit; text-decoration: none;">
+                    {{ delivery.invoice.invoice_number|default:'N/A' }}
+                  </a>
+                </td>
+                <td>
+                  <span class="badge badge-{{ delivery.status }}">
+                    {{ delivery.get_status_display }}
+                  </span>
+                </td>
+                <td>{{ delivery.scheduled_date|date:'M d, Y'|default:'Not scheduled' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="dashboard-card-empty">
+          No deliveries yet. <a href="{% url 'deliveries:create' %}">Create your first delivery →</a>
         </div>
       {% endif %}
     </div>

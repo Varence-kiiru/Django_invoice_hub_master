@@ -1,0 +1,304 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}{% if tax_class %}Edit{% else %}Create{% endif %} Tax Class - Invoicing App{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/taxes.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h1><i class="bi bi-tags-fill"></i> {% if tax_class %}Edit Tax Class{% else %}Create New Tax Class{% endif %}</h1>
+        <p class="text-muted">Configure the tax treatment for your products</p>
+    </div>
+    
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger mb-4">
+        <i class="bi bi-exclamation-circle"></i>
+        {% for error in form.non_field_errors %}
+            <div>{{ error }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <form method="post" class="tax-class-form">
+        {% csrf_token %}
+        
+        <!-- Basic Information Section -->
+        <div class="form-section">
+            <h3>Basic Information</h3>
+            
+            <div class="form-group required">
+                <label for="{{ form.name.id_for_label }}" class="form-label">
+                    {{ form.name.label }}
+                </label>
+                {{ form.name }}
+                {% if form.name.help_text %}
+                    <small class="form-text text-muted">{{ form.name.help_text|safe }}</small>
+                {% endif %}
+                {% if form.name.errors %}
+                    <div class="form-error">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        {{ form.name.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group required">
+                <label for="{{ form.rate_type.id_for_label }}" class="form-label">
+                    {{ form.rate_type.label }}
+                </label>
+                {{ form.rate_type }}
+                {% if form.rate_type.help_text %}
+                    <small class="form-text text-muted">{{ form.rate_type.help_text|safe }}</small>
+                {% endif %}
+                {% if form.rate_type.errors %}
+                    <div class="form-error">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        {{ form.rate_type.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Status Section -->
+        {% if tax_class %}
+        <div class="form-section">
+            <h3>Status</h3>
+            
+            <div class="form-group">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {% if tax_class.is_active %}checked{% endif %}>
+                    <label class="form-check-label" for="is_active">
+                        <strong>Active</strong>
+                        <span class="text-muted">When disabled, this tax class won't be available for assignment to new products</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-divider"></div>
+            
+            <div class="info-box">
+                <i class="bi bi-info-circle"></i>
+                <div>
+                    <strong>Created:</strong> {{ tax_class.created_at|date:"M d, Y \a\t H:i" }}<br>
+                    <strong>Last Modified:</strong> {{ tax_class.updated_at|date:"M d, Y \a\t H:i"|default:"Not tracked" }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="bi bi-check-circle"></i> 
+                {% if tax_class %}Save Changes{% else %}Create Tax Class{% endif %}
+            </button>
+            <a href="{% url 'products:tax-classes-list' %}" class="btn btn-secondary btn-lg">
+                <i class="bi bi-arrow-left"></i> Cancel
+            </a>
+        </div>
+    </form>
+
+    <!-- Info Box -->
+    <div class="info-section mt-4">
+        <h4>Tax Classes Overview</h4>
+        <p>Tax classes define the default VAT treatment for products in your catalog:</p>
+        <ul style="margin-left: 20px;">
+            <li><strong>Standard VAT:</strong> Products subject to standard VAT rate</li>
+            <li><strong>Zero-Rated:</strong> Products with 0% VAT (e.g., exports, basic foods)</li>
+            <li><strong>Exempt:</strong> Products exempt from VAT</li>
+        </ul>
+        <p class="text-muted small">Each tax class can have multiple VAT rules that define specific conditions for tax application.</p>
+    </div>
+</div>
+
+<style>
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--color-border);
+}
+
+.form-header h1 {
+    margin-bottom: 0.5rem;
+}
+
+.form-section {
+    background: var(--color-surface);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--color-border);
+}
+
+.form-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group.required .form-label::after {
+    content: " *";
+    color: #dc3545;
+}
+
+.form-label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.form-error {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-text {
+    display: block;
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+}
+
+.form-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.form-check-input {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0.25rem;
+    cursor: pointer;
+}
+
+.form-check-label {
+    cursor: pointer;
+    flex: 1;
+}
+
+.form-divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: 1.5rem 0;
+}
+
+.info-box {
+    background: #f0f7ff;
+    border: 1px solid #b3d9ff;
+    border-radius: 4px;
+    padding: 1rem;
+    display: flex;
+    gap: 1rem;
+    color: #0c5aa0;
+}
+
+.info-box i {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: var(--color-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-lg {
+    padding: 0.875rem 2rem;
+    font-size: 1.1rem;
+}
+
+.info-section {
+    background: var(--color-surface);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+}
+
+.info-section h4 {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.info-section ul {
+    margin-bottom: 1rem;
+}
+
+.info-section li {
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+}
+</style>
+
+{% endblock %}

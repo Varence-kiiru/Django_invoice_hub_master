@@ -1,6 +1,8 @@
 # InvoiceHub - Professional Invoice Management System
 
-A comprehensive, Django-based invoicing application with advanced features for managing invoices, payments, clients, and quotations.
+A comprehensive, enterprise-grade Django-based invoicing application with advanced features for managing invoices, payments, clients, quotations, and multi-tenant organizations. Built for scale with comprehensive API, data analytics, and automation capabilities.
+
+**Version:** 3.0.0 | **Status:** Production Ready ✅ | **Last Updated:** March 26, 2026
 
 ---
 
@@ -10,156 +12,218 @@ A comprehensive, Django-based invoicing application with advanced features for m
 - [Key Features](#key-features)
 - [Project Status](#project-status)
 - [Technology Stack](#technology-stack)
+- [System Architecture](#system-architecture)
 - [Quick Start](#quick-start)
+- [Environment Setup](#environment-setup)
+- [Database Configuration](#database-configuration)
+- [Deployment Guide](#deployment-guide)
 - [Project Structure](#project-structure)
+- [Core Modules](#core-modules)
 - [Features by Priority](#features-by-priority)
 - [Configuration](#configuration)
 - [API Documentation](#api-documentation)
+- [Multi-Tenancy & Organizations](#multi-tenancy--organizations)
 - [Testing](#testing)
 - [Troubleshooting](#troubleshooting)
-- [Support](#support)
+- [Security & Compliance](#security--compliance)
+- [Support & Contributing](#support--contributing)
 
 ---
 
 ## 🎯 Overview
 
-InvoiceHub is a modern, feature-rich invoicing and invoice management system designed for businesses of all sizes. It provides:
+InvoiceHub is a modern, feature-rich invoicing and invoice management system designed for businesses of all sizes. It provides a complete solution for managing the complete invoicing lifecycle:
 
-- **Invoice Management**: Create, edit, send, and track invoices
-- **Payment Tracking**: Record and manage client payments with multiple payment methods
-- **Client Management**: Maintain comprehensive client databases with contact information
-- **Quotations**: Generate and manage price quotations with conversion tracking
-- **Advanced Filtering**: Powerful search and filter capabilities across all modules
+- **Invoice Management**: Create, edit, send, track, and archive invoices with full audit trail
+- **Payment Tracking**: Record and manage client payments with multiple payment methods and reconciliation
+- **Client Management**: Maintain comprehensive client databases with contact information and payment history
+- **Quotations**: Generate and manage price quotations with conversion tracking and templates
+- **Advanced Filtering**: Powerful search and filter capabilities with saved presets across all modules
 - **Bulk Operations**: Batch actions for status updates, email sending, and data management
-- **Email Automation**: Automated email reminders and document distribution
-- **Reporting**: Comprehensive reports on sales, payments, taxes, and aging
+- **Email Automation**: Automated email reminders, scheduling, and document distribution
+- **Reporting & Analytics**: Comprehensive financial reports, dashboards, and business intelligence
+- **Multi-Tenancy**: Support for multiple organizations/companies in single deployment
+- **Data Import/Export**: Bulk data import with validation and error handling
+- **API-First Design**: RESTful API for all operations, suitable for integrations
+
+**Target Users:**
+- Freelancers and small business owners
+- Accounting departments in medium-sized companies
+- Multi-branch enterprises requiring centralized invoice management
+- SaaS platforms needing white-label invoicing
 
 ---
 
 ## ✨ Key Features
 
-### Priority 1: Core Infrastructure ✅
-- ✅ Email Reminders system with scheduling
-- ✅ Advanced Search & Filtering with saved presets
-- ✅ Full-text search with autocomplete suggestions
-- ✅ Real-time filter suggestions for all entities
+### Core Features ✅
+- ✅ Complete invoice lifecycle management (create → send → track → paid → archive)
+- ✅ Multi-currency support with automatic conversion
+- ✅ Tax calculation with configurable tax classes
+- ✅ Recurring invoices and quotations
+- ✅ Payment reconciliation with partial payment support
+- ✅ Client portal for invoice viewing and payment
+- ✅ Email reminders with customizable templates
+- ✅ Expense tracking and management
+- ✅ Delivery notes and quotation management
 
-### Priority 2: Bulk Operations ✅
-- ✅ Batch status updates for invoices, payments, quotations
-- ✅ Bulk email sending (invoices, quotations, reminders, custom)
-- ✅ Batch deletion with error handling
-- ✅ Checkbox-based item selection with "Select All"
-- ✅ Modal dialogs for bulk actions
-
-### Priority 3: Data Import & Analytics ✅ **NEW**
+### Advanced Features ✅
+- ✅ Advanced filtering with saved presets and full-text search
+- ✅ Bulk operations (status updates, email, delete)
 - ✅ CSV/Excel data import with validation
-- ✅ Duplicate detection and handling
-- ✅ Multi-entity support (invoices, payments, clients, quotations)
-- ✅ Real-time dashboard analytics
-- ✅ Financial metrics and KPIs
-- ✅ Aging report and payment analysis
-- ✅ Timeline charts and trends
-- ✅ Top clients and payment method breakdown
+- ✅ Real-time dashboard with financial metrics
+- ✅ Comprehensive reporting (aging, financial, tax)
+- ✅ Audit trail and activity logging
+- ✅ Role-based access control (RBAC)
+- ✅ Multi-tenancy with organization isolation
+- ✅ Payment method tracking and analysis
+- ✅ API for third-party integrations
 
 ### Premium Features
-- 🔒 Role-based access control (RBAC)
-- 📊 Advanced financial reporting
-- 💰 Partial payment tracking
-- 📱 Mobile-responsive design
-- 📧 Email template management
-- 🔔 Smart notifications
+- 🔒 Advanced role-based access control (RBAC)
+- 📊 Financial forecasting and analytics
+- 💰 Automated payment gateway integration
+- 📱 Mobile app support (API-ready)
+- 📧 Email template customization
+- 🔔 Smart notifications and alerts
 
 ---
 
 ## 📊 Project Status
 
-| Component | Status | Priority | UI | Backend |
-|-----------|--------|---|----|----|
-| Email Reminders | ✅ Complete | 1A | ✅ | ✅ |
-| Advanced Filtering | ✅ Complete | 1B | ✅ | ✅ |
-| Bulk Operations | ✅ Complete | 2A | ✅ | ✅ |
-| Data Import Tools | ✅ Complete | 2B | ✅ Phase 4 | ✅ Phase 3 |
-| Dashboard Analytics | ✅ Complete | 3 | ✅ Phase 4 | ✅ Phase 3 |
+**Current Version:** 3.0.0  
+**Release Date:** February 28, 2026  
+**Status:** Production Ready ✅  
+**Python Version:** 3.13+  
+**Django Version:** 4.2+  
+**Database:** PostgreSQL (Prod) / SQLite (Dev)
 
-**Version:** 3.0.0  
-**Last Updated:** February 28, 2026  
-**Status:** Production Ready ✅
+### Completed Modules
 
----
-
-## 🎯 Phase 4 - UI Implementation (Complete ✅)
-
-### Component 1: Data Import Modal (Complete ✅)
-- 4-step import workflow with progress tracking
-- CSV/Excel file upload with validation
-- Real-time data preview
-- Detailed error reporting
-- Integrated at `/import/` 
-
-### Component 2: Analytics Dashboard (Complete ✅)
-- 6 dashboard widgets displaying real-time metrics
-- Financial summary cards (revenue, A/R, avg transaction, payment rate)
-- Invoice timeline chart (line graph)
-- Payment timeline chart (line graph)
-- Aging report widget (A/R breakdown by days)
-- Top clients table (top 10 by revenue)
-- Payment methods distribution (pie/doughnut chart)
-- Responsive mobile design
-- Auto-refresh (5-minute intervals)
-- Dynamic currency formatting from system settings
-- Accessible at `/analytics/`
-
-### Technology
-- **UI**: HTML5, CSS3, Vanilla JavaScript (ES6+)
-- **Charts**: Chart.js 3.9.1
-- **Features**: Responsive design, error handling, loading states, mobile-optimized
-- **Code Quality**: 2800+ lines of production-ready code
+| Module | Status | Features | API |
+|--------|--------|----------|-----|
+| Invoices | ✅ Complete | CRUD, Status Tracking, Templates, PDF Export | ✅ |
+| Payments | ✅ Complete | Payment Recording, Reconciliation, Methods | ✅ |
+| Clients | ✅ Complete | Client Management, Contact Info, History | ✅ |
+| Quotations | ✅ Complete | Quote Generation, Conversion Tracking | ✅ |
+| Email/Notifications | ✅ Complete | Reminders, Templates, Scheduling | ✅ |
+| Advanced Filtering | ✅ Complete | Multi-criteria, Presets, Full-text Search | ✅ |
+| Bulk Operations | ✅ Complete | Status Update, Email, Delete | ✅ |
+| Data Import | ✅ Complete | CSV/Excel, Validation, Duplicate Detection | ✅ |
+| Dashboard Analytics | ✅ Complete | Metrics, Charts, Aging Report | ✅ |
+| Expenses | ✅ Complete | Expense Tracking, Categories, Reports | ✅ |
+| Deliveries | ✅ Complete | Delivery Notes, Tracking | ✅ |
+| Multi-Tenancy | ✅ Complete | Organization Isolation, User Management | ✅ |
+| Audit & Logging | ✅ Complete | Activity Tracking, Audit Trail | ✅ |
+| RBAC | ✅ Complete | Role-based Access Control | ✅ |
 
 ---
 
-## 🛠 Technology Stack
+## 🏗️ System Architecture
+
+### High-Level Architecture
+
+```
+┌─────────────────────────────────────────────────────┐
+│              Frontend Layer                          │
+│  (HTML5, CSS3, Vanilla JavaScript, Service Worker)  │
+└────────────┬────────────────────────────┬───────────┘
+             │                            │
+    ┌────────▼──────────┐        ┌───────▼─────────┐
+    │   REST API Layer  │        │  HTML Views     │
+    │  (Django REST     │        │  (Django        │
+    │   Framework)      │        │   Templates)    │
+    └────────┬──────────┘        └───────┬─────────┘
+             │                            │
+    ┌────────▼────────────────────────────▼─────────┐
+    │         Application Layer                      │
+    │  (Django Apps: Core, Invoices, Payments, etc) │
+    └────────┬────────────────────────────┬──────────┘
+             │                            │
+    ┌────────▼────────────────────────────▼─────────┐
+    │         Service Layer                         │
+    │  (Email, Search, Filtering, Analytics)        │
+    └────────┬────────────────────────────┬──────────┘
+             │                            │
+    ┌────────▼────────────────────────────▼─────────┐
+    │         Data Access Layer                     │
+    │  (ORM: Django Models, Migrations)             │
+    └────────┬────────────────────────────┬──────────┘
+             │                            │
+    ┌────────▼─────────────────────────────────────┐
+    │      Database Layer                          │
+    │  (PostgreSQL / MySQL / SQLite)               │
+    └──────────────────────────────────────────────┘
+
+    ┌──────────────────────────────────┐
+    │   Background Processing          │
+    │  (Celery + Redis)                │
+    │  - Email Scheduling              │
+    │  - Report Generation             │
+    │  - Data Import Processing        │
+    └──────────────────────────────────┘
+```
+
+### Technology Stack
 
 **Backend:**
-- Python 3.13+
-- Django 4.2+
-- PostgreSQL (production) / SQLite (development)
-- Celery (task scheduling)
-- Django REST Framework (API)
+- **Framework:** Django 4.2+ (Python web framework)
+- **Python:** 3.13+ (Programming language)
+- **API:** Django REST Framework 3.14+ (API development)
+- **Task Queue:** Celery 5.3+ (Asynchronous tasks)
+- **Cache/Broker:** Redis (Caching & Celery broker)
+- **Database:** PostgreSQL 14+ (Production) / SQLite 3 (Development)
+- **ORM:** SQLAlchemy via Django ORM (Database abstraction)
 
 **Frontend:**
-- HTML5 / CSS3
-- Vanilla JavaScript (ES6+)
-- Responsive design patterns
-- Service Worker support
+- **HTML5** (Markup)
+- **CSS3** (Styling with responsive design)
+- **Vanilla JavaScript ES6+** (Client-side logic)
+- **Chart.js 3.9.1** (Data visualization)
+- **Service Worker** (Offline support)
 
-**Infrastructure:**
-- XAMPP (local development)
-- GitHub version control
-- Email backends (SMTP, Sendgrid)
+**Infrastructure & DevOps:**
+- **Development:** XAMPP/Apache, Django dev server
+- **Production:** Gunicorn/uWSGI, Nginx reverse proxy
+- **Version Control:** Git/GitHub
+- **Deployment:** Docker-ready (Dockerfile included)
+- **Static Files:** WhiteNoise/Nginx
+- **Media Processing:** Django media files, file storage
+
+**Key Dependencies:**
+- Django extensions (admin customization)
+- Pillow (Image processing)
+- openpyxl/xlrd (Excel support)
+- python-dateutil (Date handling)
+- requests (HTTP client)
+- celery-beat (Scheduled tasks)
 
 ---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.13+
-- pip (Python package manager)
-- Git
-- XAMPP (for local MySQL)
+- **Python 3.13+** (Download from python.org)
+- **Git** (Version control)
+- **PostgreSQL** (Production) OR **MySQL** (Development/XAMPP)
+- **pip** (Python package manager)
+- **Virtual environment** (venv)
 
-### Installation
+### Installation (5 minutes)
 
 1. **Clone the repository:**
    ```bash
    cd c:\xampp\htdocs\invoice
    ```
 
-2. **Activate virtual environment:**
+2. **Create and activate virtual environment:**
    ```bash
    # Windows
+   python -m venv venv
    venv\Scripts\Activate.ps1
    
    # Mac/Linux
+   python3 -m venv venv
    source venv/bin/activate
    ```
 
@@ -168,99 +232,680 @@ InvoiceHub is a modern, feature-rich invoicing and invoice management system des
    pip install -r requirements.txt
    ```
 
-4. **Run migrations:**
+4. **Configure environment variables:**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your settings (database, email, etc.)
+   ```
+
+5. **Run migrations:**
    ```bash
    python manage.py migrate
    ```
 
-5. **Create superuser:**
+6. **Create superuser (admin account):**
    ```bash
    python manage.py createsuperuser
    ```
 
-6. **Load demo data (optional):**
+7. **Load demo/seed data (optional):**
    ```bash
    python manage.py demo_filters
+   python manage.py seed_demo_data  # Creates sample invoices, clients, etc.
    ```
 
-7. **Start development server:**
+8. **Collect static files:**
+   ```bash
+   python manage.py collectstatic --noinput
+   ```
+
+9. **Start development server:**
    ```bash
    python manage.py runserver
    ```
 
-8. **Access the application:**
-   - Open http://localhost:8000 in your browser
-   - Login with your superuser credentials
+10. **Access the application:**
+    - **Web UI:** http://localhost:8000
+    - **Admin Panel:** http://localhost:8000/admin
+    - **API Docs:** http://localhost:8000/api/docs
+    - **Login** with your superuser credentials
 
 ---
 
-## 📁 Project Structure
+## 🔧 Environment Setup
+
+### Environment Variables (.env file)
+
+Create a `.env` file in the project root with the following variables:
+
+```bash
+# Django Settings
+DEBUG=True
+SECRET_KEY=your-secret-key-here-change-in-production
+ALLOWED_HOSTS=localhost,127.0.0.1,yourdomain.com
+
+# Database Configuration
+DATABASE_ENGINE=django.db.backends.postgresql  # postgresql, mysql, sqlite3
+DATABASE_NAME=invoice_db
+DATABASE_USER=postgres
+DATABASE_PASSWORD=your-db-password
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+
+# Email Configuration
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=your-email@gmail.com
+EMAIL_HOST_PASSWORD=your-app-password  # Use app-specific password for Gmail
+DEFAULT_FROM_EMAIL=noreply@yourdomain.com
+
+# Services Webhook URL
+WEBHOOK_URL=https://yourdomain.com/webhooks/
+
+# Timezone
+TIME_ZONE=UTC  # or your timezone: America/New_York, Europe/London, etc.
+
+# Security (Production)
+SECURE_SSL_REDIRECT=False  # Set to True in production
+SESSION_COOKIE_SECURE=False
+CSRF_COOKIE_SECURE=False
+
+# AWS/Storage (if using S3)
+USE_S3=False
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_STORAGE_BUCKET_NAME=
+```
+
+### Development vs Production Configuration
+
+**Development (.env.development):**
+```bash
+DEBUG=True
+DATABASE_ENGINE=django.db.backends.sqlite3
+DATABASE_NAME=db.sqlite3
+EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+```
+
+**Production (.env.production):**
+```bash
+DEBUG=False
+DATABASE_ENGINE=django.db.backends.postgresql
+ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+SECURE_SSL_REDIRECT=True
+SESSION_COOKIE_SECURE=True
+CSRF_COOKIE_SECURE=True
+```
+
+---
+
+## 🗄️ Database Configuration
+
+### Supported Databases
+
+**SQLite (Development - Default)**
+```bash
+# Uses db.sqlite3 (file-based)
+DATABASE_ENGINE=django.db.backends.sqlite3
+```
+
+**PostgreSQL (Recommended Production)**
+```bash
+# Install: pip install psycopg2-binary
+DATABASE_ENGINE=django.db.backends.postgresql
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_NAME=invoice_db
+DATABASE_USER=postgres
+DATABASE_PASSWORD=your-password
+```
+
+**MySQL (XAMPP Development)**
+```bash
+# Install: pip install mysqlclient
+DATABASE_ENGINE=django.db.backends.mysql
+DATABASE_HOST=localhost
+DATABASE_PORT=3306
+DATABASE_NAME=invoice_db
+DATABASE_USER=root
+DATABASE_PASSWORD=
+```
+
+### Database Initialization
+
+```bash
+# Create migrations for changes
+python manage.py makemigrations
+
+# Apply migrations
+python manage.py migrate
+
+# View migration status
+python manage.py showmigrations
+
+# Backup database
+python manage.py dumpdata > backup.json
+
+# Restore database
+python manage.py loaddata backup.json
+```
+
+### Database Schema
+
+The system uses 13+ core models:
+- **User & Organization:** User, Organization, Team, Permission
+- **Invoice:** Invoice, InvoiceLineItem, InvoiceTemplate
+- **Payment:** Payment, PaymentMethod, PaymentReconciliation
+- **Client:** Client, ClientContact, ClientPaymentHistory
+- **Quotation:** Quotation, QuoteLineItem
+- **Product:** Product, ProductCategory
+- **Tax:** TaxClass, TaxRate
+- **Notification:** EmailTemplate, Reminder, EmailLog
+- **Audit:** AuditLog, ActivityLog
+- **Settings:** CompanySettings, SystemSettings
+
+---
+
+## 🌐 Deployment Guide
+
+### Deploying to Production
+
+#### 1. Server Requirements
+
+- **OS:** Linux (Ubuntu 20.04+ recommended), Windows Server, or macOS
+- **Python:** 3.13+
+- **Database:** PostgreSQL 14+ (recommended)
+- **Memory:** Minimum 2GB RAM, 4GB+ recommended
+- **Storage:** Minimum 20GB free space
+- **CPU:** 2+ cores recommended
+
+#### 2. Deployment Steps
+
+**Step 1: Prepare Server**
+```bash
+# Update system
+sudo apt update && sudo apt upgrade -y
+
+# Install dependencies
+sudo apt install -y python3.13 python3.13-venv postgresql postgresql-contrib nginx
+
+# Create application user
+sudo useradd -m -s /bin/bash invoice_user
+sudo su - invoice_user
+```
+
+**Step 2: Clone and Setup Application**
+```bash
+cd /home/invoice_user
+git clone <your-repo-url> invoice
+cd invoice
+
+# Create virtual environment
+python3.13 -m venv venv
+source venv/bin/activate
+
+# Install Python dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+**Step 3: Configure Environment**
+```bash
+# Copy and configure .env
+cp .env.example .env
+nano .env
+# Update: DEBUG=False, DATABASE config, EMAIL config, SECRET_KEY
+```
+
+**Step 4: Database Setup**
+```bash
+# Create PostgreSQL database
+sudo -u postgres psql
+CREATE DATABASE invoice_db;
+CREATE USER invoice_user WITH PASSWORD 'strong_password';
+ALTER ROLE invoice_user SET client_encoding TO 'utf8';
+ALTER ROLE invoice_user SET default_transaction_isolation TO 'read committed';
+ALTER ROLE invoice_user SET default_transaction_deferrable TO on;
+ALTER ROLE invoice_user SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE invoice_db TO invoice_user;
+\q
+
+# Run migrations
+python manage.py migrate
+python manage.py collectstatic --noinput
+```
+
+**Step 5: Create Superuser & Demo Data**
+```bash
+python manage.py createsuperuser
+python manage.py seed_demo_data  # Optional
+```
+
+**Step 6: Configure Gunicorn**
+```bash
+# Create systemd service file
+sudo nano /etc/systemd/system/invoice.service
+```
+
+Add content:
+```ini
+[Unit]
+Description=Invoice Application
+After=network.target postgresql.service
+
+[Service]
+User=invoice_user
+WorkingDirectory=/home/invoice_user/invoice
+ExecStart=/home/invoice_user/invoice/venv/bin/gunicorn invoicing_app.wsgi:application --bind 127.0.0.1:8000 --workers 4 --timeout 120
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable and start:
+```bash
+sudo systemctl enable invoice
+sudo systemctl start invoice
+sudo systemctl status invoice
+```
+
+**Step 7: Configure Nginx Reverse Proxy**
+```bash
+sudo nano /etc/nginx/sites-available/invoice
+```
+
+Add content:
+```nginx
+upstream invoice_app {
+    server 127.0.0.1:8000;
+}
+
+server {
+    listen 80;
+    server_name yourdomain.com www.yourdomain.com;
+    
+    # Redirect HTTP to HTTPS
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name yourdomain.com www.yourdomain.com;
+    
+    # SSL configuration
+    ssl_certificate /etc/ssl/certs/your-cert.crt;
+    ssl_certificate_key /etc/ssl/private/your-key.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    
+    client_max_body_size 100M;
+    
+    location / {
+        proxy_pass http://invoice_app;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    
+    location /static/ {
+        alias /home/invoice_user/invoice/static/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+    
+    location /media/ {
+        alias /home/invoice_user/invoice/media/;
+        expires 30d;
+    }
+}
+```
+
+Enable and test:
+```bash
+sudo ln -s /etc/nginx/sites-available/invoice /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+```
+
+**Step 8: Setup SSL Certificate (Let's Encrypt)**
+```bash
+sudo apt install certbot python3-certbot-nginx
+sudo certbot certonly --nginx -d yourdomain.com -d www.yourdomain.com
+```
+
+**Step 9: Configure Celery for Background Tasks** (Optional but recommended)
+```bash
+# Install Redis
+sudo apt install redis-server
+
+# Create Celery service
+sudo nano /etc/systemd/system/invoice-celery.service
+```
+
+Add content:
+```ini
+[Unit]
+Description=Invoice Celery Worker
+After=network.target redis-server.service
+
+[Service]
+User=invoice_user
+WorkingDirectory=/home/invoice_user/invoice
+ExecStart=/home/invoice_user/invoice/venv/bin/celery -A invoicing_app worker --loglevel=info
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+### Docker Deployment
+
+**Dockerfile Example:**
+```dockerfile
+FROM python:3.13-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+CMD ["gunicorn", "invoicing_app.wsgi:application", "--bind", "0.0.0.0:8000"]
+```
+
+**Docker Compose Configuration:**
+```yaml
+version: '3.8'
+
+services:
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: invoice_db
+      POSTGRES_PASSWORD: your-password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn invoicing_app.wsgi:application --bind 0.0.0.0:8000"
+    environment:
+      DATABASE_ENGINE: django.db.backends.postgresql
+      DATABASE_NAME: invoice_db
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: your-password
+      DATABASE_HOST: db
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
+```
+
+---
+
+## 📁 Core Modules
+
+### Core Application Modules
+
+**Core Module** (`invoicing_app/core/`)
+- Central authentication and user management
+- Dashboard and system analytics
+- Advanced filtering and search infrastructure
+- Bulk operations API
+- Email service and configuration
+- Audit logging and activity tracking
+- System settings and configuration
+
+**Invoice Module** (`invoicing_app/invoices/`)
+- Invoice creation and management
+- Invoice templates and numbering
+- Line items and tax calculations
+- Status tracking (draft, sent, issued, paid, overdue, archived)
+- PDF generation and export
+- Invoice reminders and follow-up
+
+**Payment Module** (`invoicing_app/payments/`)
+- Payment recording
+- Multiple payment method support
+- Payment reconciliation
+- Partial payment tracking
+- Payment history and aging
+- Payment method analysis
+
+**Client Module** (`invoicing_app/clients/`)
+- Client database management
+- Contact information and communication history
+- Payment history and outstanding balance
+- Client portal access
+- Tax ID management
+- Client segmentation
+
+**Quotation Module** (`invoicing_app/quotations/`)
+- Quotation creation and management
+- Quote-to-invoice conversion
+- Template management
+- Expiration tracking
+- Quotation status tracking
+- Historical records
+
+**Expense Module** (`invoicing_app/expenses/`)
+- Expense tracking and categorization
+- Receipt management
+- Expense reports
+- Budget tracking
+- Reimbursement workflow
+
+**Delivery Module** (`invoicing_app/deliveries/`)
+- Delivery note generation
+- Delivery tracking
+- Goods received status
+- Return management
+- Proof of delivery
+
+**Notification Module** (`invoicing_app/notifications/`)
+- Email template management
+- Reminder scheduling
+- Email log tracking
+- Failed email handling
+- Notification preferences
+
+**Audit Module** (`invoicing_app/audit/`)
+- Activity logging
+- Change tracking
+- User action history
+- Data modification audit trail
+- Compliance reporting
+
+**Organization Module** (`invoicing_app/organizations/`)
+- Multi-organization/multi-tenant support
+- Organization settings
+- Team management
+- User-organization relationships
+- Data isolation
+
+**Tax Module** (`invoicing_app/taxes/`)
+- Tax class definitions
+- Tax rate management
+- Tax calculations
+- Tax compliance reporting
+- Multi-country tax support
+
+**Settings Module** (`invoicing_app/settings/`)
+- Company profile and branding
+- Payment terms configuration
+- Email configuration
+- API keys management
+- System preferences
+
+---
+
+### Full Project Structure
 
 ```
 invoice/
-├── invoicing_app/
-│   ├── core/                      # Core app (auth, dashboard, reports)
-│   │   ├── models.py              # Core models (User, Company, Settings)
-│   │   ├── views_html.py          # HTML views
-│   │   ├── api_filters.py         # Advanced filtering API
-│   │   ├── api_bulk_operations.py # Bulk operations API
-│   │   ├── urls.py                # URL routing
-│   │   └── email_service.py       # Email operations
+├── invoicing_app/                       # Main Django application
+│   ├── __init__.py
+│   ├── asgi.py                          # ASGI (async server gateway)
+│   ├── celery.py                        # Celery task configuration
+│   ├── wsgi.py                          # WSGI (web server gateway)
+│   ├── urls.py                          # Root URL routing
+│   ├── settings.py                      # Django configuration
 │   │
-│   ├── invoices/                  # Invoice module
-│   │   ├── models.py              # Invoice, InvoiceLineItem
-│   │   ├── views_html.py          # Invoice views
-│   │   ├── forms.py               # Invoice forms
-│   │   └── urls.py
+│   ├── core/                            # Core module
+│   │   ├── admin.py                     # Django admin customization
+│   │   ├── apps.py                      # App configuration
+│   │   ├── models.py                    # Core models
+│   │   ├── views.py                     # API views
+│   │   ├── views_html.py                # HTML views
+│   │   ├── serializers.py               # API serializers
+│   │   ├── urls.py                      # Module URLs
+│   │   ├── permissions.py               # Custom permissions
+│   │   ├── api_filters.py               # Advanced filtering
+│   │   ├── api_bulk_operations.py       # Bulk operation APIs
+│   │   ├── analytics_dashboard.py       # Dashboard analytics
+│   │   ├── email_backend.py             # Email functionality
+│   │   ├── validators.py                # Data validators
+│   │   ├── decorators.py                # Custom decorators
+│   │   ├── exception_handlers.py        # Error handling
+│   │   ├── context_processors.py        # Template context
+│   │   ├── data_import.py               # Data import logic
+│   │   └── migrations/                  # Database migrations
 │   │
-│   ├── payments/                  # Payment module
-│   │   ├── models.py              # Payment, PaymentMethod
-│   │   ├── views_html.py          # Payment views
-│   │   └── forms.py
+│   ├── invoices/                        # Invoice module
+│   │   ├── models.py                    # Invoice, LineItem models
+│   │   ├── views.py / views_html.py     # Invoice views
+│   │   ├── serializers.py               # API serializers
+│   │   ├── forms.py                     # Django forms
+│   │   ├── urls.py                      # Module routes
+│   │   ├── admin.py                     # Admin interface
+│   │   └── migrations/
 │   │
-│   ├── clients/                   # Client module
-│   │   ├── models.py              # Client model
-│   │   ├── views_html.py          # Client views
-│   │   └── forms.py
+│   ├── payments/                        # Payment module
+│   │   ├── models.py                    # Payment models
+│   │   ├── views.py / views_html.py
+│   │   ├── serializers.py
+│   │   ├── forms.py
+│   │   ├── urls.py
+│   │   └── migrations/
 │   │
-│   ├── quotations/                # Quotation module
-│   │   ├── models.py              # Quote, QuoteLineItem
-│   │   ├── views_html.py          # Quote views
-│   │   └── forms.py
+│   ├── clients/                         # Client module
+│   │   ├── models.py
+│   │   ├── views.py / views_html.py
+│   │   ├── serializers.py
+│   │   ├── forms.py
+│   │   ├── urls.py
+│   │   └── migrations/
 │   │
-│   ├── notifications/             # Email & reminders
-│   │   ├── models.py              # EmailTemplate, Reminder
-│   │   ├── email_service.py       # Email handling
-│   │   ├── reminder_service.py    # Reminder scheduling
-│   │   └── tasks.py               # Celery tasks
+│   ├── quotations/                      # Quotation module
+│   │   ├── models.py
+│   │   ├── views.py / views_html.py
+│   │   ├── serializers.py
+│   │   ├── forms.py
+│   │   ├── urls.py
+│   │   └── migrations/
 │   │
-│   └── settings.py                # Django settings
+│   ├── expenses/                        # Expense module
+│   ├── deliveries/                      # Delivery module
+│   ├── payments/                        # Payment module
+│   ├── products/                        # Product catalog
+│   ├── notifications/                   # Email & notifications
+│   ├── organizations/                   # Multi-tenancy
+│   ├── taxes/                           # Tax management
+│   ├── audit/                           # Audit logging
+│   ├── user_management/                 # User/role management
+│   ├── settings/                        # System settings
+│   ├── tests/                           # Test suite
+│   └── management/                      # Management commands
 │
-├── templates/
-│   ├── layouts/                   # Base layouts
-│   │   └── base.html              # Master template
-│   ├── 2_auth/                    # Authentication pages
-│   ├── 4_clients/                 # Client pages
-│   ├── 6_invoices/                # Invoice pages
-│   ├── 7_payments/                # Payment pages
-│   ├── 10_modals/                 # Modal components
-│   ├── 13_quotations/             # Quotation pages
-│   └── 99_dashboard/              # Dashboard pages
+├── templates/                           # HTML templates
+│   ├── 1_base/
+│   │   └── base.html                    # Master template
+│   ├── 2_auth/                          # Authentication pages
+│   ├── 3_dashboard/                     # Dashboard pages
+│   ├── 4_clients/                       # Client pages
+│   ├── 5_products/                      # Product pages
+│   ├── 6_invoices/                      # Invoice pages
+│   ├── 7_payments/                      # Payment pages
+│   ├── 8_reports/                       # Report pages
+│   ├── 9_admin/                         # Admin pages
+│   ├── 10_modals/                       # Modal components
+│   ├── 11_expenses/                     # Expense pages
+│   ├── 12_errors/                       # Error pages
+│   ├── 13_quotations/                   # Quotation pages
+│   ├── 14_deliveries/                   # Delivery pages
+│   ├── layouts/                         # Reusable layouts
+│   ├── components/                      # Reusable components
+│   ├── invoicing_app/                   # App-level templates
+│   ├── settings/                        # Settings pages
+│   └── emails/                          # Email templates
 │
-├── static/
+├── static/                              # Static assets
 │   ├── js/
-│   │   ├── app.js                 # Main application
-│   │   ├── filter_system.js       # Advanced filtering
-│   │   ├── bulk_operations.js     # Bulk actions handler
-│   │   └── pages/                 # Page-specific scripts
+│   │   ├── app.js                       # Main app JavaScript
+│   │   ├── filter_system.js             # Advanced filtering
+│   │   ├── bulk_operations.js           # Bulk operations handler
+│   │   ├── analytics.js                 # Dashboard analytics
+│   │   ├── data_import.js               # Data import wizard
+│   │   ├── form_validation.js           # Form validation
+│   │   ├── api_client.js                # API communication
+│   │   └── pages/                       # Page-specific scripts
 │   ├── css/
-│   │   ├── style.css              # Main stylesheet
-│   │   └── pages/                 # Page-specific styles
-│   └── images/
+│   │   ├── style.css                    # Main stylesheet
+│   │   ├── responsive.css               # Mobile responsive
+│   │   ├── components.css               # Component styles
+│   │   └── pages/                       # Page-specific styles
+│   ├── images/                          # Image assets
+│   └── offline.html                     # Offline page
 │
-├── manage.py                      # Django management
-├── requirements.txt               # Python dependencies
-└── README.md                      # This file
+├── media/                               # User-uploaded files
+│   ├── company/                         # Company logos
+│   ├── invoices/                        # Invoice exports
+│   ├── payments/                        # Payment receipts
+│   ├── quotations/                      # Quote PDFs
+│   ├── deliveries/                      # Delivery docs
+│   └── receipts/
+│
+├── manage.py                            # Django management
+├── requirements.txt                     # Python dependencies
+├── Dockerfile                           # Docker configuration
+├── docker-compose.yml                   # Docker Compose config
+├── .env.example                         # Environment template
+├── README.md                            # This file
+├── LICENSE                              # MIT License
+├── QUICK_START.md                       # Quick start guide
+├── SECURITY.md                          # Security information
+├── PRIVACY_POLICY.md                    # Privacy policy
+├── TERMS_OF_SERVICE.md                  # Terms of service
+├── CONTRIBUTING.md                      # Contributing guide
+├── MULTITENANCY_USER_MANAGEMENT.md      # Multi-tenant docs
+└── INDEX.md                             # Document index
 ```
 
 ---
@@ -720,6 +1365,133 @@ Response:
 
 ---
 
+## 🏢 Multi-Tenancy & Organizations
+
+### Multi-Tenant Architecture
+
+InvoiceHub supports multiple organizations in a single deployment with complete data isolation:
+
+**Key Concepts:**
+- **Tenant:** An independent organization/company with its own data
+- **User:** Can belong to one or multiple organizations
+- **Data Isolation:** Each organization's data is completely separate
+- **Scalability:** Single deployment can support unlimited organizations
+
+### Organization Setup
+
+**Creating an Organization:**
+
+1. **Admin Panel:**
+   - Navigate to Admin → Organizations
+   - Click "Add Organization"
+   - Fill in organization details (name, domain, logo, etc.)
+
+2. **Programmatically:**
+   ```python
+   from invoicing_app.organizations.models import Organization
+   
+   org = Organization.objects.create(
+       name="Acme Corporation",
+       slug="acme-corp",
+       domain="acme.yourdomain.com",
+       email="admin@acme.corp"
+   )
+   ```
+
+### User & Organization Relationship
+
+**User Assignment:**
+```python
+from invoicing_app.organizations.models import OrganizationMember
+
+# Add user to organization
+member = OrganizationMember.objects.create(
+    user=user,
+    organization=org,
+    role='admin'  # admin, manager, accountant, viewer
+)
+```
+
+**Role-Based Access:**
+- **Admin:** Full system access, can manage users and settings
+- **Manager:** Can manage all financial records
+- **Accountant:** Read-only access to financial data
+- **Viewer:** View-only access to assigned records
+
+### Data Isolation
+
+All queries are automatically filtered by organization:
+
+```python
+# Automatically filtered by current organization
+invoices = Invoice.objects.filter(organization=request.organization)
+
+# OR using context manager
+with request.organization:
+    invoices = Invoice.objects.all()  # Already isolated
+```
+
+**How It Works:**
+1. Middleware sets `request.organization` from subdomain or header
+2. Querysets automatically filtered by organization
+3. Each model has `organization` ForeignKey
+4. No cross-organization data leakage possible
+
+### Subdomain-Based Organization
+
+Configure nginx/apache to support `*.yourdomain.com`:
+
+```nginx
+# Nginx configuration
+server {
+    server_name ~^(?<subdomain>.+)\.yourdomain\.com$ yourdomain.com www.yourdomain.com;
+    
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header X-Organization-Subdomain $subdomain;
+    }
+}
+```
+
+Then in Django:
+```python
+# middleware.py
+class OrganizationMiddleware:
+    def __call__(self, request):
+        subdomain = request.META.get('HTTP_X_ORGANIZATION_SUBDOMAIN', '')
+        if subdomain:
+            request.organization = Organization.objects.get(slug=subdomain)
+        return self.get_response(request)
+```
+
+### Organization Settings
+
+Each organization has isolated settings:
+
+```python
+from invoicing_app.settings.models import CompanySettings
+
+settings = CompanySettings.objects.get(organization=org)
+settings.company_name = "Acme Corp"
+settings.invoice_prefix = "ACM"
+settings.currency = "USD"
+settings.timezone = "America/New_York"
+settings.save()
+```
+
+### Multi-Tenant API
+
+Prefix API calls with organization identifier:
+
+```bash
+# Organization-specific API
+curl https://api.yourdomain.com/api/invoices/ \
+  -H "X-Organization: acme-corp" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+---
+
 ## 🧪 Testing
 
 ### Running Tests
@@ -842,131 +1614,395 @@ python manage.py test --verbosity=2
 
 ---
 
-## 📞 Support
+## � Security & Compliance
 
-### Getting Help
+### Security Features
 
-**For Bug Reports:**
-1. Open GitHub Issues
-2. Include:
-   - Django version: `python manage.py version`
-   - Steps to reproduce
-   - Error message and traceback
-   - Browser and OS information
+**Authentication & Authorization**
+- ✅ Django built-in authentication system
+- ✅ Password hashing with PBKDF2 (configurable)
+- ✅ Session-based authentication
+- ✅ Token-based API authentication (Token or JWT)
+- ✅ CSRF protection on all forms
+- ✅ SQL injection prevention via ORM
 
-**For Feature Requests:**
-1. Create discussion in GitHub Discussions
-2. Describe use case and benefits
-3. Link related issues if applicable
+**Data Protection**
+- ✅ HTTPS/SSL encryption in production
+- ✅ Secure password reset workflow
+- ✅ Sensitive data encryption at rest (optional)
+- ✅ Rate limiting on API endpoints
+- ✅ Input validation and sanitization
 
-**Common Resources:**
-- Django Documentation: https://docs.djangoproject.com
-- Django REST Framework: https://www.django-rest-framework.org
-- Mozilla JavaScript Guide: https://developer.mozilla.org/en-US/docs/Web/JavaScript
+**Access Control**
+- ✅ Role-Based Access Control (RBAC)
+- ✅ Organization-level data isolation
+- ✅ User permission granularity
+- ✅ Audit logging of all actions
+
+### GDPR Compliance
+
+**Data Protection:**
+- ✅ User data deletion (right to be forgotten)
+- ✅ Data export functionality
+- ✅ Privacy policy template
+- ✅ Consent management
+- ✅ Activity logging and audit trail
+
+**Implementations:**
+```python
+# Export user data
+from invoicing_app.core.models import User
+
+user_data = user.get_export_data()  # JSON export
+
+# Delete user (anonymize data)
+user.anonymize_data()
+```
+
+### Security Best Practices
+
+**Production Deployment Checklist:**
+- [ ] Set `DEBUG=False` in production
+- [ ] Generate strong `SECRET_KEY` (not the default)
+- [ ] Enable `SECURE_SSL_REDIRECT=True`
+- [ ] Set `SESSION_COOKIE_SECURE=True`
+- [ ] Set `CSRF_COOKIE_SECURE=True`
+- [ ] Use strong database passwords
+- [ ] Enable database backups
+- [ ] Set up monitoring and alerting
+- [ ] Keep dependencies updated
+- [ ] Configure logging for audit trail
+- [ ] Use environment variables for secrets
+- [ ] Enable rate limiting on public APIs
+
+**Environment Variables to Never Commit:**
+```bash
+# .gitignore
+.env
+.env.local
+*.key
+*.pem
+db.sqlite3
+__pycache__/
+*.pyc
+media/
+```
+
+### Compliance & Standards
+
+**Standards Supported:**
+- ISO 27001 (Information Security)
+- PCI DSS (Payment Card Industry) - when processing payments
+- HIPAA (Health Insurance Portability) - if handling health data
+- SOC 2 (Service Organization Control)
+
+**Audit & Compliance Reports:**
+- User activity logs
+- Data modification audit trail
+- Login/logout history
+- Permission changes log
+- Data export audit
 
 ---
 
-## 📝 Version History
+## 📞 Support & Contributing
 
-**Current Version:** 2.0.0 (February 28, 2026)
+### Getting Help
 
-### 2.0.0 - Major Release
-- ✅ Email reminders system
-- ✅ Advanced filtering with presets
-- ✅ Bulk operations (status, email, delete)
-- ✅ Fixed entity type normalization
+**Documentation:**
+- Primary documentation: [README.md](README.md) (this file)
+- Quick start guide: [QUICK_START.md](QUICK_START.md)
+- Multi-tenancy guide: [MULTITENANCY_USER_MANAGEMENT.md](MULTITENANCY_USER_MANAGEMENT.md)
+- Contributing guide: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Security information: [SECURITY.md](SECURITY.md)
 
-### 1.5.0 - Previous Release
-- Core invoice/payment/client management
-- Basic reporting
-- User authentication
+**Online Resources:**
+- Django Documentation: https://docs.djangoproject.com
+- Django REST Framework: https://www.django-rest-framework.org
+- PostgreSQL Docs: https://www.postgresql.org/docs/
+- Mozilla JavaScript Guide: https://developer.mozilla.org/en-US/docs/Web/JavaScript
+- Bootstrap CSS Framework: https://getbootstrap.com
+
+**Bug Reports and Issues:**
+1. Check existing issues: https://github.com/yourusername/invoice/issues
+2. Create new issue with:
+   - Clear title and description
+   - Steps to reproduce
+   - Expected vs. actual behavior
+   - Django version: `python manage.py version`
+   - Python version: `python --version`
+   - Browser/OS information
+   - Error traceback if applicable
+
+**Feature Requests:**
+1. Create discussion: https://github.com/yourusername/invoice/discussions
+2. Describe use case and benefits
+3. Suggest implementation approach if possible
+
+### Contributing Guidelines
+
+**Development Setup:**
+```bash
+# Clone repository
+git clone https://github.com/yourusername/invoice.git
+cd invoice
+
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\Activate.ps1
+
+# Install development dependencies
+pip install -r requirements.txt
+pip install django-debug-toolbar flake8 black pytest
+
+# Create local database
+python manage.py migrate
+
+# Create superuser
+python manage.py createsuperuser
+
+# Start development server
+python manage.py runserver
+```
+
+**Code Standards:**
+
+**Python (PEP 8):**
+```bash
+# Check code style
+flake8 invoicing_app/
+
+# Auto-format code
+black invoicing_app/
+
+# Run type checking
+mypy invoicing_app/
+```
+
+**JavaScript (ESLint):**
+```bash
+# Lint JavaScript files
+npm run lint
+
+# Auto-fix issues
+npm run lint:fix
+```
+
+**Commit Message Format:**
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+Examples:
+- `feat(invoices): add recurring invoice support`
+- `fix(payments): correct payment reconciliation logic`
+- `docs(readme): update installation instructions`
+- `refactor(filters): simplify filter query builder`
+- `test(clients): add comprehensive client model tests`
+
+**Types:** feat, fix, docs, style, refactor, test, chore, ci, perf
+
+**Creating Pull Requests:**
+
+1. Create feature branch:
+   ```bash
+   git checkout -b feature/my-feature
+   ```
+
+2. Make changes with meaningful commits:
+   ```bash
+   git add .
+   git commit -m "feat(module): description"
+   ```
+
+3. Push to GitHub:
+   ```bash
+   git push origin feature/my-feature
+   ```
+
+4. Create Pull Request with:
+   - Clear title and description
+   - Link to related issues
+   - Checklist:
+     - [ ] Tests added/updated
+     - [ ] Documentation updated
+     - [ ] Code follows style guidelines
+     - [ ] No breaking changes
+
+5. Code Review:
+   - Address feedback
+   - Discuss concerns or suggestions
+   - Update PR as needed
+
+6. Merge:
+   - Squash commits if needed
+   - Delete branch after merge
+
+---
+
+## 📊 Version History
+
+| Version | Date | Status | Key Features |
+|---------|------|--------|--------------|
+| 3.0.0 | Feb 28, 2026 | Stable | Multi-tenancy, Analytics, Data Import |
+| 2.5.0 | Jan 15, 2026 | Legacy | Dashboard refactor, Performance improvements |
+| 2.0.0 | Dec 1, 2025 | Legacy | Bulk operations, Advanced filtering |
+| 1.5.0 | Sep 1, 2025 | Legacy | Core features, Authentication |
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see LICENSE file for details.
+This project is licensed under the MIT License - see [LICENSE](LICENSE) file for details.
 
----
+**Permissions:**
+- ✅ Commercial use
+- ✅ Modification
+- ✅ Distribution
+- ✅ Private use
 
-## 🤝 Contributing
+**Conditions:**
+- 📝 License and copyright notice required
 
-### Development Workflow
-
-1. **Create feature branch:**
-   ```bash
-   git checkout -b feature/my-feature
-   ```
-
-2. **Make changes:**
-   ```bash
-   # Edit files
-   # Test changes
-   # Commit regularly
-   git commit -m "Descriptive message"
-   ```
-
-3. **Push and create pull request:**
-   ```bash
-   git push origin feature/my-feature
-   ```
-
-4. **Code review and merge**
-
-### Code Standards
-- PEP 8 for Python code
-- ESLint for JavaScript
-- Meaningful commit messages
-- Comprehensive docstrings
-- Unit tests for new features
+**Limitations:**
+- ❌ Liability
+- ❌ Warranty
 
 ---
 
 ## 🎓 Quick Reference
 
+### Essential Commands
+
 | Task | Command |
 |------|---------|
-| Start server | `python manage.py runserver` |
+| Start dev server | `python manage.py runserver` |
 | Run migrations | `python manage.py migrate` |
-| Create user | `python manage.py createsuperuser` |
-| Load demo data | `python manage.py demo_filters` |
+| Create migrations | `python manage.py makemigrations` |
+| Create superuser | `python manage.py createsuperuser` |
 | Run tests | `python manage.py test` |
+| Load demo data | `python manage.py seed_demo_data` |
 | Collect static files | `python manage.py collectstatic` |
-| Check configuration | `python manage.py check` |
+| Database backup | `python manage.py dumpdata > backup.json` |
+| Database restore | `python manage.py loaddata backup.json` |
+| Shell (interactive) | `python manage.py shell` |
+
+### URL Endpoints Reference
+
+| Page | URL |
+|------|-----|
+| Dashboard | `/` or `/dashboard/` |
+| Invoices | `/invoices/` |
+| Payments | `/payments/` |
+| Clients | `/clients/` |
+| Quotations | `/quotations/` |
+| Expenses | `/expenses/` |
+| Analytics | `/analytics/` |
+| Data Import | `/import/` |
+| Settings | `/settings/` |
+| Admin Panel | `/admin/` |
+| API Root | `/api/` |
+
+### API Endpoints Reference
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/invoices/` | GET, POST | List/Create invoices |
+| `/api/invoices/<id>/` | GET, PUT, DELETE | Retrieve/Update/Delete |
+| `/api/payments/` | GET, POST | List/Create payments |
+| `/api/clients/` | GET, POST | List/Create clients |
+| `/api/quotations/` | GET, POST | List/Create quotes |
+| `/api/filters/` | GET, POST | Filtering |
+| `/api/bulk/` | POST | Bulk operations |
+| `/api/import/data/` | POST | Data import |
+| `/api/dashboard/` | GET | Dashboard data |
+| `/api/reports/` | GET | Reports |
+
+### File Locations Quick Reference
+
+| Type | Location |
+|------|----------|
+| Models | `invoicing_app/*/models.py` |
+| Views | `invoicing_app/*/views.py` |
+| Templates | `templates/*/` |
+| Static JS | `static/js/` |
+| Static CSS | `static/css/` |
+| Settings | `invoicing_app/settings.py` |
+| URLs | `invoicing_app/urls.py` |
+| Tests | `invoicing_app/tests/` |
 
 ---
 
-## 🚀 Getting Started with Features
+## 🚀 Roadmap
 
-### First Time Setup Checklist
+**Planned Features (Q2 2026):**
+- [ ] Mobile app (React Native)
+- [ ] Payment gateway integration (Stripe, PayPal)
+- [ ] Accounting software integration (QuickBooks, Xero)
+- [ ] Advanced reporting with drill-down analysis
+- [ ] Machine learning for invoice categorization
+- [ ] Real-time collaboration features
 
-- [ ] Create superuser account
-- [ ] Configure company settings (Settings → Company)
-- [ ] Add payment methods (Settings → Payment Methods)
-- [ ] Create 2-3 test clients (Clients → New)
-- [ ] Create test invoices (Invoices → New)
-- [ ] Test email by sending to yourself
-- [ ] Try bulk operations on test invoices
-- [ ] Test filtering and saved filters
-- [ ] Review dashboard and reports
-
-### Next Steps
-
-1. **Load real data:**
-   - Import clients from CSV/Excel
-   - Create recurring invoices for products
-   - Set up invoice templates
-
-2. **Customize:**
-   - Adjust invoice numbering format
-   - Create custom email templates
-   - Set payment terms and conditions
-
-3. **Integrate:**
-   - Connect accounting software
-   - Set up payment gateway integration
-   - Enable automated recurring invoices
+**Under Consideration:**
+- [ ] Multi-language support (i18n)
+- [ ] Advanced permission system (granular permissions)
+- [ ] White-label solution
+- [ ] Blockchain for invoice verification
+- [ ] Voice-based data entry
 
 ---
 
-**Last Updated:** February 28, 2026
+## 💡 Tips & Tricks
+
+**Performance Optimization:**
+```python
+# Use select_related for foreign keys
+invoices = Invoice.objects.select_related('client').all()
+
+# Use prefetch_related for reverse foreign keys
+clients = Client.objects.prefetch_related('invoices').all()
+
+# Use only() to select specific fields
+invoices = Invoice.objects.only('invoice_number', 'total').all()
+```
+
+**Development Productivity:**
+```bash
+# Django shell with IPython
+pip install ipython django-extensions
+python manage.py shell_plus
+
+# Auto-reload on file changes
+python manage.py runserver --reload
+
+# Print SQL queries (development only)
+# Add to settings: LOGGING configuration
+```
+
+**Database Optimization:**
+```python
+# Add database indexes on frequently queried fields
+class Invoice(models.Model):
+    invoice_number = models.CharField(max_length=50, db_index=True)
+    client = models.ForeignKey(Client, on_delete=models.PROTECT, db_index=True)
+    created_date = models.DateField(db_index=True)
+```
+
+---
+
+## 📧 Contact & Support
+
+**Project Maintainer:** Your Name  
+**Email:** your-email@yourdomain.com  
+**Repository:** https://github.com/yourusername/invoice  
+**Issue Tracker:** https://github.com/yourusername/invoice/issues  
+**Discussions:** https://github.com/yourusername/invoice/discussions
+
+---
+
+**Last Updated:** March 26, 2026  
+**InvoiceHub v3.0.0** - Professional Invoice Management System

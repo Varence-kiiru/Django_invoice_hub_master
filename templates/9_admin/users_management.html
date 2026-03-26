@@ -38,6 +38,7 @@
         <tr>
           <th>Name</th>
           <th>Email</th>
+          <th>Organization</th>
           <th>Role</th>
           <th>Status</th>
           <th>Last Login</th>
@@ -46,9 +47,10 @@
         </tr>
       </thead>
       <tbody id="usersTableBody">
-        {% if users %}
-          {% for user in users %}
-            <tr class="user-row" data-name="{{ user.get_full_name|default:user.username|lower }}" data-email="{{ user.email|lower }}" data-role="{% if user.invoicing_profile.role %}{{ user.invoicing_profile.role.name|lower }}{% else %}user{% endif %}">
+        {% if users_data %}
+          {% for item in users_data %}
+            {% with user=item.user organizations=item.organizations %}
+            <tr class="user-row" data-name="{{ user.get_full_name|default:user.username|lower }}" data-email="{{ user.email|lower }}" data-role="{% if user.invoicing_profile.role %}{{ user.invoicing_profile.role.name|lower }}{% else %}user{% endif %}" data-org="{% if organizations %}{{ organizations.0.name|lower }}{% endif %}">
               <td class="user-name">
                 <div class="user-avatar">{{ user.first_name|first|upper|default:user.username|first|upper }}</div>
                 <div class="user-info">
@@ -56,6 +58,19 @@
                 </div>
               </td>
               <td class="user-email">{{ user.email }}</td>
+              <td class="user-org">
+                {% if organizations %}
+                  <div class="org-list">
+                    {% for org in organizations %}
+                    <span class="badge bg-info" title="Role: {{ org.role|upper }}">
+                      {% if org.is_primary %}👑{% endif %} {{ org.name }}
+                    </span>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <span class="text-muted text-sm">No organization</span>
+                {% endif %}
+              </td>
               <td class="user-role">
                 <span class="role-badge {% if user.invoicing_profile.role %}role-{{ user.invoicing_profile.role.name|lower }}{% else %}role-user{% endif %}">
                   {% if user.invoicing_profile.role %}{{ user.invoicing_profile.role.name|title }}{% else %}User{% endif %}
@@ -73,10 +88,11 @@
                 <button class="btn btn-sm btn-danger" onclick="showDeleteConfirm({{ user.id }}, '{{ user.get_full_name|default:user.username }}')" >🗑️ Delete</button>
               </td>
             </tr>
+            {% endwith %}
           {% endfor %}
         {% else %}
           <tr>
-            <td colspan="7" class="text-center py-4">
+            <td colspan="8" class="text-center py-4">
               <p class="text-muted">No users found</p>
             </td>
           </tr>
@@ -187,12 +203,15 @@
   function showDeleteConfirm(userId, userName) {
     currentUserId = userId;
     document.getElementById('deleteUserName').textContent = userName;
-    document.getElementById('delete-modal').style.display = 'flex';
+    const deleteModal = document.getElementById('delete-modal');
+    deleteModal.classList.add('active');
   }
 
   function closeDeleteModal() {
-    document.getElementById('delete-modal').style.display = 'none';
+    const deleteModal = document.getElementById('delete-modal');
+    deleteModal.classList.remove('active');
     currentUserId = null;
+    document.getElementById('deleteUserName').textContent = '';
   }
 
   function confirmDeleteUser() {
@@ -201,10 +220,14 @@
       btn.disabled = true;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
       
+      // Get CSRF token from meta tag or cookie
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || getCookie('csrftoken');
+      
       fetch(`/api/system/users/${currentUserId}/delete/`, {
         method: 'DELETE',
         headers: {
-          'X-CSRFToken': getCookie('csrftoken'),
+          'X-CSRFToken': csrfToken,
+          'X-Requested-With': 'XMLHttpRequest',
         }
       })
       .then(response => response.json())
@@ -251,5 +274,15 @@
       closeDeleteModal();
     }
   };
+
+  // Initialize: Ensure modal is hidden on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    const deleteModal = document.getElementById('delete-modal');
+    if (deleteModal) {
+      deleteModal.style.display = 'none';
+      currentUserId = null;
+      document.getElementById('deleteUserName').textContent = '';
+    }
+  });
 </script>
 {% endblock %}

@@ -1,0 +1,253 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Delete Tax Class - Invoicing App{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/taxes.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+    <div class="delete-card">
+        <div class="delete-header">
+            <div class="delete-icon warning">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+            <h1>Delete Tax Class</h1>
+            <p>This action will deactivate the tax class.</p>
+        </div>
+
+        <div class="delete-content">
+            <div class="delete-item">
+                <span class="label">Tax Class Name:</span>
+                <strong>{{ tax_class.name }}</strong>
+            </div>
+            
+            <div class="delete-item">
+                <span class="label">Rate Type:</span>
+                <strong>{{ tax_class.get_rate_type_display }}</strong>
+            </div>
+
+            {% if in_use %}
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-circle"></i>
+                <div>
+                    <strong>This tax class is in use</strong>
+                    <p>{{ in_use_count }} product(s) are currently using this tax class. When you deactivate it, these products will keep their tax class assignment but no new products can be assigned to it.</p>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i>
+                <div>
+                    <strong>Safe to delete</strong>
+                    <p>This tax class is not currently in use by any products.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="delete-footer">
+            <form method="post" style="width: 100%;">
+                {% csrf_token %}
+                <div class="delete-actions">
+                    <button type="submit" class="btn btn-danger btn-lg">
+                        <i class="bi bi-trash"></i> Deactivate Tax Class
+                    </button>
+                    <a href="{% url 'products:tax-class-detail' tax_class.id %}" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-arrow-left"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.delete-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.delete-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    max-width: 500px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.delete-header {
+    background: #fff5f5;
+    padding: 2rem;
+    text-align: center;
+    border-bottom: 1px solid #f5e6e6;
+}
+
+.delete-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #ffe6e6;
+    color: #dc3545;
+}
+
+.delete-icon.warning {
+    background: #ffe6e6;
+    color: #dc3545;
+}
+
+.delete-header h1 {
+    margin: 0 0 0.5rem 0;
+    color: #dc3545;
+    font-size: 1.75rem;
+}
+
+.delete-header p {
+    margin: 0;
+    color: #6c757d;
+}
+
+.delete-content {
+    padding: 2rem;
+}
+
+.delete-item {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.delete-item .label {
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.delete-item strong {
+    color: var(--color-text);
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.alert i {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+}
+
+.alert-warning {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+}
+
+.alert-warning i {
+    color: #ff6b6b;
+}
+
+.alert-warning strong {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.alert-warning p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.alert-info {
+    background: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+}
+
+.alert-info i {
+    color: #00bcd4;
+}
+
+.alert-info strong {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.alert-info p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.delete-footer {
+    padding: 1.5rem 2rem;
+    background: #f8f9fa;
+    border-top: 1px solid var(--color-border);
+}
+
+.delete-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    transition: all 0.2s;
+    flex: 1;
+    justify-content: center;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-lg {
+    padding: 0.875rem 2rem;
+    font-size: 1.1rem;
+}
+</style>
+
+{% endblock %}

@@ -1,0 +1,93 @@
+{% comment %}
+Quota Warning Component - Show usage and upgrade CTA when near limit
+Displays when user has used 80%+ of their monthly quota
+{% endcomment %}
+
+{% if quota_check and quota_check.reason == 'near_quota' %}
+<div class="quota-warning-banner">
+    <div class="quota-warning-content">
+        <span class="quota-warning-icon">⚠️</span>
+        <div>
+            <strong>{{ quota_type|default:"Resource" }} Quota: {{ quota_check.current_count }}/{{ quota_check.limit }}</strong>
+            <p class="quota-warning-text">You've used {{ percentage_used }}% of your monthly limit. Upgrade to continue.</p>
+        </div>
+    </div>
+    <a href="{% url 'organizations:upgrade' %}" class="quota-warning-cta">
+        Upgrade Plan →
+    </a>
+</div>
+
+<style>
+.quota-warning-banner {
+    background: linear-gradient(135deg, #fff3cd 0%, #fffacd 100%);
+    border-left: 4px solid #ff9800;
+    padding: 16px 20px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.2);
+}
+
+.quota-warning-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex-grow: 1;
+}
+
+.quota-warning-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.quota-warning-banner strong {
+    color: #f57f17;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.quota-warning-text {
+    margin: 0;
+    font-size: 13px;
+    color: #e65100;
+}
+
+.quota-warning-cta {
+    padding: 10px 16px;
+    background: #ff9800;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.quota-warning-cta:hover {
+    background: #f57c00;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+@media (max-width: 768px) {
+    .quota-warning-banner {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .quota-warning-cta {
+        width: 100%;
+        text-align: center;
+    }
+}
+</style>
+{% endif %}

@@ -275,6 +275,11 @@ class CompanySettings(TimeStampedModel):
         default="QUOTE",
         help_text="Prefix for quotation numbers (e.g., QUOTE-2026-0001)"
     )
+    delivery_prefix = models.CharField(
+        max_length=10,
+        default="DLV",
+        help_text="Prefix for delivery challan numbers (e.g., DLV-2026-0001)"
+    )
     financial_year_start = models.IntegerField(
         default=1,
         help_text="Month number when financial year starts (1-12)"
@@ -285,6 +290,7 @@ class CompanySettings(TimeStampedModel):
         max_length=200,
         blank=True,
         null=True,
+        default="Payment due within 14 days of invoice date",
         help_text="Default payment terms for invoices (e.g., Net 30 days)"
     )
     
@@ -383,7 +389,7 @@ class CompanySettings(TimeStampedModel):
     timezone = models.CharField(
         max_length=50,
         choices=TIMEZONE_CHOICES,
-        default='UTC',
+        default='Africa/Nairobi',
         help_text="System timezone for date/time operations"
     )
     
@@ -396,13 +402,13 @@ class CompanySettings(TimeStampedModel):
     date_format = models.CharField(
         max_length=20,
         choices=DATE_FORMAT_CHOICES,
-        default='MM/DD/YYYY',
+        default='DD/MM/YYYY',
         help_text="Display format for dates throughout the system"
     )
     
     currency_symbol = models.CharField(
         max_length=10,
-        default='$',
+        default='KES',
         help_text="Default currency symbol or code to display"
     )
     
@@ -445,6 +451,13 @@ class CompanySettings(TimeStampedModel):
     terms_and_conditions = models.TextField(
         blank=True,
         null=True,
+        default="""1. Payment Terms: Net 14 days from invoice date
+2. Prices in KES exclude VAT unless otherwise stated
+3. Goods/services are provided as specified in invoice
+4. Disputes must be raised within 7 days of invoice
+5. All work is subject to our standard terms of engagement
+6. Late payment charges may apply as per Kenyan law
+7. This invoice is valid for payment within 30 days""",
         help_text="Default terms and conditions to display on quotations and invoices"
     )
     

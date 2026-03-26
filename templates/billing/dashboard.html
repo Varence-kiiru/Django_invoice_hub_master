@@ -1,0 +1,194 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Billing & Subscription - {{ organization.name }}{% endblock %}
+
+{% block page_title %}Billing & Subscription{% endblock %}
+{% block page_description %}Manage your subscription plan, usage, and billing information{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/billing.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="billing-container">
+    <!-- Page Header -->
+    <div class="billing-header">
+        <h1>💳 Billing & Subscription</h1>
+        <p>Manage your plan and view billing information</p>
+    </div>
+
+    <!-- No Subscription Alert -->
+    {% if not subscription %}
+    <div class="billing-alert info">
+        <span>ℹ️</span>
+        <span>No active subscription found. Start with our free plan - upgrade anytime!</span>
+    </div>
+    {% endif %}
+
+    <!-- Current Subscription Card -->
+    {% if subscription %}
+    <div class="subscription-card">
+        <div class="subscription-card-content">
+            {% if subscription.plan == 'free' %}
+            <span class="trial-badge">Free Trial - {{ trial_days_remaining }} days</span>
+            {% endif %}
+            
+            <div class="plan-name">{{ subscription.get_plan_display }} Plan</div>
+            <div class="plan-price">
+                {% if subscription.plan != 'free' %}
+                <span>${{ subscription.price|default:'See pricing' }}</span>
+                {% else %}
+                <span style="font-size: 28px;">Free</span>
+                {% endif %}
+                <small>/month</small>
+            </div>
+            
+            <div class="renewal-date">
+                {% if subscription.current_period_end %}
+                📅 Next billing date: <strong>{{ subscription.current_period_end|date:"M d, Y" }}</strong>
+                {% else %}
+                ✨ Trial mode - upgrade anytime
+                {% endif %}
+            </div>
+            
+            <div class="action-buttons">
+                {% if subscription.plan != 'enterprise' %}
+                <a href="{% url 'organizations:upgrade' %}" class="upgrade-btn">✨ Upgrade Plan</a>
+                {% endif %}
+                <a href="{% url 'organizations:payment_method' %}" class="upgrade-btn">💳 Update Payment Method</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="subscription-card">
+        <div class="subscription-card-content">
+            <div class="plan-name">Free Plan</div>
+            <div class="renewal-date" style="margin-bottom: 30px;">Get started with our free plan - upgrade to unlock premium features</div>
+            <a href="{% url 'organizations:upgrade' %}" class="upgrade-btn">🚀 View Paid Plans</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Usage Statistics -->
+    {% if subscription %}
+    <div class="usage-card">
+        <h3 class="billing-section-title">📊 Plan Usage</h3>
+        <div class="usage-item">
+            <div>
+                <div class="usage-label">Invoices Created (This Month)</div>
+                <small style="color: #999;">{{ current_usage.invoices }} of {{ current_usage.invoices_limit }}</small>
+            </div>
+            <div class="usage-value">
+                {{ current_usage.percentage_used }}%
+            </div>
+            <div style="flex-basis: 100%; margin-top: 8px;">
+                <div class="usage-bar">
+                    <div class="usage-fill {% if current_usage.percentage_used >= 90 %}critical{% elif current_usage.percentage_used >= 75 %}warning{% endif %}" 
+                         style="width: {{ current_usage.percentage_used }}%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Members -->
+        <div class="usage-item">
+            <div>
+                <div class="usage-label">Team Members</div>
+                <small style="color: #999;">{{ current_usage.users }} of {{ current_usage.users_limit }}</small>
+            </div>
+            <div class="usage-value">
+                {% if current_usage.users_limit != 'Unlimited' %}
+                    {% widthratio current_usage.users current_usage.users_limit 100 %}%
+                {% else %}
+                    Unlimited
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Plan Features -->
+    <div class="usage-card">
+        <h3 class="mb-4">Current Plan Features</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+            {% for feature in plan_limits.features %}
+            <div style="padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+                <div style="color: #667eea; font-weight: 600;">✓ {{ feature }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Recent Invoices -->
+    <div class="usage-card mt-4">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h3>Recent Invoices</h3>
+            {% if recent_invoices %}
+            <a href="{% url 'organizations:invoices' %}" class="btn btn-secondary" style="margin: 0;">View All</a>
+            {% endif %}
+        </div>
+
+        {% if recent_invoices %}
+        <div class="invoices-table">
+            {% for invoice in recent_invoices %}
+            <div class="invoice-row">
+                <div>
+                    <div class="invoice-date">Invoice #{{ invoice.invoice_number }}</div>
+                    <small style="color: #999;">{{ invoice.created_at|date:"M d, Y" }}</small>
+                </div>
+                <div class="invoice-amount">${{ invoice.total|floatformat:2 }}</div>
+                <span class="invoice-status {% if invoice.status == 'paid' %}status-paid{% else %}status-pending{% endif %}">
+                    {{ invoice.get_status_display }}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📄</div>
+            <p>No invoices yet</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Recent Invoices Section -->
+    <div class="invoices-section">
+        <h3 class="billing-section-title">📄 Recent Invoices</h3>
+        
+        {% if recent_invoices %}
+        <div class="invoices-table">
+            <div class="invoice-header">
+                <div>Date</div>
+                <div>Invoice #</div>
+                <div>Amount</div>
+                <div>Status</div>
+            </div>
+            
+            {% for invoice in recent_invoices %}
+            <div class="invoice-row">
+                <div class="invoice-date">{{ invoice.created_at|date:"M d, Y" }}</div>
+                <a href="#" class="invoice-number">{{ invoice.number }}</a>
+                <div class="invoice-amount">${{ invoice.total|floatformat:2 }}</div>
+                <span class="invoice-status {% if invoice.status == 'paid' %}status-paid{% elif invoice.status == 'pending' %}status-pending{% elif invoice.status == 'overdue' %}status-overdue{% else %}status-cancelled{% endif %}">
+                    {{ invoice.get_status_display }}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <div class="empty-state-title">No Invoices Yet</div>
+            <p class="empty-state-message">Start creating invoices to see billing history here</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Help & Support Section -->
+    <div class="help-section">
+        <h3 class="help-title">💬 Need Help?</h3>
+        <p class="help-text">Our support team is here to assist with any questions about your subscription, billing, or account.</p>
+        <a href="{% url 'core:dashboard' %}" class="help-cta">📧 Contact Support</a>
+    </div>
+</div>
+{% endblock %}

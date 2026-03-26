@@ -1,0 +1,310 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }} - Invoicing App{% endblock %}
+
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/deliveries.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <div class="row">
+            <div class="col-md-8">
+                <h1 class="page-title">📦 {{ page_title }}</h1>
+                <p class="text-muted">Create or edit a delivery record</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{% url 'deliveries:list' %}" class="btn btn-outline-secondary">← Back</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" class="needs-validation">
+                        {% csrf_token %}
+
+                        <!-- Invoice Selection (only for new deliveries) -->
+                        {% if not delivery %}
+                            <div class="mb-4">
+                                <label for="invoice_id" class="form-label fw-bold">📄 Select Invoice *</label>
+                                <select name="invoice_id" id="invoice_id" class="form-select" required>
+                                    <option value="">Choose an invoice...</option>
+                                    {% for inv in invoices %}
+                                        <option value="{{ inv.id }}" {% if selected_invoice and selected_invoice.id == inv.id %}selected="selected"{% endif %}>
+                                            {{ inv.invoice_number }} - {{ inv.client.name }} ({{ inv.currency }} {{ inv.total_amount }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <small class="form-text text-muted">
+                                    💡 Selecting an invoice will auto-populate recipient name and delivery location from client data
+                                </small>
+                            </div>
+                        {% else %}
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">📄 Invoice</label>
+                                <p class="form-control-plaintext">
+                                    <a href="{% url 'invoices:detail' delivery.invoice.id %}" class="text-decoration-none">
+                                        {{ delivery.invoice.invoice_number }}
+                                    </a>
+                                </p>
+                            </div>
+                        {% endif %}
+
+                        <hr>
+
+                        <!-- Dates -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="scheduled_date" class="form-label">Scheduled Date *</label>
+                                <input type="date" name="scheduled_date" id="scheduled_date" class="form-control" 
+                                    value="{% if delivery %}{{ delivery.scheduled_date|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="actual_delivery_date" class="form-label">Actual Delivery Date</label>
+                                <input type="date" name="actual_delivery_date" id="actual_delivery_date" class="form-control"
+                                    value="{% if delivery.actual_delivery_date %}{{ delivery.actual_delivery_date|date:'Y-m-d' }}{% endif %}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="delivery_time" class="form-label">Delivery Time</label>
+                                <input type="time" name="delivery_time" id="delivery_time" class="form-control"
+                                    value="{% if delivery.delivery_time %}{{ delivery.delivery_time|time:'H:i' }}{% endif %}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="delivery_method" class="form-label">Delivery Method *</label>
+                                <select name="delivery_method" id="delivery_method" class="form-select" required>
+                                    {% for method_value, method_name in delivery_methods %}
+                                        <option value="{{ method_value }}" {% if delivery.delivery_method == method_value %}selected{% endif %}>
+                                            {{ method_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Delivery Details -->
+                        <div class="mb-3">
+                            <label for="delivery_location" class="form-label">Delivery Location</label>
+                            <textarea name="delivery_location" id="delivery_location" class="form-control" rows="2"
+                                placeholder="Complete delivery address...">{% if delivery %}{{ delivery.delivery_location }}{% elif auto_delivery_location %}{{ auto_delivery_location }}{% endif %}</textarea>
+                            <small class="form-text text-muted">
+                                {% if auto_delivery_location %}✓ Auto-populated from client's address{% endif %}
+                            </small>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="recipient_name" class="form-label">Recipient Name</label>
+                                <input type="text" name="recipient_name" id="recipient_name" class="form-control"
+                                    placeholder="Name of person receiving..." value="{% if delivery %}{{ delivery.recipient_name }}{% elif auto_recipient_name %}{{ auto_recipient_name }}{% endif %}">
+                                <small class="form-text text-muted">
+                                    {% if auto_recipient_name %}✓ Auto-populated from client name{% endif %}
+                                </small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="condition" class="form-label">Condition on Delivery *</label>
+                                <select name="condition" id="condition" class="form-select" required>
+                                    {% for cond_value, cond_name in conditions %}
+                                        <option value="{{ cond_value }}" {% if delivery.condition == cond_value %}selected{% endif %}>
+                                            {{ cond_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="condition_notes" class="form-label">Condition Notes</label>
+                            <textarea name="condition_notes" id="condition_notes" class="form-control" rows="2"
+                                placeholder="Any notes about item condition...">{% if delivery %}{{ delivery.condition_notes }}{% endif %}</textarea>
+                        </div>
+
+                        <hr>
+
+                        <!-- Delivery Status (for edits) -->
+                        {% if delivery %}
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Status *</label>
+                                <select name="status" id="status" class="form-select" required>
+                                    {% for status_value, status_name in statuses %}
+                                        <option value="{{ status_value }}" {% if delivery.status == status_value %}selected{% endif %}>
+                                            {{ status_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Items & Quantities Delivered</label>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Product</th>
+                                                <th class="text-center">Scheduled</th>
+                                                <th class="text-center">Delivered</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in line_items %}
+                                                <tr>
+                                                    <td>{{ item.product.name }}</td>
+                                                    <td class="text-center">{{ item.quantity_scheduled }} {{ item.unit }}</td>
+                                                    <td>
+                                                        <input type="number" step="0.01" name="qty_delivered_{{ item.id }}" 
+                                                            class="form-control form-control-sm text-center"
+                                                            value="{{ item.quantity_delivered }}">
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <hr>
+
+                        <!-- Notes -->
+                        <div class="mb-4">
+                            <label for="notes" class="form-label">Additional Notes</label>
+                            <textarea name="notes" id="notes" class="form-control" rows="3"
+                                placeholder="Any additional notes about this delivery...">{% if delivery %}{{ delivery.notes }}{% endif %}</textarea>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                💾 {% if delivery %}Update{% else %}Create{% endif %} Delivery
+                            </button>
+                            <a href="{% url 'deliveries:list' %}" class="btn btn-outline-secondary btn-lg">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Information Sidebar -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">ℹ️ Delivery Tips</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li>✓ Set scheduled date for when delivery should occur</li>
+                        <li>✓ Update actual delivery date when completed</li>
+                        <li>✓ Record delivery method (courier, hand, pickup, etc.)</li>
+                        <li>✓ Note recipient name for accountability</li>
+                        <li>✓ Specify condition (good, damaged, partial, not deliverable)</li>
+                        <li>✓ Update quantities actually delivered if partial</li>
+                        <li>✓ Include tracking number for courier deliveries</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const invoiceSelect = document.getElementById('invoice_id');
+    const recipientNameInput = document.getElementById('recipient_name');
+    const deliveryLocationInput = document.getElementById('delivery_location');
+    
+    console.log('Delivery form script loaded');
+    console.log('Invoice select element:', invoiceSelect);
+    console.log('Recipient name input:', recipientNameInput);
+    console.log('Delivery location input:', deliveryLocationInput);
+    
+    // Function to populate form from invoice data
+    function populateInvoiceData(invoiceId) {
+        if (!invoiceId) {
+            console.log('No invoice ID provided, skipping population');
+            return;
+        }
+        
+        console.log('Attempting to populate data for invoice:', invoiceId);
+        const apiUrl = `/deliveries/api/invoice/${invoiceId}/details/`;
+        console.log('Fetching invoice data from:', apiUrl);
+        
+        fetch(apiUrl)
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Invoice data received:', data);
+                
+                // Auto-populate recipient name from client
+                if (recipientNameInput) {
+                    if (!recipientNameInput.value || recipientNameInput.value.trim() === '') {
+                        recipientNameInput.value = data.recipient_name || data.client_name || '';
+                        console.log('✓ Populated recipient_name with:', recipientNameInput.value);
+                    } else {
+                        console.log('Skipped recipient_name - field already has value:', recipientNameInput.value);
+                    }
+                }
+                
+                // Auto-populate delivery location from client address
+                if (deliveryLocationInput) {
+                    if (!deliveryLocationInput.value || deliveryLocationInput.value.trim() === '') {
+                        deliveryLocationInput.value = data.delivery_location || '';
+                        console.log('✓ Populated delivery_location with:', deliveryLocationInput.value);
+                    } else {
+                        console.log('Skipped delivery_location - field already has value:', deliveryLocationInput.value);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching invoice data:', error);
+            });
+    }
+    
+    // Populate on initial load if invoice pre-selected
+    if (invoiceSelect) {
+        console.log('Invoice select found, current value:', invoiceSelect.value);
+        
+        // Use a small timeout to ensure all form elements are ready
+        setTimeout(function() {
+            if (invoiceSelect.value) {
+                console.log('Pre-selected invoice detected:', invoiceSelect.value);
+                populateInvoiceData(invoiceSelect.value);
+            } else {
+                console.log('No pre-selected invoice');
+            }
+        }, 100);
+        
+        // Populate when user selects invoice
+        invoiceSelect.addEventListener('change', function() {
+            console.log('Invoice selection changed to:', this.value);
+            if (this.value) {
+                populateInvoiceData(this.value);
+            } else {
+                console.log('No invoice selected');
+            }
+        });
+    } else {
+        console.warn('Invoice select element not found!');
+    }
+});
+</script>
+{% endblock %}

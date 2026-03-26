@@ -1,0 +1,152 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Deliveries - Invoice Management{% endblock %}
+
+{% block page_title %}Deliveries{% endblock %}
+{% block page_description %}Track delivery of invoiced items to customers{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/invoices.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container" data-entity-type="deliveries">
+    <div class="invoices-header">
+        <h1>Deliveries</h1>
+        <a href="{% url 'deliveries:create' %}" class="btn-create">+ New Delivery</a>
+    </div>
+    
+    {% include "10_modals/filter_form_invoices.html" %}
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <!-- Filters & Search -->
+    <div class="filter-container">
+        <form method="GET" class="filter-form">
+            <div class="filter-group">
+                <input type="text" name="q" class="form-control" placeholder="Search by #..." value="{{ search_query }}">
+            </div>
+            <div class="filter-group">
+                <select name="status" class="form-control">
+                    <option value="">All Statuses</option>
+                    {% for status_value, status_name in statuses %}
+                        <option value="{{ status_value }}" {% if selected_status == status_value %}selected{% endif %}>
+                            {{ status_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group">
+                <select name="method" class="form-control">
+                    <option value="">All Methods</option>
+                    {% for method_value, method_name in methods %}
+                        <option value="{{ method_value }}" {% if selected_method == method_value %}selected{% endif %}>
+                            {{ method_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn-filter">🔍 Filter</button>
+        </form>
+    </div>
+    
+    {% if deliveries %}
+    <table class="invoices-table">
+        <thead>
+            <tr>
+                <th>Delivery #</th>
+                <th>Invoice #</th>
+                <th>Client</th>
+                <th>Status</th>
+                <th style="text-align: right;">Scheduled Date</th>
+                <th style="text-align: right;">Delivery Date</th>
+                <th>Method</th>
+                <th style="text-align: right;">Items</th>
+                <th style="width: 120px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for delivery in deliveries %}
+            <tr>
+                <td>
+                    <div class="invoice-number">{{ delivery.delivery_number }}</div>
+                </td>
+                <td>
+                    <a href="{% url 'invoices:detail' delivery.invoice.id %}" class="text-decoration-none">
+                        {{ delivery.invoice.invoice_number }}
+                    </a>
+                </td>
+                <td>
+                    <div>{{ delivery.invoice.client.name }}</div>
+                </td>
+                <td>
+                    <span class="status-badge status-{{ delivery.status }}">
+                        {{ delivery.get_status_display }}
+                    </span>
+                </td>
+                <td class="amount-text">
+                    {{ delivery.scheduled_date|date:"M d, Y" }}
+                </td>
+                <td class="amount-text">
+                    {{ delivery.actual_delivery_date|date:"M d, Y"|default:"—" }}
+                </td>
+                <td>
+                    {{ delivery.get_delivery_method_display }}
+                </td>
+                <td class="amount-text">
+                    {{ delivery.total_items_delivered }}/{{ delivery.total_items_scheduled }}
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <a href="{% url 'deliveries:detail' delivery.id %}" class="btn-small btn-view">View</a>
+                        {% if delivery.status == 'draft' %}
+                            <a href="{% url 'deliveries:edit' delivery.id %}" class="btn-small btn-edit">Edit</a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if deliveries.has_other_pages %}
+    <div class="pagination">
+        {% if deliveries.has_previous %}
+            <a href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_method %}&method={{ selected_method }}{% endif %}">First</a>
+            <a href="?page={{ deliveries.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_method %}&method={{ selected_method }}{% endif %}">Previous</a>
+        {% endif %}
+        
+        {% for num in deliveries.paginator.page_range %}
+            {% if deliveries.number == num %}
+                <span class="current">{{ num }}</span>
+            {% else %}
+                <a href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_method %}&method={{ selected_method }}{% endif %}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+        
+        {% if deliveries.has_next %}
+            <a href="?page={{ deliveries.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_method %}&method={{ selected_method }}{% endif %}">Next</a>
+            <a href="?page={{ deliveries.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_method %}&method={{ selected_method }}{% endif %}">Last</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <div class="no-data">
+        <p>No deliveries found</p>
+        <a href="{% url 'deliveries:create' %}" class="btn-create">Create your first delivery</a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

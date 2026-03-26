@@ -21,6 +21,7 @@ from invoicing_app.taxes.models import TaxRate
 from invoicing_app.audit.models import AuditLog
 from invoicing_app.payments.models import Payment
 from invoicing_app.core.models import CompanySettings
+from invoicing_app.organizations.plan_enforcer import check_invoice_quota
 from django.contrib import messages
 
 logger = logging.getLogger(__name__)
@@ -46,7 +47,7 @@ def role_required(*allowed_roles):
         @wraps(view_func)
         def wrapper(request, *args, **kwargs):
             if not request.user.is_authenticated:
-                return redirect('core:login')
+                return redirect('organizations:login')
             role = _get_user_role(request)
             if role not in allowed_roles:
                 from django.contrib import messages
@@ -126,6 +127,8 @@ def invoices_list_view(request):
 
 
 @login_required
+@login_required
+@check_invoice_quota
 def invoices_create_view(request):
     """Create new invoice (draft)."""
     if request.method == 'POST':
@@ -160,9 +163,14 @@ def invoices_create_view(request):
             from django.contrib import messages
             messages.error(request, f'Error creating invoice: {str(e)}')
     
+    # Get quota info for display
+    from invoicing_app.organizations.plan_enforcer import PlanEnforcer
+    quota_check = PlanEnforcer.check_invoice_quota(request.user)
+    
     context = {
         'page_title': 'Create Invoice',
         'clients': Client.objects.filter(is_active=True),
+        'quota_check': quota_check,
     }
     return render(request, '6_invoices/invoices_create.html', context)
 
@@ -174,11 +182,23 @@ def invoices_detail_view(request, pk):
     line_items = invoice.line_items.all()
     payments = invoice.payments.all()
     
+    # Get associated deliveries
+    from invoicing_app.deliveries.models import Delivery
+    deliveries = Delivery.objects.filter(invoice=invoice, is_active=True).order_by('-created_at')
+    
+    # Check if user can create deliveries
+    can_create_delivery = request.user.is_superuser or (
+        hasattr(request.user, 'custom_user') and 
+        'create_deliveries' in request.user.custom_user.get_permissions()
+    )
+    
     context = {
         'page_title': f'Invoice - {invoice.invoice_number}',
         'invoice': invoice,
         'line_items': line_items,
         'payments': payments,
+        'deliveries': deliveries,
+        'can_create_delivery': can_create_delivery,
         'can_edit': invoice.status == 'draft',
     }
     return render(request, '6_invoices/invoices_detail.html', context)
@@ -662,9 +682,9 @@ def invoices_pdf_view(request, pk):
         pdf_path = PDFService.generate_invoice_pdf(invoice.id, save=True)
         
         # Open and return the file for download
-        pdf_file = default_storage.open(pdf_path, 'rb')
-        response = HttpResponse(pdf_file.read(), content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="invoice_{invoice.invoice_number}.pdf"'
+        with default_storage.open(pdf_path, 'rb') as pdf_file:
+            response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="invoice_{invoice.invoice_number}.pdf"'
         
         logger.info(f"Served invoice PDF {invoice.invoice_number} for download")
         return response
@@ -689,9 +709,9 @@ def invoices_print_view(request, pk):
         pdf_path = PDFService.generate_invoice_pdf(invoice.id, save=True)
         
         # Open and return the file inline for printing
-        pdf_file = default_storage.open(pdf_path, 'rb')
-        response = HttpResponse(pdf_file.read(), content_type='application/pdf')
-        response['Content-Disposition'] = f'inline; filename="invoice_{invoice.invoice_number}.pdf"'
+        with default_storage.open(pdf_path, 'rb') as pdf_file:
+            response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'inline; filename="invoice_{invoice.invoice_number}.pdf"'
         
         logger.info(f"Opened invoice PDF {invoice.invoice_number} for printing")
         return response

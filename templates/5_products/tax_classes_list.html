@@ -1,0 +1,202 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Tax Classes Management - Invoicing App{% endblock %}
+
+{% block page_title %}Tax Classes{% endblock %}
+{% block page_description %}Manage tax classifications for your product catalog{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/taxes.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Page Header with Create Button -->
+    <div class="page-header mb-4">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1><i class="bi bi-tags-fill"></i> Tax Classes Management</h1>
+                <p class="text-muted mb-0">Configure tax treatments for your product catalog</p>
+            </div>
+            <a href="{% url 'products:tax-class-create' %}" class="btn btn-primary btn-lg">
+                <i class="bi bi-plus-circle"></i> New Tax Class
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid mb-4">
+        <div class="stat-card">
+            <div class="stat-icon primary"><i class="bi bi-tags-fill"></i></div>
+            <div class="stat-content">
+                <div class="stat-label">Total Classes</div>
+                <div class="stat-value">{{ total_count }}</div>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon success"><i class="bi bi-check-circle"></i></div>
+            <div class="stat-content">
+                <div class="stat-label">Active Classes</div>
+                <div class="stat-value">{{ total_active }}</div>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon warning"><i class="bi bi-exclamation-circle"></i></div>
+            <div class="stat-content">
+                <div class="stat-label">Inactive Classes</div>
+                <div class="stat-value">{{ total_inactive }}</div>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon info"><i class="bi bi-type"></i></div>
+            <div class="stat-content">
+                <div class="stat-label">Rate Types</div>
+                <div class="stat-value">{{ rate_type_choices|length }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters Card -->
+    <div class="filters-card mb-4">
+        <form method="get" class="filter-form">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="search" class="filter-label">Search</label>
+                    <input type="text" name="search" id="search" class="form-control" placeholder="Search by name..." value="{{ search_query|default:'' }}">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="rate_type" class="filter-label">Rate Type</label>
+                    <select name="rate_type" id="rate_type" class="form-control">
+                        <option value="">All Rate Types</option>
+                        {% for value, label in rate_type_choices %}
+                        <option value="{{ value }}" {% if rate_type_filter == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="status" class="filter-label">Status</label>
+                    <select name="status" id="status" class="form-control">
+                        <option value="">All Statuses</option>
+                        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary filter-btn">
+                    <i class="bi bi-search"></i> Filter
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tax Classes Table -->
+    <div class="table-card">
+        {% if tax_classes %}
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Rate Type</th>
+                    <th>Status</th>
+                    <th style="text-align: center;">Products</th>
+                    <th style="text-align: center;">VAT Rules</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tax_class in tax_classes %}
+                <tr>
+                    <td>
+                        <strong>{{ tax_class.name }}</strong>
+                    </td>
+                    <td>
+                        <span class="badge-type">{{ tax_class.get_rate_type_display }}</span>
+                    </td>
+                    <td>
+                        {% if tax_class.is_active %}
+                            <span class="status-badge active"><i class="bi bi-check-circle"></i> Active</span>
+                        {% else %}
+                            <span class="status-badge inactive"><i class="bi bi-circle"></i> Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: center;">
+                        <span class="usage-count">{{ tax_class.product_count }}</span>
+                    </td>
+                    <td style="text-align: center;">
+                        <span class="usage-count">{{ tax_class.vat_rule_count }}</span>
+                    </td>
+                    <td>
+                        <span class="date-text">{{ tax_class.created_at|date:"M d, Y" }}</span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'products:tax-class-detail' tax_class.id %}" class="btn-icon" title="View"><i class="bi bi-eye"></i></a>
+                            <a href="{% url 'products:tax-class-edit' tax_class.id %}" class="btn-icon" title="Edit"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'products:tax-class-delete' tax_class.id %}" class="btn-icon delete" title="Delete"><i class="bi bi-trash"></i></a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="pagination-container">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">First</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="bi bi-inbox"></i>
+            </div>
+            <h5>No tax classes found</h5>
+            <p>
+                {% if search_query %}
+                    Try adjusting your search criteria
+                {% else %}
+                    Create your first tax class to get started
+                {% endif %}
+            </p>
+            <a href="{% url 'products:tax-class-create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Create Tax Class
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

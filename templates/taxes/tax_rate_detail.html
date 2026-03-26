@@ -1,142 +1,134 @@
 {% extends "layouts/base.html" %}
 {% load static %}
 
-{% block title %}{% endblock %}
+{% block title %}{{ tax_rate.name }} - Tax Rate Details - Invoicing App{% endblock %}
 
 {% block extra_css %}
-<style>
-    .detail-row { padding: 1rem 0; border-bottom: 1px solid #e9ecef; }
-    .detail-row:last-child { border-bottom: none; }
-    .detail-label { font-weight: 600; color: #495057; }
-    .detail-value { color: #212529; }
-    .status-badge { display: inline-block; }
-</style>
+<link rel="stylesheet" href="{% static 'css/admin/taxes.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
+<div class="container py-4">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-start mb-4">
-        <div>
-            <h1>{{ tax_rate.name }}</h1>
-            <p class="text-muted">Tax Rate Details - <code>{{ tax_rate.code }}</code></p>
-        </div>
-        <div class="d-flex gap-2">
-            <a href="{% url 'taxes:edit' tax_rate.id %}" class="btn btn-info">
-                <i class="bi bi-pencil"></i> Edit
-            </a>
-            <a href="{% url 'taxes:delete' tax_rate.id %}" class="btn btn-danger">
-                <i class="bi bi-trash"></i> Delete
-            </a>
-            <a href="{% url 'taxes:list' %}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left"></i> Back
-            </a>
+    <div class="page-header mb-4">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1><i class="bi bi-percent"></i> {{ tax_rate.name }}</h1>
+                <p class="text-muted mb-0">Tax Rate Details - <code>{{ tax_rate.code }}</code></p>
+            </div>
+            <div class="header-actions">
+                <a href="{% url 'taxes:edit' tax_rate.id %}" class="btn btn-primary">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+                <a href="{% url 'taxes:delete' tax_rate.id %}" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Delete
+                </a>
+                <a href="{% url 'taxes:list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+            </div>
         </div>
     </div>
 
     <div class="row">
-        <!-- Main Details -->
+        <!-- Main Content -->
         <div class="col-lg-8">
-            <!-- Basic Information Card -->
-            <div class="card mb-4">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Basic Information</h5>
+            <!-- Basic Information -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <h5 class="detail-card-title"><i class="bi bi-info-circle"></i> Basic Information</h5>
                 </div>
-                <div class="card-body">
+                <div class="detail-card-body">
                     <div class="detail-row">
-                        <div class="detail-label">Code</div>
-                        <div class="detail-value"><code class="bg-light p-2 rounded">{{ tax_rate.code }}</code></div>
+                        <span class="detail-label">Code</span>
+                        <span class="detail-value"><code class="code-badge">{{ tax_rate.code }}</code></span>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-label">Name</div>
-                        <div class="detail-value">{{ tax_rate.name }}</div>
+                        <span class="detail-label">Name</span>
+                        <span class="detail-value">{{ tax_rate.name }}</span>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-label">Rate</div>
-                        <div class="detail-value">
-                            <span class="badge bg-info" style="font-size: 1.1em;">{{ tax_rate.rate_percentage }}%</span>
-                        </div>
+                        <span class="detail-label">Rate</span>
+                        <span class="detail-value"><span class="rate-display">{{ tax_rate.rate_percentage }}%</span></span>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-label">Tax Type</div>
-                        <div class="detail-value">
-                            <span class="badge bg-primary">{{ tax_rate.get_tax_type_display }}</span>
-                        </div>
+                        <span class="detail-label">Tax Type</span>
+                        <span class="detail-value"><span class="badge-type">{{ tax_rate.get_tax_type_display }}</span></span>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-label">Country</div>
-                        <div class="detail-value">{{ tax_rate.country }}</div>
+                        <span class="detail-label">Country</span>
+                        <span class="detail-value">{{ tax_rate.country }}</span>
                     </div>
                     {% if tax_rate.description %}
                     <div class="detail-row">
-                        <div class="detail-label">Description</div>
-                        <div class="detail-value">{{ tax_rate.description }}</div>
+                        <span class="detail-label">Description</span>
+                        <span class="detail-value">{{ tax_rate.description }}</span>
                     </div>
                     {% endif %}
                 </div>
             </div>
 
-            <!-- Dates & Status Card -->
-            <div class="card mb-4">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0"><i class="bi bi-calendar"></i> Effective Dates & Status</h5>
+            <!-- Dates & Status -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <h5 class="detail-card-title"><i class="bi bi-calendar-event"></i> Effective Dates & Status</h5>
                 </div>
-                <div class="card-body">
+                <div class="detail-card-body">
                     <div class="detail-row">
-                        <div class="detail-label">Effective From</div>
-                        <div class="detail-value">{{ tax_rate.effective_from|date:"d M Y" }}</div>
+                        <span class="detail-label">Effective From</span>
+                        <span class="detail-value">{{ tax_rate.effective_from|date:"d M Y" }}</span>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-label">Effective To</div>
-                        <div class="detail-value">
+                        <span class="detail-label">Effective To</span>
+                        <span class="detail-value">
                             {% if tax_rate.effective_to %}
                                 {{ tax_rate.effective_to|date:"d M Y" }}
                             {% else %}
                                 <span class="text-muted">No end date (active indefinitely)</span>
                             {% endif %}
-                        </div>
+                        </span>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-label">Status</div>
-                        <div class="detail-value">
+                        <span class="detail-label">Status</span>
+                        <span class="detail-value">
                             {% if tax_rate.is_active %}
-                                <span class="badge bg-success status-badge">
+                                <span class="status-display active">
                                     <i class="bi bi-check-circle"></i> Currently Active
                                 </span>
                             {% else %}
-                                <span class="badge bg-secondary status-badge">
+                                <span class="status-display inactive">
                                     <i class="bi bi-circle"></i> Inactive
                                 </span>
                             {% endif %}
-                        </div>
+                        </span>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-label">Created</div>
-                        <div class="detail-value">{{ tax_rate.created_at|date:"d M Y \a\t H:i" }}</div>
+                        <span class="detail-label">Created</span>
+                        <span class="detail-value">{{ tax_rate.created_at|date:"d M Y \a\t H:i" }}</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Settings Card -->
-            <div class="card">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0"><i class="bi bi-sliders"></i> Settings</h5>
+            <!-- Settings -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <h5 class="detail-card-title"><i class="bi bi-sliders"></i> Settings</h5>
                 </div>
-                <div class="card-body">
+                <div class="detail-card-body">
                     <div class="detail-row">
-                        <div class="detail-label">VAT Applicable</div>
-                        <div class="detail-value">
+                        <span class="detail-label">VAT Applicable</span>
+                        <span class="detail-value">
                             {% if tax_rate.is_vat_applicable %}
-                                <span class="badge bg-success">Yes - VAT can be recovered</span>
+                                <span class="badge-success">Yes - VAT can be recovered</span>
                             {% else %}
-                                <span class="badge bg-warning">No - VAT cannot be recovered</span>
+                                <span class="badge-warning">No - VAT cannot be recovered</span>
                             {% endif %}
-                        </div>
+                        </span>
                     </div>
                     {% if tax_rate.kra_code %}
                     <div class="detail-row">
-                        <div class="detail-label">KRA Code</div>
-                        <div class="detail-value"><code>{{ tax_rate.kra_code }}</code></div>
+                        <span class="detail-label">KRA Code</span>
+                        <span class="detail-value"><code class="code-badge">{{ tax_rate.kra_code }}</code></span>
                     </div>
                     {% endif %}
                 </div>
@@ -146,53 +138,55 @@
         <!-- Sidebar -->
         <div class="col-lg-4">
             <!-- Usage Card -->
-            <div class="card mb-4">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0"><i class="bi bi-diagram-3"></i> Usage</h6>
+            <div class="sidebar-card">
+                <div class="sidebar-card-header">
+                    <h6 class="sidebar-card-title"><i class="bi bi-diagram-3"></i> Usage</h6>
                 </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <div class="text-muted small">VAT Rules Using This Rate</div>
-                        <h4 class="mb-0">{{ vat_rules.count }}</h4>
+                <div class="sidebar-card-body">
+                    <div class="usage-stat">
+                        <div class="usage-label">VAT Rules Using This Rate</div>
+                        <div class="usage-count">{{ vat_rules.count }}</div>
                     </div>
                     {% if vat_rules %}
-                    <div class="list-group list-group-sm">
+                    <div class="usage-list">
                         {% for rule in vat_rules %}
-                        <a href="#" class="list-group-item list-group-item-action small">
+                        <a href="#" class="usage-item">
                             <i class="bi bi-link"></i> {{ rule.name }}
                         </a>
                         {% endfor %}
                     </div>
                     {% else %}
-                    <p class="text-muted small mb-0">Not used in any VAT rules yet</p>
+                    <p class="usage-empty">Not used in any VAT rules yet</p>
                     {% endif %}
                 </div>
             </div>
 
-            <!-- Actions Card -->
-            <div class="card bg-light">
-                <div class="card-header bg-light border-0">
-                    <h6 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h6>
+            <!-- Quick Actions -->
+            <div class="sidebar-card">
+                <div class="sidebar-card-header">
+                    <h6 class="sidebar-card-title"><i class="bi bi-lightning"></i> Quick Actions</h6>
                 </div>
-                <div class="card-body small">
-                    <a href="{% url 'taxes:edit' tax_rate.id %}" class="btn btn-sm btn-primary w-100 mb-2">
+                <div class="sidebar-card-body">
+                    <a href="{% url 'taxes:edit' tax_rate.id %}" class="btn btn-primary btn-block">
                         <i class="bi bi-pencil"></i> Edit Rate
                     </a>
-                    <a href="{% url 'taxes:delete' tax_rate.id %}" class="btn btn-sm btn-outline-danger w-100">
-                        <i class="bi bi-trash"></i> Deactivate
+                    <a href="{% url 'taxes:delete' tax_rate.id %}" class="btn btn-outline-danger btn-block">
+                        <i class="bi bi-trash"></i> Delete Rate
                     </a>
                 </div>
             </div>
 
             <!-- Info Box -->
-            <div class="card border-info mt-4">
-                <div class="card-body small">
-                    <h6 class="card-title text-info"><i class="bi bi-info-circle"></i> Info</h6>
-                    <p class="mb-2">
+            <div class="sidebar-card info-box">
+                <div class="info-box-header">
+                    <h6 class="info-box-title"><i class="bi bi-info-circle"></i> Info</h6>
+                </div>
+                <div class="info-box-body">
+                    <p>
                         This tax rate is used when creating and calculating taxes on invoices.
                     </p>
-                    <p class="mb-0">
-                        To stop using this rate, use the Deactivate button or set an "Effective To" date by editing the rate.
+                    <p>
+                        To stop using this rate, use the Delete button or set an "Effective To" date by editing the rate.
                     </p>
                 </div>
             </div>

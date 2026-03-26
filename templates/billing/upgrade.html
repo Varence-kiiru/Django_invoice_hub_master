@@ -1,0 +1,239 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Upgrade Your Plan - {{ organization.name }}{% endblock %}
+
+{% block page_title %}Choose Your Perfect Plan{% endblock %}
+{% block page_description %}Select the plan that best fits your business needs{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/billing.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="plans-header">
+        <h1>Choose Your Plan</h1>
+        <p>Scale your business with our flexible pricing. Start free, upgrade anytime.</p>
+    </div>
+
+    <!-- Plan Cards -->
+    <div class="plans-container">
+        <!-- Free Plan -->
+        <div class="plan-card {% if current_plan == 'free' %}current{% endif %}">
+            {% if current_plan == 'free' %}
+            <span class="plan-badge">Current Plan</span>
+            {% endif %}
+            <div class="plan-name">{{ plans.free.name }}</div>
+            <div class="plan-price">{{ plans.free.price }}</div>
+            <div class="plan-period">Forever free - No payment required</div>
+            
+            <div class="plan-features">
+                {% for feature in plans.free.features %}
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span class="feature-text">{{ feature }}</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if current_plan != 'free' %}
+            <button class="plan-button btn-secondary" disabled style="cursor: not-allowed;">Current Plan</button>
+            {% else %}
+            <button class="plan-button btn-disabled" disabled>Your Current Plan</button>
+            {% endif %}
+        </div>
+
+        <!-- Starter Plan -->
+        <div class="plan-card {% if current_plan == 'starter' %}current{% endif %}">
+            {% if current_plan == 'starter' %}
+            <span class="plan-badge">Current Plan</span>
+            {% endif %}
+            <div class="plan-name">{{ plans.starter.name }}</div>
+            <div class="plan-price">{{ plans.starter.price }}</div>
+            <div class="plan-period">Billed monthly</div>
+            
+            <div class="plan-features">
+                {% for feature in plans.starter.features %}
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span class="feature-text">{{ feature }}</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if current_plan == 'starter' %}
+            <button class="plan-button btn-disabled" disabled>Your Current Plan</button>
+            {% else %}
+            <form method="post" style="width: 100%;">
+                {% csrf_token %}
+                <input type="hidden" name="plan" value="starter">
+                <button type="submit" class="plan-button btn-primary">Upgrade to Starter</button>
+            </form>
+            {% endif %}
+        </div>
+
+        <!-- Professional Plan -->
+        <div class="plan-card featured {% if current_plan == 'professional' %}current{% endif %}">
+            <span class="plan-badge featured">Most Popular</span>
+            {% if current_plan == 'professional' %}
+            <span class="plan-badge">Current Plan</span>
+            {% endif %}
+            <div class="plan-name">{{ plans.professional.name }}</div>
+            <div class="plan-price">{{ plans.professional.price }}</div>
+            <div class="plan-period">Billed monthly</div>
+            
+            <div class="plan-features">
+                {% for feature in plans.professional.features %}
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span class="feature-text">{{ feature }}</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if current_plan == 'professional' %}
+            <button class="plan-button btn-disabled" disabled>Your Current Plan</button>
+            {% else %}
+            <form method="post" style="width: 100%;">
+                {% csrf_token %}
+                <input type="hidden" name="plan" value="professional">
+                <button type="submit" class="plan-button btn-primary">Upgrade to Professional</button>
+            </form>
+            {% endif %}
+        </div>
+
+        <!-- Enterprise Plan -->
+        <div class="plan-card {% if current_plan == 'enterprise' %}current{% endif %}">
+            {% if current_plan == 'enterprise' %}
+            <span class="plan-badge">Current Plan</span>
+            {% endif %}
+            <div class="plan-name">{{ plans.enterprise.name }}</div>
+            <div class="plan-price">{{ plans.enterprise.price }}</div>
+            <div class="plan-period">Custom pricing</div>
+            
+            <div class="plan-features">
+                {% for feature in plans.enterprise.features %}
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span class="feature-text">{{ feature }}</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if current_plan == 'enterprise' %}
+            <button class="plan-button btn-disabled" disabled>Your Current Plan</button>
+            {% else %}
+            <a href="{% url 'core:dashboard' %}contact" class="plan-button btn-primary" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">Contact Sales</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="comparison-section">
+        <h2 style="margin-bottom: 30px;">Feature Comparison</h2>
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Free</th>
+                    <th>Starter</th>
+                    <th>Professional</th>
+                    <th>Enterprise</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Monthly Price</strong></td>
+                    <td>$0</td>
+                    <td>$29</td>
+                    <td>$79</td>
+                    <td>Custom</td>
+                </tr>
+                <tr>
+                    <td><strong>Invoices/Month</strong></td>
+                    <td>50</td>
+                    <td>1,000</td>
+                    <td>Unlimited</td>
+                    <td>Unlimited</td>
+                </tr>
+                <tr>
+                    <td><strong>Team Members</strong></td>
+                    <td>1</td>
+                    <td>5</td>
+                    <td>25</td>
+                    <td>Unlimited</td>
+                </tr>
+                <tr>
+                    <td><strong>Payment Tracking</strong></td>
+                    <td><span class="cross-icon">—</span></td>
+                    <td><span class="check-icon">✓</span></td>
+                    <td><span class="check-icon">✓</span></td>
+                    <td><span class="check-icon">✓</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Advanced Reporting</strong></td>
+                    <td><span class="cross-icon">—</span></td>
+                    <td><span class="cross-icon">—</span></td>
+                    <td><span class="check-icon">✓</span></td>
+                    <td><span class="check-icon">✓</span></td>
+                </tr>
+                <tr>
+                    <td><strong>API Access</strong></td>
+                    <td><span class="cross-icon">—</span></td>
+                    <td><span class="cross-icon">—</span></td>
+                    <td><span class="check-icon">✓</span></td>
+                    <td><span class="check-icon">✓</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Custom Branding</strong></td>
+                    <td><span class="cross-icon">—</span></td>
+                    <td><span class="cross-icon">—</span></td>
+                    <td><span class="check-icon">✓</span></td>
+                    <td><span class="check-icon">✓</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Priority Support</strong></td>
+                    <td><span class="cross-icon">—</span></td>
+                    <td><span class="cross-icon">—</span></td>
+                    <td><span class="check-icon">✓</span></td>
+                    <td><span class="check-icon">✓</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Dedicated Support</strong></td>
+                    <td><span class="cross-icon">—</span></td>
+                    <td><span class="cross-icon">—</span></td>
+                    <td><span class="cross-icon">—</span></td>
+                    <td><span class="check-icon">✓</span></td>
+                </tr>
+                <tr>
+                    <td><strong>SLA Guarantee</strong></td>
+                    <td><span class="cross-icon">—</span></td>
+                    <td><span class="cross-icon">—</span></td>
+                    <td><span class="cross-icon">—</span></td>
+                    <td><span class="check-icon">✓</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- FAQ -->
+    <div style="margin-top: 50px; text-align: center;">
+        <h3 style="margin-bottom: 30px;">Frequently Asked Questions</h3>
+        <div style="max-width: 600px; margin: 0 auto;">
+            <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 15px; text-align: left;">
+                <strong>Can I change my plan anytime?</strong>
+                <p style="margin-top: 10px; color: #666;">Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately.</p>
+            </div>
+            <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 15px; text-align: left;">
+                <strong>What payment methods do you accept?</strong>
+                <p style="margin-top: 10px; color: #666;">We accept all major credit cards (Visa, MasterCard, American Express) through Stripe.</p>
+            </div>
+            <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; text-align: left;">
+                <strong>Is there a setup fee?</strong>
+                <p style="margin-top: 10px; color: #666;">No, there are no setup fees or hidden charges. You only pay for what you use.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

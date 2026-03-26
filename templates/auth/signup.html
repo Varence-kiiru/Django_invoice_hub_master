@@ -1,0 +1,356 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Sign Up - InvoiceSystem{% endblock %}
+
+{% block extra_css %}
+<style>
+    .signup-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .signup-card {
+        width: 100%;
+        max-width: 500px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 10px 35px rgba(0,0,0,0.2);
+        padding: 40px 30px;
+    }
+    
+    .signup-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .signup-header h1 {
+        font-size: 28px;
+        color: #333;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    
+    .signup-header p {
+        color: #666;
+        font-size: 14px;
+    }
+    
+    .form-section {
+        margin-bottom: 25px;
+    }
+    
+    .form-section h5 {
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .form-control {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px 12px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .form-control-lg {
+        padding: 12px 14px;
+        font-size: 15px;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-text {
+        font-size: 12px;
+        color: #999;
+        margin-top: 5px;
+    }
+    
+    .form-check {
+        padding-left: 0;
+        margin-bottom: 12px;
+    }
+    
+    .form-check-input {
+        margin-right: 8px;
+        margin-top: 3px;
+    }
+    
+    .form-check-label {
+        font-size: 13px;
+        color: #555;
+        margin-left: 5px;
+    }
+    
+    .plan-options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .plan-option {
+        border: 2px solid #eee;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+    }
+    
+    .plan-option:hover {
+        border-color: #667eea;
+        background-color: #f8f9ff;
+    }
+    
+    .plan-option input[type="radio"] {
+        margin-right: 10px;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+    
+    .plan-option input[type="radio"]:checked {
+        border-color: #667eea;
+        accent-color: #667eea;
+    }
+    
+    .plan-option input[type="radio"]:checked + .plan-label {
+        font-weight: 600;
+        color: #667eea;
+    }
+    
+    .plan-label {
+        cursor: pointer;
+        margin-bottom: 0;
+        flex: 1;
+    }
+    
+    .btn-signup {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 600;
+        margin-top: 20px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .btn-signup:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+    
+    .signup-footer {
+        text-align: center;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+    }
+    
+    .signup-footer p {
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 0;
+    }
+    
+    .signup-footer a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    
+    .signup-footer a:hover {
+        text-decoration: underline;
+    }
+    
+    .error-message {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+        padding: 12px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+        font-size: 13px;
+    }
+    
+    .error-message ul {
+        margin-bottom: 0;
+        padding-left: 20px;
+    }
+    
+    .error-message li {
+        margin-bottom: 5px;
+    }
+    
+    .error-message:last-child {
+        margin-bottom: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="signup-container">
+    <div class="signup-card">
+        <div class="signup-header">
+            <h1>Create Your Account</h1>
+            <p>Start invoicing in minutes. Free forever.</p>
+        </div>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <form method="post" class="signup-form">
+            {% csrf_token %}
+            
+            <!-- User Information Section -->
+            <div class="form-section">
+                <h5>Your Account</h5>
+                
+                <div class="form-group">
+                    {{ form.email.label_tag }}
+                    {{ form.email }}
+                    {% if form.email.help_text %}
+                        <small class="form-text">{{ form.email.help_text|safe }}</small>
+                    {% endif %}
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ form.first_name.label_tag }}
+                            {{ form.first_name }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ form.last_name.label_tag }}
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    {{ form.password.label_tag }}
+                    {{ form.password }}
+                    {% if form.password.help_text %}
+                        <small class="form-text d-block">{{ form.password.help_text|safe }}</small>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    {{ form.password_confirm.label_tag }}
+                    {{ form.password_confirm }}
+                </div>
+            </div>
+            
+            <!-- Company Information Section -->
+            <div class="form-section">
+                <h5>Your Company</h5>
+                
+                <div class="form-group">
+                    {{ form.company_name.label_tag }}
+                    {{ form.company_name }}
+                    {% if form.company_name.help_text %}
+                        <small class="form-text">{{ form.company_name.help_text|safe }}</small>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    {{ form.company_website.label_tag }}
+                    {{ form.company_website }}
+                    {% if form.company_website.help_text %}
+                        <small class="form-text">{{ form.company_website.help_text|safe }}</small>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Plan Selection Section -->
+            <div class="form-section">
+                <h5>{{ form.plan.label }}</h5>
+                
+                <div class="plan-options">
+                    {% for radio in form.plan %}
+                        <label class="plan-option">
+                            {{ radio.tag }}<span class="plan-label">{{ radio.choice_label }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+                
+                {% if form.plan.help_text %}
+                    <small class="form-text">{{ form.plan.help_text|safe }}</small>
+                {% endif %}
+                {% if form.plan.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.plan.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Agreements Section -->
+            <div class="form-section">
+                <div class="form-check">
+                    {{ form.agree_terms }}
+                    {{ form.agree_terms.label_tag }}
+                </div>
+                
+                <div class="form-check">
+                    {{ form.subscribe_newsletter }}
+                    {{ form.subscribe_newsletter.label_tag }}
+                </div>
+            </div>
+            
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-signup">
+                Create My Free Account
+            </button>
+        </form>
+        
+        <div class="signup-footer">
+            <p>Already have an account? <a href="{% url 'organizations:login' %}">Sign in here</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add real-time form validation
+    document.querySelectorAll('.signup-form input[type="password"]').forEach(input => {
+        input.addEventListener('input', function() {
+            const password = document.querySelector('[name="password"]').value;
+            const confirmPassword = document.querySelector('[name="password_confirm"]').value;
+            
+            if (confirmPassword && password !== confirmPassword) {
+                this.classList.add('is-invalid');
+            } else if (confirmPassword) {
+                this.classList.remove('is-invalid');
+            }
+        });
+    });
+</script>
+{% endblock %}

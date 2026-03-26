@@ -47,7 +47,7 @@
         <a href="{% url 'invoices:clone' invoice.id %}" class="btn btn-secondary">📋 Clone</a>
       {% endif %}
       
-      {% if invoice.amount_due > 0 and invoice.status != 'cancelled' %}
+      {% if invoice.amount_due > 0 and invoice.status != 'cancelled' and invoice.status != 'draft' %}
         <a href="{% url 'payments:create' %}?invoice={{ invoice.id }}" class="btn btn-success">💰 Record Payment</a>
       {% elif invoice.amount_due <= 0 and invoice.status != 'paid' and invoice.status != 'cancelled' %}
         <a href="{% url 'invoices:mark-paid' invoice.id %}" class="btn btn-success">✅ Mark as Paid</a>
@@ -212,7 +212,7 @@
     <div class="payments-section">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h3 class="mb-0">Payment History</h3>
-        {% if invoice.amount_due > 0 and invoice.status != 'cancelled' %}
+        {% if invoice.amount_due > 0 and invoice.status != 'cancelled' and invoice.status != 'draft' %}
           <a href="{% url 'payments:create' %}?invoice={{ invoice.id }}" class="btn btn-success btn-sm">
             <i class="icon-plus"></i> Record Payment
           </a>
@@ -247,7 +247,7 @@
         </table>
       </div>
     </div>
-  {% elif invoice.amount_due > 0 and invoice.status != 'cancelled' %}
+  {% elif invoice.amount_due > 0 and invoice.status != 'cancelled' and invoice.status != 'draft' %}
     <!-- Show payment button if no payment history but amount is due -->
     <div class="payments-section">
       <div class="alert alert-info">
@@ -268,6 +268,72 @@
         {{ invoice.description }}
       </div>
     </div>
+  {% endif %}
+
+  <!-- Deliveries Section -->
+  {% if invoice.status == 'paid' and deliveries or invoice.status == 'paid' and can_create_delivery %}
+  <div class="deliveries-section">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="mb-0">🚚 Deliveries</h3>
+      {% if invoice.status != 'draft' and invoice.status != 'cancelled' and can_create_delivery and not deliveries %}
+        <a href="{% url 'deliveries:create' %}?invoice={{ invoice.id }}" class="btn btn-primary btn-sm">
+          <i class="icon-plus"></i> Create Delivery
+        </a>
+      {% endif %}
+    </div>
+
+    {% if deliveries %}
+      <div class="table-wrapper">
+        <table class="deliveries-table">
+          <thead>
+            <tr>
+              <th>Delivery #</th>
+              <th>Status</th>
+              <th>Scheduled</th>
+              <th>Delivered</th>
+              <th>Recipient</th>
+              <th>Location</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for delivery in deliveries %}
+              <tr>
+                <td>
+                  <a href="{% url 'deliveries:detail' delivery.id %}" style="color: inherit; text-decoration: none;">
+                    <strong>{{ delivery.delivery_number }}</strong>
+                  </a>
+                </td>
+                <td>
+                  <span class="status-badge status-{{ delivery.status }}">
+                    {{ delivery.get_status_display }}
+                  </span>
+                </td>
+                <td>{{ delivery.scheduled_date|date:"M d, Y"|default:"Not scheduled" }}</td>
+                <td>{{ delivery.delivery_date|date:"M d, Y"|default:"Pending" }}</td>
+                <td>{{ delivery.recipient_name|default:"—" }}</td>
+                <td>{{ delivery.location|truncatewords:5 }}</td>
+                <td>
+                  <a href="{% url 'deliveries:detail' delivery.id %}" class="btn btn-xs btn-info">👁️ View</a>
+                  <a href="{% url 'deliveries:pdf' delivery.id %}" class="btn btn-xs btn-secondary" target="_blank">📄 Challan</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% elif can_create_delivery %}
+      <div class="alert alert-info">
+        <h5>No deliveries created yet</h5>
+        <p>Track deliveries by creating a delivery record for this invoice.</p>
+        {% if invoice.status != 'draft' and invoice.status != 'cancelled' %}
+          <a href="{% url 'deliveries:create' %}?invoice={{ invoice.id }}" class="btn btn-primary btn-sm mt-2">
+            <i class="icon-plus"></i> Create First Delivery
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
   {% endif %}
 
   <!-- Timeline -->

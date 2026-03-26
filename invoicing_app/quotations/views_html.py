@@ -565,9 +565,9 @@ def quote_print_view(request, pk):
         pdf_path = PDFService.generate_quote_pdf(quote.id, save=True)
         
         # Open and return the file inline for printing
-        pdf_file = default_storage.open(pdf_path, 'rb')
-        response = HttpResponse(pdf_file.read(), content_type='application/pdf')
-        response['Content-Disposition'] = f'inline; filename="quotation_{quote.quote_number}.pdf"'
+        with default_storage.open(pdf_path, 'rb') as pdf_file:
+            response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'inline; filename="quotation_{quote.quote_number}.pdf"'
         
         logger.info(f"Opened quotation PDF {quote.quote_number} for printing")
         return response
@@ -650,9 +650,9 @@ def quote_download_view(request, pk):
         pdf_path = PDFService.generate_quote_pdf(quote.id, save=True)
         
         # Open and return the file for download
-        pdf_file = default_storage.open(pdf_path, 'rb')
-        response = HttpResponse(pdf_file.read(), content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="quotation_{quote.quote_number}.pdf"'
+        with default_storage.open(pdf_path, 'rb') as pdf_file:
+            response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="quotation_{quote.quote_number}.pdf"'
         
         logger.info(f"Downloaded quotation PDF {quote.quote_number}")
         return response

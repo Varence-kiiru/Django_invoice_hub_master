@@ -1,0 +1,440 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block css %}
+<style>
+    .payment-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .card-section {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .current-method {
+        background: #f9f9f9;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .card-display {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .card-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 20px;
+    }
+
+    .card-info {
+        flex-grow: 1;
+    }
+
+    .card-brand {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 4px;
+    }
+
+    .card-number {
+        color: #999;
+        font-size: 14px;
+        font-family: monospace;
+    }
+
+    .card-expiry {
+        color: #999;
+        font-size: 14px;
+        margin-top: 4px;
+    }
+
+    .default-badge {
+        display: inline-block;
+        background: #4caf50;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .btn {
+        padding: 10px 16px;
+        border-radius: 6px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-danger {
+        background: #f44336;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #d32f2f;
+    }
+
+    .btn-secondary {
+        background: white;
+        border: 1px solid #ddd;
+        color: #333;
+    }
+
+    .btn-secondary:hover {
+        background: #f9f9f9;
+        border-color: #999;
+    }
+
+    .info-box {
+        background: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        padding: 16px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        color: #1565c0;
+    }
+
+    .info-box strong {
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        color: #999;
+    }
+
+    .empty-state-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+
+    .security-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+        padding: 15px;
+        background: #f0f7ff;
+        border-radius: 6px;
+        font-size: 13px;
+        color: #555;
+    }
+
+    .security-icon {
+        color: #667eea;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 100px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">{{ page_title }}</h1>
+
+    <div class="payment-container">
+        {% if messages %}
+        {% for message in messages %}
+        <div style="background: {% if message.tags %}#c8e6c9{% else %}#fff9c4{% endif %}; color: {% if message.tags %}#2e7d32{% else %}#f57f17{% endif %}; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid {% if message.tags %}#4caf50{% else %}#fbc02d{% endif %};">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <div class="info-box">
+            <strong>🔒 Secure Payment</strong>
+            All payment information is encrypted and processed securely by Stripe. We never store your full card details.
+        </div>
+
+        <!-- Current Payment Method -->
+        {% if subscription.stripe_customer_id %}
+        <div class="card-section">
+            <div class="section-title">Current Payment Method</div>
+            
+            <div class="current-method">
+                <div class="card-display">
+                    <div class="card-icon">💳</div>
+                    <div class="card-info">
+                        <div class="card-brand">Visa</div>
+                        <div class="card-number">**** **** **** 4242</div>
+                        <div class="card-expiry">Expires 12/25</div>
+                    </div>
+                    <span class="default-badge">DEFAULT</span>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="updatePaymentMethod()">Update Card</button>
+                    <button class="btn btn-secondary" onclick="viewBillingHistory()">View Billing History</button>
+                </div>
+            </div>
+
+            <hr style="margin: 20px 0;">
+            
+            <div style="background: #fffbea; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                <strong>Next Billing Date:</strong> {{ subscription.current_period_end|date:"F d, Y" }}
+            </div>
+        </div>
+        {% else %}
+        <div class="card-section">
+            <div class="empty-state">
+                <div class="empty-state-icon">💳</div>
+                <p><strong>No payment method on file</strong></p>
+                <p style="margin-top: 10px; font-size: 13px;">Add a payment method to enable automatic billing.</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Add/Update Payment Method Form -->
+        <div class="card-section">
+            <div class="section-title">{% if subscription.stripe_customer_id %}Update{% else %}Add{% endif %} Payment Method</div>
+
+            <form method="post" action="">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="cardholder">Cardholder Name</label>
+                    <input type="text" id="cardholder" name="cardholder" placeholder="John Doe" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="card">Card Number</label>
+                    <input type="text" id="card" name="card" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="expiry">Expiry Date</label>
+                        <input type="text" id="expiry" name="expiry" placeholder="MM/YY" maxlength="5" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cvc">CVC</label>
+                        <input type="text" id="cvc" name="cvc" placeholder="123" maxlength="4" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="country">Country</label>
+                        <select id="country" name="country" required>
+                            <option value="">Select Country</option>
+                            <option value="US">United States</option>
+                            <option value="CA">Canada</option>
+                            <option value="GB">United Kingdom</option>
+                            <option value="AU">Australia</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="zip">ZIP/Postal Code</label>
+                        <input type="text" id="zip" name="zip" placeholder="12345" required>
+                    </div>
+                </div>
+
+                <label style="display: flex; align-items: center; margin-bottom: 20px;">
+                    <input type="checkbox" name="set_default" checked style="width: auto; margin-right: 10px;">
+                    <span style="font-weight: normal; color: #666;">Set as default payment method</span>
+                </label>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    {% if subscription.stripe_customer_id %}Update Payment Method{% else %}Add Payment Method{% endif %}
+                </button>
+
+                <a href="{% url 'organizations:billing_dashboard' %}" class="btn btn-secondary" style="width: 100%; margin-top: 10px; text-align: center;">Cancel</a>
+            </form>
+
+            <div class="security-info">
+                <span class="security-icon">🔐</span>
+                <span>This form is in demo mode. In production, it will integrate with Stripe for secure payment processing.</span>
+            </div>
+        </div>
+
+        <!-- Billing Settings -->
+        <div class="card-section">
+            <div class="section-title">Billing Settings</div>
+
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="billing_email">Billing Email Address</label>
+                    <input type="email" id="billing_email" name="billing_email" 
+                           value="{{ request.user.email }}" required>
+                    <small style="color: #999; display: block; margin-top: 5px;">
+                        Invoices will be sent to this address
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="invoice_reminder"> 
+                        <span style="font-weight: normal;">Send me invoice reminders 3 days before renewal</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="receipt_email"> 
+                        <span style="font-weight: normal;">Send email receipt after each payment</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Save Settings</button>
+            </form>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="card-section" style="border-color: #f44336;">
+            <div class="section-title" style="color: #f44336;">Danger Zone</div>
+
+            <div style="background: #ffebee; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                <strong style="color: #c62828;">Cancel Subscription</strong>
+                <p style="color: #d32f2f; font-size: 14px; margin-top: 10px;">
+                    Your subscription will remain active until the end of your current billing period.
+                </p>
+            </div>
+
+            <button class="btn btn-danger" onclick="cancelSubscription()" style="width: 100%;">
+                Cancel Subscription
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function updatePaymentMethod() {
+    alert('Card update form is ready above. Fill in your new card details.');
+    document.getElementById('cardholder').focus();
+}
+
+function viewBillingHistory() {
+    window.location.href = '{% url "organizations:invoices" %}';
+}
+
+function cancelSubscription() {
+    if (confirm('Are you sure you want to cancel your subscription? You will lose access to paid features at the end of your billing period.')) {
+        // In production, this would call an API endpoint
+        alert('Subscription cancellation feature coming soon!');
+    }
+}
+
+// Auto-format card number
+document.getElementById('card').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\s/g, '');
+    let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+    e.target.value = formattedValue;
+});
+
+// Auto-format expiry date
+document.getElementById('expiry').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length >= 2) {
+        value = value.slice(0, 2) + '/' + value.slice(2, 4);
+    }
+    e.target.value = value;
+});
+
+// Only allow numbers in CVC
+document.getElementById('cvc').addEventListener('input', function(e) {
+    e.target.value = e.target.value.replace(/\D/g, '');
+});
+</script>
+{% endblock %}

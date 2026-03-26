@@ -8,7 +8,7 @@ from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator
 from django.db.models import Q, Count, Sum
 
-from invoicing_app.products.models import Product, ProductCategory
+from invoicing_app.products.models import Product, ProductCategory, ProductTaxClass
 from invoicing_app.products.forms import ProductForm
 from invoicing_app.invoices.models import InvoiceLineItem
 from invoicing_app.core.views_html import role_required
@@ -331,34 +331,6 @@ def category_delete_view(request, pk):
     return redirect('products:categories')
 
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# TAX CLASS MANAGEMENT VIEWS
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-@login_required
-def tax_classes_list_view(request):
-    """
-    List all tax classes with usage count.
-    """
-    from invoicing_app.products.models import ProductTaxClass
-    
-    tax_classes = ProductTaxClass.objects.annotate(
-        product_count=Count('products')
-    ).order_by('name')
-    
-    context = {
-        'tax_classes': tax_classes,
-    }
-    # DEPRECATED: Tax class management moved to admin settings (9_admin/settings_tax.html)
-    # Redirect to admin settings instead
-    from django.shortcuts import redirect
-    return redirect('settings-tax')
-
-
-# Tax Class management has been consolidated into admin settings (9_admin/settings_tax.html)
-# These functions are DEPRECATED - tax management is now in core/views_html.py
-
-
 @login_required
 @role_required('Admin')
 def category_create_view(request):
@@ -403,3 +375,210 @@ def category_edit_view(request, pk):
     
     context = {'form': form, 'category': category}
     return render(request, '5_products/category_form.html', context)
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# TAX CLASSES MANAGEMENT VIEWS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@login_required
+def tax_classes_list_view(request):
+    """
+    List all tax classes with filters and usage statistics.
+    Shows tax class name, rate type, status, and count of VAT rules.
+    """
+    from invoicing_app.products.models import ProductTaxClass
+    from invoicing_app.taxes.models import VATRule
+    from django.contrib import messages
+    
+    tax_classes_qs = ProductTaxClass.objects.annotate(
+        product_count=Count('products'),
+        vat_rule_count=Count('vat_rules')
+    )
+    
+    # Search functionality
+    search_query = request.GET.get('search', '')
+    if search_query:
+        tax_classes_qs = tax_classes_qs.filter(
+            Q(name__icontains=search_query)
+        )
+    
+    # Filter by rate type
+    rate_type_filter = request.GET.get('rate_type', '')
+    if rate_type_filter:
+        tax_classes_qs = tax_classes_qs.filter(rate_type=rate_type_filter)
+    
+    # Filter by status
+    status_filter = request.GET.get('status', '')
+    if status_filter:
+        tax_classes_qs = tax_classes_qs.filter(is_active=(status_filter == 'active'))
+    
+    tax_classes_qs = tax_classes_qs.order_by('name')
+    
+    # Pagination
+    paginator = Paginator(tax_classes_qs, 25)
+    page_number = request.GET.get('page', 1)
+    tax_classes = paginator.get_page(page_number)
+    
+    # Calculate stats
+    all_tax_classes = ProductTaxClass.objects.all()
+    total_active = all_tax_classes.filter(is_active=True).count()
+    total_inactive = all_tax_classes.filter(is_active=False).count()
+    rate_types = dict(ProductTaxClass.RATE_TYPE_CHOICES)
+    
+    context = {
+        'tax_classes': tax_classes,
+        'page_obj': tax_classes,
+        'search_query': search_query,
+        'rate_type_filter': rate_type_filter,
+        'status_filter': status_filter,
+        'total_active': total_active,
+        'total_inactive': total_inactive,
+        'total_count': all_tax_classes.count(),
+        'rate_type_choices': ProductTaxClass.RATE_TYPE_CHOICES,
+    }
+    return render(request, '5_products/tax_classes_list.html', context)
+
+
+@login_required
+@role_required('Admin')
+def tax_class_create_view(request):
+    """
+    Create a new tax class with validation.
+    """
+    from invoicing_app.products.forms import ProductTaxClassForm
+    from django.contrib import messages
+    
+    if request.method == 'POST':
+        form = ProductTaxClassForm(request.POST)
+        if form.is_valid():
+            tax_class = form.save()
+            messages.success(request, f'Tax class "{tax_class.name}" created successfully!')
+            return redirect('products:tax-class-detail', pk=tax_class.id)
+    else:
+        form = ProductTaxClassForm()
+    
+    context = {'form': form, 'title': 'Create Tax Class'}
+    return render(request, '5_products/tax_class_form.html', context)
+
+
+@login_required
+@role_required('Admin')
+def tax_class_edit_view(request, pk):
+    """
+    Edit an existing tax class.
+    """
+    from invoicing_app.products.forms import ProductTaxClassForm
+    from django.contrib import messages
+    
+    tax_class = get_object_or_404(ProductTaxClass, pk=pk)
+    
+    if request.method == 'POST':
+        form = ProductTaxClassForm(request.POST, instance=tax_class)
+        if form.is_valid():
+            tax_class = form.save()
+            messages.success(request, f'Tax class "{tax_class.name}" updated successfully!')
+            return redirect('products:tax-class-detail', pk=tax_class.id)
+    else:
+        form = ProductTaxClassForm(instance=tax_class)
+    
+    context = {
+        'form': form,
+        'tax_class': tax_class,
+        'title': f'Edit Tax Class - {tax_class.name}'
+    }
+    return render(request, '5_products/tax_class_form.html', context)
+
+
+@login_required
+def tax_class_detail_view(request, pk):
+    """
+    View complete tax class details with related products and VAT rules.
+    Shows associated products, VAT rules, and usage statistics.
+    """
+    from invoicing_app.taxes.models import VATRule
+    
+    tax_class = get_object_or_404(ProductTaxClass, pk=pk)
+    
+    # Get related data
+    products = Product.objects.filter(tax_class=tax_class)
+    vat_rules = VATRule.objects.filter(tax_class=tax_class).select_related('tax_rate')
+    
+    # Calculate statistics
+    product_count = products.count()
+    active_products = products.filter(is_active=True).count()
+    vat_rule_count = vat_rules.count()
+    active_vat_rules = vat_rules.filter(is_active=True).count()
+    
+    # Get total usage in invoices
+    from invoicing_app.invoices.models import InvoiceLineItem
+    invoice_usage = InvoiceLineItem.objects.filter(
+        product__tax_class=tax_class
+    ).count()
+    
+    context = {
+        'tax_class': tax_class,
+        'products': products,
+        'vat_rules': vat_rules,
+        'product_count': product_count,
+        'active_products': active_products,
+        'vat_rule_count': vat_rule_count,
+        'active_vat_rules': active_vat_rules,
+        'invoice_usage': invoice_usage,
+    }
+    return render(request, '5_products/tax_class_detail.html', context)
+
+
+@login_required
+@role_required('Admin')
+@require_http_methods(["GET", "POST"])
+def tax_class_delete_view(request, pk):
+    """
+    Archive/soft-delete a tax class (don't remove if in use).
+    """
+    from django.contrib import messages
+    
+    tax_class = get_object_or_404(ProductTaxClass, pk=pk)
+    
+    # Check if tax class is in use
+    in_use = Product.objects.filter(tax_class=tax_class).exists()
+    
+    if request.method == 'POST':
+        # Soft delete
+        tax_class.is_active = False
+        tax_class.save()
+        messages.success(request, f'Tax class "{tax_class.name}" deactivated successfully!')
+        return redirect('products:tax-classes-list')
+    
+    context = {
+        'tax_class': tax_class,
+        'in_use': in_use,
+        'in_use_count': Product.objects.filter(tax_class=tax_class).count(),
+    }
+    return render(request, '5_products/tax_class_delete_confirm.html', context)
+
+
+@login_required
+@role_required('Admin')
+@require_http_methods(["POST"])
+def tax_class_toggle_status_view(request, pk):
+    """
+    Toggle tax class active/inactive status via AJAX.
+    """
+    from django.http import JsonResponse
+    
+    try:
+        tax_class = get_object_or_404(ProductTaxClass, pk=pk)
+        tax_class.is_active = not tax_class.is_active
+        tax_class.save()
+        
+        return JsonResponse({
+            'success': True,
+            'is_active': tax_class.is_active,
+            'status': 'Active' if tax_class.is_active else 'Inactive'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=400)

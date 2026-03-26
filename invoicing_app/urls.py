@@ -17,6 +17,11 @@ from invoicing_app.payments.views import PaymentViewSet
 from invoicing_app.taxes.views import TaxRateViewSet, VATRuleViewSet
 from invoicing_app.quotations.views import QuoteViewSet
 from invoicing_app.expenses.views import ExpenseViewSet, ExpenseCategoryViewSet, VendorViewSet
+from invoicing_app.organizations.views import (
+    OrganizationViewSet, OrganizationMemberViewSet,
+    SubscriptionViewSet as OrgSubscriptionViewSet, InvoiceViewSet as OrgInvoiceViewSet
+)
+from invoicing_app.core.views import UserViewSet
 
 router = routers.DefaultRouter()
 router.register(r'clients', ClientViewSet)
@@ -29,6 +34,12 @@ router.register(r'vatrules', VATRuleViewSet)
 router.register(r'expense-categories', ExpenseCategoryViewSet)
 router.register(r'vendors', VendorViewSet)
 router.register(r'expenses', ExpenseViewSet)
+router.register(r'organizations', OrganizationViewSet, basename='organization')
+router.register(r'organization-members', OrganizationMemberViewSet, basename='organization-member')
+router.register(r'subscriptions', OrgSubscriptionViewSet, basename='subscription')
+router.register(r'billing-invoices', OrgInvoiceViewSet, basename='billing-invoice')
+router.register(r'users', UserViewSet, basename='system-user')
+router.register(r'users', UserViewSet, basename='user')
 
 
 # Service Worker view  
@@ -58,6 +69,9 @@ urlpatterns = [
     # Service Worker - must be at root for scope
     path('sw.js', service_worker_view, name='service-worker'),
     
+    # ━━━ Authentication ━━━
+    path('auth/', include('invoicing_app.organizations.urls')),
+    
     # ━━━ HTML Views - App Level URLs ━━━
     path('', include('invoicing_app.core.urls')),           # Auth, dashboard, reports, settings
     path('clients/', include('invoicing_app.clients.urls')), # Client CRUD
@@ -65,6 +79,7 @@ urlpatterns = [
     path('invoices/', include('invoicing_app.invoices.urls')), # Invoice CRUD
     path('quotations/', include('invoicing_app.quotations.urls')), # Quotations CRUD
     path('payments/', include('invoicing_app.payments.urls')), # Payment CRUD
+    path('deliveries/', include('invoicing_app.deliveries.urls')), # Delivery CRUD
     path('expenses/', include('invoicing_app.expenses.urls')), # Expense CRUD
     path('', include('invoicing_app.taxes.urls')),          # Tax Rates CRUD
     

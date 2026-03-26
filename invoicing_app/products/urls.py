@@ -23,4 +23,12 @@ urlpatterns = [
     path('categories/create/', views_html.category_create_view, name='category-create'),
     path('categories/<int:pk>/edit/', views_html.category_edit_view, name='category-edit'),
     path('categories/<int:pk>/delete/', views_html.category_delete_view, name='category-delete'),
+    
+    # ━━━ Tax Classes Management ━━━
+    path('tax-classes/', views_html.tax_classes_list_view, name='tax-classes-list'),
+    path('tax-classes/create/', views_html.tax_class_create_view, name='tax-class-create'),
+    path('tax-classes/<int:pk>/', views_html.tax_class_detail_view, name='tax-class-detail'),
+    path('tax-classes/<int:pk>/edit/', views_html.tax_class_edit_view, name='tax-class-edit'),
+    path('tax-classes/<int:pk>/delete/', views_html.tax_class_delete_view, name='tax-class-delete'),
+    path('tax-classes/<int:pk>/toggle-status/', views_html.tax_class_toggle_status_view, name='tax-class-toggle-status'),
 ]

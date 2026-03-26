@@ -200,7 +200,12 @@ def payments_create_view(request):
             payment_method_id = request.POST.get('payment_method')
             
             # Validate invoice exists and is payable
-            invoice = get_object_or_404(Invoice, id=invoice_id, is_active=True)
+            try:
+                invoice = Invoice.objects.get(id=invoice_id, is_active=True, amount_due__gt=0,
+                                            status__in=['issued', 'sent', 'viewed', 'overdue', 'partial'])
+            except Invoice.DoesNotExist:
+                messages.error(request, f'Selected invoice is not available for payment. Only issued, sent, viewed, overdue, or partially paid invoices can receive payments.')
+                return redirect('payments:create')
             
             # Check if payment amount exceeds invoice balance
             if amount > invoice.amount_due:
@@ -235,6 +240,7 @@ def payments_create_view(request):
             messages.error(request, f'Error recording payment: {str(e)}')
     
     # Get payable invoices - any with outstanding balance (issued, sent, viewed, overdue, or partially paid)
+    # Draft invoices are NOT payable and should not appear in the dropdown
     payable_invoices = Invoice.objects.filter(
         is_active=True,
         amount_due__gt=0,
@@ -320,15 +326,79 @@ def payment_matching_view(request, pk):
 @login_required
 def payment_receipt_view(request, pk):
     """Generate/view payment receipt."""
+    import base64
+    import qrcode
+    from io import BytesIO
+    from invoicing_app.core.models import CompanySettings
+    
     payment = get_object_or_404(Payment, pk=pk)
     
     # Calculate previous payments (all payments for this invoice except this one)
     previous_payments = payment.invoice.payments.exclude(id=payment.id).aggregate(total=Sum('amount'))['total'] or 0
     
+    # Get company settings
+    company_settings = CompanySettings.get_settings()
+    
+    # Generate QR code with payment information
+    qr_content_lines = [
+        f"Payment Receipt: {payment.receipt_number or payment.id}",
+        f"Invoice: {payment.invoice.invoice_number}",
+        f"Amount: {payment.invoice.currency} {payment.amount:.2f}",
+        f"Date: {payment.payment_date.strftime('%Y-%m-%d')}",
+        f"Method: {payment.payment_method.name}",
+    ]
+    
+    if payment.transaction_reference:
+        qr_content_lines.append(f"Reference: {payment.transaction_reference}")
+    
+    if company_settings and company_settings.tax_id:
+        qr_content_lines.append(f"Tax ID: {company_settings.tax_id}")
+    
+    qr_content = "\n".join(qr_content_lines)
+    
+    # Generate QR code
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
+        box_size=10,
+        border=2,
+    )
+    qr.add_data(qr_content)
+    qr.make(fit=True)
+    
+    # Convert QR code to image
+    qr_img = qr.make_image(fill_color="black", back_color="white")
+    
+    # Convert to base64 data URI
+    qr_buffer = BytesIO()
+    qr_img.save(qr_buffer, format='PNG')
+    qr_buffer.seek(0)
+    qr_data = base64.b64encode(qr_buffer.getvalue()).decode()
+    qr_data_uri = f'data:image/png;base64,{qr_data}'
+    
+    # Get company information
+    company_logo = None
+    company_name = company_settings.company_name if company_settings else ''
+    company_address = company_settings.company_address if company_settings else ''
+    company_phone = company_settings.company_phone if company_settings else ''
+    company_email = company_settings.company_email if company_settings else ''
+    company_tax_id = company_settings.tax_id if company_settings else ''
+    
+    if company_settings and company_settings.company_logo:
+        company_logo = company_settings.company_logo.url
+    
     context = {
         'page_title': f'Receipt - Payment #{pk}',
         'payment': payment,
         'previous_payments': previous_payments,
+        'receipt_qr_code': qr_data_uri,
+        'company_name': company_name,
+        'company_address': company_address,
+        'company_phone': company_phone,
+        'company_email': company_email,
+        'company_logo': company_logo,
+        'company_tax_id': company_tax_id,
+        'company_settings': company_settings,
     }
     return render(request, '7_payments/payment_receipt.html', context)
 
@@ -347,9 +417,9 @@ def payment_receipt_pdf_view(request, pk):
         pdf_path = PDFService.generate_payment_receipt_pdf(payment.id, save=True)
         
         # Open and return the file
-        pdf_file = default_storage.open(pdf_path, 'rb')
-        response = HttpResponse(pdf_file.read(), content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="receipt_{payment.receipt_number or payment.id}.pdf"'
+        with default_storage.open(pdf_path, 'rb') as pdf_file:
+            response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="receipt_{payment.receipt_number or payment.id}.pdf"'
         
         return response
     
@@ -372,10 +442,10 @@ def payment_receipt_print_view(request, pk):
         pdf_path = PDFService.generate_payment_receipt_pdf(payment.id, save=True)
         
         # Open and return the file inline
-        pdf_file = default_storage.open(pdf_path, 'rb')
-        response = HttpResponse(pdf_file.read(), content_type='application/pdf')
-        response['Content-Disposition'] = f'inline; filename="receipt_{payment.receipt_number or payment.id}.pdf"'
-        response['X-PDF-Action'] = 'print'
+        with default_storage.open(pdf_path, 'rb') as pdf_file:
+            response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'inline; filename="receipt_{payment.receipt_number or payment.id}.pdf"'
+            response['X-PDF-Action'] = 'print'
         
         return response
     

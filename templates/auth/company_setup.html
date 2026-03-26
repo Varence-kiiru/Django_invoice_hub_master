@@ -1,0 +1,364 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Complete Your Profile - InvoiceSystem{% endblock %}
+
+{% block extra_css %}
+<style>
+    .setup-container {
+        min-height: 100vh;
+        background: #f8f9fa;
+        padding: 40px 0;
+    }
+    
+    .setup-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 40px;
+    }
+    
+    .setup-header {
+        margin-bottom: 30px;
+    }
+    
+    .setup-header h1 {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 5px;
+        font-weight: 700;
+    }
+    
+    .setup-header p {
+        color: #666;
+        font-size: 14px;
+    }
+    
+    .setup-progress {
+        margin-bottom: 30px;
+    }
+    
+    .progress-step {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .progress-number {
+        width: 35px;
+        height: 35px;
+        background: #667eea;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin-right: 15px;
+        flex-shrink: 0;
+    }
+    
+    .progress-number.completed {
+        background: #28a745;
+    }
+    
+    .progress-number.active {
+        background: #667eea;
+    }
+    
+    .progress-number.pending {
+        background: #ccc;
+        color: #666;
+    }
+    
+    .progress-content h5 {
+        font-size: 15px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 2px;
+    }
+    
+    .progress-content p {
+        font-size: 12px;
+        color: #999;
+        margin-bottom: 0;
+    }
+    
+    .form-section {
+        margin-bottom: 30px;
+    }
+    
+    .form-section h5 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-control {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px 12px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .form-text {
+        font-size: 12px;
+        color: #999;
+        margin-top: 5px;
+        display: block;
+    }
+    
+    .row {
+        margin-left: -7.5px;
+        margin-right: -7.5px;
+    }
+    
+    .col-md-6 {
+        padding-left: 7.5px;
+        padding-right: 7.5px;
+    }
+    
+    .btn-setup {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 12px 30px;
+        font-size: 15px;
+        font-weight: 600;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .btn-setup:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+    
+    .btn-skip {
+        background: #f0f0f0;
+        color: #666;
+        border: none;
+        border-radius: 5px;
+        padding: 12px 30px;
+        font-size: 15px;
+        font-weight: 600;
+        margin-left: 10px;
+        transition: background 0.2s;
+    }
+    
+    .btn-skip:hover {
+        background: #e0e0e0;
+        color: #333;
+    }
+    
+    .form-actions {
+        display: flex;
+        justify-content: flex-start;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #f0f0f0;
+    }
+    
+    .alert {
+        border-radius: 5px;
+        margin-bottom: 20px;
+        font-size: 13px;
+    }
+    
+    .info-banner {
+        background-color: #e7f3ff;
+        border-left: 4px solid #667eea;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        font-size: 13px;
+        color: #004085;
+    }
+    
+    .info-banner strong {
+        display: block;
+        margin-bottom: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="setup-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-700">
+                <div class="setup-card">
+                    <div class="setup-header">
+                        <h1>Complete Your Company Profile</h1>
+                        <p>This information helps us serve you better and customize your experience</p>
+                    </div>
+                    
+                    <div class="setup-progress">
+                        <div class="progress-step">
+                            <div class="progress-number completed">✓</div>
+                            <div class="progress-content">
+                                <h5>Account Created</h5>
+                                <p>Your account is ready to use</p>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-step">
+                            <div class="progress-number active">2</div>
+                            <div class="progress-content">
+                                <h5>Company Details</h5>
+                                <p>Tell us about your business</p>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-step">
+                            <div class="progress-number pending">3</div>
+                            <div class="progress-content">
+                                <h5>Start Invoicing</h5>
+                                <p>You'll be ready to create invoices</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <div class="info-banner">
+                        <strong>✓ Good news!</strong>
+                        Your free trial account is active. Your company name is already pre-filled. Optionally add more details, or <a href="{% url 'core:dashboard' %}" style="color: #004085; text-decoration: underline; font-weight: 600;">skip and start invoicing</a>.
+                    </div>
+                    
+                    <form method="post" class="setup-form">
+                        {% csrf_token %}
+                        
+                        <!-- Company Information Section -->
+                        <div class="form-section">
+                            <h5>Company Information</h5>
+                            
+                            <div class="form-group">
+                                {{ form.company_name.label_tag }}
+                                {{ form.company_name }}
+                                {% if form.company_name.help_text %}
+                                    <small class="form-text">{{ form.company_name.help_text|safe }}</small>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.company_phone.label_tag }}
+                                {{ form.company_phone }}
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.company_website.label_tag }}
+                                {{ form.company_website }}
+                                {% if form.company_website.help_text %}
+                                    <small class="form-text">{{ form.company_website.help_text|safe }}</small>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.company_email.label_tag }}
+                                {{ form.company_email }}
+                            </div>
+                        </div>
+                        
+                        <!-- Address Section -->
+                        <div class="form-section">
+                            <h5>Business Address</h5>
+                            
+                            <div class="form-group">
+                                {{ form.company_address.label_tag }}
+                                {{ form.company_address }}
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form.company_city.label_tag }}
+                                        {{ form.company_city }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form.company_postal_code.label_tag }}
+                                        {{ form.company_postal_code }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form.company_state.label_tag }}
+                                        {{ form.company_state }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form.company_country.label_tag }}
+                                        {{ form.company_country }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tax & Legal Section -->
+                        <div class="form-section">
+                            <h5>Tax & Legal Information</h5>
+                            
+                            <div class="form-group">
+                                {{ form.company_tax_id.label_tag }}
+                                {{ form.company_tax_id }}
+                                {% if form.company_tax_id.help_text %}
+                                    <small class="form-text">{{ form.company_tax_id.help_text|safe }}</small>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.company_industry.label_tag }}
+                                {{ form.company_industry }}
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.company_registration_number.label_tag }}
+                                {{ form.company_registration_number }}
+                                {% if form.company_registration_number.help_text %}
+                                    <small class="form-text">{{ form.company_registration_number.help_text|safe }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-setup">
+                                Save Company Details
+                            </button>
+                            <a href="{% url 'core:dashboard' %}" class="btn btn-skip">
+                                Skip for Now
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

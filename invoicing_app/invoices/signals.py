@@ -5,8 +5,7 @@ Handles automation for invoice creation, payment processing, and status changes.
 from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
 from django.utils import timezone
-from django.core.files.storage import default_storage
-import logging
+from django.core.files.storage import default_storagefrom django.db import transactionimport logging
 
 from invoicing_app.invoices.models import Invoice, InvoiceLineItem
 from invoicing_app.payments.models import Payment
@@ -53,14 +52,26 @@ def track_invoice_status_change(sender, instance, **kwargs):
 
 
 def _clear_invoice_pdf_cache(invoice):
-    """Helper function to clear cached PDF for an invoice."""
+    """Helper function to clear cached PDF for an invoice.
+    Defers the save operation until after the current transaction completes
+    to avoid transaction management errors.
+    """
     if invoice.invoice_pdf:
         try:
             if default_storage.exists(invoice.invoice_pdf.name):
                 default_storage.delete(invoice.invoice_pdf.name)
-            invoice.invoice_pdf = None
-            invoice.save(update_fields=['invoice_pdf'])
-            logger.info(f"Cleared cached PDF for invoice {invoice.invoice_number}")
+            
+            # Defer the database save until after the transaction completes
+            def clear_pdf_field():
+                try:
+                    invoice.invoice_pdf = None
+                    invoice.save(update_fields=['invoice_pdf'])
+                    logger.info(f"Cleared cached PDF for invoice {invoice.invoice_number}")
+                except Exception as e:
+                    logger.warning(f"Error clearing PDF field for invoice {invoice.invoice_number}: {str(e)}")
+            
+            transaction.on_commit(clear_pdf_field)
+            
         except Exception as e:
             logger.warning(f"Error clearing PDF cache for invoice {invoice.invoice_number}: {str(e)}")
 
