@@ -18,8 +18,11 @@ Styles are in static/css/components/navbar.css
     <!-- Search -->
     <form class="navbar-search" role="search" method="get" action="{% url 'invoices:list' %}">
       <label for="global-search" class="sr-only">Search invoices, clients, products</label>
-      <input id="global-search" type="search" name="q" placeholder="Search invoices, clients, products..." aria-label="Search" />
-      <button type="submit" class="search-btn" aria-label="Search">🔍</button>
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input id="global-search" type="search" name="q" placeholder="Search invoices, clients, products..." aria-label="Search" autocomplete="off" />
+      <button type="submit" class="search-submit" aria-label="Submit search">
+        <span class="search-submit-icon">↵</span>
+      </button>
     </form>
 
     <!-- Actions -->
