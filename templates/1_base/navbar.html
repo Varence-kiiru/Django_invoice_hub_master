@@ -24,6 +24,14 @@ Styles are in static/css/components/navbar.css
 
     <!-- Actions -->
     <div class="navbar-actions">
+      <!-- Date and Time Clock -->
+      <div class="datetime-widget">
+        <span class="datetime-display" id="datetime-display">
+          <span id="current-time">Loading...</span>
+          <span id="current-date" class="date-part">Loading...</span>
+        </span>
+      </div>
+
       <!-- Notifications -->
       <div class="notifications-widget">
         <button class="navbar-btn notification-btn" id="notification-toggle" title="View notifications" aria-haspopup="true" aria-expanded="false" aria-label="Notifications">
@@ -133,5 +141,38 @@ Styles are in static/css/components/navbar.css
         sidebar.classList.toggle('open');
       });
     }
+
+    // Date and time clock
+    function updateDateTime() {
+      const now = new Date();
+      const timeElement = document.getElementById('current-time');
+      const dateElement = document.getElementById('current-date');
+      
+      if (timeElement) {
+        const timeFormat = now.toLocaleTimeString('en-US', { 
+          hour: '2-digit', 
+          minute: '2-digit', 
+          second: '2-digit',
+          hour12: true 
+        });
+        timeElement.textContent = timeFormat;
+      }
+      
+      if (dateElement) {
+        const dateFormat = now.toLocaleDateString('en-US', { 
+          weekday: 'short', 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric' 
+        });
+        dateElement.textContent = dateFormat;
+      }
+    }
+    
+    // Update on page load
+    updateDateTime();
+    
+    // Update every second
+    setInterval(updateDateTime, 1000);
   })();
 </script>

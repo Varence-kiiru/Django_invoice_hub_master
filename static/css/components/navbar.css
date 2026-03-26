@@ -324,6 +324,39 @@
   color: var(--color-danger);
 }
 
+/* Date and Time Widget */
+.datetime-widget {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--spacing-md);
+  border-left: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+}
+
+.datetime-display {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  font-family: 'Courier New', monospace;
+  white-space: nowrap;
+}
+
+.datetime-display #current-time {
+  font-size: 0.95rem;
+  color: var(--color-secondary);
+  letter-spacing: 0.5px;
+}
+
+.datetime-display .date-part {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-normal);
+}
+
 /* Mobile Toggle */
 .navbar-toggle {
   display: none;
@@ -368,6 +401,10 @@
   }
 
   .user-name {
+    display: none;
+  }
+
+  .datetime-widget {
     display: none;
   }
 
@@ -463,6 +500,23 @@
 
 [data-theme="dark"] .user-info-header small {
   color: var(--color-text-secondary);
+}
+
+[data-theme="dark"] .datetime-widget {
+  border-left-color: var(--color-border);
+  border-right-color: var(--color-border);
+}
+
+[data-theme="dark"] .datetime-display {
+  color: var(--color-text-secondary);
+}
+
+[data-theme="dark"] .datetime-display #current-time {
+  color: var(--color-primary);
+}
+
+[data-theme="dark"] .datetime-display .date-part {
+  color: var(--color-text-muted);
 }
 
 [data-theme="dark"] .dropdown-item {
