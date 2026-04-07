@@ -1,69 +1,78 @@
 # Python 3.11+ Compatible Dependencies
 # Production-ready Invoice Management System
 
-# ━━━━━ CORE FRAMEWORK ━━━━━
+# ===== CORE FRAMEWORK =====
 Django==4.2.28
 djangorestframework==3.16.1
 django-filter==24.1
 
-# ━━━━━ DATABASE ━━━━━
-mysqlclient==2.2.6
+# ===== DATABASE =====
+# For PostgreSQL (production on Linux): psycopg2-binary>=2.9.10
+# On Windows development: use MySQL via XAMPP or install PostgreSQL with pg_config in PATH
+psycopg2-binary>=2.9.10;sys_platform=="linux"  # PostgreSQL driver (Linux production)
+mysqlclient==2.2.6      # MySQL driver (XAMPP development)
+# SQLite3 is built-in with Python
 
-# ━━━━━ AUTHENTICATION & SECURITY ━━━━━
+# ===== AUTHENTICATION & SECURITY =====
 djangorestframework-simplejwt==5.5.1
 django-cors-headers==4.9.0
 cryptography==43.0.0
 
-# ━━━━━ PAYMENT PROCESSING (STRIPE) ━━━━━
+# ===== PAYMENT PROCESSING (STRIPE) =====
 stripe==11.1.1
 
-# ━━━━━ API DOCUMENTATION & SCHEMA ━━━━━
+# ===== API DOCUMENTATION & SCHEMA =====
 drf-spectacular==0.29.0
 drf-spectacular-sidecar==2025.12.1
 
-# ━━━━━ PDF GENERATION ━━━━━
+# ===== PDF GENERATION =====
 reportlab==4.0.0
 xhtml2pdf==0.2.9
 weasyprint==60.0
 qrcode==7.4.2
 Pillow>=11.0.0
 
-# ━━━━━ DATA IMPORT & PROCESSING ━━━━━
+# ===== DATA IMPORT & PROCESSING =====
 openpyxl==3.1.5
 pandas>=2.0.0
+python-dateutil==2.8.2
 
-# ━━━━━ EMAIL & NOTIFICATIONS ━━━━━
+# ===== UTILITIES & SLUG GENERATION =====
+django-autoslug==1.9.9
+
+# ===== EMAIL & NOTIFICATIONS =====
 django-anymail==9.2.0
 celery==5.4.0
 
-# ━━━━━ CACHING & MESSAGE BROKER ━━━━━
+# ===== CACHING & MESSAGE BROKER =====
 redis==5.0.1
 django-redis==5.4.0
 django-celery-beat==2.5.0
 django-celery-results==2.5.1
 
-# ━━━━━ MONITORING & ERROR TRACKING ━━━━━
+# ===== MONITORING & ERROR TRACKING =====
 sentry-sdk==2.20.0
+django-dbbackup==4.0.2  # Database backup functionality
 
-# ━━━━━ CLOUD STORAGE (OPTIONAL) ━━━━━
+# ===== CLOUD STORAGE (OPTIONAL) =====
 boto3>=1.26
 django-storages==1.14.2
 
-# ━━━━━ GEO-IP & LOCATION SERVICES ━━━━━
+# ===== GEO-IP & LOCATION SERVICES =====
 geoip2==4.7.0
 requests==2.31.0
 
-# ━━━━━ ENVIRONMENT & CONFIGURATION ━━━━━
+# ===== ENVIRONMENT & CONFIGURATION =====
 python-dotenv==1.0.0
 django-environ==0.11.0
 pytz>=2024.2
 
-# ━━━━━ ASYNC & DEPLOYMENT SERVERS ━━━━━
+# ===== ASYNC & DEPLOYMENT SERVERS =====
 uvicorn==0.22.0
 gunicorn==21.2.0
 whitenoise==6.6.0
 
-# ━━━━━ DEVELOPMENT & TESTING ━━━━━
+# ===== DEVELOPMENT & TESTING =====
 django-extensions==4.1.0
 pytest==7.4.0
 pytest-django==4.5.2
@@ -74,7 +83,8 @@ black==24.3.0
 isort==5.12.0
 flake8==6.1.0
 pylint==3.1.0
+pre-commit==3.8.0
 
-# ━━━━━ INTERACTIVE DEVELOPMENT ━━━━━
+# ===== INTERACTIVE DEVELOPMENT =====
 ipython==8.20.0
 ipdb==0.13.13
