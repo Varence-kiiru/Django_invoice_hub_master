@@ -3,6 +3,8 @@
 
 {% block title %}Support Ticket {{ ticket.ticket_number }} - Invoice System{% endblock %}
 
+{% block page_title %}Support Ticket {{ ticket.ticket_number }}{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/help_support/support_ticket_detail.css' %}">
 {% endblock %}
@@ -354,7 +356,7 @@
                 </div>
                 <div class="ticket-info-item">
                     <span class="ticket-info-label">🎯 Priority</span>
-                    <span class="ticket-info-value" style="color: 
+                    <span class="ticket-info-value" style="color:
                         {% if ticket.priority == 'urgent' %}#c62828
                         {% elif ticket.priority == 'high' %}#f57c00
                         {% elif ticket.priority == 'medium' %}#fbc02d
@@ -405,7 +407,7 @@
                 </div>
 
                 <div class="timeline-item">
-                    <div class="timeline-marker" style="background: 
+                    <div class="timeline-marker" style="background:
                         {% if ticket.status == 'open' %}#90a4ae
                         {% elif ticket.status == 'in_progress' %}#f57c00
                         {% else %}#4caf50{% endif %};">2</div>
@@ -456,7 +458,7 @@
         <!-- Support Info -->
         <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 30px; text-align: center;">
             <p style="color: #666; margin-bottom: 10px;">
-                Need immediate help? Contact us directly at <strong>support@invoice.local</strong>
+                Need immediate help? Contact us directly at <strong>hernandezngash@gmail.com</strong>
             </p>
             <p style="color: #999; font-size: 0.95rem; margin: 0;">
                 Reference your ticket number <strong>{{ ticket.ticket_number }}</strong> for faster resolution

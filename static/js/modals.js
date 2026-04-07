@@ -11,39 +11,39 @@ async function confirm(title = 'Confirm', message = '', options = {}) {
   return new Promise((resolve) => {
     const modalId = options.modalId || 'confirmModal';
     let modal = document.getElementById(modalId);
-    
+
     if (!modal) {
       modal = createConfirmModal(modalId);
       document.body.appendChild(modal);
     }
-    
+
     // Set content
     modal.querySelector('.modal-title').textContent = title;
     modal.querySelector('.modal-body').textContent = message;
-    
+
     // Show custom modal
     showModal(modal);
-    
+
     // Handle buttons
     const confirmBtn = modal.querySelector('.btn-confirm');
     const cancelBtn = modal.querySelector('.btn-cancel');
-    
+
     const cleanup = () => {
       confirmBtn.removeEventListener('click', onConfirm);
       cancelBtn.removeEventListener('click', onCancel);
       hideModal(modal);
     };
-    
+
     const onConfirm = () => {
       cleanup();
       resolve(true);
     };
-    
+
     const onCancel = () => {
       cleanup();
       resolve(false);
     };
-    
+
     confirmBtn.addEventListener('click', onConfirm);
     cancelBtn.addEventListener('click', onCancel);
   });
@@ -57,34 +57,34 @@ async function alert(title = 'Alert', message = '', type = 'info') {
   return new Promise((resolve) => {
     const modalId = 'alertModal';
     let modal = document.getElementById(modalId);
-    
+
     if (!modal) {
       modal = createAlertModal(modalId);
       document.body.appendChild(modal);
     }
-    
+
     // Set content
     modal.querySelector('.modal-title').textContent = title;
     modal.querySelector('.modal-body').textContent = message;
     modal.classList.remove('alert-info', 'alert-success', 'alert-warning', 'alert-danger');
     modal.classList.add(`alert-${type}`);
-    
+
     // Show custom modal
     showModal(modal);
-    
+
     // Handle button
     const okBtn = modal.querySelector('.btn-ok');
-    
+
     const cleanup = () => {
       okBtn.removeEventListener('click', onOk);
       hideModal(modal);
     };
-    
+
     const onOk = () => {
       cleanup();
       resolve();
     };
-    
+
     okBtn.addEventListener('click', onOk);
   });
 }
@@ -104,18 +104,18 @@ async function confirmDelete(itemName = 'this item') {
 function loading(message = 'Loading...') {
   const modalId = 'loadingModal';
   let modal = document.getElementById(modalId);
-  
+
   if (!modal) {
     modal = createLoadingModal(modalId);
     document.body.appendChild(modal);
   }
-  
+
   // Set message
   modal.querySelector('.loading-text').textContent = message;
-  
+
   // Show custom modal
   showModal(modal);
-  
+
   // Return close function
   return () => hideModal(modal);
 }
@@ -134,10 +134,14 @@ function close(modalId) {
  * Show modal using custom CSS classes
  */
 function showModal(modal) {
+  if (!modal) return;
+
   modal.classList.add('show');
   modal.style.display = 'flex';
   modal.setAttribute('aria-hidden', 'false');
+
   // Prevent body scroll
+  document.body.classList.add('modal-open');
   document.body.style.overflow = 'hidden';
 }
 
@@ -145,11 +149,21 @@ function showModal(modal) {
  * Hide modal using custom CSS classes
  */
 function hideModal(modal) {
+  if (!modal) return;
+
   modal.classList.remove('show');
+  modal.classList.remove('fade');
   modal.style.display = 'none';
   modal.setAttribute('aria-hidden', 'true');
-  // Restore body scroll
-  document.body.style.overflow = '';
+
+  // Restore body scroll - remove the inline style that was blocking it
+  document.body.classList.remove('modal-open');
+
+  // Set overflow back to auto only if no other modals are open
+  const activeModals = document.querySelectorAll('.modal.show, .modal[style*="display: flex"]');
+  if (activeModals.length === 0) {
+    document.body.style.overflow = 'auto';
+  }
 }
 
 /**
@@ -162,7 +176,7 @@ function createConfirmModal(id) {
   modal.tabIndex = -1;
   modal.setAttribute('role', 'dialog');
   modal.setAttribute('aria-hidden', 'true');
-  
+
   modal.innerHTML = `
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -178,12 +192,12 @@ function createConfirmModal(id) {
       </div>
     </div>
   `;
-  
+
   // Close on X button
   modal.querySelector('.btn-close').addEventListener('click', () => {
     hideModal(modal);
   });
-  
+
   return modal;
 }
 
@@ -197,7 +211,7 @@ function createAlertModal(id) {
   modal.tabIndex = -1;
   modal.setAttribute('role', 'dialog');
   modal.setAttribute('aria-hidden', 'true');
-  
+
   modal.innerHTML = `
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -212,12 +226,12 @@ function createAlertModal(id) {
       </div>
     </div>
   `;
-  
+
   // Close on X button
   modal.querySelector('.btn-close').addEventListener('click', () => {
     hideModal(modal);
   });
-  
+
   return modal;
 }
 
@@ -231,7 +245,7 @@ function createLoadingModal(id) {
   modal.tabIndex = -1;
   modal.setAttribute('role', 'dialog');
   modal.setAttribute('aria-hidden', 'true');
-  
+
   modal.innerHTML = `
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -244,38 +258,17 @@ function createLoadingModal(id) {
       </div>
     </div>
   `;
-  
+
   return modal;
 }
 
 /**
- * Auto-initialize delete buttons with modal confirmation
- * Add class="btn-delete" and data-form="/url/to/delete/" to triggers
+ * DEPRECATED: Auto-initialize delete buttons with modal confirmation
+ * This function is no longer used - the global modal system (confirm_delete.html)
+ * handles all delete button confirmations using the .btn-delete class.
+ * Keeping function signature for backward compatibility if needed.
  */
 function initializeDeleteButtons() {
-  document.querySelectorAll('.btn-delete').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      const itemName = btn.getAttribute('data-item-name') || 'this item';
-      const formUrl = btn.getAttribute('data-form');
-      
-      const confirmed = await confirmDelete(itemName);
-      
-      if (confirmed && formUrl) {
-        // Create temporary form and submit
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = formUrl;
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
-        if (csrfToken) {
-          form.innerHTML = `<input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken.value}">`;
-        }
-        document.body.appendChild(form);
-        form.submit();
-      }
-    });
-  });
+  // DISABLED: Using global delete modal from confirm_delete.html instead
+  // Do not initialize old delete button handlers
 }
-
-// Initialize on DOM ready
-document.addEventListener('DOMContentLoaded', initializeDeleteButtons);

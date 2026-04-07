@@ -6,10 +6,10 @@
     'use strict';
 
     // ========== Line Items Formset Management ==========
-    
+
     const QuoteFormset = {
         formPrefix: 'quotelineitem_set',
-        
+
         init() {
             this.attachEventListeners();
             this.calculateTotals();
@@ -33,7 +33,7 @@
                         this.calculateTotals();
                     }
                 });
-                
+
                 formset.addEventListener('input', (e) => {
                     if (e.target.matches('input[type="number"]')) {
                         this.calculateTotals();
@@ -55,7 +55,7 @@
             if (!mgmtForm) return;
 
             const currentCount = parseInt(mgmtForm.value);
-            
+
             // Clone the last form
             const lastForm = forms[forms.length - 1];
             const newForm = lastForm.cloneNode(true);
@@ -98,7 +98,7 @@
 
             // Reattach event listeners
             this.attachDeleteHandlers();
-            
+
             // Set focus to first input in new form
             const firstInput = newForm.querySelector('input:not([type="hidden"])');
             if (firstInput) {
@@ -180,7 +180,7 @@
     };
 
     // ========== Date Field Helpers ==========
-    
+
     const DateHelper = {
         init() {
             this.setupDateValidation();
@@ -234,7 +234,7 @@
     };
 
     // ========== Invoice Date Defaults ==========
-    
+
     const InvoiceDateHelper = {
         init() {
             this.setupInvoiceDateDefaults();
@@ -264,7 +264,7 @@
     };
 
     // ========== Form Submission Handlers ==========
-    
+
     const FormHandler = {
         init() {
             this.attachFormListeners();
@@ -350,7 +350,7 @@
 
         validateConvertForm(form) {
             const dueDate = form.querySelector('[name="due_date"]');
-            
+
             if (!dueDate || !dueDate.value) {
                 alert('Please enter a due date for the invoice');
                 if (dueDate) dueDate.focus();
@@ -362,7 +362,7 @@
     };
 
     // ========== Initialization ==========
-    
+
     document.addEventListener('DOMContentLoaded', function() {
         QuoteFormset.init();
         DateHelper.init();

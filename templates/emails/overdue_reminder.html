@@ -1,0 +1,43 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Payment Overdue Reminder{% endblock %}
+{% block header_class %}header-red{% endblock %}
+{% block header_title %}⚠️ Payment Overdue{% endblock %}
+
+{% block content %}
+    <p>Hello {{ client_name }},</p>
+
+    <div class="alert-badge">
+        <h2>Invoice is {{ days_overdue }} day(s) overdue</h2>
+        <p>We have not yet received payment for the invoice listed below. Immediate payment is required to bring your account current.</p>
+    </div>
+
+    <div class="section">
+        <div class="details-table">
+            <div class="detail-row">
+                <span class="detail-label accent-red">Invoice Number:</span>
+                <span class="detail-value">{{ invoice_number }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label accent-red">Original Due Date:</span>
+                <span class="detail-value">{{ original_due_date }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label accent-red">Outstanding Amount:</span>
+                <span class="detail-value amount red">{{ amount_due }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label accent-red">Days Overdue:</span>
+                <span class="detail-value">{{ days_overdue }}</span>
+            </div>
+        </div>
+    </div>
+
+    <p><strong>Please submit payment as soon as possible</strong>. If there is a dispute or issue with this invoice, please contact us immediately so we can resolve it.</p>
+
+    <div class="button-container">
+        <a href="{{ payment_url }}" class="btn btn-danger">Submit Payment Now</a>
+    </div>
+{% endblock %}
+</body>
+</html>

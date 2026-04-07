@@ -3,6 +3,8 @@
 
 {% block title %}{% endblock %}
 
+{% block page_title %}Payment Methods{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-5">
     <!-- Page Header -->
@@ -57,12 +59,9 @@
                             <a href="{% url 'payments:method-edit' method.id %}" class="btn btn-sm btn-outline-primary me-2">
                                 <i class="bi bi-pencil"></i> Edit
                             </a>
-                            <form method="post" action="{% url 'payments:method-delete' method.id %}" class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this payment method?')">
-                                    <i class="bi bi-trash"></i> Delete
-                                </button>
-                            </form>
+                            <a href="#" class="btn btn-sm btn-outline-danger btn-delete" data-delete-url="{% url 'payments:method-delete' method.id %}" data-item-name="{{ method.method_name }}" data-item-type="Payment Method" data-message="Delete this payment method? This action cannot be undone.">
+                                <i class="bi bi-trash"></i> Delete
+                            </a>
                         </td>
                     </tr>
                     {% empty %}

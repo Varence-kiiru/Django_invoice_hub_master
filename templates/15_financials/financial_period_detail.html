@@ -1,0 +1,161 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}{{ period }} - Financial Period{% endblock %}
+
+{% block page_title %}{{ period }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/components/tables.css' %}">
+<link rel="stylesheet" href="{% static 'css/financials.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Period Header -->
+  <div class="period-header">
+    <h1 class="period-title">{{ period }}</h1>
+    <p>Financial Period Details</p>
+
+    <div class="period-meta">
+      <div class="period-meta-item">
+        <div class="period-meta-label">Period Type</div>
+        <div class="period-meta-value">{{ period.get_period_type_display }}</div>
+      </div>
+      <div class="period-meta-item">
+        <div class="period-meta-label">Start Date</div>
+        <div class="period-meta-value">{{ period.start_date|date:"M j, Y" }}</div>
+      </div>
+      <div class="period-meta-item">
+        <div class="period-meta-label">End Date</div>
+        <div class="period-meta-value">{{ period.end_date|date:"M j, Y" }}</div>
+      </div>
+      <div class="period-meta-item">
+        <div class="period-meta-label">Status</div>
+        <div class="period-meta-value">
+          {% if period.is_closed %}Closed{% else %}Active{% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Period Statistics -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-title">💰 Total Revenue</div>
+      <div class="stat-value">{{ company_settings.currency_symbol }}{{ period_totals.total_revenue|default:0|floatformat:2 }}</div>
+      <div class="stat-change">Revenue collected this period</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-title">🏛️ Tax Collected</div>
+      <div class="stat-value">{{ company_settings.currency_symbol }}{{ period_totals.total_tax|default:0|floatformat:2 }}</div>
+      <div class="stat-change">VAT and other taxes</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-title">💵 Total Collected</div>
+      <div class="stat-value">{{ company_settings.currency_symbol }}{{ period_totals.total_collected|default:0|floatformat:2 }}</div>
+      <div class="stat-change">Total payments received</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-title">📊 Collections</div>
+      <div class="stat-value">{{ revenue_collections|length }}</div>
+      <div class="stat-change">Individual revenue records</div>
+    </div>
+  </div>
+
+  <!-- Tax Liability -->
+  {% if tax_liability %}
+  <div class="card tax-liability-card">
+    <div class="card-header">
+      <h3 class="card-title">🏛️ Tax Liability</h3>
+      {% if tax_liability.status != 'remitted' and can_manage_financials %}
+      <a href="{% url 'financials:tax-liability-mark-remitted' tax_liability.pk %}" class="btn btn-success btn-sm btn-header-action">
+        ✓ Mark as Remitted
+      </a>
+      {% endif %}
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-3">
+          <strong>Tax Type:</strong> {{ tax_liability.tax_type }}
+        </div>
+        <div class="col-md-3">
+          <strong>Total Revenue:</strong> {{ company_settings.currency_symbol }}{{ tax_liability.total_revenue|floatformat:2 }}
+        </div>
+        <div class="col-md-3">
+          <strong>Tax Collected:</strong> {{ company_settings.currency_symbol }}{{ tax_liability.total_tax_collected|floatformat:2 }}
+        </div>
+        <div class="col-md-3">
+          <strong>Status:</strong>
+          <span class="badge badge-{% if tax_liability.status == 'pending' %}warning{% elif tax_liability.status == 'overdue' %}danger{% elif tax_liability.status == 'remitted' %}success{% else %}secondary{% endif %}">
+            {{ tax_liability.get_status_display }}
+          </span>
+        </div>
+      </div>
+      {% if tax_liability.due_date %}
+      <div class="row mt-2">
+        <div class="col-md-6">
+          <strong>Due Date:</strong> {{ tax_liability.due_date|date:"M j, Y" }}
+        </div>
+        {% if tax_liability.remitted_date %}
+        <div class="col-md-6">
+          <strong>Remitted Date:</strong> {{ tax_liability.remitted_date|date:"M j, Y" }}
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Revenue Collections -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">💰 Revenue Collections</h3>
+    </div>
+    <div class="card-body">
+      {% if revenue_collections %}
+      <table class="collections-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Invoice</th>
+            <th>Revenue</th>
+            <th>Tax</th>
+            <th>Total</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for collection in revenue_collections %}
+          <tr>
+            <td>{{ collection.collected_date|date:"M j, Y" }}</td>
+            <td>{{ collection.invoice.invoice_number }}</td>
+            <td class="amount-column">{{ company_settings.currency_symbol }}{{ collection.revenue_amount|floatformat:2 }}</td>
+            <td class="amount-column">{{ company_settings.currency_symbol }}{{ collection.tax_amount|floatformat:2 }}</td>
+            <td class="amount-column"><strong>{{ company_settings.currency_symbol }}{{ collection.total_amount|floatformat:2 }}</strong></td>
+            <td>
+              <a href="{% url 'financials:revenue-detail' collection.pk %}" class="btn btn-sm btn-outline-primary">
+                View
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">💰</div>
+        <h3 class="empty-state-title">No Revenue Collections</h3>
+        <p class="empty-state-description">
+          No revenue has been collected for this period yet.
+        </p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

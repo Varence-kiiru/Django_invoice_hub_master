@@ -33,17 +33,17 @@
           {% endif %}
         </div>
       </div>
-      
+
       <div class="info-card">
         <div class="info-label">Total Backups</div>
         <div class="info-value">{{ backup_count }}</div>
       </div>
-      
+
       <div class="info-card">
         <div class="info-label">Storage Used</div>
         <div class="info-value">{{ total_backup_size_mb }} MB</div>
       </div>
-      
+
       <div class="info-card">
         <div class="info-label">Backup Location</div>
         <div class="info-value info-path">{{ backup_location }}</div>
@@ -51,10 +51,22 @@
     </div>
   </div>
 
+  <!-- Automated Backups Info -->
+  <div class="backup-info-box info-highlight">
+    <h3>⏰ Automated Daily Backups</h3>
+    <p>Automated backups are scheduled to run <strong>daily at 2:00 AM</strong> (database only). To enable automated backups:</p>
+    <ol>
+      <li>Ensure Redis is running</li>
+      <li>Start Celery worker with: <code>celery -A invoicing_app worker --loglevel=info -c 2</code></li>
+      <li>Start Celery Beat with: <code>celery -A invoicing_app beat --loglevel=info</code></li>
+    </ol>
+    <p><small>💡 Automated backups keep only the last 30 days (old backups are auto-cleaned weekly).</small></p>
+  </div>
+
   <!-- Quick Actions Section -->
   <div class="quick-actions-section">
     <h2>Quick Actions</h2>
-    
+
     <form method="post" class="actions-form" id="backup-form">
       {% csrf_token %}
       <div class="actions-grid">
@@ -74,7 +86,7 @@
   <!-- Backup History Section -->
   <div class="backup-history-section">
     <h2>Backup History</h2>
-    
+
     {% if backups %}
       <div class="admin-table-wrapper">
         <table class="admin-table">
@@ -103,9 +115,8 @@
                   </span>
                 </td>
                 <td class="backup-actions">
-                  <button type="button" class="btn-action btn-delete-backup" onclick="event.preventDefault(); event.stopPropagation(); showDeleteBackupModal({{ backup.id }}, '{{ backup.file_name }}');" title="Delete Backup">
-                    🗑️ Delete
-                  </button>
+                  <a href="{% url 'core:backup-download' backup.id %}" class="btn btn-sm btn-download" title="Download Backup" download>⬇️ Download</a>
+                  <a href="#" class="btn btn-sm btn-danger" data-delete-url="{% url 'core:backup-delete' backup.id %}" data-item-name="{{ backup.file_name }}" data-item-type="Backup" data-message="Deleting a backup cannot be undone. Are you sure?">🗑️ Delete</a>
                 </td>
               </tr>
             {% endfor %}
@@ -127,7 +138,12 @@
       <div class="upload-content">
         <div class="upload-icon">📤</div>
         <h3>Upload Backup File</h3>
-        <p>Upload a .sql or .sql.gz database backup file to restore</p>
+        <p>Upload a backup file to restore your database. Supported formats:</p>
+        <ul style="text-align: left; display: inline-block; margin: 0.5rem 0; font-size: 0.95rem;">
+          <li><strong>.sql</strong> - Database dump only</li>
+          <li><strong>.sql.gz</strong> - Compressed database dump</li>
+          <li><strong>.zip</strong> - Full system backup (database + media files including logos, invoices, etc.)</li>
+        </ul>
         <form method="post" enctype="multipart/form-data" class="upload-form" id="upload-form">
           {% csrf_token %}
           <input type="hidden" name="action" value="upload_backup">
@@ -135,7 +151,7 @@
             <input type="file" name="backup_file" accept=".sql,.sql.gz,.zip" id="file-input" required onchange="handleFileChange()">
             <label for="file-input" class="file-input-label">Choose File</label>
           </div>
-          
+
           <!-- Selected File Display -->
           <div id="file-display" class="file-display" style="display: none;">
             <div class="file-display-content">
@@ -158,7 +174,7 @@
   <div class="restore-info-section">
     <h2>Before Restoring a Backup</h2>
     <div class="alert alert-warning">
-      <strong>⚠️ Important:</strong> Restoring from a backup will overwrite all current database data. Please ensure you have:
+      <strong>⚠️ Important:</strong> Restoring from a backup will overwrite all current database data and optionally restore media files. Please ensure you have:
       <ul>
         <li>✓ Created a backup of your current database</li>
         <li>✓ Verified the backup file is valid and uncorrupted</li>
@@ -166,6 +182,9 @@
         <li>✓ Scheduled the restore during a maintenance window</li>
         <li>✓ Tested the backup on a staging environment (recommended)</li>
       </ul>
+    </div>
+    <div class="alert alert-info alert-tip">
+      <strong>💡 Tip:</strong> If restoring from a <strong>.zip backup</strong>, all media files (logos, invoices, receipts, etc.) will be automatically restored along with the database.
     </div>
   </div>
 </div>
@@ -183,21 +202,37 @@
   <div class="modal-overlay" onclick="closeCreateBackupModal()"></div>
   <div class="modal-content">
     <div class="modal-header">
-      <h2>Create Database Backup</h2>
+      <h2>Create Backup</h2>
       <button class="modal-close" onclick="closeCreateBackupModal()">&times;</button>
     </div>
     <div class="modal-body">
       <div class="alert alert-warning">
         <strong>⚠️ Note:</strong> Creating a backup may take several minutes depending on your database size. Your system will remain fully operational during this process.
       </div>
-      <p><strong>The following will be backed up:</strong></p>
-      <ul style="margin: 1rem 0; padding-left: 1.5rem;">
-        <li>All database tables and data</li>
-        <li>Database structure and relationships</li>
-        <li>View data and configurations</li>
-      </ul>
-      <p style="color: var(--text-secondary); font-size: 0.9rem;">
-        The backup will be compressed with gzip and stored in: <code style="background-color: rgba(0,0,0,0.05); padding: 0.25rem 0.5rem; border-radius: 3px;">{{ backup_location }}</code>
+
+      <div style="margin: 1.5rem 0;">
+        <label style="display: block; margin-bottom: 1rem; font-weight: 500;">Choose backup type:</label>
+        <div style="display: flex; gap: 1rem; flex-direction: column;">
+          <label class="backup-type-option">
+            <input type="radio" name="backup_type_choice" value="database" checked style="cursor: pointer;">
+            <div>
+              <strong>Database Only</strong>
+              <br><small>All invoices, clients, payments, settings (~0.02 MB)</small>
+            </div>
+          </label>
+
+          <label class="backup-type-option">
+            <input type="radio" name="backup_type_choice" value="full" style="cursor: pointer;">
+            <div>
+              <strong>Full System</strong>
+              <br><small>Database + all uploaded media files (logos, invoices, etc.)</small>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <p class="backup-location-info">
+        Backup will be stored in: <code>{{ backup_location }}</code>
       </p>
     </div>
     <div class="modal-footer">
@@ -210,7 +245,7 @@
 </div>
 
 <!-- Include Modal Templates -->
-{% include "10_modals/delete_backup_modal.html" %}
+
 {% include "10_modals/restore_warning_modal.html" %}
 
 <script>
@@ -219,14 +254,14 @@
     const fileInput = document.getElementById('file-input');
     const fileDisplay = document.getElementById('file-display');
     const uploadBtn = document.getElementById('upload-btn');
-    
+
     if (fileInput.files[0]) {
       const file = fileInput.files[0];
       const filesize = (file.size / (1024*1024)).toFixed(2);
-      
+
       document.getElementById('selected-filename').textContent = file.name;
       document.getElementById('selected-filesize').textContent = filesize + ' MB';
-      
+
       fileDisplay.style.display = 'block';
       uploadBtn.style.display = 'block';
     } else {
@@ -259,15 +294,22 @@
   function confirmCreateBackup() {
     closeCreateBackupModal();
     showLoadingIndicator('Creating backup... Please wait');
-    
+
     const form = document.getElementById('backup-form');
     const actionInput = document.createElement('input');
     actionInput.type = 'hidden';
     actionInput.name = 'action';
     actionInput.value = 'create_backup';
-    
+
+    const backupTypeInput = document.createElement('input');
+    backupTypeInput.type = 'hidden';
+    backupTypeInput.name = 'backup_type';
+    const selectedType = document.querySelector('input[name="backup_type_choice"]:checked');
+    backupTypeInput.value = selectedType ? selectedType.value : 'database';
+
     form.appendChild(actionInput);
-    
+    form.appendChild(backupTypeInput);
+
     // Submit after a brief delay to ensure modal closes
     setTimeout(() => {
       form.submit();
@@ -281,10 +323,10 @@
       alert('Please select a backup file');
       return;
     }
-    
+
     const file = fileInput.files[0];
     const filesize = (file.size / (1024*1024)).toFixed(2);
-    
+
     // Show restore warning modal
     showRestoreWarningModal(file.name, filesize + ' MB');
   }
@@ -293,7 +335,7 @@
   function showLoadingIndicator(message = 'Processing...') {
     const loader = document.getElementById('loading-indicator');
     const loaderText = document.getElementById('loading-text');
-    
+
     if (loader) {
       loaderText.textContent = message;
       loader.style.display = 'flex';

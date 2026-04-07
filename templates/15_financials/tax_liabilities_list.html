@@ -1,0 +1,107 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Tax Liabilities - Invoicing App{% endblock %}
+
+{% block page_title %}Tax Liabilities{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/components/tables.css' %}">
+<link rel="stylesheet" href="{% static 'css/financials.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-header-content">
+      <h1 class="page-title">🏛️ Tax Liabilities</h1>
+      <p class="page-subtitle">Monitor tax obligations and remittance status</p>
+    </div>
+    {% if can_manage_financials %}
+    <div class="page-header-actions">
+      <a href="{% url 'financials:tax-liability-create' %}" class="btn btn-primary">
+        ➕ Create Tax Liability
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Liabilities Table -->
+  <div class="card">
+    <div class="card-body">
+      {% if liabilities %}
+      <table class="liabilities-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th>Tax Type</th>
+            <th>Total Revenue</th>
+            <th>Tax Collected</th>
+            <th>Due Date</th>
+            <th>Status</th>
+            <th class="actions-column">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for liability in liabilities %}
+          <tr>
+            <td>
+              <a href="{% url 'financials:period-detail' liability.financial_period.pk %}">
+                {{ liability.financial_period }}
+              </a>
+            </td>
+            <td>{{ liability.tax_type }}</td>
+            <td class="amount-column">{{ company_settings.currency_symbol }}{{ liability.total_revenue|floatformat:2 }}</td>
+            <td class="amount-column">{{ company_settings.currency_symbol }}{{ liability.total_tax_collected|floatformat:2 }}</td>
+            <td>
+              {% if liability.due_date %}
+                <span class="{% if liability.status == 'overdue' %}due-date-warning{% elif liability.status == 'due_soon' %}due-date-soon{% endif %}">
+                  {{ liability.due_date|date:"M j, Y" }}
+                </span>
+              {% else %}
+                Not set
+              {% endif %}
+            </td>
+            <td>
+              <span class="status-badge {{ liability.status }}">
+                {{ liability.get_status_display }}
+              </span>
+            </td>
+            <td>
+              <a href="{% url 'financials:tax-liability-detail' liability.pk %}" class="btn btn-sm btn-outline-primary">
+                View
+              </a>
+              {% if can_manage_financials %}
+              <a href="{% url 'financials:tax-liability-edit' liability.pk %}" class="btn btn-sm btn-outline-secondary">
+                ✏️ Edit
+              </a>
+              {% endif %}
+              {% if liability.status != 'remitted' and can_manage_financials %}
+              <a href="{% url 'financials:tax-liability-mark-remitted' liability.pk %}" class="btn btn-sm btn-outline-success btn-remit-action">
+                ✓ Remit
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">🏛️</div>
+        <h3 class="empty-state-title">No Tax Liabilities</h3>
+        <p class="empty-state-description">
+          Tax liabilities will be automatically created when revenue is collected.
+        </p>
+        {% if can_manage_financials %}
+        <a href="{% url 'financials:tax-liability-create' %}" class="btn btn-primary">
+          ➕ Create First Tax Liability
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

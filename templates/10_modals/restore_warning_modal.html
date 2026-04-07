@@ -57,7 +57,7 @@
     document.getElementById('restore-filename').textContent = filename;
     document.getElementById('restore-filesize').textContent = filesize;
     document.getElementById('restore-warning-modal').style.display = 'flex';
-    
+
     // Reset checkboxes
     document.getElementById('restore-backup').checked = false;
     document.getElementById('restore-notify').checked = false;
@@ -82,7 +82,7 @@
   document.getElementById('restore-accept')?.addEventListener('change', updateRestoreButton);
 
   function updateRestoreButton() {
-    const allChecked = 
+    const allChecked =
       document.getElementById('restore-backup')?.checked &&
       document.getElementById('restore-notify')?.checked &&
       document.getElementById('restore-schedule')?.checked &&
@@ -92,16 +92,16 @@
 
   function confirmRestoreWarning() {
     showLoadingIndicator('Restoring backup... This may take a few minutes.');
-    
+
     const fileInput = document.getElementById('file-input');
     if (!fileInput || !fileInput.files[0]) {
       hideLoadingIndicator();
       alert('Please select a backup file');
       return;
     }
-    
+
     closeRestoreWarningModal();
-    
+
     setTimeout(() => {
       document.getElementById('upload-form').submit();
     }, 500);

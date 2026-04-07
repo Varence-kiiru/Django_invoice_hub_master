@@ -3,6 +3,8 @@
 
 {% block title %}Invoices Report - Financial Dashboard{% endblock %}
 
+{% block page_title %}Invoices Report{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/icons.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/reports.css' %}">
@@ -28,7 +30,7 @@
                         <i class="icon-file-excel"></i> CSV
                     </button>
                 {% endif %}
-                <button class="btn btn-primary" onclick="location.href='{% url 'core:invoices-report-pdf' %}' + window.location.search">
+                <button class="btn btn-primary" onclick='location.href="{% url "core:invoices-report-pdf" %}" + window.location.search'>
                     <i class="icon-print"></i> Download PDF
                 </button>
             </div>
@@ -103,7 +105,7 @@
             <form method="get" class="row g-3" id="filterForm" name="filterForm">
                 <div class="col-md-3">
                     <label for="dateFrom" class="form-label">From Date</label>
-                    <input type="date" class="form-control" id="dateFrom" name="date_from" 
+                    <input type="date" class="form-control" id="dateFrom" name="date_from"
                            value="{{ filters.date_from|default:'' }}">
                     <small class="text-muted"><i class="icon-calendar"></i>Start date for invoice</small>
                 </div>
@@ -160,7 +162,7 @@
                 <thead>
                     <tr>
                         <th>
-                            <a href="?sort=invoice_number{% if filters.sort == 'invoice_number' %}_desc{% endif %}" 
+                            <a href="?sort=invoice_number{% if filters.sort == 'invoice_number' %}_desc{% endif %}"
                                title="Sort by Invoice Number">
                                 Invoice # <i class="icon-sort-alt"></i>
                             </a>
@@ -183,7 +185,7 @@
                                     <strong>{{ invoice.invoice_number }}</strong>
                                 </td>
                                 <td>
-                                    <a href="{% url 'clients:detail' invoice.client.id %}" 
+                                    <a href="{% url 'clients:detail' invoice.client.id %}"
                                        class="text-decoration-none" title="View client details">
                                         {{ invoice.client.name }}
                                     </a>
@@ -223,7 +225,7 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <a href="{% url 'invoices:detail' invoice.id %}" 
+                                        <a href="{% url 'invoices:detail' invoice.id %}"
                                            class="btn btn-outline-primary" title="View invoice details">
                                             <i class="icon-eye"></i>
                                         </a>
@@ -346,7 +348,7 @@
     // Handle form submission
     filterForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        
+
         if (!validateDates()) {
             return;
         }
@@ -395,7 +397,7 @@
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
         checkActiveFilters();
-        
+
         // Add enter key submit for client input
         clientInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
@@ -423,19 +425,19 @@ function exportCSV() {
         alert('Export to CSV is currently disabled by your administrator');
         return;
     }
-    
+
     // Build URL with current filters
     const url = new URL('{% url "core:export-invoices-csv" %}', window.location.origin);
     const fromDate = document.getElementById('dateFrom').value;
     const toDate = document.getElementById('dateTo').value;
     const status = document.getElementById('statusFilter').value;
     const clientName = document.getElementById('searchClient').value;
-    
+
     if (fromDate) url.searchParams.append('from_date', fromDate);
     if (toDate) url.searchParams.append('to_date', toDate);
     if (status) url.searchParams.append('status', status);
     if (clientName) url.searchParams.append('client_name', clientName);
-    
+
     // Download the file
     window.location.href = url.toString();
 }
@@ -455,7 +457,7 @@ function downloadPDF(invoiceId) {
 document.addEventListener('DOMContentLoaded', function() {
     // Add smooth scroll behavior
     document.documentElement.style.scrollBehavior = 'smooth';
-    
+
     // Initialize tooltips if Bootstrap tooltips are available
     if (typeof bootstrap !== 'undefined') {
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -463,13 +465,13 @@ document.addEventListener('DOMContentLoaded', function() {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
     }
-    
+
     // Add row click navigation (optional)
     const tableRows = document.querySelectorAll('.table tbody tr');
     tableRows.forEach(row => {
         // Don't make empty state row clickable
         if (row.querySelector('td[colspan]')) return;
-        
+
         row.style.cursor = 'pointer';
         row.addEventListener('click', function(e) {
             // Don't navigate if clicking on a button or link
@@ -486,4 +488,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
-

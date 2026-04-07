@@ -3,6 +3,8 @@
 
 {% block title %}Quotation Performance Report - Sales Analysis{% endblock %}
 
+{% block page_title %}Quotation Performance{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/icons.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/reports.css' %}">
@@ -99,7 +101,7 @@
             <form method="get" class="row g-3" id="filterForm" name="filterForm">
                 <div class="col-md-3">
                     <label for="dateFrom" class="form-label">From Date</label>
-                    <input type="date" class="form-control" id="dateFrom" name="from_date" 
+                    <input type="date" class="form-control" id="dateFrom" name="from_date"
                            value="{{ filters.date_from|default:'' }}">
                 </div>
                 <div class="col-md-3">
@@ -141,7 +143,7 @@
                         {% for client in client_performance %}
                             <tr>
                                 <td>
-                                    <a href="{% url 'clients:detail' client.client__id %}" 
+                                    <a href="{% url 'clients:detail' client.client__id %}"
                                        class="text-decoration-none">
                                         <strong>{{ client.client__name }}</strong>
                                     </a>

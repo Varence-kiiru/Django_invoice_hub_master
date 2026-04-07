@@ -134,7 +134,7 @@
   // Password toggle
   const password1Toggle = document.getElementById('password1-toggle');
   const password1Input = document.getElementById('id_password1');
-  
+
   password1Toggle.addEventListener('click', (e) => {
     e.preventDefault();
     const isPassword = password1Input.type === 'password';
@@ -144,7 +144,7 @@
 
   const password2Toggle = document.getElementById('password2-toggle');
   const password2Input = document.getElementById('id_password2');
-  
+
   password2Toggle.addEventListener('click', (e) => {
     e.preventDefault();
     const isPassword = password2Input.type === 'password';
@@ -157,17 +157,17 @@
     const bar = document.getElementById('strength-bar');
     const text = document.getElementById('strength-text');
     let strength = 0;
-    
+
     if (password.length >= 8) strength++;
     if (/[A-Z]/.test(password)) strength++;
     if (/[a-z]/.test(password)) strength++;
     if (/[0-9]/.test(password)) strength++;
-    
+
     document.getElementById('req-length').classList.toggle('met', password.length >= 8);
     document.getElementById('req-upper').classList.toggle('met', /[A-Z]/.test(password));
     document.getElementById('req-lower').classList.toggle('met', /[a-z]/.test(password));
     document.getElementById('req-number').classList.toggle('met', /[0-9]/.test(password));
-    
+
     bar.classList.remove('weak', 'fair', 'good');
     if (strength === 1) {
       bar.classList.add('weak');

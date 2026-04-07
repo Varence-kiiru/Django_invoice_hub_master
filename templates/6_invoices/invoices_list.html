@@ -16,10 +16,10 @@
         <h1>Invoices</h1>
         <a href="{% url 'invoices:create' %}" class="btn-create">+ Create Invoice</a>
     </div>
-    
+
     {% include "10_modals/filter_form_invoices.html" %}
     {% include "10_modals/bulk_actions_modal.html" %}
-    
+
     {% if messages %}
         {% for message in messages %}
             <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
@@ -30,7 +30,7 @@
             </div>
         {% endfor %}
     {% endif %}
-    
+
     <!-- Bulk Actions Toolbar -->
     <div class="bulk-actions">
         <span class="bulk-count">0 selected</span>
@@ -38,7 +38,7 @@
         <button class="bulk-send-email">Send Email</button>
         <button class="bulk-delete">Delete</button>
     </div>
-    
+
     {% if invoices %}
     <table class="invoices-table">
         <thead>
@@ -85,14 +85,14 @@
             {% endfor %}
         </tbody>
     </table>
-    
+
     {% if invoices.has_other_pages %}
     <div class="pagination">
         {% if invoices.has_previous %}
             <a href="?page=1{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">First</a>
             <a href="?page={{ invoices.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">Previous</a>
         {% endif %}
-        
+
         {% for num in invoices.paginator.page_range %}
             {% if invoices.number == num %}
                 <span class="current">{{ num }}</span>
@@ -100,14 +100,14 @@
                 <a href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">{{ num }}</a>
             {% endif %}
         {% endfor %}
-        
+
         {% if invoices.has_next %}
             <a href="?page={{ invoices.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">Next</a>
             <a href="?page={{ invoices.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">Last</a>
         {% endif %}
     </div>
     {% endif %}
-    
+
     {% else %}
     <div class="no-data">
         <p>No invoices found</p>
@@ -116,54 +116,10 @@
     {% endif %}
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div id="delete-invoice-modal" class="modal" style="display: none;">
-  <div class="modal-overlay" onclick="closeDeleteConfirm()"></div>
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2>Delete Invoice</h2>
-      <button class="modal-close" onclick="closeDeleteConfirm()">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div class="alert alert-warning">
-        <strong>⚠️ Warning:</strong> This action will delete the invoice and cannot be undone.
-      </div>
-      <p>Are you sure you want to delete invoice <strong id="delete-invoice-num"></strong>?</p>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeDeleteConfirm()">Cancel</button>
-      <form id="delete-form" method="post" style="display: inline;">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">✓ Delete</button>
-      </form>
-    </div>
-  </div>
-</div>
-
 {% endblock %}
 
 {% block extra_js %}
 <script src="{% static 'js/filter_system.js' %}"></script>
 <script src="{% static 'js/bulk_operations.js' %}"></script>
 <script src="{% static 'js/pages/invoices.js' %}"></script>
-<script>
-  function showDeleteConfirm(invoiceId, invoiceNum) {
-    document.getElementById('delete-invoice-num').textContent = invoiceNum;
-    const form = document.getElementById('delete-form');
-    form.action = `/invoices/${invoiceId}/delete/`;
-    document.getElementById('delete-invoice-modal').style.display = 'flex';
-  }
-
-  function closeDeleteConfirm() {
-    document.getElementById('delete-invoice-modal').style.display = 'none';
-  }
-
-  // Close modal when clicking outside
-  document.addEventListener('click', function(event) {
-    const modal = document.getElementById('delete-invoice-modal');
-    if (event.target === modal) {
-      closeDeleteConfirm();
-    }
-  });
-</script>
 {% endblock %}

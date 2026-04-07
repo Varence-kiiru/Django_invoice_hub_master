@@ -1,56 +1,39 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .email-container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
-        .content { background: white; padding: 20px; border: 1px solid #ddd; }
-        .button { display: inline-block; background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-        .footer { background: #f8f9fa; padding: 15px; text-align: center; font-size: 12px; color: #666; border-radius: 0 0 5px 5px; }
-        .greeting { font-size: 18px; font-weight: bold; margin-bottom: 15px; }
-        .feature-list { list-style: none; padding-left: 0; }
-        .feature-list li { padding: 10px 0; border-bottom: 1px solid #eee; }
-        .feature-list li:before { content: "✓ "; color: #28a745; font-weight: bold; margin-right: 10px; }
-    </style>
-</head>
-<body>
-    <div class="email-container">
-        <div class="header">
-            <h1>🎉 Welcome to {{ organization.name }}!</h1>
-        </div>
-        <div class="content">
-            <p class="greeting">Hi {{ user.first_name|default:"there" }},</p>
-            
-            <p>Thank you for signing up! We're excited to help you manage your invoices more efficiently.</p>
-            
-            <p><strong>Your Free Trial is Active</strong><br>
-            You have 14 days to explore all features of our Professional plan for free. After that, you can choose to upgrade or continue with our free plan.</p>
-            
-            <p><strong>Get Started:</strong></p>
-            <ul class="feature-list">
-                <li>Create your first invoice</li>
-                <li>Add your clients and products</li>
-                <li>Customize your invoice templates</li>
-                <li>Set up payment methods</li>
-                <li>Invite team members</li>
-            </ul>
-            
-            <center>
-                <a href="{{ dashboard_url }}" class="button">Go to Dashboard</a>
-            </center>
-            
-            <p><strong>Need help?</strong><br>
-            Check out our <a href="#">help documentation</a> or <a href="#">contact our support team</a> for any questions.</p>
-            
-            <p>Happy invoicing!<br>
-            <strong>The {{ organization.name }} Team</strong></p>
-        </div>
-        <div class="footer">
-            <p>This is an automated email. Please do not reply directly to this message.</p>
-            <p>&copy; {{ organization.name }}. All rights reserved.</p>
+{% extends "emails/base_email.html" %}
+
+{% block title %}Welcome to {{ organization.name }}{% endblock %}
+{% block header_class %}header-purple{% endblock %}
+{% block header_title %}🎉 Welcome to {{ organization.name }}!{% endblock %}
+
+{% block content %}
+    <p class="text-bold">Hi {{ user.first_name|default:'there' }},</p>
+
+    <p>Thank you for signing up! We're excited to help you manage your invoices more efficiently.</p>
+
+    <div class="section">
+        <div class="highlight-box highlight-green">
+            <strong>Your Free Trial is Active</strong><br>
+            You have 14 days to explore all features of our Professional plan for free. After that, you can choose to upgrade or continue with our free plan.
         </div>
     </div>
-</body>
-</html>
+
+    <div class="section">
+        <div class="section-title">Get Started:</div>
+        <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+            <li>✓ Create your first invoice</li>
+            <li>✓ Add your clients and products</li>
+            <li>✓ Customize your invoice templates</li>
+            <li>✓ Set up payment methods</li>
+            <li>✓ Invite team members</li>
+        </ul>
+    </div>
+
+    <div class="button-container">
+        <a href="{{ dashboard_url }}" class="btn btn-primary">Go to Dashboard</a>
+    </div>
+
+    <p><strong>Need help?</strong><br>
+    Check out our <a href="#">help documentation</a> or <a href="#">contact our support team</a> for any questions.</p>
+
+    <p>Happy invoicing!<br>
+    <strong>The {{ organization.name }} Team</strong></p>
+{% endblock %}

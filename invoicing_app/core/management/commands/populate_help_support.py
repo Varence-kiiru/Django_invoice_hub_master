@@ -1,91 +1,92 @@
 """Management command to populate sample Help & Support data."""
+
 from django.core.management.base import BaseCommand
 from invoicing_app.core.models import FAQ, HelpArticle
-from django.utils.text import slugify
 
 
 class Command(BaseCommand):
     """Populate sample Help & Support data."""
-    
-    help = 'Populate sample FAQs and Help Articles for demonstration'
+
+    help = "Populate sample FAQs and Help Articles for demonstration"
 
     def handle(self, *args, **options):
         """Execute the command."""
-        self.stdout.write(self.style.SUCCESS('Starting to populate Help & Support data...'))
-        
+        self.stdout.write(
+            self.style.SUCCESS("Starting to populate Help & Support data...")
+        )
+
         # Sample FAQs
         faqs_data = [
             {
-                'category': 'invoicing',
-                'question': 'How do I create a new invoice?',
-                'answer': 'To create a new invoice:\n1. Navigate to Invoices in the sidebar\n2. Click "New Invoice"\n3. Select a client\n4. Add line items\n5. Set payment terms\n6. Click Save\n\nYour invoice will be automatically numbered based on your settings.',
-                'order': 1,
+                "category": "invoicing",
+                "question": "How do I create a new invoice?",
+                "answer": 'To create a new invoice:\n1. Navigate to Invoices in the sidebar\n2. Click "New Invoice"\n3. Select a client\n4. Add line items\n5. Set payment terms\n6. Click Save\n\nYour invoice will be automatically numbered based on your settings.',
+                "order": 1,
             },
             {
-                'category': 'invoicing',
-                'question': 'Can I customize invoice templates?',
-                'answer': 'Yes! You can customize invoice templates in Settings > Invoice. You can add your company logo, change colors, adjust the layout, and add custom notes or terms and conditions.',
-                'order': 2,
+                "category": "invoicing",
+                "question": "Can I customize invoice templates?",
+                "answer": "Yes! You can customize invoice templates in Settings > Invoice. You can add your company logo, change colors, adjust the layout, and add custom notes or terms and conditions.",
+                "order": 2,
             },
             {
-                'category': 'payments',
-                'question': 'How do I record a payment?',
-                'answer': 'To record a payment:\n1. Go to Invoices\n2. Find the invoice that was paid\n3. Click "Record Payment"\n4. Enter the payment amount and date\n5. Select payment method\n6. Add any reference notes\n7. Click Save\n\nThe invoice status will update automatically.',
-                'order': 1,
+                "category": "payments",
+                "question": "How do I record a payment?",
+                "answer": 'To record a payment:\n1. Go to Invoices\n2. Find the invoice that was paid\n3. Click "Record Payment"\n4. Enter the payment amount and date\n5. Select payment method\n6. Add any reference notes\n7. Click Save\n\nThe invoice status will update automatically.',
+                "order": 1,
             },
             {
-                'category': 'payments',
-                'question': 'What payment methods are supported?',
-                'answer': 'You can record payments for any method including:\n- Bank Transfer\n- Credit Card\n- Cheque\n- Cash\n- PayPal\n- Stripe\n- Custom payment methods\n\nSet your default payment methods in Settings > Payment Methods.',
-                'order': 2,
+                "category": "payments",
+                "question": "What payment methods are supported?",
+                "answer": "You can record payments for any method including:\n- Bank Transfer\n- Credit Card\n- Cheque\n- Cash\n- PayPal\n- Stripe\n- Custom payment methods\n\nSet your default payment methods in Settings > Payment Methods.",
+                "order": 2,
             },
             {
-                'category': 'clients',
-                'question': 'How do I add a new client?',
-                'answer': 'To add a new client:\n1. Go to Clients in the sidebar\n2. Click "New Client"\n3. Fill in their details (name, email, address, phone)\n4. Set default payment terms\n5. Click Save\n\nYou can then create invoices for this client.',
-                'order': 1,
+                "category": "clients",
+                "question": "How do I add a new client?",
+                "answer": 'To add a new client:\n1. Go to Clients in the sidebar\n2. Click "New Client"\n3. Fill in their details (name, email, address, phone)\n4. Set default payment terms\n5. Click Save\n\nYou can then create invoices for this client.',
+                "order": 1,
             },
             {
-                'category': 'reports',
-                'question': 'Can I export reports?',
-                'answer': 'Yes! All reports can be exported in multiple formats:\n- PDF: For sharing or printing\n- CSV: For use in Excel or other tools\n- Print: Direct printing to your printer\n\nLook for the export buttons above any report.',
-                'order': 1,
+                "category": "reports",
+                "question": "Can I export reports?",
+                "answer": "Yes! All reports can be exported in multiple formats:\n- PDF: For sharing or printing\n- CSV: For use in Excel or other tools\n- Print: Direct printing to your printer\n\nLook for the export buttons above any report.",
+                "order": 1,
             },
             {
-                'category': 'technical',
-                'question': 'What should I do if the system is running slowly?',
-                'answer': 'If the system is running slowly:\n1. Try clearing your browser cache\n2. Go to System > System Status and click \"Clear Cache\"\n3. Try \"Optimize Database\" to improve performance\n4. Check that you have a stable internet connection\n5. If problems persist, contact support',
-                'order': 1,
+                "category": "technical",
+                "question": "What should I do if the system is running slowly?",
+                "answer": 'If the system is running slowly:\n1. Try clearing your browser cache\n2. Go to System > System Status and click "Clear Cache"\n3. Try "Optimize Database" to improve performance\n4. Check that you have a stable internet connection\n5. If problems persist, contact support',
+                "order": 1,
             },
             {
-                'category': 'settings',
-                'question': 'How do I set up email notifications?',
-                'answer': 'To set up email:\n1. Go to Settings > Email Configuration\n2. Select your email provider (Gmail, Outlook, Custom SMTP)\n3. Enter your email credentials\n4. Click \"Test Email\" to verify\n5. Check the box to enable notifications\n\nEmails will be sent for invoice reminders, payments, and other events.',
-                'order': 1,
+                "category": "settings",
+                "question": "How do I set up email notifications?",
+                "answer": 'To set up email:\n1. Go to Settings > Email Configuration\n2. Select your email provider (Gmail, Outlook, Custom SMTP)\n3. Enter your email credentials\n4. Click "Test Email" to verify\n5. Check the box to enable notifications\n\nEmails will be sent for invoice reminders, payments, and other events.',
+                "order": 1,
             },
         ]
-        
+
         # Create FAQs
         for faq_data in faqs_data:
             faq, created = FAQ.objects.get_or_create(
-                question=faq_data['question'],
-                defaults=faq_data
+                question=faq_data["question"], defaults=faq_data
             )
             if created:
-                self.stdout.write(self.style.SUCCESS(
-                    f'✓ Created FAQ: {faq_data["question"][:50]}...'
-                ))
+                self.stdout.write(
+                    self.style.SUCCESS(f'✓ Created FAQ: {faq_data["question"][:50]}...')
+                )
             else:
                 self.stdout.write(f'  Already exists: {faq_data["question"][:50]}...')
-        
+
         # Sample Help Articles
         articles_data = [
             {
-                'title': 'Getting Started with Invoice System',
-                'slug': 'getting-started-invoice-system',
-                'category': 'getting-started',
-                'excerpt': 'Learn the basics of setting up and using the invoice system for your business.',
-                'content': """<h2>Welcome to Invoice System</h2>
+                "title": "Getting Started with Invoice System",
+                "slug": "getting-started-invoice-system",
+                "category": "getting-started",
+                "excerpt": "Learn the basics of setting up and using the invoice system for your business.",
+                "content": """<h2>Welcome to Invoice System</h2>
 <p>This comprehensive guide will help you get started with our invoice management system.</p>
 
 <h3>Initial Setup</h3>
@@ -109,17 +110,17 @@ class Command(BaseCommand):
 
 <h3>Next Steps</h3>
 <p>Start by reading our detailed guides on invoicing, payments, and reporting.</p>""",
-                'author': 'Support Team',
-                'featured': True,
-                'order': 1,
-                'tags': 'setup, getting-started, tutorial'
+                "author": "Support Team",
+                "featured": True,
+                "order": 1,
+                "tags": "setup, getting-started, tutorial",
             },
             {
-                'title': 'Creating and Managing Invoices',
-                'slug': 'creating-managing-invoices',
-                'category': 'invoicing',
-                'excerpt': 'Complete guide to creating professional invoices and managing your invoicing workflow.',
-                'content': """<h2>Creating and Managing Invoices</h2>
+                "title": "Creating and Managing Invoices",
+                "slug": "creating-managing-invoices",
+                "category": "invoicing",
+                "excerpt": "Complete guide to creating professional invoices and managing your invoicing workflow.",
+                "content": """<h2>Creating and Managing Invoices</h2>
 <p>Learn how to create, send, and manage invoices effectively.</p>
 
 <h3>Creating an Invoice</h3>
@@ -153,17 +154,17 @@ class Command(BaseCommand):
 
 <h3>Templates</h3>
 <p>Customize your invoice appearance in Settings to match your brand.""",
-                'author': 'Support Team',
-                'featured': True,
-                'order': 2,
-                'tags': 'invoicing, tutorial, workflow'
+                "author": "Support Team",
+                "featured": True,
+                "order": 2,
+                "tags": "invoicing, tutorial, workflow",
             },
             {
-                'title': 'Understanding Payment Processing',
-                'slug': 'understanding-payment-processing',
-                'category': 'payments',
-                'excerpt': 'Learn how to record and track payments, and understand payment methods.',
-                'content': """<h2>Payment Processing Guide</h2>
+                "title": "Understanding Payment Processing",
+                "slug": "understanding-payment-processing",
+                "category": "payments",
+                "excerpt": "Learn how to record and track payments, and understand payment methods.",
+                "content": """<h2>Payment Processing Guide</h2>
 <p>Manage your payments efficiently with our streamlined payment system.</p>
 
 <h3>Recording Payments</h3>
@@ -200,17 +201,17 @@ class Command(BaseCommand):
 
 <h3>Payment Reminders</h3>
 <p>Set up automatic payment reminders to encourage timely payment.""",
-                'author': 'Support Team',
-                'featured': False,
-                'order': 1,
-                'tags': 'payments, tutorial, methods'
+                "author": "Support Team",
+                "featured": False,
+                "order": 1,
+                "tags": "payments, tutorial, methods",
             },
             {
-                'title': 'Reports and Analytics',
-                'slug': 'reports-analytics-guide',
-                'category': 'reports',
-                'excerpt': 'Master comprehensive reporting and analytics to understand your business performance.',
-                'content': """<h2>Reports and Analytics</h2>
+                "title": "Reports and Analytics",
+                "slug": "reports-analytics-guide",
+                "category": "reports",
+                "excerpt": "Master comprehensive reporting and analytics to understand your business performance.",
+                "content": """<h2>Reports and Analytics</h2>
 <p>Gain insights into your business with comprehensive reports and analytics.</p>
 
 <h3>Available Reports</h3>
@@ -239,17 +240,17 @@ class Command(BaseCommand):
 <li>CSV - for use in Excel</li>
 <li>Print directly</li>
 </ul>""",
-                'author': 'Support Team',
-                'featured': True,
-                'order': 3,
-                'tags': 'reports, analytics, business-intelligence'
+                "author": "Support Team",
+                "featured": True,
+                "order": 3,
+                "tags": "reports, analytics, business-intelligence",
             },
             {
-                'title': 'System Settings and Configuration',
-                'slug': 'system-settings-configuration',
-                'category': 'settings',
-                'excerpt': 'Configure your system settings for optimal performance and customization.',
-                'content': """<h2>System Settings and Configuration</h2>
+                "title": "System Settings and Configuration",
+                "slug": "system-settings-configuration",
+                "category": "settings",
+                "excerpt": "Configure your system settings for optimal performance and customization.",
+                "content": """<h2>System Settings and Configuration</h2>
 <p>Configure all aspects of your system to match your business needs.</p>
 
 <h3>Company Settings</h3>
@@ -289,27 +290,30 @@ class Command(BaseCommand):
 
 <h3>User Preferences</h3>
 <p>Customize your personal preferences in your account settings.""",
-                'author': 'Support Team',
-                'featured': False,
-                'order': 2,
-                'tags': 'settings, configuration, admin'
+                "author": "Support Team",
+                "featured": False,
+                "order": 2,
+                "tags": "settings, configuration, admin",
             },
         ]
-        
+
         # Create Help Articles
         for article_data in articles_data:
             article, created = HelpArticle.objects.get_or_create(
-                slug=article_data['slug'],
-                defaults=article_data
+                slug=article_data["slug"], defaults=article_data
             )
             if created:
-                self.stdout.write(self.style.SUCCESS(
-                    f'✓ Created Article: {article_data["title"]}'
-                ))
+                self.stdout.write(
+                    self.style.SUCCESS(f'✓ Created Article: {article_data["title"]}')
+                )
             else:
                 self.stdout.write(f'  Already exists: {article_data["title"]}')
-        
-        self.stdout.write(self.style.SUCCESS('\n✅ Help & Support data population complete!'))
-        self.stdout.write(self.style.WARNING(
-            '\nVisit http://localhost:8000/help/ to see the Help & Support center'
-        ))
+
+        self.stdout.write(
+            self.style.SUCCESS("\n✅ Help & Support data population complete!")
+        )
+        self.stdout.write(
+            self.style.WARNING(
+                "\nVisit http://localhost:8000/help/ to see the Help & Support center"
+            )
+        )

@@ -34,7 +34,7 @@
             <div class="details-column">
                 <div class="detail-section">
                     <h3 class="section-title">Expense Information</h3>
-                    
+
                     <div class="detail-item">
                         <span class="detail-label">Category:</span>
                         <span class="detail-value">
@@ -107,7 +107,7 @@
                 <!-- Status & Approval -->
                 <div class="detail-section">
                     <h3 class="section-title">Approval Workflow</h3>
-                    
+
                     <div class="workflow-timeline">
                         <div class="workflow-step {% if expense.status != 'draft' %}completed{% endif %}">
                             <div class="workflow-marker">1</div>
@@ -159,7 +159,7 @@
                 <!-- Quick Info -->
                 <div class="detail-section">
                     <h3 class="section-title">Details</h3>
-                    
+
                     <div class="detail-item">
                         <span class="detail-label">Submitted By:</span>
                         <span class="detail-value">{{ expense.submitted_by.first_name }} {{ expense.submitted_by.last_name }}</span>
@@ -196,7 +196,7 @@
                 <span aria-hidden="true">✏️</span> Edit Expense
             </a>
             {% endif %}
-            
+
             {% if expense.status == 'draft' %}
             <form method="post" action="{% url 'expenses:submit' expense.id %}" style="display:inline;">
                 {% csrf_token %}
@@ -204,7 +204,7 @@
                     <span aria-hidden="true">✓</span> Submit for Approval
                 </button>
             </form>
-            <a href="{% url 'expenses:delete' expense.id %}" class="btn btn-danger">
+            <a href="#" class="btn btn-danger btn-delete" data-delete-url="{% url 'expenses:delete' expense.id %}" data-item-name="Expense #{{ expense.id }}" data-item-type="Expense" data-message="Delete this expense? This action cannot be undone.">
                 <span aria-hidden="true">🗑️</span> Delete
             </a>
             {% endif %}

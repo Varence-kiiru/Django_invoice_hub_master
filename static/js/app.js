@@ -28,26 +28,7 @@ class Application {
    * Setup global event listeners
    */
   setupEventListeners() {
-    // User menu dropdown
-    const userMenuToggle = document.getElementById('user-menu-toggle');
-    const userDropdownMenu = document.getElementById('user-dropdown-menu');
-
-    if (userMenuToggle && userDropdownMenu) {
-      userMenuToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        userDropdownMenu.classList.toggle('active');
-      });
-
-      // Close dropdown when clicking outside
-      document.addEventListener('click', (e) => {
-        if (
-          !userMenuToggle.contains(e.target) &&
-          !userDropdownMenu.contains(e.target)
-        ) {
-          userDropdownMenu.classList.remove('active');
-        }
-      });
-    }
+    // ✅ User menu and navbar dropdowns are now handled by navbar.js (NavbarManager)
 
     // Global search
     const globalSearch = document.getElementById('global-search');

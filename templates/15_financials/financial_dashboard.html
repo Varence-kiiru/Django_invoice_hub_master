@@ -1,0 +1,133 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Financial Dashboard - Invoicing App{% endblock %}
+
+{% block page_title %}Financial Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/financials.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Page Header -->
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">💰 Financial Overview</h1>
+    <p class="dashboard-subtitle">Track your revenue, taxes, and financial periods</p>
+  </div>
+
+  <!-- Financial KPI Cards -->
+  <div class="financial-kpi-grid">
+    <!-- Total Revenue -->
+    <div class="financial-kpi-card">
+      <div class="financial-kpi-title">💵 Total Revenue</div>
+      <div class="financial-kpi-value large">{{ company_settings.currency_symbol }}{{ total_revenue|floatformat:2 }}</div>
+      <div class="financial-kpi-change positive">All time collected</div>
+    </div>
+
+    <!-- Total Tax Collected -->
+    <div class="financial-kpi-card">
+      <div class="financial-kpi-title">🏛️ Tax Collected</div>
+      <div class="financial-kpi-value">{{ company_settings.currency_symbol }}{{ total_tax_collected|floatformat:2 }}</div>
+      <div class="financial-kpi-change neutral">VAT and other taxes</div>
+    </div>
+
+    <!-- Pending Tax -->
+    {% if pending_tax > 0 %}
+    <a href="{% url 'financials:tax-liabilities-list' %}?status=pending" class="pending-tax-link">
+    {% endif %}
+    <div class="financial-kpi-card{% if pending_tax > 0 %} pending-tax-card-clickable{% endif %}">
+      <div class="financial-kpi-title">⏳ Pending Tax</div>
+      <div class="financial-kpi-value {% if pending_tax > 0 %}text-warning{% else %}text-success{% endif %}">{{ company_settings.currency_symbol }}{{ pending_tax|floatformat:2 }}</div>
+      <div class="financial-kpi-change {% if pending_tax > 0 %}neutral{% else %}positive{% endif %}">
+        {% if pending_tax > 0 %}<span class="pending-tax-label">Click to remit</span>{% else %}✓ All up to date{% endif %}
+      </div>
+    </div>
+    {% if pending_tax > 0 %}
+    </a>
+    {% endif %}
+
+    <!-- Overdue Tax -->
+    <div class="financial-kpi-card">
+      <div class="financial-kpi-title">⚠️ Overdue Tax</div>
+      <div class="financial-kpi-value {% if overdue_tax > 0 %}text-danger{% else %}text-success{% endif %}">{{ company_settings.currency_symbol }}{{ overdue_tax|floatformat:2 }}</div>
+      <div class="financial-kpi-change {% if overdue_tax > 0 %}negative{% else %}positive{% endif %}">
+        {% if overdue_tax > 0 %}! Requires attention{% else %}✓ None overdue{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Current Period Info -->
+  {% if current_period %}
+  <div class="financial-section">
+    <div class="financial-section-title">
+      📅 Current Period
+    </div>
+    <div class="financial-cards-grid">
+      <div class="financial-card">
+        <div class="financial-card-title">{{ current_period }}</div>
+        <div class="financial-card-content">
+          <p><strong>Period:</strong> {{ current_period.start_date }} to {{ current_period.end_date }}</p>
+          <p><strong>Type:</strong> {{ current_period.get_period_type_display }}</p>
+          <p><strong>Status:</strong>
+            {% if current_period.is_closed %}
+              <span class="badge badge-secondary">Closed</span>
+            {% else %}
+              <span class="badge badge-success">Active</span>
+            {% endif %}
+          </p>
+        </div>
+        <div class="financial-actions">
+          <a href="{% url 'financials:period-detail' current_period.pk %}" class="btn btn-primary btn-sm">View Details</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Quick Actions -->
+  <div class="financial-section">
+    <div class="financial-section-title">
+      🚀 Quick Actions
+    </div>
+    <div class="financial-cards-grid">
+      <div class="financial-card">
+        <div class="financial-card-title">📊 Financial Periods</div>
+        <div class="financial-card-content">
+          View and manage your financial reporting periods
+        </div>
+        <div class="financial-actions">
+          <a href="{% url 'financials:periods-list' %}" class="btn btn-primary btn-sm">View Periods</a>
+        </div>
+      </div>
+
+      <div class="financial-card">
+        <div class="financial-card-title">💰 Revenue Collections</div>
+        <div class="financial-card-content">
+          Track all revenue and tax collections from payments
+        </div>
+        <div class="financial-actions">
+          <a href="{% url 'financials:revenue-list' %}" class="btn btn-primary btn-sm">View Collections</a>
+        </div>
+      </div>
+
+      <div class="financial-card">
+        <div class="financial-card-title">🏛️ Tax Liabilities</div>
+        <div class="financial-card-content">
+          Monitor tax obligations and remittance status
+        </div>
+        <div class="financial-actions">
+          <a href="{% url 'financials:tax-liabilities-list' %}" class="btn btn-primary btn-sm">View Liabilities</a>
+          {% if pending_tax > 0 and can_manage_financials %}
+          <a href="{% url 'financials:tax-liabilities-list' %}" class="btn btn-success btn-sm btn-remit-action">
+            ✓ Remit Tax
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

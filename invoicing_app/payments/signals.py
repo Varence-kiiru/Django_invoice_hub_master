@@ -1,12 +1,12 @@
 """
 Payment signal handlers for reconciliation and invoice updates.
 """
+
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.utils import timezone
 from django.db import transaction, models
 from invoicing_app.payments.models import Payment, PaymentReconciliation
-from invoicing_app.invoices.models import Invoice
 from decimal import Decimal
 
 
@@ -19,11 +19,11 @@ def payment_post_save(sender, instance, created, **kwargs):
     3. Mark invoice as paid if fully paid
     """
     # Only process confirmed payments
-    if instance.status != 'confirmed':
+    if instance.status != "confirmed":
         return
-    
+
     invoice = instance.invoice
-    
+
     # If this is a new confirmed payment, create reconciliation record
     if created:
         PaymentReconciliation.objects.create(
@@ -31,28 +31,34 @@ def payment_post_save(sender, instance, created, **kwargs):
             invoice=invoice,
             amount_matched=instance.amount,
         )
-    
+
     # Recalculate invoice paid amount and due amount
-    total_paid = invoice.payments.filter(
-        status='confirmed'
-    ).aggregate(
-        total=models.Sum('amount')
-    )['total'] or Decimal('0.00')
-    
+    total_paid = invoice.payments.filter(status="confirmed").aggregate(
+        total=models.Sum("amount")
+    )["total"] or Decimal("0.00")
+
     # Update invoice
     new_amount_paid = total_paid
     new_amount_due = invoice.total_amount - new_amount_paid
-    
+
     with transaction.atomic():
         invoice.amount_paid = new_amount_paid
         invoice.amount_due = new_amount_due
-        
+
         # Auto-mark as paid if fully paid
-        if new_amount_due <= Decimal('0.00') and invoice.status != 'paid':
-            invoice.status = 'paid'
+        if new_amount_due <= Decimal("0.00") and invoice.status != "paid":
+            invoice.status = "paid"
             invoice.paid_at = timezone.now()  # Set paid timestamp
-        
-        invoice.save(update_fields=['amount_paid', 'amount_due', 'status', 'paid_at', 'updated_at'])
+
+        invoice.save(
+            update_fields=[
+                "amount_paid",
+                "amount_due",
+                "status",
+                "paid_at",
+                "updated_at",
+            ]
+        )
 
 
 @receiver(post_delete, sender=Payment)
@@ -64,35 +70,41 @@ def payment_post_delete(sender, instance, **kwargs):
     3. Delete associated reconciliation records
     """
     invoice = instance.invoice
-    
+
     # Delete associated reconciliation records (cascaded by model)
     PaymentReconciliation.objects.filter(payment=instance).delete()
-    
+
     # Recalculate invoice paid amount
-    total_paid = invoice.payments.filter(
-        status='confirmed'
-    ).aggregate(
-        total=models.Sum('amount')
-    )['total'] or Decimal('0.00')
-    
+    total_paid = invoice.payments.filter(status="confirmed").aggregate(
+        total=models.Sum("amount")
+    )["total"] or Decimal("0.00")
+
     new_amount_paid = total_paid
     new_amount_due = invoice.total_amount - new_amount_paid
-    
+
     with transaction.atomic():
         invoice.amount_paid = new_amount_paid
         invoice.amount_due = new_amount_due
-        
+
         # Revert status from 'paid' if no longer fully paid
-        if new_amount_due > Decimal('0.00') and invoice.status == 'paid':
+        if new_amount_due > Decimal("0.00") and invoice.status == "paid":
             # Revert to previous status (check due date for overdue status)
             today = timezone.now().date()
             if today > invoice.due_date:
-                invoice.status = 'overdue'
+                invoice.status = "overdue"
             else:
-                invoice.status = 'issued'
+                invoice.status = "issued"
             invoice.paid_at = None  # Clear paid timestamp
-        
-        invoice.save(update_fields=['amount_paid', 'amount_due', 'status', 'paid_at', 'updated_at'])
+
+        invoice.save(
+            update_fields=[
+                "amount_paid",
+                "amount_due",
+                "status",
+                "paid_at",
+                "updated_at",
+            ]
+        )
 
 
 @receiver(post_save, sender=PaymentReconciliation)
@@ -108,4 +120,3 @@ def payment_reconciliation_post_save(sender, instance, created, **kwargs):
 
 
 # Import at module level for aggregation
-from django.db import models

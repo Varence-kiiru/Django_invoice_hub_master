@@ -34,7 +34,7 @@
                 <div class="stat-value">{{ total_count }}</div>
             </div>
         </div>
-        
+
         <div class="stat-card">
             <div class="stat-icon success"><i class="bi bi-check-circle"></i></div>
             <div class="stat-content">
@@ -42,7 +42,7 @@
                 <div class="stat-value">{{ total_active }}</div>
             </div>
         </div>
-        
+
         <div class="stat-card">
             <div class="stat-icon warning"><i class="bi bi-exclamation-circle"></i></div>
             <div class="stat-content">
@@ -50,7 +50,7 @@
                 <div class="stat-value">{{ total_inactive }}</div>
             </div>
         </div>
-        
+
         <div class="stat-card">
             <div class="stat-icon info"><i class="bi bi-type"></i></div>
             <div class="stat-content">
@@ -68,7 +68,7 @@
                     <label for="search" class="filter-label">Search</label>
                     <input type="text" name="search" id="search" class="form-control" placeholder="Search by name..." value="{{ search_query|default:'' }}">
                 </div>
-                
+
                 <div class="filter-group">
                     <label for="rate_type" class="filter-label">Rate Type</label>
                     <select name="rate_type" id="rate_type" class="form-control">
@@ -78,7 +78,7 @@
                         {% endfor %}
                     </select>
                 </div>
-                
+
                 <div class="filter-group">
                     <label for="status" class="filter-label">Status</label>
                     <select name="status" id="status" class="form-control">
@@ -87,7 +87,7 @@
                         <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
                     </select>
                 </div>
-                
+
                 <button type="submit" class="btn btn-primary filter-btn">
                     <i class="bi bi-search"></i> Filter
                 </button>
@@ -139,7 +139,7 @@
                         <div class="action-buttons">
                             <a href="{% url 'products:tax-class-detail' tax_class.id %}" class="btn-icon" title="View"><i class="bi bi-eye"></i></a>
                             <a href="{% url 'products:tax-class-edit' tax_class.id %}" class="btn-icon" title="Edit"><i class="bi bi-pencil"></i></a>
-                            <a href="{% url 'products:tax-class-delete' tax_class.id %}" class="btn-icon delete" title="Delete"><i class="bi bi-trash"></i></a>
+                            <a href="#" class="btn-icon delete btn-delete" title="Delete" data-delete-url="{% url 'products:tax-class-delete' tax_class.id %}" data-item-name="{{ tax_class.name }}" data-item-type="Tax Class" data-message="Are you sure you want to delete this tax class?"><i class="bi bi-trash"></i></a>
                         </div>
                     </td>
                 </tr>

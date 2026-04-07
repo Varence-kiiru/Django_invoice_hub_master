@@ -1,6 +1,7 @@
 """
 Payment services.
 """
+
 from django.db import transaction
 from django.utils import timezone
 from .models import PaymentReceiptNumberSequence
@@ -13,7 +14,7 @@ class PaymentReceiptNumberService:
     """
 
     @staticmethod
-    def generate_next_number(prefix='REC', year=None):
+    def generate_next_number(prefix="REC", year=None):
         """
         Generate the next payment receipt number for the given prefix and year.
 
@@ -33,8 +34,7 @@ class PaymentReceiptNumberService:
         with transaction.atomic():
             # Lock the row to prevent concurrent increments
             seq_qs = PaymentReceiptNumberSequence.objects.select_for_update().filter(
-                prefix=prefix,
-                year=year
+                prefix=prefix, year=year
             )
 
             # Get or create the sequence row
@@ -43,9 +43,7 @@ class PaymentReceiptNumberService:
             except PaymentReceiptNumberSequence.DoesNotExist:
                 # Create new sequence row
                 seq = PaymentReceiptNumberSequence.objects.create(
-                    prefix=prefix,
-                    year=year,
-                    next_sequence=1
+                    prefix=prefix, year=year, next_sequence=1
                 )
 
             # Get current sequence value
@@ -53,14 +51,14 @@ class PaymentReceiptNumberService:
 
             # Increment for next call
             seq.next_sequence += 1
-            seq.save(update_fields=['next_sequence'])
+            seq.save(update_fields=["next_sequence"])
 
             # Generate and return receipt number
             receipt_number = f"{prefix}-{year}-{current_seq:04d}"
             return receipt_number
 
     @staticmethod
-    def reserve_number(prefix='REC', year=None):
+    def reserve_number(prefix="REC", year=None):
         """
         Pre-reserve a receipt number.
         Increments sequence without returning the number.

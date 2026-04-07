@@ -3,6 +3,8 @@
 
 {% block title %}Data Import & Analytics Dashboard - Invoice System v3.0.0{% endblock %}
 
+{% block page_title %}Data Management{% endblock %}
+
 {% block content %}
 <div class="container-fluid pt-4 pb-4">
   <!-- Header -->
@@ -159,7 +161,7 @@
   document.addEventListener('DOMContentLoaded', function() {
     // Load statistics
     loadDashboardMetrics();
-    
+
     // Optional: Load recent import activity
     loadImportActivity();
   });
@@ -170,7 +172,7 @@
   function loadDashboardMetrics() {
     // Fetch metrics from the analytics API endpoint
     const endpoint = '/api/analytics/summary/';
-    
+
     fetch(endpoint, {
       credentials: 'include'
     })
@@ -192,7 +194,7 @@
    */
   function loadImportActivity() {
     const endpoint = '/api/import/history/';
-    
+
     fetch(endpoint, {
       credentials: 'include'
     })
@@ -206,8 +208,8 @@
             <td><span class="badge badge-info">${item.entity_type}</span></td>
             <td>${item.records_count}</td>
             <td>
-              ${item.status === 'success' 
-                ? '<span class="badge badge-success">Success</span>' 
+              ${item.status === 'success'
+                ? '<span class="badge badge-success">Success</span>'
                 : '<span class="badge badge-warning">Partial</span>'}
             </td>
             <td>${item.user || 'System'}</td>

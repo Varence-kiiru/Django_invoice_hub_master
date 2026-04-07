@@ -3,6 +3,8 @@
 
 {% block title %}Quotations Report - Sales Dashboard{% endblock %}
 
+{% block page_title %}Quotations Report{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/icons.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/reports.css' %}">
@@ -174,7 +176,7 @@
             <form method="get" class="row g-3" id="filterForm" name="filterForm">
                 <div class="col-md-3">
                     <label for="dateFrom" class="form-label">From Date</label>
-                    <input type="date" class="form-control" id="dateFrom" name="from_date" 
+                    <input type="date" class="form-control" id="dateFrom" name="from_date"
                            value="{{ filters.date_from|default:'' }}">
                     <small class="text-muted"><i class="icon-calendar"></i>Start date for quotation</small>
                 </div>
@@ -245,7 +247,7 @@
                                     <strong>{{ quote.quote_number }}</strong>
                                 </td>
                                 <td>
-                                    <a href="{% url 'clients:detail' quote.client.id %}" 
+                                    <a href="{% url 'clients:detail' quote.client.id %}"
                                        class="text-decoration-none" title="View client details">
                                         {{ quote.client.name }}
                                     </a>
@@ -286,7 +288,7 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <a href="{% url 'quotations:detail' quote.id %}" 
+                                        <a href="{% url 'quotations:detail' quote.id %}"
                                            class="btn btn-outline-primary" title="View quotation details">
                                             <i class="icon-eye"></i>
                                         </a>
@@ -337,14 +339,14 @@ function updateFilterStatus() {
     const form = document.getElementById('filterForm');
     const formData = new FormData(form);
     let hasFilters = false;
-    
+
     for (let [key, value] of formData.entries()) {
         if (value.trim() !== '') {
             hasFilters = true;
             break;
         }
     }
-    
+
     const badge = document.getElementById('filterStatus');
     if (hasFilters) {
         badge.innerHTML = '<i class="icon-check-circle"></i> Filters active';

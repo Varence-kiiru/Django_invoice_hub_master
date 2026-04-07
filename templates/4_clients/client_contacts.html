@@ -3,6 +3,8 @@
 
 {% block title %}Client Contacts - {{ client.name }}{% endblock %}
 
+{% block page_title %}Contacts{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/clients.css' }">
 {% endblock %}
@@ -37,7 +39,7 @@
 <!-- Current Contacts -->
 <div class="section">
     <div class="section-title">Contacts on File</div>
-    
+
     {% if contacts %}
         {% for contact in contacts %}
         <div class="contact-card">
@@ -60,10 +62,7 @@
             </div>
             <div class="contact-actions">
                 <a href="#edit-{{ contact.id }}" class="btn btn-primary btn-small" onclick="editContact({{ contact.id }})">Edit</a>
-                <form method="post" action="{% url 'clients:contact-delete' contact.id %}" style="display: inline;" onsubmit="return confirm('Delete this contact?');">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-secondary btn-small" style="width: 100%; padding: 6px 12px;">Delete</button>
-                </form>
+                <a href="#" class="btn btn-secondary btn-small btn-delete" data-delete-url="{% url 'clients:contact-delete' contact.id %}" data-item-name="Contact: {{ contact.name }}" data-item-type="Contact" data-message="Are you sure you want to delete this contact?">Delete</a>
             </div>
         </div>
         {% endfor %}
@@ -81,10 +80,10 @@
             Add New Contact
         {% endif %}
     </div>
-    
+
     <form method="post" class="form-container">
         {% csrf_token %}
-        
+
         <div class="form-group required">
             <label>{{ form.name.label }}</label>
             {{ form.name }}
@@ -92,7 +91,7 @@
                 <div class="form-error">{{ form.name.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-group">
             <label>{{ form.title.label }}</label>
             {{ form.title }}
@@ -100,7 +99,7 @@
                 <div class="form-error">{{ form.title.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-group">
             <label>{{ form.email.label }}</label>
             {{ form.email }}
@@ -108,7 +107,7 @@
                 <div class="form-error">{{ form.email.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-group">
             <label>{{ form.phone.label }}</label>
             {{ form.phone }}
@@ -116,7 +115,7 @@
                 <div class="form-error">{{ form.phone.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-group">
             <label>
                 {{ form.is_primary }}
@@ -126,7 +125,7 @@
                 <div class="form-error">{{ form.is_primary.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Save Contact</button>
             <a href="{% url 'clients:detail' client.id %}" class="btn btn-secondary">Cancel</a>

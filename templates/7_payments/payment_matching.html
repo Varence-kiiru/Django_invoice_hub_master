@@ -3,6 +3,8 @@
 
 {% block title %}Match Payment - Invoicing App{% endblock %}
 
+{% block page_title %}Match Payment{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/payments.css' %}">
 {% endblock %}
@@ -93,7 +95,7 @@
                 <div class="card-body">
                     <form method="post">
                         {% csrf_token %}
-                        
+
                         <!-- Search and Filter -->
                         <div class="row mb-3">
                             <div class="col-md-6">
@@ -145,7 +147,7 @@
                                     <label class="form-label fw-bold">Match Amount</label>
                                     <div class="input-group">
                                         <span class="input-group-text">{{ payment.currency }}</span>
-                                        <input type="number" name="match_amount" class="form-control" 
+                                        <input type="number" name="match_amount" class="form-control"
                                                value="{{ payment.amount }}" step="0.01" min="0" max="{{ payment.amount }}">
                                     </div>
                                     <small class="form-text text-muted">Amount to match to selected invoice(s)</small>
@@ -166,7 +168,7 @@
                         <!-- Notes -->
                         <div class="mb-3">
                             <label class="form-label fw-bold">Matching Notes</label>
-                            <textarea name="matching_notes" class="form-control" rows="3" 
+                            <textarea name="matching_notes" class="form-control" rows="3"
                                       placeholder="Any notes about this matching..."></textarea>
                         </div>
 

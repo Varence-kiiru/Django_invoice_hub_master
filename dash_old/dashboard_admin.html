@@ -18,7 +18,7 @@
   <!-- Admin Control Panel -->
   <div class="dashboard-section">
     <div class="dashboard-section-title">Administration Controls</div>
-    
+
     <div class="admin-grid">
       <!-- User Management -->
       <div class="admin-card">
@@ -106,7 +106,7 @@
       <div class="kpi-label" id="kpi-revenue-label">💰 Total Revenue</div>
       <div class="kpi-value kpi-large" aria-labelledby="kpi-revenue-label" role="status">{{ company_settings.currency_symbol }}{{ total_revenue|default:'0'|floatformat:2 }}</div>
       <div class="kpi-change {% if revenue_trend == 'up' %}positive{% elif revenue_trend == 'down' %}negative{% else %}neutral{% endif %}">
-        <span aria-hidden="true">{% if revenue_trend == 'up' %}↑{% elif revenue_trend == 'down' %}↓{% else %}→{% endif %}</span> 
+        <span aria-hidden="true">{% if revenue_trend == 'up' %}↑{% elif revenue_trend == 'down' %}↓{% else %}→{% endif %}</span>
         <span>{% if month_revenue > prev_month_revenue %}+{{ revenue_change|floatformat:0 }}{% elif month_revenue < prev_month_revenue %}-{{ revenue_change|floatformat:0 }}{% else %}0{% endif %}% vs last month</span>
       </div>
     </div>
@@ -145,7 +145,7 @@
       <div class="kpi-label" id="kpi-quotes-label">📋 Total Quotations</div>
       <div class="kpi-value" aria-labelledby="kpi-quotes-label" role="status">{{ total_quotations|default:'0' }}</div>
       <div class="kpi-change {% if sent_quotations > 0 %}positive{% else %}neutral{% endif %}">
-        <span aria-hidden="true">{% if sent_quotations > 0 %}→{% else %}✓{% endif %}</span> 
+        <span aria-hidden="true">{% if sent_quotations > 0 %}→{% else %}✓{% endif %}</span>
         <span>{{ sent_quotations|default:'0' }} awaiting response</span>
       </div>
     </div>
@@ -164,7 +164,7 @@
       <div class="kpi-label" id="kpi-converted-label">🔄 Converted to Invoice</div>
       <div class="kpi-value" aria-labelledby="kpi-converted-label" role="status">{{ converted_quotations|default:'0' }}</div>
       <div class="kpi-change {% if accepted_quotations > 0 %}positive{% else %}neutral{% endif %}">
-        <span aria-hidden="true">{% if accepted_quotations > 0 %}→{% else %}✓{% endif %}</span> 
+        <span aria-hidden="true">{% if accepted_quotations > 0 %}→{% else %}✓{% endif %}</span>
         <span>{{ accepted_quotations|default:'0' }} accepted</span>
       </div>
     </div>
@@ -272,7 +272,7 @@
   {% if overdue_invoices or expiring_quotations %}
   <div class="dashboard-section">
     <div class="dashboard-section-title">⚠️ Alerts & Notifications</div>
-    
+
     <div class="dashboard-grid-2col">
       {% if overdue_invoices %}
       <div class="dashboard-panel">
@@ -311,7 +311,7 @@
       <div class="dashboard-section-title">Recent Invoices</div>
       <a href="{% url 'invoices:list' %}" class="btn btn-secondary btn-sm">View All →</a>
     </div>
-    
+
     <div class="dashboard-card">
       {% if recent_invoices %}
         <table class="recent-table">

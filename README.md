@@ -2,7 +2,7 @@
 
 A comprehensive, enterprise-grade Django-based invoicing application with advanced features for managing invoices, payments, clients, quotations, and multi-tenant organizations. Built for scale with comprehensive API, data analytics, and automation capabilities.
 
-**Version:** 3.0.0 | **Status:** Production Ready ✅ | **Last Updated:** March 26, 2026
+**Version:** 4.5.0 | **Status:** Production Ready ✅ | **Last Updated:** April 7, 2026 | **API:** v2.1
 
 ---
 
@@ -91,12 +91,27 @@ InvoiceHub is a modern, feature-rich invoicing and invoice management system des
 
 ## 📊 Project Status
 
-**Current Version:** 3.0.0  
-**Release Date:** February 28, 2026  
-**Status:** Production Ready ✅  
-**Python Version:** 3.13+  
-**Django Version:** 4.2+  
-**Database:** PostgreSQL (Prod) / SQLite (Dev)
+**Current Version:** 4.5.0
+**Release Date:** April 7, 2026
+**Status:** Production Ready ✅
+**Python Version:** 3.11+
+**Django Version:** 4.2.28+
+**Database:** PostgreSQL (Prod) / MySQL (Supported) / SQLite (Dev)
+**API Version:** v2.1
+**Task Queue:** Celery 5.4.0 with Redis 7
+
+## 📚 Documentation & Policies
+
+- `README.md` (this file)
+- `docs/INSTALLATION.md`
+- `docs/UPGRADE.md`
+- `docs/DOCKER_DEPLOYMENT.md`
+- `docs/PRICING_TIERS.md`
+- `docs/MARKETING_COPY.md`
+- `docs/SECURITY.md`
+- `TERMS_OF_SERVICE.md`
+- `PRIVACY_POLICY.md`
+- `EULA.md`
 
 ### Completed Modules
 
@@ -221,7 +236,7 @@ InvoiceHub is a modern, feature-rich invoicing and invoice management system des
    # Windows
    python -m venv venv
    venv\Scripts\Activate.ps1
-   
+
    # Mac/Linux
    python3 -m venv venv
    source venv/bin/activate
@@ -528,7 +543,7 @@ upstream invoice_app {
 server {
     listen 80;
     server_name yourdomain.com www.yourdomain.com;
-    
+
     # Redirect HTTP to HTTPS
     return 301 https://$server_name$request_uri;
 }
@@ -536,15 +551,15 @@ server {
 server {
     listen 443 ssl http2;
     server_name yourdomain.com www.yourdomain.com;
-    
+
     # SSL configuration
     ssl_certificate /etc/ssl/certs/your-cert.crt;
     ssl_certificate_key /etc/ssl/private/your-key.key;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
-    
+
     client_max_body_size 100M;
-    
+
     location / {
         proxy_pass http://invoice_app;
         proxy_set_header Host $host;
@@ -552,13 +567,13 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
-    
+
     location /static/ {
         alias /home/invoice_user/invoice/static/;
         expires 1y;
         add_header Cache-Control "public, immutable";
     }
-    
+
     location /media/ {
         alias /home/invoice_user/invoice/media/;
         expires 30d;
@@ -1389,7 +1404,7 @@ InvoiceHub supports multiple organizations in a single deployment with complete 
 2. **Programmatically:**
    ```python
    from invoicing_app.organizations.models import Organization
-   
+
    org = Organization.objects.create(
        name="Acme Corporation",
        slug="acme-corp",
@@ -1445,7 +1460,7 @@ Configure nginx/apache to support `*.yourdomain.com`:
 # Nginx configuration
 server {
     server_name ~^(?<subdomain>.+)\.yourdomain\.com$ yourdomain.com www.yourdomain.com;
-    
+
     location / {
         proxy_pass http://127.0.0.1:8000;
         proxy_set_header X-Organization-Subdomain $subdomain;
@@ -1735,7 +1750,7 @@ media/
    - Error traceback if applicable
 
 **Feature Requests:**
-1. Create discussion: https://github.com/yourusername/invoice/discussions
+1. Create discussion: https://github.com/Varence-kiiru/Django_invoice_hub_master/discussions
 2. Describe use case and benefits
 3. Suggest implementation approach if possible
 
@@ -1744,8 +1759,8 @@ media/
 **Development Setup:**
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/invoice.git
-cd invoice
+git clone https://github.com/Varence-kiiru/Django_invoice_hub_master.git
+cd Django_invoice_hub_master
 
 # Create and activate virtual environment
 python -m venv venv
@@ -1996,13 +2011,14 @@ class Invoice(models.Model):
 
 ## 📧 Contact & Support
 
-**Project Maintainer:** Your Name  
-**Email:** your-email@yourdomain.com  
-**Repository:** https://github.com/yourusername/invoice  
-**Issue Tracker:** https://github.com/yourusername/invoice/issues  
-**Discussions:** https://github.com/yourusername/invoice/discussions
+**Developer:** Varence-kiiru
+**Email:** hernandezngash@gmail.com
+**GitHub:** https://github.com/Varence-kiiru
+**Repository:** https://github.com/Varence-kiiru/invoice
+**Issue Tracker:** https://github.com/Varence-kiiru/invoice/issues
+**Discussions:** https://github.com/Varence-kiiru/invoice/discussions
 
 ---
 
-**Last Updated:** March 26, 2026  
-**InvoiceHub v3.0.0** - Professional Invoice Management System
+**Last Updated:** April 7, 2026
+**InvoiceHub v4.5.0** - Professional Invoice Management System

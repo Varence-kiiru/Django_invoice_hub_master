@@ -13,18 +13,18 @@
 function validateClientForm() {
     const name = document.getElementById('id_name');
     const email = document.getElementById('id_email');
-    
+
     let isValid = true;
-    
+
     // Clear previous errors
     clearFormErrors();
-    
+
     // Validate name
     if (!name || !name.value.trim()) {
         showFieldError(name, 'Client name is required');
         isValid = false;
     }
-    
+
     // Validate email
     if (!email || !email.value.trim()) {
         showFieldError(email, 'Email is required');
@@ -33,7 +33,7 @@ function validateClientForm() {
         showFieldError(email, 'Please enter a valid email address');
         isValid = false;
     }
-    
+
     return isValid;
 }
 
@@ -45,30 +45,30 @@ function validateAddressForm() {
     const city = document.getElementById('id_city');
     const state = document.getElementById('id_state');
     const postalCode = document.getElementById('id_postal_code');
-    
+
     let isValid = true;
     clearFormErrors();
-    
+
     if (!streetAddress || !streetAddress.value.trim()) {
         showFieldError(streetAddress, 'Street address is required');
         isValid = false;
     }
-    
+
     if (!city || !city.value.trim()) {
         showFieldError(city, 'City is required');
         isValid = false;
     }
-    
+
     if (!state || !state.value.trim()) {
         showFieldError(state, 'State is required');
         isValid = false;
     }
-    
+
     if (!postalCode || !postalCode.value.trim()) {
         showFieldError(postalCode, 'Postal code is required');
         isValid = false;
     }
-    
+
     return isValid;
 }
 
@@ -79,25 +79,25 @@ function validateContactForm() {
     const firstName = document.getElementById('id_first_name');
     const lastName = document.getElementById('id_last_name');
     const email = document.getElementById('id_email');
-    
+
     let isValid = true;
     clearFormErrors();
-    
+
     if (!firstName || !firstName.value.trim()) {
         showFieldError(firstName, 'First name is required');
         isValid = false;
     }
-    
+
     if (!lastName || !lastName.value.trim()) {
         showFieldError(lastName, 'Last name is required');
         isValid = false;
     }
-    
+
     if (email && email.value && !isValidEmail(email.value)) {
         showFieldError(email, 'Please enter a valid email address');
         isValid = false;
     }
-    
+
     return isValid;
 }
 
@@ -118,10 +118,10 @@ function isValidEmail(email) {
  */
 function showFieldError(fieldElement, message) {
     if (!fieldElement) return;
-    
+
     fieldElement.classList.add('has-error');
     const formGroup = fieldElement.closest('.form-group');
-    
+
     if (formGroup) {
         const existingError = formGroup.querySelector('.form-error');
         if (existingError) {
@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.closest('form').submit();
         });
     }
-    
+
     // Status filter
     const statusFilter = document.querySelector('select[name="status"]');
     if (statusFilter) {
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.closest('form').submit();
         });
     }
-    
+
     // Confirmation dialogs
     const deleteButtons = document.querySelectorAll('a[href*="delete"]');
     deleteButtons.forEach(btn => {
@@ -312,7 +312,7 @@ document.addEventListener('keydown', function(e) {
             form.submit();
         }
     }
-    
+
     // Escape to cancel
     if (e.key === 'Escape') {
         const cancelBtn = document.querySelector('[href*="cancel"], a.btn-secondary');
@@ -329,7 +329,7 @@ document.addEventListener('keydown', function(e) {
 // Email field real-time validation
 document.addEventListener('DOMContentLoaded', function() {
     const emailFields = document.querySelectorAll('input[type="email"]');
-    
+
     emailFields.forEach(field => {
         field.addEventListener('blur', function() {
             if (this.value && !isValidEmail(this.value)) {
@@ -338,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 clearFieldError(this);
             }
         });
-        
+
         field.addEventListener('input', function() {
             if (this.classList.contains('has-error') && isValidEmail(this.value)) {
                 clearFieldError(this);
@@ -370,7 +370,7 @@ function clearFieldError(fieldElement) {
  */
 function highlightSearchTerms(searchTerm) {
     if (!searchTerm) return;
-    
+
     const rows = document.querySelectorAll('table tbody tr');
     rows.forEach(row => {
         const text = row.textContent.toLowerCase();

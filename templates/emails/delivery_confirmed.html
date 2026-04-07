@@ -1,0 +1,35 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Delivery Confirmed - {{ invoice_number }}{% endblock %}
+
+{% block header_class %}header-blue{% endblock %}
+
+{% block header_title %}📦 Your Delivery is Confirmed{% endblock %}
+
+{% block content %}
+    <p>Hello {{ client_name }},</p>
+
+    <p>We're excited to let you know that your delivery has been confirmed and is on our way!</p>
+
+    <div class="details-table">
+        <div class="detail-row">
+            <span class="detail-label accent-blue">Invoice Number:</span>
+            <span class="detail-value">{{ invoice_number }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label accent-blue">Delivery Date:</span>
+            <span class="detail-value">{{ delivery_date }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label accent-blue">Expected Arrival:</span>
+            <span class="detail-value">{{ expected_arrival }}</span>
+        </div>
+    </div>
+
+    <div class="highlight-box highlight-blue">
+        <strong>📍 Tracking Information:</strong>
+        <p>You can track your delivery using the invoice number above. If you have any questions about your delivery, please don't hesitate to contact us.</p>
+    </div>
+
+    <p>Thank you for your business!</p>
+{% endblock %}

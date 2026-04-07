@@ -1,7 +1,7 @@
 /**
  * Dashboard Analytics Module
  * Handles dashboard data loading, processing, and visualization
- * 
+ *
  * Usage:
  *   const dashboard = new DashboardAnalytics({ period: 30 });
  *   dashboard.refresh();
@@ -13,7 +13,7 @@ class DashboardAnalytics {
     this.autoRefresh = options.autoRefresh !== false;
     this.refreshInterval = options.refreshInterval || 5 * 60 * 1000;
     this.currencyCode = 'KES'; // Default currency, will be updated from API
-    
+
     // Chart instances
     this.charts = {
       invoiceTimeline: null,
@@ -36,7 +36,7 @@ class DashboardAnalytics {
       errorAlert: document.getElementById('errorAlert'),
       errorMessage: document.getElementById('errorMessage'),
       refreshBtn: document.getElementById('refreshBtn'),
-      
+
       // Financial cards
       totalRevenue: document.getElementById('totalRevenue'),
       revenueChange: document.getElementById('revenueChange'),
@@ -46,12 +46,12 @@ class DashboardAnalytics {
       transactionCount: document.getElementById('transactionCount'),
       paymentRate: document.getElementById('paymentRate'),
       paymentStats: document.getElementById('paymentStats'),
-      
+
       // Charts
       invoiceTimelineChart: document.getElementById('invoiceTimelineChart'),
       paymentTimelineChart: document.getElementById('paymentTimelineChart'),
       paymentMethodChart: document.getElementById('paymentMethodChart'),
-      
+
       // Aging report
       currentCount: document.getElementById('current-count'),
       currentBar: document.getElementById('current-bar'),
@@ -66,10 +66,10 @@ class DashboardAnalytics {
       '90plusBar': document.getElementById('90plus-bar'),
       '90plusAmount': document.getElementById('90plus-amount'),
       totalAR: document.getElementById('total-ar'),
-      
+
       // Top clients
       topClientsTable: document.getElementById('topClientsTable'),
-      
+
       // Payment methods legend
       paymentMethodLegend: document.getElementById('paymentMethodLegend')
     };
@@ -160,12 +160,12 @@ class DashboardAnalytics {
 
       const result = await response.json();
       this.data.summary = result.data;
-      
+
       // Capture currency code from API
       if (result.data.currency_code) {
         this.currencyCode = result.data.currency_code;
       }
-      
+
       return this.data.summary;
     } catch (error) {
       console.error('Summary load error:', error);
@@ -264,7 +264,7 @@ class DashboardAnalytics {
     // Total Revenue
     this.elements.totalRevenue.textContent = this.formatCurrency(summary.total_revenue || 0);
     const revenueChangePercent = summary.revenue_change_percent || 0;
-    this.elements.revenueChange.innerHTML = 
+    this.elements.revenueChange.innerHTML =
       `${revenueChangePercent >= 0 ? '↑' : '↓'} ${Math.abs(revenueChangePercent)}% vs last period`;
 
     // Outstanding A/R
@@ -518,7 +518,7 @@ class DashboardAnalytics {
 
     if (countElement) countElement.textContent = data.count || 0;
     if (amountElement) amountElement.textContent = this.formatCurrency(data.amount || 0);
-    
+
     if (barElement) {
       const percentage = total > 0 ? (data.amount / total) * 100 : 0;
       barElement.style.width = percentage + '%';
@@ -550,7 +550,7 @@ class DashboardAnalytics {
     }
 
     const html = clients.map((client, index) => {
-      const statusBadge = client.payment_rate >= 0.8 
+      const statusBadge = client.payment_rate >= 0.8
         ? '<span class="badge badge-success">Good</span>'
         : client.payment_rate >= 0.5
         ? '<span class="badge badge-warning">At Risk</span>'
@@ -581,13 +581,13 @@ class DashboardAnalytics {
   generateDateLabels(days) {
     const labels = [];
     const today = new Date();
-    
+
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
       labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
     }
-    
+
     return labels;
   }
 

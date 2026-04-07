@@ -102,14 +102,14 @@
               <select name="product" id="product" onchange="updateProductInfo()" class="form-control">
                 <option value="">--- Select or Enter Description ---</option>
                 {% for product in products %}
-                  <option value="{{ product.id }}" 
-                          data-description="{{ product.description|default:product.name|escapejs }}" 
-                          data-price="{{ product.unit_price }}" 
+                  <option value="{{ product.id }}"
+                          data-description="{{ product.description|default:product.name }}"
+                          data-price="{{ product.unit_price }}"
                           data-tax-rate-type="{{ product.tax_class.rate_type }}">{{ product.code }} - {{ product.name }}</option>
                 {% endfor %}
               </select>
             </div>
-            
+
             <!-- Tax class to rate mapping for JavaScript -->
             <script type="application/json" id="tax-class-rate-map">
               {{ tax_class_rate_map|safe }}

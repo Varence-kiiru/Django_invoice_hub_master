@@ -33,13 +33,13 @@ document.querySelectorAll('.btn-confirm-action').forEach(btn => {
     const actionUrl = this.getAttribute('data-action');
     const actionText = this.getAttribute('data-action-text') || 'Confirm';
     const actionClass = this.getAttribute('data-action-class') || 'btn-primary';
-    
+
     document.getElementById('actionMessage').textContent = message;
     document.getElementById('actionForm').action = actionUrl;
     const submitBtn = document.getElementById('actionSubmitBtn');
     submitBtn.textContent = actionText;
     submitBtn.className = 'btn ' + actionClass;
-    
+
     // Show modal
     const modal = document.getElementById('confirmActionModal');
     modal.classList.add('show');

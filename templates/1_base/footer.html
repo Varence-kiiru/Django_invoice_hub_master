@@ -6,54 +6,71 @@
     <div class="footer-grid">
       <!-- Brand Section -->
       <div class="footer-column footer-brand">
-        <h3 class="footer-brand-title">💼 Invoicing App</h3>
-        <p class="footer-brand-desc">Professional invoicing and finance management system for businesses. Streamline your invoicing workflow with powerful tools.</p>
-        
+        <div class="footer-brand-info">
+          <h3 class="footer-brand-title">InvoiceHub</h3>
+          <p class="footer-brand-subtitle">{{ version_name }}</p>
+          <p class="footer-version-badge">v{{ app_version }} | API {{ api_version }}</p>
+        </div>
+        <p class="footer-brand-desc">Complete financial and invoicing management platform. Multi-tenant enterprise system with invoicing, quotations, payments, expenses, tax management, delivery tracking, financial analytics, audit trails, and intelligent reporting.</p>
+
+        <!-- Core Features -->
+        <div class="footer-features">
+          <span class="feature-badge">Invoicing</span>
+          <span class="feature-badge">Quotations</span>
+          <span class="feature-badge">Payments</span>
+          <span class="feature-badge">Taxes</span>
+          <span class="feature-badge">Financials</span>
+          <span class="feature-badge">Expenses</span>
+          <span class="feature-badge">Deliveries</span>
+          <span class="feature-badge">Analytics</span>
+          <span class="feature-badge">Audit Logs</span>
+          <span class="feature-badge">Multi-Tenant</span>
+        </div>
+
         <!-- Social Links -->
         <div class="footer-socials">
-          <a href="#" class="footer-social-link" title="LinkedIn" aria-label="LinkedIn">
-            <span class="footer-social-icon">in</span>
+          <a href="https://linkedin.com" class="footer-social-link" title="LinkedIn" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.475-2.236-1.986-2.236-1.081 0-1.722.721-2.004 1.416-.103.25-.129.599-.129.948v5.441h-3.554s.05-8.844 0-9.768h3.554v1.391c.43-.665 1.199-1.61 2.920-1.61 2.134 0 3.734 1.393 3.734 4.385v5.602zM5.337 8.855c-1.144 0-1.915-.759-1.915-1.71 0-.956.77-1.71 1.957-1.71 1.187 0 1.915.754 1.915 1.71 0 .951-.728 1.71-1.957 1.71zm1.581 11.597H3.715V9.539h3.203v10.913zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg>
           </a>
-          <a href="#" class="footer-social-link" title="X (Twitter)" aria-label="X (Twitter)">
-            <span class="footer-social-icon">𝕏</span>
+          <a href="https://twitter.com" class="footer-social-link" title="Twitter" aria-label="Twitter" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M23.953 4.57a10 10 0 002.856-3.414c-1.017.409-2.087.612-3.23.765a5.592 5.592 0 002.579-3.012 11.209 11.209 0 01-3.997 1.524 5.564 5.564 0 00-9.678 5.075 15.779 15.779 0 01-11.451-5.986A5.59 5.59 0 001.637 9.02a5.546 5.546 0 01-2.514-.689v.076a5.57 5.57 0 004.469 5.46 5.573 5.573 0 01-2.503.095 5.575 5.575 0 005.202 3.877A11.183 11.183 0 000 19.33a15.775 15.775 0 008.56 2.51c10.271 0 15.87-8.409 15.87-15.698 0-.24 0-.48-.015-.718A11.388 11.388 0 0024 4.557z"/></svg>
           </a>
-          <a href="#" class="footer-social-link" title="GitHub" aria-label="GitHub">
-            <span class="footer-social-icon">⚙️</span>
+          <a href="https://github.com/Varence-kiiru" class="footer-social-link" title="GitHub - Varence-kiiru" aria-label="GitHub" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v 3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
           </a>
         </div>
       </div>
 
-      <!-- Product Links -->
+      <!-- Operations & Transactions -->
       <div class="footer-column">
-        <h4 class="footer-column-title">Product</h4>
+        <h4 class="footer-column-title">Operations</h4>
         <ul class="footer-links">
-          <li><a href="{% url 'core:dashboard' %}" class="footer-link">Dashboard</a></li>
-          {% if can_view_invoices %}<li><a href="{% url 'invoices:list' %}" class="footer-link">Invoices</a></li>{% endif %}
-          {% if can_view_clients %}<li><a href="{% url 'clients:list' %}" class="footer-link">Clients</a></li>{% endif %}
+          <li><a href="{% url 'invoices:list' %}" class="footer-link">Invoices</a></li>
+          <li><a href="{% url 'quotations:list' %}" class="footer-link">Quotations</a></li>
+          <li><a href="{% url 'payments:list' %}" class="footer-link">Payments</a></li>
+          <li><a href="{% url 'deliveries:list' %}" class="footer-link">Deliveries</a></li>
+        </ul>
+      </div>
+
+      <!-- Management & Admin -->
+      <div class="footer-column">
+        <h4 class="footer-column-title">Management</h4>
+        <ul class="footer-links">
+          <li><a href="{% url 'clients:list' %}" class="footer-link">Clients</a></li>
           <li><a href="{% url 'products:list' %}" class="footer-link">Products</a></li>
-          {% if can_view_payments %}<li><a href="{% url 'payments:list' %}" class="footer-link">Payments</a></li>{% endif %}
-          {% if can_view_expenses %}<li><a href="{% url 'expenses:list' %}" class="footer-link">Expenses</a></li>{% endif %}
+          <li><a href="{% url 'expenses:list' %}" class="footer-link">Expenses</a></li>
+          <li><a href="{% url 'taxes:list' %}" class="footer-link">Tax Rates</a></li>
         </ul>
       </div>
 
-      <!-- Account Links -->
+      <!-- Finance & Analytics -->
       <div class="footer-column">
-        <h4 class="footer-column-title">Account</h4>
+        <h4 class="footer-column-title">Finance</h4>
         <ul class="footer-links">
-          <li><a href="{% url 'core:profile' %}" class="footer-link">Profile</a></li>
-          {% if can_manage_settings or is_admin %}<li><a href="{% url 'core:settings' %}" class="footer-link">Settings</a></li>{% endif %}
-          <li><a href="{% url 'core:dashboard' %}" class="footer-link">Dashboard</a></li>
-        </ul>
-      </div>
-
-      <!-- Support Links -->
-      <div class="footer-column">
-        <h4 class="footer-column-title">Support</h4>
-        <ul class="footer-links">
-          <li><a href="{% url 'core:help-center' %}" class="footer-link">Help Center</a></li>
-          <li><a href="{% url 'core:faq' %}" class="footer-link">FAQ</a></li>
-          <li><a href="{% url 'core:help-articles' %}" class="footer-link">Documentation</a></li>
-          <li><a href="{% url 'core:support-form' %}" class="footer-link">Contact Support</a></li>
+          <li><a href="{% url 'financials:dashboard' %}" class="footer-link">Financial Dashboard</a></li>
+          <li><a href="{% url 'core:dashboard' %}" class="footer-link">Analytics</a></li>
+          <li><a href="{% url 'financials:tax-liabilities-list' %}" class="footer-link">Tax Liabilities</a></li>
+          <li><a href="{% url 'financials:periods-list' %}" class="footer-link">Financial Periods</a></li>
         </ul>
       </div>
     </div>
@@ -63,23 +80,19 @@
 
     <!-- Footer Bottom -->
     <div class="footer-bottom">
-      <div class="footer-bottom-content">
-        <p class="footer-copyright">&copy; <span id="current-year">2026</span> Invoicing App. All rights reserved.</p>
+      <div class="footer-bottom-left">
+        <p class="footer-copyright">&copy; <span id="current-year">2026</span> InvoiceHub. All rights reserved.</p>
+        <p class="footer-contact">Support: <a href="mailto:hernandezngash@gmail.com">hernandezngash@gmail.com</a></p>
       </div>
-      
-      <div class="footer-bottom-info">
-        <span class="footer-version">Version {{ app_version }}</span>
+
+      <div class="footer-bottom-right">
+        <span class="footer-badge badge-version">v{{ app_version }}</span>
+        <span class="footer-badge badge-api">API {{ api_version }}</span>
         <span class="footer-status">
           <span class="status-indicator"></span>
-          <span class="status-text">All Systems Operational</span>
+          <span class="status-text">Operational</span>
         </span>
       </div>
     </div>
   </div>
 </footer>
-
-<script>
-  // Update year dynamically
-  document.getElementById('current-year').textContent = new Date().getFullYear();
-</script>
-

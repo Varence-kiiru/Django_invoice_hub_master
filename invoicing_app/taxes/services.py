@@ -2,6 +2,7 @@
 Tax calculation service.
 Handles VAT and tax calculations for invoices and line items.
 """
+
 from decimal import Decimal
 from invoicing_app.taxes.models import TaxRate
 
@@ -24,11 +25,11 @@ class TaxCalculationService:
             Decimal: Calculated VAT amount
         """
         if not tax_rate or tax_rate.rate_percentage is None:
-            return Decimal('0.00')
+            return Decimal("0.00")
 
         rate_decimal = Decimal(str(tax_rate.rate_percentage))
         line_decimal = Decimal(str(line_amount))
-        vat = (line_decimal * rate_decimal / 100).quantize(Decimal('0.01'))
+        vat = (line_decimal * rate_decimal / 100).quantize(Decimal("0.01"))
         return vat
 
     @staticmethod
@@ -45,7 +46,7 @@ class TaxCalculationService:
         """
         line_decimal = Decimal(str(line_amount))
         vat = TaxCalculationService.calculate_line_vat(line_amount, tax_rate)
-        return (line_decimal + vat).quantize(Decimal('0.01'))
+        return (line_decimal + vat).quantize(Decimal("0.01"))
 
     @staticmethod
     def calculate_invoice_totals(line_items):
@@ -67,11 +68,11 @@ class TaxCalculationService:
                 }
             }
         """
-        subtotal = Decimal('0.00')
-        vat_total = Decimal('0.00')
-        standard_vat = Decimal('0.00')
-        zero_rated = Decimal('0.00')
-        exempt = Decimal('0.00')
+        subtotal = Decimal("0.00")
+        vat_total = Decimal("0.00")
+        standard_vat = Decimal("0.00")
+        zero_rated = Decimal("0.00")
+        exempt = Decimal("0.00")
 
         for line in line_items:
             line_amount = Decimal(str(line.line_amount))
@@ -83,7 +84,10 @@ class TaxCalculationService:
             # Categorize VAT type
             if line.tax_rate.rate_percentage == 0:
                 zero_rated += line_amount
-            elif line.tax_rate.rate_percentage is None or line.tax_rate.rate_percentage == 0:
+            elif (
+                line.tax_rate.rate_percentage is None
+                or line.tax_rate.rate_percentage == 0
+            ):
                 if line.tax_rate.is_vat_applicable is False:
                     exempt += line_amount
                 else:
@@ -91,17 +95,17 @@ class TaxCalculationService:
             else:
                 standard_vat += tax_amount
 
-        total = (subtotal + vat_total).quantize(Decimal('0.01'))
+        total = (subtotal + vat_total).quantize(Decimal("0.01"))
 
         return {
-            'subtotal': subtotal.quantize(Decimal('0.01')),
-            'vat_amount': vat_total.quantize(Decimal('0.01')),
-            'total': total,
-            'vat_breakdown': {
-                'standard_vat': standard_vat.quantize(Decimal('0.01')),
-                'zero_rated': zero_rated.quantize(Decimal('0.01')),
-                'exempt': exempt.quantize(Decimal('0.01')),
-            }
+            "subtotal": subtotal.quantize(Decimal("0.01")),
+            "vat_amount": vat_total.quantize(Decimal("0.01")),
+            "total": total,
+            "vat_breakdown": {
+                "standard_vat": standard_vat.quantize(Decimal("0.01")),
+                "zero_rated": zero_rated.quantize(Decimal("0.01")),
+                "exempt": exempt.quantize(Decimal("0.01")),
+            },
         }
 
     @staticmethod
@@ -117,7 +121,7 @@ class TaxCalculationService:
             TaxRate: The applicable tax rate
         """
         # Check if there are any VAT rules for this product's tax class
-        rules = product.tax_class.vat_rules.filter(is_active=True).order_by('-priority')
+        rules = product.tax_class.vat_rules.filter(is_active=True).order_by("-priority")
 
         if rules.exists():
             # Use highest priority rule
@@ -125,9 +129,9 @@ class TaxCalculationService:
 
         # Fall back to looking for active rate matching the tax class type
         rate_type_map = {
-            'standard': 'VATX16',  # Or look up current standard rate
-            'zero': 'VATZ00',
-            'exempt': 'VATXEM',
+            "standard": "VATX16",  # Or look up current standard rate
+            "zero": "VATZ00",
+            "exempt": "VATXEM",
         }
 
         code = rate_type_map.get(product.tax_class.rate_type)
@@ -138,7 +142,7 @@ class TaxCalculationService:
                 pass
 
         # Last resort: return first active tax rate
-        return TaxRate.objects.filter(tax_type='vat').first()
+        return TaxRate.objects.filter(tax_type="vat").first()
 
     @staticmethod
     def validate_vat_amount(line_amount, tax_rate, expected_vat):
@@ -155,4 +159,4 @@ class TaxCalculationService:
         """
         calculated_vat = TaxCalculationService.calculate_line_vat(line_amount, tax_rate)
         # Allow small rounding differences (up to 0.01)
-        return abs(calculated_vat - Decimal(str(expected_vat))) <= Decimal('0.01')
+        return abs(calculated_vat - Decimal(str(expected_vat))) <= Decimal("0.01")

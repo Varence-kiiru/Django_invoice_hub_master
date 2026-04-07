@@ -9,23 +9,23 @@ class GlobalSearch {
         this.suggestionsContainer = document.getElementById('searchSuggestions');
         this.searchTimeout = null;
         this.minChars = 2;
-        
+
         this.init();
     }
-    
+
     init() {
         if (!this.searchInput) return;
-        
+
         // Search on input
         this.searchInput.addEventListener('input', (e) => this.handleInput(e));
-        
+
         // Close suggestions on escape
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 this.closeSuggestions();
             }
         });
-        
+
         // Close suggestions when clicking outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.global-search-container')) {
@@ -33,39 +33,39 @@ class GlobalSearch {
             }
         });
     }
-    
+
     handleInput(event) {
         const query = event.target.value.trim();
-        
+
         // Clear previous timeout
         clearTimeout(this.searchTimeout);
-        
+
         if (query.length < this.minChars) {
             this.closeSuggestions();
             return;
         }
-        
+
         // Debounce search
         this.searchTimeout = setTimeout(() => {
             this.fetchSuggestions(query);
         }, 300);
     }
-    
+
     fetchSuggestions(query) {
         fetch(`/api/search/suggestions/?q=${encodeURIComponent(query)}`)
             .then(response => response.json())
             .then(data => this.displaySuggestions(data, query))
             .catch(error => console.error('Search error:', error));
     }
-    
+
     displaySuggestions(data, query) {
         if (!data.suggestions || Object.keys(data.suggestions).length === 0) {
             this.showNoResults(query);
             return;
         }
-        
+
         let html = '';
-        
+
         // Invoices
         if (data.suggestions.invoices && data.suggestions.invoices.length > 0) {
             html += '<div class="suggestion-group">';
@@ -80,7 +80,7 @@ class GlobalSearch {
             });
             html += '</div>';
         }
-        
+
         // Payments
         if (data.suggestions.payments && data.suggestions.payments.length > 0) {
             html += '<div class="suggestion-group">';
@@ -95,7 +95,7 @@ class GlobalSearch {
             });
             html += '</div>';
         }
-        
+
         // Clients
         if (data.suggestions.clients && data.suggestions.clients.length > 0) {
             html += '<div class="suggestion-group">';
@@ -110,16 +110,16 @@ class GlobalSearch {
             });
             html += '</div>';
         }
-        
+
         // View all results button
         html += '<div class="suggestion-group">';
         html += `<a href="/search/?q=${encodeURIComponent(query)}" class="suggestion-item" style="text-align: center; color: #3498db; font-weight: 500;">View all results →</a>`;
         html += '</div>';
-        
+
         this.suggestionsContainer.innerHTML = html;
         this.showSuggestions();
     }
-    
+
     showNoResults(query) {
         this.suggestionsContainer.innerHTML = `
             <div class="suggestion-group">
@@ -131,31 +131,31 @@ class GlobalSearch {
         `;
         this.showSuggestions();
     }
-    
+
     showSuggestions() {
         if (this.suggestionsContainer) {
             this.suggestionsContainer.style.display = 'block';
         }
     }
-    
+
     closeSuggestions() {
         if (this.suggestionsContainer) {
             this.suggestionsContainer.style.display = 'none';
         }
     }
-    
+
     highlightQuery(text, query) {
         const regex = new RegExp(`(${this.escapeRegex(query)})`, 'gi');
         return text.replace(regex, '<strong style="color: #3498db; font-weight: 600;">$1</strong>');
     }
-    
+
     escapeHtml(text) {
         if (!text) return '';
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
-    
+
     escapeRegex(str) {
         return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }

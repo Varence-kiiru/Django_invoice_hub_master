@@ -10,18 +10,18 @@
         <form id="saveFilterForm" method="post">
             {% csrf_token %}
             <input type="hidden" id="filterType" name="filter_type" value="">
-            
+
             <div class="form-group">
                 <label for="filterName">Filter Name</label>
                 <input type="text" id="filterName" name="name" placeholder="e.g., Unpaid Invoices" required class="form-control">
                 <small>Give this filter a memorable name</small>
             </div>
-            
+
             <div class="form-group">
                 <label for="filterDescription">Description (Optional)</label>
                 <textarea id="filterDescription" name="description" placeholder="What does this filter show?" class="form-control" rows="3"></textarea>
             </div>
-            
+
             <div class="form-group">
                 <label>
                     <input type="checkbox" id="filterGlobal" name="is_global" value="true">
@@ -29,7 +29,7 @@
                 </label>
                 <small>If checked, all users can access this filter</small>
             </div>
-            
+
             <div class="form-actions">
                 <button type="submit" class="btn-save">Save Filter</button>
                 <button type="button" class="btn-cancel" onclick="closeSaveFilterModal()">Cancel</button>
@@ -248,11 +248,11 @@
         width: 95%;
         max-width: 100%;
     }
-    
+
     .form-actions {
         flex-direction: column;
     }
-    
+
     .btn-save, .btn-cancel {
         width: 100%;
     }

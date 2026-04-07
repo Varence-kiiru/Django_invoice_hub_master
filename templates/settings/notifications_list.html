@@ -1,0 +1,212 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Notifications - {{ app_name }}{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/notifications.css' %}">
+{% endblock %}
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <span class="title-icon">🔔</span>
+                    Notifications
+                </h1>
+                <p class="page-subtitle">View and manage all your notifications</p>
+            </div>
+
+            <!-- Filter and Actions -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <form method="get" class="d-flex gap-2">
+                                <select name="status" class="form-select" style="max-width: 150px;">
+                                    <option value="">All Statuses</option>
+                                    <option value="sent" {% if request.GET.status == 'sent' %}selected{% endif %}>Sent</option>
+                                    <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                                    <option value="failed" {% if request.GET.status == 'failed' %}selected{% endif %}>Failed</option>
+                                </select>
+                                <select name="type" class="form-select" style="max-width: 150px;">
+                                    <option value="">All Types</option>
+                                    <option value="invoice" {% if request.GET.type == 'invoice' %}selected{% endif %}>Invoices</option>
+                                    <option value="payment" {% if request.GET.type == 'payment' %}selected{% endif %}>Payments</option>
+                                    <option value="quotation" {% if request.GET.type == 'quotation' %}selected{% endif %}>Quotations</option>
+                                    <option value="delivery" {% if request.GET.type == 'delivery' %}selected{% endif %}>Deliveries</option>
+                                    <option value="expense" {% if request.GET.type == 'expense' %}selected{% endif %}>Expenses</option>
+                                    <option value="team_member" {% if request.GET.type == 'team_member' %}selected{% endif %}>Team</option>
+                                </select>
+                                <button type="submit" class="btn btn-outline-primary">
+                                    <span>🔍 Filter</span>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <span class="badge bg-info">{{ total_notifications }} notifications</span>
+                            {% if failed_count > 0 %}
+                            <span class="badge bg-danger">{{ failed_count }} failed</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications List -->
+            {% if notifications %}
+                <div class="notifications-list">
+                    {% for notification in notifications %}
+                        <div class="notification-card"
+                             data-notification-id="{{ notification.id }}">
+                            <div class="notification-icon">
+                                {% if notification.notification_type == 'invoice_issued' %}
+                                    <span class="icon-badge icon-blue">📄</span>
+                                {% elif notification.notification_type == 'payment_received' %}
+                                    <span class="icon-badge icon-green">💰</span>
+                                {% elif notification.notification_type == 'quote_accepted' %}
+                                    <span class="icon-badge icon-green">✓</span>
+                                {% elif notification.notification_type == 'quote_rejected' %}
+                                    <span class="icon-badge icon-red">✕</span>
+                                {% elif notification.notification_type == 'delivery_confirmed' %}
+                                    <span class="icon-badge icon-blue">📦</span>
+                                {% elif notification.notification_type == 'expense_approved' %}
+                                    <span class="icon-badge icon-green">✓</span>
+                                {% elif notification.notification_type == 'expense_approval_required' %}
+                                    <span class="icon-badge icon-orange">⚠️</span>
+                                {% elif notification.notification_type == 'overdue_reminder' %}
+                                    <span class="icon-badge icon-red">⚠️</span>
+                                {% elif notification.notification_type == 'member_invited' %}
+                                    <span class="icon-badge icon-purple">👤</span>
+                                {% else %}
+                                    <span class="icon-badge icon-gray">ℹ️</span>
+                                {% endif %}
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <h5 class="notification-title">{{ notification.subject }}</h5>
+                                    <button class="btn-close-notification" onclick="deleteNotification({{ notification.id }})"
+                                            title="Delete notification">&times;</button>
+                                </div>
+                                <p class="notification-message">{{ notification.subject|truncatewords:20 }}</p>
+                                <div class="notification-meta">
+                                    <span class="meta-item">
+                                        <span class="meta-label">Type:</span>
+                                        <span class="badge bg-light text-dark">{{ notification.notification_type }}</span>
+                                    </span>
+                                    <span class="meta-item">
+                                        <span class="meta-label">Entity:</span>
+                                        <span class="badge bg-light text-dark">{{ notification.entity_type|title }}</span>
+                                    </span>
+                                    <span class="meta-item">
+                                        <span class="meta-label">Date:</span>
+                                        <span class="meta-date">{{ notification.created_at|date:"M d, Y H:i" }}</span>
+                                    </span>
+                                    {% if notification.status == 'sent' %}
+                                        <span class="meta-item">
+                                            <span class="badge bg-success">✓ Sent</span>
+                                        </span>
+                                    {% elif notification.status == 'failed' %}
+                                        <span class="meta-item">
+                                            <span class="badge bg-danger">✕ Failed</span>
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="notification-action">
+                                {% if notification.status == 'sent' %}
+                                    <span class="badge bg-success">✓ Sent</span>
+                                {% elif notification.status == 'pending' %}
+                                    <span class="badge bg-warning">⏳ Pending</span>
+                                {% elif notification.status == 'failed' %}
+                                    <span class="badge bg-danger">✕ Failed</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if is_paginated %}
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center mt-4">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">First</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">🔔</div>
+                    <h3>No Notifications</h3>
+                    <p>You have no notifications at this time. We'll let you know when something important happens!</p>
+                    <a href="{% url 'core:dashboard' %}" class="btn btn-primary mt-3">
+                        Go to Dashboard
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    function deleteNotification(notificationId) {
+        if (confirm('Delete this notification?')) {
+            fetch(`/api/v1/notifications/${notificationId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

@@ -3,6 +3,8 @@
 
 {% block title %}Delete Account{% endblock %}
 
+{% block page_title %}Delete Account{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/auth.css' %}">
 {% endblock %}
@@ -29,7 +31,7 @@
     <div class="settings-card">
         <h3>Are you absolutely sure?</h3>
         <p>Please read the following carefully before proceeding:</p>
-        
+
         <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h4>Account Information to be Deleted:</h4>
             <ul>
@@ -48,7 +50,7 @@
         <!-- Deletion Form -->
         <form method="POST" style="margin-top: 30px;">
             {% csrf_token %}
-            
+
             <div class="form-group">
                 <label>
                     <input type="checkbox" name="confirm_delete" required>

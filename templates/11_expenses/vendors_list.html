@@ -18,7 +18,7 @@
         <form method="get" class="filters-form">
             <div class="filters-row">
                 <div class="filter-group">
-                    <input type="text" name="search" class="form-control" 
+                    <input type="text" name="search" class="form-control"
                            placeholder="Search by name, email, or phone"
                            value="{{ search_query }}">
                 </div>
@@ -107,7 +107,7 @@
                         <a href="{% url 'expenses:vendors-edit' vendor.id %}" class="btn btn-sm btn-warning" title="Edit">
                             ✏️
                         </a>
-                        <a href="{% url 'expenses:vendors-delete' vendor.id %}" class="btn btn-sm btn-danger" title="Delete">
+                        <a href="#" class="btn btn-sm btn-danger btn-delete" title="Delete" data-delete-url="{% url 'expenses:vendors-delete' vendor.id %}" data-item-name="{{ vendor.name }}" data-item-type="Vendor" data-message="Delete this vendor? This action cannot be undone.">
                             🗑️
                         </a>
                     </td>

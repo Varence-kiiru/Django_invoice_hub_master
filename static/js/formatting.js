@@ -10,7 +10,7 @@ function currency(value, symbol = '$', decimals = 2) {
   if (typeof value !== 'number') {
     value = parseFloat(value) || 0;
   }
-  
+
   return symbol + number(value.toFixed(decimals));
 }
 
@@ -22,7 +22,7 @@ function number(value, separator = ',') {
   if (typeof value !== 'number') {
     value = parseFloat(value) || 0;
   }
-  
+
   return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, separator);
 }
 
@@ -34,7 +34,7 @@ function percentage(value, decimals = 1) {
   if (typeof value !== 'number') {
     value = parseFloat(value) || 0;
   }
-  
+
   const percent = (value * 100).toFixed(decimals);
   return percent + '%';
 }
@@ -45,11 +45,11 @@ function percentage(value, decimals = 1) {
  */
 function fileSize(bytes) {
   if (typeof bytes !== 'number' || bytes === 0) return '0 B';
-  
+
   const k = 1024;
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
+
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
@@ -59,9 +59,9 @@ function fileSize(bytes) {
  */
 function truncate(str, maxLength = 50, suffix = '...') {
   if (typeof str !== 'string') return '';
-  
+
   if (str.length <= maxLength) return str;
-  
+
   return str.substring(0, maxLength - suffix.length) + suffix;
 }
 
@@ -71,7 +71,7 @@ function truncate(str, maxLength = 50, suffix = '...') {
  */
 function titleCase(str) {
   if (typeof str !== 'string') return '';
-  
+
   return str
     .toLowerCase()
     .split(/[\s_-]+/)
@@ -85,7 +85,7 @@ function titleCase(str) {
  */
 function capitalize(str) {
   if (typeof str !== 'string') return '';
-  
+
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
@@ -95,7 +95,7 @@ function capitalize(str) {
  */
 function slug(str) {
   if (typeof str !== 'string') return '';
-  
+
   return str
     .toLowerCase()
     .trim()
@@ -110,15 +110,15 @@ function slug(str) {
  */
 function phone(str) {
   if (typeof str !== 'string') return '';
-  
+
   const cleaned = str.replace(/\D/g, '');
-  
+
   if (cleaned.length === 10) {
     return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
   } else if (cleaned.length === 11) {
     return `+${cleaned[0]} (${cleaned.slice(1, 4)}) ${cleaned.slice(4, 7)}-${cleaned.slice(7)}`;
   }
-  
+
   return str;
 }
 
@@ -128,14 +128,14 @@ function phone(str) {
  */
 function maskEmail(email) {
   if (typeof email !== 'string') return '';
-  
+
   const [name, domain] = email.split('@');
-  
+
   if (!name || !domain) return email;
-  
+
   const visibleChars = Math.max(1, Math.floor(name.length / 2));
   const masked = name.substring(0, visibleChars) + '*'.repeat(Math.max(2, name.length - visibleChars));
-  
+
   return masked + '@' + domain;
 }
 
@@ -145,9 +145,9 @@ function maskEmail(email) {
  */
 function creditCard(str) {
   if (typeof str !== 'string') return '';
-  
+
   const cleaned = str.replace(/\D/g, '');
-  
+
   return cleaned
     .padEnd(16, '0')
     .substring(0, 16)
@@ -163,11 +163,11 @@ function formatDate(date, format = 'MMM DD, YYYY') {
   if (!(date instanceof Date)) {
     date = new Date(date);
   }
-  
+
   if (isNaN(date.getTime())) {
     return '';
   }
-  
+
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const year = date.getFullYear();
   const month = months[date.getMonth()];
@@ -175,7 +175,7 @@ function formatDate(date, format = 'MMM DD, YYYY') {
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
   const seconds = String(date.getSeconds()).padStart(2, '0');
-  
+
   return format
     .replace('YYYY', year)
     .replace('MMM', month)
@@ -192,7 +192,7 @@ function formatDate(date, format = 'MMM DD, YYYY') {
 function highlight(str, searchStr, className = 'highlight') {
   if (typeof str !== 'string') return '';
   if (!searchStr) return str;
-  
+
   const regex = new RegExp(`(${searchStr})`, 'gi');
   return str.replace(regex, `<mark class="${className}">$1</mark>`);
 }
@@ -203,7 +203,7 @@ function highlight(str, searchStr, className = 'highlight') {
  */
 function sanitizeHTML(str) {
   if (typeof str !== 'string') return '';
-  
+
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;

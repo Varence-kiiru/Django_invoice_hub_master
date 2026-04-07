@@ -30,7 +30,7 @@ class BulkOperations {
         // Modal close buttons
         document.querySelector('.bulk-status-close')?.addEventListener('click', () => this.closeStatusModal());
         document.querySelector('.bulk-email-close')?.addEventListener('click', () => this.closeEmailModal());
-        
+
         // Modal submit buttons
         document.querySelector('.bulk-status-submit')?.addEventListener('click', () => this.submitStatusUpdate());
         document.querySelector('.bulk-email-submit')?.addEventListener('click', () => this.submitEmail());
@@ -38,11 +38,11 @@ class BulkOperations {
 
     handleSelectAll(event) {
         const isChecked = event.target.checked;
-        
+
         document.querySelectorAll('.bulk-select-item').forEach(checkbox => {
             checkbox.checked = isChecked;
             const rowId = checkbox.dataset.id;
-            
+
             if (isChecked) {
                 this.selectedIds.add(rowId);
             } else {
@@ -55,7 +55,7 @@ class BulkOperations {
 
     handleItemSelect(event) {
         const rowId = event.target.dataset.id;
-        
+
         if (event.target.checked) {
             this.selectedIds.add(rowId);
         } else {
@@ -109,7 +109,7 @@ class BulkOperations {
             if (data.success) {
                 const select = document.querySelector('.bulk-status-select');
                 select.innerHTML = '<option value="">-- Select Status --</option>';
-                
+
                 data.options.status_options.forEach(status => {
                     const option = document.createElement('option');
                     option.value = status;
@@ -142,7 +142,7 @@ class BulkOperations {
             if (data.success) {
                 const select = document.querySelector('.bulk-email-type-select');
                 select.innerHTML = '<option value="">-- Select Email Type --</option>';
-                
+
                 data.options.email_types.forEach(emailType => {
                     const option = document.createElement('option');
                     option.value = emailType;

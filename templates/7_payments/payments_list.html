@@ -3,6 +3,8 @@
 
 {% block title %}Payments - Invoicing App{% endblock %}
 
+{% block page_title %}Payments{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/payments.css' %}">
 {% endblock %}
@@ -13,10 +15,10 @@
         <h1>Payments</h1>
         <a href="{% url 'payments:create' %}" class="btn-create">+ Record Payment</a>
     </div>
-    
+
     {% include "10_modals/filter_form_payments.html" %}
     {% include "10_modals/bulk_actions_modal.html" %}
-    
+
     {% if messages %}
         {% for message in messages %}
             <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show" role="alert">
@@ -25,7 +27,7 @@
             </div>
         {% endfor %}
     {% endif %}
-    
+
     <!-- Bulk Actions Toolbar -->
     <div class="bulk-actions">
         <span class="bulk-count">0 selected</span>
@@ -33,7 +35,7 @@
         <button class="bulk-send-email">Send Email</button>
         <button class="bulk-delete">Delete</button>
     </div>
-    
+
     {% if payments %}
     <table class="payments-table">
         <thead>
@@ -76,14 +78,14 @@
             {% endfor %}
         </tbody>
     </table>
-    
+
     {% if payments.has_other_pages %}
     <div class="pagination">
         {% if payments.has_previous %}
             <a href="?page=1{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">First</a>
             <a href="?page={{ payments.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">Previous</a>
         {% endif %}
-        
+
         {% for num in payments.paginator.page_range %}
             {% if payments.number == num %}
                 <span class="current">{{ num }}</span>
@@ -91,14 +93,14 @@
                 <a href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">{{ num }}</a>
             {% endif %}
         {% endfor %}
-        
+
         {% if payments.has_next %}
             <a href="?page={{ payments.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">Next</a>
             <a href="?page={{ payments.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">Last</a>
         {% endif %}
     </div>
     {% endif %}
-    
+
     {% else %}
     <div class="no-data">
         <p>No payments found</p>

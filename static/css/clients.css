@@ -1022,28 +1022,28 @@
     .toolbar {
         grid-template-columns: 1fr;
     }
-    
+
     .clients-header {
         flex-direction: column;
         align-items: flex-start;
         gap: var(--spacing-lg);
     }
-    
+
     .clients-header-stats {
         width: 100%;
         flex-wrap: wrap;
     }
-    
+
     .section-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .section-title {
         flex-direction: column;
         align-items: flex-start;
         gap: var(--spacing-md);
     }
-    
+
     .section-title a {
         float: none;
     }
@@ -1053,81 +1053,81 @@
     .client-header {
         padding: var(--spacing-lg) var(--spacing-lg);
     }
-    
+
     .client-header h1 {
         font-size: var(--font-size-2xl);
     }
-    
+
     .client-header-info {
         grid-template-columns: 1fr;
     }
-    
+
     .client-actions {
         flex-direction: column;
         width: 100%;
     }
-    
+
     .client-actions .btn {
         width: 100%;
         justify-content: center;
     }
-    
+
     .toolbar {
         flex-direction: column;
         gap: var(--spacing-lg);
     }
-    
+
     .search-box {
         flex-direction: column;
     }
-    
+
     .search-box input {
         width: 100%;
     }
-    
+
     .filter-group {
         width: 100%;
         flex-direction: column;
     }
-    
+
     .filter-group select {
         width: 100%;
     }
-    
+
     .clients-table {
         font-size: var(--font-size-xs);
     }
-    
+
     .clients-table th,
     .clients-table td {
         padding: var(--spacing-md) var(--spacing-md);
     }
-    
+
     .action-buttons {
         flex-direction: column;
     }
-    
+
     .address-card,
     .contact-card {
         grid-template-columns: 1fr;
     }
-    
+
     .summary-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .section {
         padding: var(--spacing-lg);
     }
-    
+
     .section-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .section-table {
         font-size: var(--font-size-xs);
     }
-    
+
     .section-table th,
     .section-table td {
         padding: var(--spacing-md);
@@ -1138,68 +1138,68 @@
     .client-header {
         padding: var(--spacing-lg) var(--spacing-md);
     }
-    
+
     .client-header h1 {
         font-size: var(--font-size-xl);
     }
-    
+
     .client-actions {
         flex-direction: column;
         width: 100%;
     }
-    
+
     .client-actions .btn {
         width: 100%;
         justify-content: center;
     }
-    
+
     .clients-header-stats {
         gap: var(--spacing-md);
     }
-    
+
     .stat-badge {
         padding: var(--spacing-md) var(--spacing-lg);
     }
-    
+
     .stat-badge-value {
         font-size: var(--font-size-base);
     }
-    
+
     .clients-table th {
         font-size: var(--font-size-xs);
     }
-    
+
     .clients-table td {
         font-size: var(--font-size-xs);
         padding: var(--spacing-md) var(--spacing-xs);
     }
-    
+
     .action-buttons {
         gap: var(--spacing-xs);
     }
-    
+
     .section {
         padding: var(--spacing-lg) var(--spacing-md);
         margin-bottom: var(--spacing-lg);
     }
-    
+
     .section-title {
         font-size: var(--font-size-base);
     }
-    
+
     .section-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .grid-item-value {
         font-size: var(--font-size-xl);
     }
-    
+
     .section-table th {
         font-size: 10px;
         padding: var(--spacing-md) var(--spacing-xs);
     }
-    
+
     .section-table td {
         font-size: var(--font-size-xs);
         padding: var(--spacing-md) var(--spacing-xs);

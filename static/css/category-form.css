@@ -1,0 +1,163 @@
+/* Category Form Styling */
+
+.form-section {
+    margin-bottom: 2rem;
+}
+
+.form-section h6 {
+    color: #495057;
+    font-weight: 600;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e9ecef;
+    margin-bottom: 1rem;
+}
+
+.help-text {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+.required-indicator {
+    color: #dc3545;
+}
+
+.tips-panel {
+    background: #f8f9fa;
+    border-left: 4px solid #0d6efd;
+}
+
+.current-values {
+    background: #f0f7ff;
+    border-left: 4px solid #0d6efd;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #212529;
+    margin-bottom: 0.5rem;
+}
+
+.invalid-feedback {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+}
+
+.form-check-label {
+    margin-left: 0.5rem;
+    margin-bottom: 0;
+}
+
+.card {
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-outline-secondary {
+    color: #6c757d;
+    border: 1px solid #6c757d;
+    background: transparent;
+}
+
+.btn-outline-secondary:hover {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+    border: 1px solid #007bff;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+}
+
+.badge {
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.bg-info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.bg-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.bg-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.border-info {
+    border: 1px solid #17a2b8 !important;
+    border-left: 4px solid #17a2b8 !important;
+}
+
+.text-info {
+    color: #17a2b8;
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.alert-dismissible {
+    padding-right: 2rem;
+}
+
+.btn-close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    opacity: 0.5;
+}
+
+.btn-close:hover {
+    opacity: 0.75;
+}

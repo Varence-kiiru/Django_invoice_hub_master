@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="{% static 'css/components/buttons.css' %}">
   <link rel="stylesheet" href="{% static 'css/components/cards.css' %}">
   <link rel="stylesheet" href="{% static 'css/components/badges.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/breadcrumb.css' %}">
   <link rel="stylesheet" href="{% static 'css/auth.css' %}">
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 
@@ -69,6 +70,18 @@
   <!-- ==================== MAIN CONTENT AREA ==================== -->
   <main role="main" id="main-content">
     <div class="page-container">
+      <div style="background: #fff3cd; padding: 10px; margin-bottom: 20px; border: 1px solid #ffc107; display: {% if DEBUG %}block{% else %}none{% endif %};">
+        <strong>DEBUG MODE:</strong>
+        Breadcrumbs in context: <span style="color: {% if breadcrumbs %}green{% else %}red{% endif %}; font-weight: bold;">
+          {{ breadcrumbs|default:"NOT_IN_CONTEXT"|default:"FALSE" }}
+        </span>
+        ({{ breadcrumbs|length }} items)
+      </div>
+
+      {% if breadcrumbs %}
+        {% include '1_base/breadcrumb.html' %}
+      {% endif %}
+
       {% block page_header %}
       <header class="page-header">
         <div class="page-header-content">
@@ -98,9 +111,13 @@
   <!-- ==================== FILTER MODALS ==================== -->
   {% include '10_modals/filter_modals.html' %}
 
+  <!-- ==================== DELETE CONFIRMATION MODAL ==================== -->
+  {% include '10_modals/confirm_delete.html' %}
+
   <!-- JavaScript Files - Navigation and Interactions -->
   <script src="{% static 'js/app.js' %}"></script>
   <script src="{% static 'js/navigation.js' %}"></script>
+  <script src="{% static 'js/components/navbar.js' %}"></script>
   <script src="{% static 'js/components/sidebar.js' %}"></script>
   <script type="module" src="{% static 'js/utils/api-client.js' %}"></script>
   <script type="module" src="{% static 'js/notifications.js' %}"></script>

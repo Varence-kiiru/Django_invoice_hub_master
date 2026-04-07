@@ -1,0 +1,166 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load math_filters %}
+
+{% block title %}Revenue Collection #{{ collection.pk }} - Invoicing App{% endblock %}
+
+{% block page_title %}Revenue Collection Details{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/financials.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Collection Header -->
+  <div class="collection-header">
+    <h1 class="collection-title">Revenue Collection #{{ collection.pk }}</h1>
+    <p>Collection from {{ collection.invoice.invoice_number }}</p>
+
+    <div class="collection-meta">
+      <div class="collection-meta-item">
+        <div class="collection-meta-label">Collection Date</div>
+        <div class="collection-meta-value">{{ collection.collected_date|date:"M j, Y" }}</div>
+      </div>
+      <div class="collection-meta-item">
+        <div class="collection-meta-label">Financial Period</div>
+        <div class="collection-meta-value">{{ collection.financial_period }}</div>
+      </div>
+      <div class="collection-meta-item">
+        <div class="collection-meta-label">Status</div>
+        <div class="collection-meta-value">
+          <span class="status-badge {{ collection.status }}">{{ collection.get_status_display }}</span>
+        </div>
+      </div>
+      <div class="collection-meta-item">
+        <div class="collection-meta-label">Tax Type</div>
+        <div class="collection-meta-value">{{ collection.tax_type }} ({{ collection.tax_rate }}%)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Amount Breakdown -->
+  <div class="amount-breakdown">
+    <div class="amount-card">
+      <div class="amount-label">💰 Revenue Amount</div>
+      <div class="amount-value">{{ company_settings.currency_symbol }}{{ collection.revenue_amount|floatformat:2 }}</div>
+      <div class="amount-percentage">
+        {{ collection.revenue_amount|div:collection.total_amount|mul:100|floatformat:1 }}% of total
+      </div>
+    </div>
+
+    <div class="amount-card">
+      <div class="amount-label">🏛️ Tax Amount</div>
+      <div class="amount-value">{{ company_settings.currency_symbol }}{{ collection.tax_amount|floatformat:2 }}</div>
+      <div class="amount-percentage">
+        {{ collection.tax_amount|div:collection.total_amount|mul:100|floatformat:1 }}% of total
+      </div>
+    </div>
+
+    <div class="amount-card">
+      <div class="amount-label">💵 Total Amount</div>
+      <div class="amount-value">{{ company_settings.currency_symbol }}{{ collection.total_amount|floatformat:2 }}</div>
+      <div class="amount-percentage">100% of collection</div>
+    </div>
+  </div>
+
+  <!-- Related Information -->
+  <div class="detail-section">
+    <div class="detail-grid">
+      <!-- Invoice Information -->
+      <div class="detail-card">
+        <div class="detail-card-title">📄 Invoice Information</div>
+        <div class="detail-item">
+          <div class="detail-label">Invoice Number</div>
+          <div class="detail-value">
+            <a href="{% url 'invoices:detail' collection.invoice.pk %}">{{ collection.invoice.invoice_number }}</a>
+          </div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Client</div>
+          <div class="detail-value">{{ collection.invoice.client.name }}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Invoice Date</div>
+          <div class="detail-value">{{ collection.invoice.invoice_date|date:"M j, Y" }}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Invoice Total</div>
+          <div class="detail-value">{{ company_settings.currency_symbol }}{{ collection.invoice.total_amount|floatformat:2 }}</div>
+        </div>
+      </div>
+
+      <!-- Payment Information -->
+      {% if collection.payment %}
+      <div class="detail-card">
+        <div class="detail-card-title">💳 Payment Information</div>
+        <div class="detail-item">
+          <div class="detail-label">Payment Amount</div>
+          <div class="detail-value">{{ company_settings.currency_symbol }}{{ collection.payment.amount|floatformat:2 }}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Payment Method</div>
+          <div class="detail-value">{{ collection.payment.payment_method.name }}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Payment Date</div>
+          <div class="detail-value">{{ collection.payment.payment_date|date:"M j, Y" }}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Receipt Number</div>
+          <div class="detail-value">{{ collection.payment.receipt_number|default:"Not assigned" }}</div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Tax Information -->
+      <div class="detail-card">
+        <div class="detail-card-title">🏛️ Tax Information</div>
+        <div class="detail-item">
+          <div class="detail-label">Tax Type</div>
+          <div class="detail-value">{{ collection.tax_type }}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Tax Rate</div>
+          <div class="detail-value">{{ collection.tax_rate }}%</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Tax Amount</div>
+          <div class="detail-value">{{ company_settings.currency_symbol }}{{ collection.tax_amount|floatformat:2 }}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Collection Status</div>
+          <div class="detail-value">
+            <span class="status-badge {{ collection.status }}">{{ collection.get_status_display }}</span>
+          </div>
+        </div>
+        {% if tax_liability %}
+        <div class="detail-item">
+          <div class="detail-label">Tax Remittance Status</div>
+          <div class="detail-value">
+            <span class="status-badge {{ tax_liability.status }}">{{ tax_liability.get_status_display }}</span>
+          </div>
+        </div>
+        <div class="detail-item detail-item-action">
+          <a href="{% url 'financials:tax-liability-detail' tax_liability.pk %}" class="btn btn-sm btn-outline-primary">
+            📋 View Tax Liability
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Notes -->
+  {% if collection.notes %}
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">📝 Notes</h3>
+    </div>
+    <div class="card-body">
+      <p>{{ collection.notes }}</p>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

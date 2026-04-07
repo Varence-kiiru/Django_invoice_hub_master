@@ -25,15 +25,7 @@
   {% endif %}
 
   <!-- Breadcrumb -->
-  <nav class="breadcrumb-nav" aria-label="breadcrumb">
-    <a href="{% url 'core:dashboard' %}">Dashboard</a> 
-    <span>/</span> 
-    <a href="{% url 'quotations:list' %}">Quotations</a> 
-    <span>/</span> 
-    <a href="{% url 'quotations:detail' quote.id %}">{{ quote.quote_number }}</a> 
-    <span>/</span> 
-    <span>Issue Quotation</span>
-  </nav>
+  {% include '1_base/breadcrumb.html' %}
 
   <div class="quote-form-section">
     <div class="form-header">

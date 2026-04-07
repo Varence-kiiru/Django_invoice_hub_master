@@ -3,6 +3,8 @@
 
 {% block title %}{% endblock %}
 
+{% block page_title %}Clone Invoice{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-5">
     <!-- Page Header -->
@@ -24,7 +26,7 @@
                     <h6 class="card-title fw-bold mb-3">Cloning Details</h6>
                     <form method="post" class="needs-validation">
                         {% csrf_token %}
-                        
+
                         <!-- Original Invoice Info -->
                         <div class="mb-3 p-3 bg-light rounded">
                             <h6 class="mb-2">Template Invoice</h6>

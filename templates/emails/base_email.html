@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Invoice Management{% endblock %}</title>
+    <style>
+        /* ========== RESET STYLES ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ========== BODY & CONTAINER ========== */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+
+        .email-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* ========== HEADER ========== */
+        .email-header {
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            border-bottom: 3px solid;
+        }
+
+        .email-header.header-blue {
+            border-bottom-color: #007bff;
+        }
+
+        .email-header.header-green {
+            border-bottom-color: #28a745;
+        }
+
+        .email-header.header-red {
+            border-bottom-color: #dc3545;
+        }
+
+        .email-header.header-orange {
+            border-bottom-color: #fd7e14;
+        }
+
+        .email-header.header-purple {
+            border-bottom-color: #6f42c1;
+        }
+
+        .email-header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            padding: 20px;
+        }
+
+        .email-header.header-blue h1 {
+            color: #007bff;
+        }
+
+        .email-header.header-green h1 {
+            color: #28a745;
+        }
+
+        .email-header.header-red h1 {
+            color: #dc3545;
+        }
+
+        .email-header.header-orange h1 {
+            color: #fd7e14;
+        }
+
+        .email-header.header-purple h1 {
+            color: #6f42c1;
+        }
+
+        /* ========== CONTENT BODY ========== */
+        .email-body {
+            padding: 0 30px 30px 30px;
+        }
+
+        .email-body p {
+            margin: 15px 0;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        .email-body p:first-child {
+            margin-top: 0;
+        }
+
+        /* ========== SECTIONS & BOXES ========== */
+        .section {
+            margin: 25px 0;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin: 20px 0 15px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Highlighter boxes */
+        .highlight-box {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            border-left: 4px solid;
+        }
+
+        .highlight-blue {
+            background: #e7f3ff;
+            border-left-color: #007bff;
+        }
+
+        .highlight-green {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+
+        .highlight-red {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+
+        .highlight-orange {
+            background: #fff3cd;
+            border-left-color: #fd7e14;
+        }
+
+        .highlight-purple {
+            background: #e2d5f3;
+            border-left-color: #6f42c1;
+        }
+
+        /* Success badge */
+        .success-badge {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+            border-radius: 4px;
+        }
+
+        .success-badge h2 {
+            margin: 0;
+            color: #155724;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        /* Warning badge */
+        .warning-badge {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-left: 4px solid #fd7e14;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .warning-badge h2 {
+            margin: 0;
+            color: #856404;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        /* Alert badge */
+        .alert-badge {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .alert-badge h2 {
+            margin: 0;
+            color: #721c24;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        /* ========== DETAILS TABLE ========== */
+        .details-table {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            width: 100%;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #666;
+            flex: 1;
+        }
+
+        .detail-value {
+            text-align: right;
+            color: #333;
+            flex: 1;
+        }
+
+        .detail-label.accent-blue {
+            color: #007bff;
+        }
+
+        .detail-label.accent-green {
+            color: #28a745;
+        }
+
+        .detail-label.accent-red {
+            color: #dc3545;
+        }
+
+        .detail-label.accent-orange {
+            color: #fd7e14;
+        }
+
+        /* Amount highlight */
+        .amount {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .amount.blue {
+            color: #007bff;
+        }
+
+        .amount.green {
+            color: #28a745;
+        }
+
+        .amount.red {
+            color: #dc3545;
+        }
+
+        .amount.orange {
+            color: #fd7e14;
+        }
+
+        /* ========== BUTTONS ========== */
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            text-decoration: none;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+            text-decoration: none;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            text-decoration: none;
+        }
+
+        .btn-warning {
+            background: #fd7e14;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #dc6011;
+            text-decoration: none;
+        }
+
+        /* ========== FOOTER ========== */
+        .email-footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .email-footer p {
+            margin: 5px 0;
+            line-height: 1.5;
+        }
+
+        .email-footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .email-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ========== DIVIDER ========== */
+        .divider {
+            height: 1px;
+            background: #eee;
+            margin: 20px 0;
+        }
+
+        /* ========== TEXT UTILITIES ========== */
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-muted {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .text-bold {
+            font-weight: 600;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        .mt-0 {
+            margin-top: 0 !important;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .email-body {
+                padding: 0 20px 20px 20px;
+            }
+
+            .email-header h1 {
+                font-size: 22px;
+                padding: 15px;
+            }
+
+            .detail-row {
+                flex-direction: column;
+                padding: 10px 0;
+            }
+
+            .detail-label {
+                margin-bottom: 5px;
+            }
+
+            .detail-value {
+                text-align: left;
+            }
+
+            .btn {
+                display: block;
+                width: 100%;
+            }
+
+            .email-footer {
+                padding: 15px 20px;
+            }
+        }
+
+        /* ========== EMAIL CLIENT FIXES ========== */
+        /* Remove outline on links in Outlook */
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        /* Fix for Gmail rendering */
+        img {
+            border: none;
+            outline: none;
+            text-decoration: none;
+        }
+
+        /* Microsoft Office fix */
+        table {
+            border-collapse: collapse;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <div class="container">
+            <!-- Header Section -->
+            <div class="email-header {% block header_class %}header-blue{% endblock %}">
+                <h1>{% block header_title %}Invoice Management{% endblock %}</h1>
+            </div>
+
+            <!-- Body Section -->
+            <div class="email-body">
+                {% block content %}
+                    <p>Hello,</p>
+                    <p>This is a default email template. Please override the content block.</p>
+                {% endblock %}
+            </div>
+
+            <!-- Footer Section -->
+            <div class="email-footer">
+                {% block footer %}
+                    <p>&copy; 2026 Invoice Management System. All rights reserved.</p>
+                    <p>
+                        <a href="#">Support</a> |
+                        <a href="#">Privacy Policy</a> |
+                        <a href="#">Terms of Service</a>
+                    </p>
+                    <p class="text-muted">
+                        You received this email because you are a user of Invoice Management System.
+                    </p>
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

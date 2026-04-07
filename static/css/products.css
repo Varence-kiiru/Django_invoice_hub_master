@@ -1339,105 +1339,105 @@ input[type="file"] {
     .product-header {
         padding: var(--spacing-lg);
     }
-    
+
     .product-header h1 {
         font-size: var(--font-size-2xl);
     }
-    
+
     .product-header-info {
         grid-template-columns: 1fr;
         gap: var(--spacing-md);
     }
-    
+
     .metrics-grid {
         grid-template-columns: 1fr;
         gap: var(--spacing-md);
     }
-    
+
     .toolbar {
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .search-box {
         flex-direction: column;
         min-width: 100%;
     }
-    
+
     .filter-group {
         width: 100%;
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .filter-group select {
         width: 100%;
     }
-    
+
     .products-table {
         font-size: var(--font-size-sm);
     }
-    
+
     .products-table th,
     .products-table td {
         padding: var(--spacing-md);
     }
-    
+
     .action-buttons {
         flex-direction: column;
     }
-    
+
     .action-buttons .btn {
         width: 100%;
     }
-    
+
     .tab-buttons {
         flex-wrap: wrap;
     }
-    
+
     .form-actions {
         flex-direction: column;
     }
-    
+
     .form-actions button,
     .form-actions a {
         width: 100%;
     }
-    
+
     .actions {
         flex-direction: column;
     }
-    
+
     .actions .btn,
     .actions form .btn-danger,
     .actions a.btn-secondary {
         width: 100%;
         max-width: none;
     }
-    
+
     .product-stats {
         grid-template-columns: 1fr;
         gap: var(--spacing-md);
     }
-    
+
     .page-header {
         flex-direction: column;
         align-items: flex-start;
     }
-    
+
     .page-header > div {
         width: 100%;
         flex-direction: column;
     }
-    
+
     .page-header > div .btn-primary {
         width: 100%;
     }
-    
+
     .section-table {
         font-size: var(--font-size-sm);
     }
-    
+
     .section-table th,
     .section-table td {
         padding: var(--spacing-md);

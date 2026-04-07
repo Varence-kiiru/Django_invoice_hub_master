@@ -1,0 +1,35 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}{{ report_type }} Report - {{ period }}{% endblock %}
+
+{% block header_class %}header-blue{% endblock %}
+
+{% block header_title %}📊 {{ report_type }} Report - {{ period }}{% endblock %}
+
+{% block content %}
+    <p>Hello {{ recipient_name }},</p>
+
+    <p>Your {{ report_type }} report for {{ period }} is ready. Here's a summary of key financial metrics:</p>
+
+    <div class="details-table">
+        {% for key, value in summary_data.items %}
+        <div class="detail-row">
+            <span class="detail-label accent-blue">{{ key|title }}:</span>
+            <span class="detail-value">{{ value }}</span>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="highlight-box highlight-blue">
+        <strong>📈 Report Highlights:</strong>
+        <p>This report provides a comprehensive overview of your financial performance during {{ period }}. Review the details in your dashboard for more insights and detailed breakdowns.</p>
+    </div>
+
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="#" class="btn btn-primary" style="background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
+            View Full Report
+        </a>
+    </div>
+
+    <p>If you have any questions about this report, please contact your finance team.</p>
+{% endblock %}

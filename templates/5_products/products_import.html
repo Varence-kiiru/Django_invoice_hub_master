@@ -3,6 +3,8 @@
 
 {% block title %}Import Products{% endblock %}
 
+{% block page_title %}Import Products{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/products.css' %}">
 {% endblock %}
@@ -10,35 +12,35 @@
 {% block content %}
 <div class="form-container">
     <h1>Import Products</h1>
-    
+
     <p class="form-description">
         Import multiple products at once using a CSV file. This is a quick way to add many products to your system.
     </p>
-    
+
     {% if form.non_field_errors %}
     <div class="form-error" style="margin-bottom: var(--spacing-xl);">
         {{ form.non_field_errors }}
     </div>
     {% endif %}
-    
+
     {% if success_message %}
     <div class="form-success">
         {{ success_message }}
     </div>
     {% endif %}
-    
+
     <!-- Tab Navigation -->
     <div class="tab-buttons">
         <button class="tab-button active" onclick="switchTab('file-upload')">Upload File</button>
         <button class="tab-button" onclick="switchTab('paste-data')">Paste Data</button>
         <button class="tab-button" onclick="switchTab('template')">View Template</button>
     </div>
-    
+
     <!-- Tab 1: File Upload -->
     <div id="file-upload" class="tab-content active">
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            
+
             <div class="form-group">
                 <label>CSV File</label>
                 <div class="file-input-wrapper">
@@ -53,27 +55,27 @@
                     <div class="form-error">{{ form.csv_file.errors.0 }}</div>
                 {% endif %}
             </div>
-            
+
             <div class="form-group">
                 <label style="display: flex; align-items: center; font-weight: normal;">
                     <input type="checkbox" name="skip_header" value="true" style="width: auto; margin-right: var(--spacing-sm);">
                     First row contains headers (skip during import)
                 </label>
             </div>
-            
+
             <div class="form-actions">
                 <button type="submit" class="btn-primary" id="submit-btn">Import Products</button>
                 <a href="{% url 'products:list' %}" class="btn-secondary">Cancel</a>
             </div>
         </form>
     </div>
-    
+
     <!-- Tab 2: Paste Data -->
     <div id="paste-data" class="tab-content">
         <form method="post" action="">
             {% csrf_token %}
             <input type="hidden" name="import_method" value="paste">
-            
+
             <div class="form-group">
                 <label>Paste CSV Data</label>
                 <textarea name="csv_data" placeholder="SKU,Name,Description,Category,Unit Price,Unit,Tax Class&#10;PRD001,Product 1,Description,General,99.99,Each,standard&#10;PRD002,Product 2,Description,General,149.99,Each,standard" style="height: 200px;"></textarea>
@@ -81,14 +83,14 @@
                     <div class="form-error">{{ form.csv_data.errors.0 }}</div>
                 {% endif %}
             </div>
-            
+
             <div class="form-actions">
                 <button type="submit" class="btn-primary">Import Products</button>
                 <button type="button" class="btn-secondary" onclick="switchTab('template')">View Template</button>
             </div>
         </form>
     </div>
-    
+
     <!-- Tab 3: Template -->
     <div id="template" class="tab-content">
         <div class="csv-template">
@@ -97,7 +99,7 @@
 PRD001,Office Chair,Ergonomic office chair with lumbar support,Furniture,299.99,Each,standard
 PRD002,Desk Lamp,LED desk lamp with adjustable brightness,Lighting,49.99,Each,zero_rated
 PRD003,Notebook,100-page A4 notebook,Stationery,9.99,Pack,standard</code>
-            
+
             <div class="note">
                 <strong>Column Descriptions:</strong><br>
                 • <strong>SKU</strong> (Required): Unique product identifier<br>
@@ -108,12 +110,12 @@ PRD003,Notebook,100-page A4 notebook,Stationery,9.99,Pack,standard</code>
                 • <strong>Unit</strong> (Required): Unit of measure (Each, Pack, Box, etc.)<br>
                 • <strong>Tax Class</strong>: standard, zero_rated, or exempt<br>
             </div>
-            
+
             <div class="note" style="margin-top: var(--spacing-lg); color: var(--color-danger);">
                 <strong>Important:</strong> Duplicate SKUs will not be imported. All required fields must be populated.
             </div>
         </div>
-        
+
         <div style="margin-top: var(--spacing-lg);">
             <a href="{% static 'templates/product_import_template.csv' %}" class="btn-primary" style="display: inline-block;">
                 ⬇️ Download Template
@@ -131,16 +133,16 @@ PRD003,Notebook,100-page A4 notebook,Stationery,9.99,Pack,standard</code>
         document.querySelectorAll('.tab-button').forEach(btn => {
             btn.classList.remove('active');
         });
-        
+
         // Show selected tab
         document.getElementById(tabName).classList.add('active');
         event.target.classList.add('active');
     }
-    
+
     function handleFileSelect(input) {
         const label = document.getElementById('file-label');
         const fileName = document.getElementById('file-name');
-        
+
         if (input.files && input.files[0]) {
             const file = input.files[0];
             label.classList.add('has-file');
@@ -152,21 +154,21 @@ PRD003,Notebook,100-page A4 notebook,Stationery,9.99,Pack,standard</code>
             document.getElementById('submit-btn').textContent = 'Import Products';
         }
     }
-    
+
     // Drag and drop
     const fileLabel = document.getElementById('file-label');
     const fileInput = document.getElementById('csv-file');
-    
+
     if (fileLabel && fileInput) {
         fileLabel.addEventListener('dragover', (e) => {
             e.preventDefault();
             fileLabel.style.backgroundColor = 'var(--color-gray-100)';
         });
-        
+
         fileLabel.addEventListener('dragleave', () => {
             fileLabel.style.backgroundColor = '';
         });
-        
+
         fileLabel.addEventListener('drop', (e) => {
             e.preventDefault();
             fileLabel.style.backgroundColor = '';

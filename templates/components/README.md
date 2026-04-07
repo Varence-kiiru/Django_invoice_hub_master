@@ -29,21 +29,21 @@ INTEGRATION EXAMPLES
 A. Add to Dashboard (DONE)
    - Plan status banner shows at top
    - Shows current tier + usage + trial timer
-   
+
 B. Add to Invoice Create (DONE)
    - Quota warning appears before form if at 80%+
    - Warns user before they hit hard limit
-   
+
 C. Add to Reports Page (Example)
    Form a feature-gated view:
-   
+
    # In views.py
    from invoicing_app.organizations.plan_enforcer import PlanEnforcer
-   
+
    @login_required
    def reports_view(request):
        org, plan, sub = PlanEnforcer.get_organization_plan(request.user)
-       
+
        # Check if user has access
        if not PlanEnforcer.can_access_feature(plan, 'advanced_reporting'):
            context = {
@@ -51,14 +51,14 @@ C. Add to Reports Page (Example)
                'required_plan': 'Professional'
            }
            return render(request, 'feature_gate_template.html', context)
-       
+
        # Show reports
        return render(request, 'reports.html', context)
-   
+
    # In template
    {% if not has_access %}
-       {% include 'components/feature_gate.html' with 
-           title="Advanced Reports" 
+       {% include 'components/feature_gate.html' with
+           title="Advanced Reports"
            description="Get detailed financial insights with our professional reporting tools"
        %}
    {% else %}
@@ -66,12 +66,12 @@ C. Add to Reports Page (Example)
    {% endif %}
 
 D. Usage in Any Template
-   
+
    Display current plan info:
    {% if subscription %}
        <span>Current Plan: {{ subscription.get_plan_display }}</span>
    {% endif %}
-   
+
    Show upgrade link anywhere:
    <a href="{% url 'organizations:upgrade' %}">Upgrade Your Plan</a>
 

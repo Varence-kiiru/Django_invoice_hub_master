@@ -1,6 +1,10 @@
 {% extends "layouts/base.html" %}
 {% load static %}
 
+{% block title %}Payment Methods - Billing{% endblock %}
+
+{% block page_title %}Payment Methods{% endblock %}
+
 {% block css %}
 <style>
     .payment-container {
@@ -249,7 +253,7 @@
         {% if subscription.stripe_customer_id %}
         <div class="card-section">
             <div class="section-title">Current Payment Method</div>
-            
+
             <div class="current-method">
                 <div class="card-display">
                     <div class="card-icon">💳</div>
@@ -260,7 +264,7 @@
                     </div>
                     <span class="default-badge">DEFAULT</span>
                 </div>
-                
+
                 <div class="action-buttons">
                     <button class="btn btn-primary" onclick="updatePaymentMethod()">Update Card</button>
                     <button class="btn btn-secondary" onclick="viewBillingHistory()">View Billing History</button>
@@ -268,7 +272,7 @@
             </div>
 
             <hr style="margin: 20px 0;">
-            
+
             <div style="background: #fffbea; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
                 <strong>Next Billing Date:</strong> {{ subscription.current_period_end|date:"F d, Y" }}
             </div>
@@ -289,7 +293,7 @@
 
             <form method="post" action="">
                 {% csrf_token %}
-                
+
                 <div class="form-group">
                     <label for="cardholder">Cardholder Name</label>
                     <input type="text" id="cardholder" name="cardholder" placeholder="John Doe" required>
@@ -353,10 +357,10 @@
 
             <form method="post">
                 {% csrf_token %}
-                
+
                 <div class="form-group">
                     <label for="billing_email">Billing Email Address</label>
-                    <input type="email" id="billing_email" name="billing_email" 
+                    <input type="email" id="billing_email" name="billing_email"
                            value="{{ request.user.email }}" required>
                     <small style="color: #999; display: block; margin-top: 5px;">
                         Invoices will be sent to this address
@@ -365,14 +369,14 @@
 
                 <div class="form-group">
                     <label>
-                        <input type="checkbox" name="invoice_reminder"> 
+                        <input type="checkbox" name="invoice_reminder">
                         <span style="font-weight: normal;">Send me invoice reminders 3 days before renewal</span>
                     </label>
                 </div>
 
                 <div class="form-group">
                     <label>
-                        <input type="checkbox" name="receipt_email"> 
+                        <input type="checkbox" name="receipt_email">
                         <span style="font-weight: normal;">Send email receipt after each payment</span>
                     </label>
                 </div>

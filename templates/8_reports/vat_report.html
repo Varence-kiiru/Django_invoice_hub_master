@@ -3,6 +3,8 @@
 
 {% block title %}{% endblock %}
 
+{% block page_title %}VAT Report{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-5">
     <!-- Page Header -->
@@ -120,17 +122,10 @@
 
     <!-- Print Button -->
     <div class="d-flex justify-content-end gap-2 mt-4">
-        <button onclick="location.href='{% url 'core:vat-report-pdf' %}' + window.location.search" class="btn btn-outline-secondary">
+        <button onclick='location.href="{% url "core:vat-report-pdf" %}" + window.location.search' class="btn btn-outline-secondary">
             <i class="bi bi-printer"></i> Download PDF
         </button>
         <a href="{% url 'core:reports-invoices' %}" class="btn btn-secondary">Back</a>
     </div>
 </div>
-
-<style>
-    @media print {
-        .btn, .row:has(.col-md-4), form { display: none !important; }
-        .card { box-shadow: none !important; border: 1px solid #ccc !important; }
-    }
-</style>
 {% endblock %}

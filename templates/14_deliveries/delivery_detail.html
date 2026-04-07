@@ -220,10 +220,7 @@
                         <a href="{% url 'deliveries:edit' delivery.id %}" class="btn btn-primary">
                             ✏️ Edit Delivery
                         </a>
-                        <form method="POST" action="{% url 'deliveries:delete' delivery.id %}" class="d-inline" onsubmit="return confirm('Delete this delivery?');">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger w-100">🗑️ Delete</button>
-                        </form>
+                        <a href="#" class="btn btn-danger btn-delete" data-delete-url="{% url 'deliveries:delete' delivery.id %}" data-item-name="Delivery {{ delivery.delivery_number }}" data-item-type="Delivery" data-message="Delete this delivery? This action cannot be undone.">🗑️ Delete</a>
                     {% endif %}
                     <a href="{% url 'deliveries:pdf' delivery.id %}" class="btn btn-success">
                         📥 Download PDF

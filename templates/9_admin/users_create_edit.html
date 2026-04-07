@@ -1,5 +1,6 @@
 {% extends "layouts/base.html" %}
 {% load static %}
+{% load tz_filters %}
 
 {% block title %}{% if pk %}Edit User{% else %}Create User{% endif %} - Administration{% endblock %}
 
@@ -20,12 +21,12 @@
 
     <form method="POST" class="user-form">
       {% csrf_token %}
-      
+
       <div class="form-grid">
         <!-- Basic Information Section -->
         <div class="form-section">
           <h3>Basic Information</h3>
-          
+
           <div class="form-group">
             <label for="first-name">First Name: <span class="required">*</span></label>
             <input type="text" id="first-name" name="first_name" class="form-control" placeholder="John" value="{% if edit_user %}{{ edit_user.first_name }}{% endif %}" required>
@@ -54,15 +55,32 @@
 
           <div class="form-group">
             <label for="role">Role: <span class="required">*</span></label>
-            <select id="role" name="role" class="form-control" required>
-              <option value="">-- Select Role --</option>
-              {% for role in available_roles %}
-              <option value="{{ role.id }}" {% if pk and user.invoicing_profile and user.invoicing_profile.role.id == role.id %}selected{% endif %}>
-                {{ role.get_icon }} {{ role.name|title }}
-              </option>
-              {% endfor %}
-            </select>
-            <small class="form-hint">Role determines user permissions and access level</small>
+            {% if is_editing_superadmin %}
+              <div class="role-readonly-display">
+                <div class="superadmin-badge">
+                  <span class="badge-icon">⭐</span>
+                  <span class="badge-text">Superadmin</span>
+                  <span class="badge-label">System Owner</span>
+                </div>
+                <p class="role-note">
+                  <strong>This user is the system superadmin</strong> and cannot be changed.
+                  The superadmin role is automatically assigned to the first user during system setup
+                  and is the only user with full system administration access.
+                </p>
+              </div>
+              <!-- Hidden input to preserve superadmin role on form submission -->
+              <input type="hidden" name="role" value="{{ edit_user.invoicing_profile.role.id }}">
+            {% else %}
+              <select id="role" name="role" class="form-control" required>
+                <option value="">-- Select Role --</option>
+                {% for role in available_roles %}
+                <option value="{{ role.id }}" {% if pk and edit_user.invoicing_profile and edit_user.invoicing_profile.role.id == role.id %}selected{% endif %}>
+                  {{ role.get_icon }} {{ role.name|title }}
+                </option>
+                {% endfor %}
+              </select>
+              <small class="form-hint">Role determines user permissions and access level. Note: Superadmin role cannot be manually assigned.</small>
+            {% endif %}
           </div>
 
           <div class="form-group">
@@ -150,52 +168,18 @@
 
         <!-- Permissions Section -->
         <div class="form-section permissions-section">
-          <h3>Assign Permissions</h3>
-          <p class="form-hint">Select which features this user can access</p>
-          
-          <div class="permissions-grid">
-            <div class="permission-item">
-              <input type="checkbox" id="perm-invoices" name="perm_invoices" checked>
-              <label for="perm-invoices">
-                <strong>📄 Manage Invoices</strong><br>
-                <small>Create, view, and edit invoices</small>
-              </label>
+          <h3>Role Permissions</h3>
+          <p class="form-hint">Permissions are determined by the role assigned to the user. Edit role permissions in the Role Management page.</p>
+
+          <div class="role-info-box">
+            <h4>Permissions for Selected Role</h4>
+            <div id="rolePermissionsDisplay">
+              <p class="text-muted">Select a role above to see its permissions</p>
             </div>
-            <div class="permission-item">
-              <input type="checkbox" id="perm-clients" name="perm_clients" checked>
-              <label for="perm-clients">
-                <strong>👥 Manage Clients</strong><br>
-                <small>Create and edit client information</small>
-              </label>
-            </div>
-            <div class="permission-item">
-              <input type="checkbox" id="perm-products" name="perm_products">
-              <label for="perm-products">
-                <strong>📦 Manage Products</strong><br>
-                <small>Create and edit products/services</small>
-              </label>
-            </div>
-            <div class="permission-item">
-              <input type="checkbox" id="perm-reports" name="perm_reports" checked>
-              <label for="perm-reports">
-                <strong>📊 View Reports</strong><br>
-                <small>Access system reports and analytics</small>
-              </label>
-            </div>
-            <div class="permission-item">
-              <input type="checkbox" id="perm-payments" name="perm_payments" checked>
-              <label for="perm-payments">
-                <strong>💳 Manage Payments</strong><br>
-                <small>Record and track payments</small>
-              </label>
-            </div>
-            <div class="permission-item">
-              <input type="checkbox" id="perm-settings" name="perm_settings">
-              <label for="perm-settings">
-                <strong>⚙️ Modify Settings</strong><br>
-                <small>Access system configuration</small>
-              </label>
-            </div>
+          </div>
+
+          <div id="permissionsCategoriesDisplay" class="permissions-categories">
+            <!-- Dynamically populated by JavaScript -->
           </div>
         </div>
       </div>
@@ -212,11 +196,200 @@
 </div>
 
 <script>
+  // Role permissions data - extracted from available roles
+  const rolePermissionsMap = {
+    {% for role in available_roles %}
+      '{{ role.id }}': {
+        name: '{{ role.get_display_name }}',
+        icon: '{{ role.get_icon }}',
+        permissions: {{ role.permissions|safe }}
+      },
+    {% endfor %}
+  };
+
+  // Permission inventory for categorization
+  const permissionInventory = {
+    {% for category_key, category_data in permission_inventory.items %}
+      '{{ category_key }}': {
+        display_name: '{{ category_data.display_name }}',
+        description: '{{ category_data.description }}',
+        permissions: {
+          {% for perm_code, perm_desc in category_data.permissions.items %}
+            '{{ perm_code }}': '{{ perm_desc }}',
+          {% endfor %}
+        }
+      },
+    {% endfor %}
+  };
+
+  // Display role permissions when selected (read-only, organized by category)
+  function updateRolePermissionsDisplay() {
+    const roleSelect = document.getElementById('role');
+    const roleId = roleSelect.value;
+    const displayDiv = document.getElementById('rolePermissionsDisplay');
+    const categoriesDiv = document.getElementById('permissionsCategoriesDisplay');
+
+    if (!roleId || !rolePermissionsMap[roleId]) {
+      displayDiv.innerHTML = '<p class="text-muted">Select a role above to see its permissions</p>';
+      categoriesDiv.innerHTML = '';
+      return;
+    }
+
+    const role = rolePermissionsMap[roleId];
+    const permissionsArray = Array.isArray(role.permissions) ? role.permissions : [];
+
+    if (permissionsArray.length === 0) {
+      displayDiv.innerHTML = '<p class="text-muted">This role has no permissions assigned</p>';
+      categoriesDiv.innerHTML = '';
+      return;
+    }
+
+    // Show professional count summary
+    const permissionCount = permissionsArray.length;
+    const summary = `
+      <div class="role-permission-summary">
+        <div class="permission-count">
+          <span class="count-number">${permissionCount}</span>
+          <span class="count-label">Permission${permissionCount !== 1 ? 's' : ''}</span>
+        </div>
+        <p class="permission-summary-text">
+          This role has <strong>${permissionCount}</strong> permission${permissionCount !== 1 ? 's' : ''} assigned.
+        </p>
+      </div>
+    `;
+    displayDiv.innerHTML = summary;
+
+    // Display permissions organized by category (read-only)
+    let categoryHtml = '';
+
+    for (const [categoryKey, categoryData] of Object.entries(permissionInventory)) {
+      // Filter permissions that belong to this role
+      const categoryPermissions = Object.entries(categoryData.permissions)
+        .filter(([permCode, permDesc]) => permissionsArray.includes(permCode));
+
+      if (categoryPermissions.length > 0) {
+        categoryHtml += `
+          <div class="permission-category">
+            <h4 class="category-title">${categoryData.display_name}</h4>
+            <p class="category-description">${categoryData.description}</p>
+            <div class="permission-badges">
+        `;
+
+        categoryPermissions.forEach(([permCode, permDesc]) => {
+          const displayName = permCode.replace(/_/g, ' ').split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+
+          categoryHtml += `
+            <div class="permission-badge">
+              <strong title="${permDesc}">${displayName}</strong>
+              <span class="permission-icon">✓</span>
+            </div>
+          `;
+        });
+
+        categoryHtml += `
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    categoriesDiv.innerHTML = categoryHtml || '<p class="text-muted">No permissions to display</p>';
+  }
+
+  // Listen for role changes
+  document.getElementById('role').addEventListener('change', updateRolePermissionsDisplay);
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    const roleSelect = document.getElementById('role');
+    if (roleSelect) {
+      updateRolePermissionsDisplay();
+      roleSelect.addEventListener('change', updateRolePermissionsDisplay);
+    } else {
+      // If role selector doesn't exist (editing superadmin), display superadmin permissions
+      displaySuperadminPermissions();
+    }
+  });
+
+  function displaySuperadminPermissions() {
+    const displayDiv = document.getElementById('rolePermissionsDisplay');
+    const categoriesDiv = document.getElementById('permissionsCategoriesDisplay');
+
+    // Find superadmin role in the role permissions map
+    let superadminRole = null;
+    for (const [roleId, role] of Object.entries(rolePermissionsMap)) {
+      if (role.name === 'Superadmin') {
+        superadminRole = role;
+        break;
+      }
+    }
+
+    if (!superadminRole) {
+      displayDiv.innerHTML = '<p class="text-muted">Superadmin permissions</p>';
+      return;
+    }
+
+    const permissionsArray = Array.isArray(superadminRole.permissions) ? superadminRole.permissions : [];
+    const permissionCount = permissionsArray.length;
+
+    const summary = `
+      <div class="role-permission-summary">
+        <div class="permission-count">
+          <span class="count-number">${permissionCount}</span>
+          <span class="count-label">Permission${permissionCount !== 1 ? 's' : ''}</span>
+        </div>
+        <p class="permission-summary-text">
+          This role has <strong>${permissionCount}</strong> permission${permissionCount !== 1 ? 's' : ''} assigned.
+        </p>
+      </div>
+    `;
+    displayDiv.innerHTML = summary;
+
+    // Display permissions organized by category (read-only)
+    let categoryHtml = '';
+
+    for (const [categoryKey, categoryData] of Object.entries(permissionInventory)) {
+      const categoryPermissions = Object.entries(categoryData.permissions)
+        .filter(([permCode, permDesc]) => permissionsArray.includes(permCode));
+
+      if (categoryPermissions.length > 0) {
+        categoryHtml += `
+          <div class="permission-category">
+            <h4 class="category-title">${categoryData.display_name}</h4>
+            <p class="category-description">${categoryData.description}</p>
+            <div class="permission-badges">
+        `;
+
+        categoryPermissions.forEach(([permCode, permDesc]) => {
+          const displayName = permCode.replace(/_/g, ' ').split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+
+          categoryHtml += `
+            <div class="permission-badge">
+              <strong title="${permDesc}">${displayName}</strong>
+              <span class="permission-icon">✓</span>
+            </div>
+          `;
+        });
+
+        categoryHtml += `
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    categoriesDiv.innerHTML = categoryHtml || '<p class="text-muted">No permissions to display</p>';
+  }
+
   // Password visibility toggle
   function setupPasswordToggle(toggleButtonId, inputId) {
     const toggleBtn = document.getElementById(toggleButtonId);
     const inputField = document.getElementById(inputId);
-    
+
     if (toggleBtn && inputField) {
       toggleBtn.addEventListener('click', function(e) {
         e.preventDefault();
@@ -238,7 +411,8 @@
     const password = document.getElementById('password')?.value;
     const confirmPassword = document.getElementById('confirm-password')?.value;
     const newPassword = document.getElementById('new-password')?.value;
-    
+    const roleSelect = document.getElementById('role');
+
     // Check password match for new users
     if (password && password !== confirmPassword) {
       e.preventDefault();
@@ -257,6 +431,13 @@
     if (newPassword && newPassword.length < 8) {
       e.preventDefault();
       alert('New password must be at least 8 characters long!');
+      return false;
+    }
+
+    // Check role is selected (only if role selector is visible)
+    if (roleSelect && !roleSelect.value) {
+      e.preventDefault();
+      alert('Please select a role for the user!');
       return false;
     }
 

@@ -131,6 +131,51 @@
   color: #d97706;
 }
 
+/* Role badge styling for users table */
+.role-badge {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+}
+
+.role-badge.role-superadmin {
+  background: #fef08a;
+  color: #b45309;
+}
+
+.role-badge.role-admin {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.role-badge.role-manager {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.role-badge.role-accountant {
+  background: #e0e7ff;
+  color: #4f46e5;
+}
+
+.role-badge.role-staff {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.role-badge.role-user {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.role-badge.role-viewer {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
 .status-active {
   color: var(--color-success);
   font-weight: var(--font-weight-bold);
@@ -183,7 +228,7 @@
 
 .roles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: var(--spacing-lg);
 }
 
@@ -193,38 +238,88 @@
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+}
+
+.role-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
 }
 
 .role-card h3 {
   margin: 0 0 var(--spacing-md) 0;
   color: var(--color-text-primary);
+  font-size: var(--font-size-lg);
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
 }
 
-.role-card.admin h3::before {
-  content: '●';
-  color: #dc2626;
-  font-size: var(--font-size-2xl);
+.role-card p {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  margin: 0 0 var(--spacing-md) 0;
+  line-height: var(--line-height-relaxed);
 }
 
-.role-card.manager h3::before {
-  content: '●';
-  color: #d97706;
-  font-size: var(--font-size-2xl);
+.role-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
 }
 
-.role-card.staff h3::before {
-  content: '●';
-  color: #2563eb;
-  font-size: var(--font-size-2xl);
+.role-card li {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  padding-left: var(--spacing-md);
+  position: relative;
 }
 
-.role-card.user h3::before {
-  content: '●';
-  color: #d97706;
-  font-size: var(--font-size-2xl);
+.role-card li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--color-success);
+  font-weight: bold;
+}
+
+/* Role-specific styling */
+.role-card.role-superadmin {
+  border-top: 4px solid #b45309;
+  background: linear-gradient(135deg, rgba(180, 83, 9, 0.05) 0%, rgba(250, 204, 21, 0.05) 100%);
+}
+
+.role-card.role-admin {
+  border-top: 4px solid #dc2626;
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.05) 0%, rgba(254, 226, 226, 0.3) 100%);
+}
+
+.role-card.role-manager {
+  border-top: 4px solid #d97706;
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.05) 0%, rgba(254, 243, 199, 0.3) 100%);
+}
+
+.role-card.role-accountant {
+  border-top: 4px solid #4f46e5;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(224, 231, 255, 0.3) 100%);
+}
+
+.role-card.role-staff {
+  border-top: 4px solid #2563eb;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(219, 234, 254, 0.3) 100%);
+}
+
+.role-card.role-user {
+  border-top: 4px solid #16a34a;
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.05) 0%, rgba(240, 253, 244, 0.3) 100%);
+}
+
+.role-card.role-viewer {
+  border-top: 4px solid #7c3aed;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.05) 0%, rgba(243, 232, 255, 0.3) 100%);
 }
 
 .role-description {
@@ -658,6 +753,9 @@
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
   white-space: nowrap;
+}.role-superadmin {
+  background: #fef08a;
+  color: #b45309;
 }
 
 .role-admin {

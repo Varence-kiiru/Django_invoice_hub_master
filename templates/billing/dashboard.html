@@ -33,7 +33,7 @@
             {% if subscription.plan == 'free' %}
             <span class="trial-badge">Free Trial - {{ trial_days_remaining }} days</span>
             {% endif %}
-            
+
             <div class="plan-name">{{ subscription.get_plan_display }} Plan</div>
             <div class="plan-price">
                 {% if subscription.plan != 'free' %}
@@ -43,7 +43,7 @@
                 {% endif %}
                 <small>/month</small>
             </div>
-            
+
             <div class="renewal-date">
                 {% if subscription.current_period_end %}
                 📅 Next billing date: <strong>{{ subscription.current_period_end|date:"M d, Y" }}</strong>
@@ -51,7 +51,7 @@
                 ✨ Trial mode - upgrade anytime
                 {% endif %}
             </div>
-            
+
             <div class="action-buttons">
                 {% if subscription.plan != 'enterprise' %}
                 <a href="{% url 'organizations:upgrade' %}" class="upgrade-btn">✨ Upgrade Plan</a>
@@ -84,7 +84,7 @@
             </div>
             <div style="flex-basis: 100%; margin-top: 8px;">
                 <div class="usage-bar">
-                    <div class="usage-fill {% if current_usage.percentage_used >= 90 %}critical{% elif current_usage.percentage_used >= 75 %}warning{% endif %}" 
+                    <div class="usage-fill {% if current_usage.percentage_used >= 90 %}critical{% elif current_usage.percentage_used >= 75 %}warning{% endif %}"
                          style="width: {{ current_usage.percentage_used }}%"></div>
                 </div>
             </div>
@@ -154,7 +154,7 @@
     <!-- Recent Invoices Section -->
     <div class="invoices-section">
         <h3 class="billing-section-title">📄 Recent Invoices</h3>
-        
+
         {% if recent_invoices %}
         <div class="invoices-table">
             <div class="invoice-header">
@@ -163,7 +163,7 @@
                 <div>Amount</div>
                 <div>Status</div>
             </div>
-            
+
             {% for invoice in recent_invoices %}
             <div class="invoice-row">
                 <div class="invoice-date">{{ invoice.created_at|date:"M d, Y" }}</div>

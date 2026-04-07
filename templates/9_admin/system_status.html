@@ -253,27 +253,27 @@
       const clearBtn = document.getElementById('clear-cache-btn');
       const optimizeBtn = document.getElementById('optimize-db-btn');
       const form = document.querySelector('.actions-form');
-      
+
       async function handleAction(actionValue, confirmMessage) {
         // Show confirmation dialog and AWAIT the user response
         const confirmed = await confirm('Confirm Action', confirmMessage);
-        
+
         if (confirmed) {
           // Remove any existing action inputs
           form.querySelectorAll('input[name="action"]').forEach(el => el.remove());
-          
+
           // Create and add new action input
           const actionInput = document.createElement('input');
           actionInput.type = 'hidden';
           actionInput.name = 'action';
           actionInput.value = actionValue;
           form.appendChild(actionInput);
-          
+
           // Submit the form
           form.submit();
         }
       }
-      
+
       if (clearBtn) {
         clearBtn.addEventListener('click', function(event) {
           event.preventDefault();
@@ -281,7 +281,7 @@
           handleAction('clear_cache', 'Clear all cached data? This may briefly impact performance.');
         });
       }
-      
+
       if (optimizeBtn) {
         optimizeBtn.addEventListener('click', function(event) {
           event.preventDefault();

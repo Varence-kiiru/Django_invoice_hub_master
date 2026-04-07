@@ -304,7 +304,7 @@
     // Using html2pdf library or similar
     const element = document.getElementById('pdf-content');
     const filename = 'invoice_{{ invoice.invoice_number }}.pdf';
-    
+
     // Check if html2pdf is available
     if (typeof html2pdf !== 'undefined') {
       html2pdf().set({

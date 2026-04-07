@@ -35,7 +35,7 @@
 
       <div class="form-section">
         <h3 class="section-title">Quotation Details</h3>
-        
+
         <div class="form-grid">
           <div class="form-group">
             <label for="client">Client <span class="required">*</span></label>
@@ -111,15 +111,15 @@
 document.addEventListener('DOMContentLoaded', function() {
   const quoteDate = document.getElementById('quote_date');
   const validUntil = document.getElementById('valid_until');
-  
+
   // Set today's date as default quote date
   const today = new Date();
   quoteDate.value = today.toISOString().split('T')[0];
-  
+
   // Set default valid_until to 30 days from today
   const defaultValidUntil = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
   validUntil.value = defaultValidUntil.toISOString().split('T')[0];
-  
+
   // When quote date changes, recalculate valid_until to 30 days later
   quoteDate.addEventListener('change', function() {
     const baseDate = new Date(this.value);
@@ -139,7 +139,7 @@ document.getElementById('quote-create-form').addEventListener('submit', function
     alert('Please select a client for this quotation.');
     return false;
   }
-  
+
   // Show loading indicator
   document.getElementById('create-btn').disabled = true;
   document.getElementById('create-btn').textContent = '⏳ Creating Quotation...';

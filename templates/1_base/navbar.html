@@ -1,13 +1,19 @@
 {% comment %}
 Professional Navigation Bar Component
+Premium UI with enhanced aesthetics and accessibility
 Styles are in static/css/components/navbar.css
 {% endcomment %}
 {% load static %}
 
 <nav id="navbar" class="navbar" role="navigation" aria-label="Main navigation">
   <div class="navbar-inner">
-    <!-- Brand -->
-    <a href="{% url 'core:dashboard' %}" class="navbar-brand">💼 <span class="brand-text">Invoicing App</span></a>
+    <!-- Brand / Logo Section -->
+    <div class="navbar-brand-section">
+      <a href="{% url 'core:dashboard' %}" class="navbar-brand" title="Go to Dashboard">
+        <span class="brand-icon">💼</span>
+        <span class="brand-text">Invoicing App</span>
+      </a>
+    </div>
 
     <!-- Mobile toggle button -->
     <button class="navbar-toggle" id="sidebar-toggle" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle navigation menu">
@@ -15,167 +21,138 @@ Styles are in static/css/components/navbar.css
       <span class="sr-only">Menu</span>
     </button>
 
-    <!-- Search -->
+    <!-- Search Bar -->
     <form class="navbar-search" role="search" method="get" action="{% url 'core:global-search' %}">
-      <label for="global-search" class="sr-only">Global search across all items</label>
+      <label for="global-search" class="sr-only">Search across invoices, clients, and more</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input id="global-search" type="search" name="q" placeholder="Search all items..." aria-label="Global search" autocomplete="off" />
-      <button type="submit" class="search-submit" aria-label="Submit search">
-        <span class="search-submit-icon">↵</span>
+      <input
+        id="global-search"
+        type="search"
+        name="q"
+        placeholder="Search invoices, clients, products..."
+        aria-label="Global search"
+        autocomplete="off"
+        class="search-input"
+      />
+      <button type="submit" class="search-submit" aria-label="Submit search" title="Search">
+        <span class="search-submit-icon">⏎</span>
       </button>
     </form>
 
     <!-- Actions -->
     <div class="navbar-actions">
       <!-- Date and Time Clock -->
-      <div class="datetime-widget">
+      <div class="datetime-widget" title="Current date and time">
         <span class="datetime-display" id="datetime-display">
-          <span id="current-time">Loading...</span>
-          <span id="current-date" class="date-part">Loading...</span>
+          <span id="current-time" class="time-value">--:--:-- AM</span>
+          <span id="current-date" class="date-value">Loading...</span>
         </span>
       </div>
 
       <!-- Notifications -->
       <div class="notifications-widget">
-        <button class="navbar-btn notification-btn" id="notification-toggle" title="View notifications" aria-haspopup="true" aria-expanded="false" aria-label="Notifications">
-          <span aria-hidden="true">🔔</span>
+        <button
+          class="navbar-btn notification-btn"
+          id="notification-toggle"
+          title="View notifications"
+          aria-haspopup="true"
+          aria-expanded="false"
+          aria-label="Notifications"
+        >
+          <span class="notification-icon" aria-hidden="true">🔔</span>
           {% if unread_notifications > 0 %}
-          <span class="notification-badge" id="notification-count">{{ unread_notifications }}</span>
+          <span class="notification-badge" id="notification-count" aria-label="Unread notifications">{{ unread_notifications }}</span>
           {% endif %}
         </button>
-        <div class="notification-panel" id="notification-panel" role="region" aria-label="Notifications" aria-hidden="true">
-          <div class="notification-header">Notifications</div>
+        <div class="notification-panel" id="notification-panel" role="region" aria-label="Notifications panel" aria-hidden="true">
+          <div class="notification-header">
+            <h3>Notifications</h3>
+          </div>
           <div class="notification-list" id="notification-list">
             <div class="no-notifications">No new notifications</div>
           </div>
-          <div class="notification-footer"><a href="#">View all</a></div>
+          <div class="notification-footer">
+            <a href="{% url 'core:notifications' %}" class="view-all-link">View all notifications →</a>
+          </div>
         </div>
       </div>
 
       <!-- User menu -->
       {% if user.is_authenticated %}
       <div class="user-menu" id="user-menu">
-        <button class="user-toggle" id="user-toggle" aria-haspopup="true" aria-expanded="false">
-          <span class="user-avatar" aria-hidden="true" title="{{ user.get_full_name|default:'User' }}">{{ user.first_name|default:'U'|first|upper }}</span>
+        <button
+          class="user-toggle"
+          id="user-toggle"
+          aria-haspopup="true"
+          aria-expanded="false"
+          title="Open user menu"
+        >
+          <span class="user-avatar" aria-hidden="true">{{ user.first_name|default:'U'|first|upper }}</span>
           <span class="user-name">{{ user.first_name|default:'User' }}</span>
           <span class="dropdown-caret" aria-hidden="true">▼</span>
         </button>
         <div class="user-dropdown" id="user-dropdown" role="menu" aria-hidden="true">
           <div class="user-info-header">
-            <strong>{{ user.get_full_name|default:'Account' }}</strong>
-            <small>{{ user.email }}</small>
+            <div class="user-info-avatar">{{ user.first_name|default:'U'|first|upper }}</div>
+            <div class="user-info-details">
+              <strong>{{ user.get_full_name|default:'Account' }}</strong>
+              <small>{{ user.email }}</small>
+            </div>
           </div>
           <div class="dropdown-divider" role="separator"></div>
-          <a role="menuitem" href="{% url 'core:profile' %}" class="dropdown-item">👤 My Profile</a>
-          <a role="menuitem" href="{% url 'organizations:billing_dashboard' %}" class="dropdown-item">💳 Billing & Subscription</a>
+          <a role="menuitem" href="{% url 'core:profile' %}" class="dropdown-item" tabindex="-1">
+            <span class="item-icon">👤</span>
+            <span class="item-text">My Profile</span>
+          </a>
+          <a role="menuitem" href="{% url 'organizations:billing_dashboard' %}" class="dropdown-item" tabindex="-1">
+            <span class="item-icon">💳</span>
+            <span class="item-text">Billing & Subscription</span>
+          </a>
           {% if can_manage_settings or is_admin %}
-          <a role="menuitem" href="{% url 'core:settings' %}" class="dropdown-item">⚙️ Settings</a>
+          <a role="menuitem" href="{% url 'core:settings-notifications' %}" class="dropdown-item" tabindex="-1">
+            <span class="item-icon">🔔</span>
+            <span class="item-text">Notification Settings</span>
+          </a>
+          <a role="menuitem" href="{% url 'core:settings' %}" class="dropdown-item" tabindex="-1">
+            <span class="item-icon">⚙️</span>
+            <span class="item-text">Settings</span>
+          </a>
           {% endif %}
           {% if can_view_reports %}
-          <a role="menuitem" href="{% url 'core:reports-invoices' %}" class="dropdown-item">📊 Reports</a>
+          <a role="menuitem" href="{% url 'core:reports-invoices' %}" class="dropdown-item" tabindex="-1">
+            <span class="item-icon">📊</span>
+            <span class="item-text">Reports</span>
+          </a>
           {% endif %}
-          <a role="menuitem" href="{% url 'core:help-center' %}" class="dropdown-item">❓ Help & Support</a>
+          <a role="menuitem" href="{% url 'core:help-center' %}" class="dropdown-item" tabindex="-1">
+            <span class="item-icon">❓</span>
+            <span class="item-text">Help & Support</span>
+          </a>
           <div class="dropdown-divider" role="separator"></div>
-          <form method="post" action="{% url 'organizations:logout' %}" style="display: inline;">
+          <form method="post" action="{% url 'organizations:logout' %}">
             {% csrf_token %}
-            <button type="submit" role="menuitem" class="dropdown-item logout-item" style="width: 100%; text-align: left; border: none; background: none; padding: inherit; cursor: pointer;">🚪 Logout</button>
+            <button
+              type="submit"
+              role="menuitem"
+              class="dropdown-item logout-item"
+              tabindex="-1"
+              title="Sign out of your account"
+            >
+              <span class="item-icon">🚪</span>
+              <span class="item-text">Logout</span>
+            </button>
           </form>
         </div>
       </div>
       {% else %}
       <div class="user-menu">
-        <a href="{% url 'organizations:login' %}" class="navbar-btn navbar-link" title="Sign in to your account" aria-label="Sign In">👤 Sign In</a>
+        <a href="{% url 'organizations:login' %}" class="navbar-btn navbar-link" title="Sign in to your account" aria-label="Sign In">
+          <span aria-hidden="true">👤</span> Sign In
+        </a>
       </div>
       {% endif %}
     </div>
   </div>
 </nav>
 
-<script>
-  (function(){
-    // User menu toggle
-    const userToggle = document.getElementById('user-toggle');
-    const userDropdown = document.getElementById('user-dropdown');
-    if (userToggle && userDropdown) {
-      userToggle.addEventListener('click', (e) => {
-        e.preventDefault();
-        const expanded = userToggle.getAttribute('aria-expanded') === 'true';
-        userToggle.setAttribute('aria-expanded', String(!expanded));
-        userDropdown.setAttribute('aria-hidden', String(expanded));
-        userDropdown.classList.toggle('show');
-      });
-      document.addEventListener('click', (e) => {
-        if (!userToggle.contains(e.target) && !userDropdown.contains(e.target)) {
-          userToggle.setAttribute('aria-expanded', 'false');
-          userDropdown.setAttribute('aria-hidden', 'true');
-          userDropdown.classList.remove('show');
-        }
-      });
-    }
-
-    // Notification panel toggle
-    const notifToggle = document.getElementById('notification-toggle');
-    const notifPanel = document.getElementById('notification-panel');
-    if (notifToggle && notifPanel) {
-      notifToggle.addEventListener('click', (e) => {
-        e.preventDefault();
-        const expanded = notifToggle.getAttribute('aria-expanded') === 'true';
-        notifToggle.setAttribute('aria-expanded', String(!expanded));
-        notifPanel.setAttribute('aria-hidden', String(expanded));
-        notifPanel.classList.toggle('show');
-      });
-      document.addEventListener('click', (e) => {
-        if (!notifToggle.contains(e.target) && !notifPanel.contains(e.target)) {
-          notifToggle.setAttribute('aria-expanded', 'false');
-          notifPanel.setAttribute('aria-hidden', 'true');
-          notifPanel.classList.remove('show');
-        }
-      });
-    }
-
-    // Sidebar toggle
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const sidebar = document.getElementById('sidebar');
-    if (sidebarToggle && sidebar) {
-      sidebarToggle.addEventListener('click', (e) => {
-        e.preventDefault();
-        const expanded = sidebarToggle.getAttribute('aria-expanded') === 'true';
-        sidebarToggle.setAttribute('aria-expanded', String(!expanded));
-        sidebar.classList.toggle('open');
-      });
-    }
-
-    // Date and time clock
-    function updateDateTime() {
-      const now = new Date();
-      const timeElement = document.getElementById('current-time');
-      const dateElement = document.getElementById('current-date');
-      
-      if (timeElement) {
-        const timeFormat = now.toLocaleTimeString('en-US', { 
-          hour: '2-digit', 
-          minute: '2-digit', 
-          second: '2-digit',
-          hour12: true 
-        });
-        timeElement.textContent = timeFormat;
-      }
-      
-      if (dateElement) {
-        const dateFormat = now.toLocaleDateString('en-US', { 
-          weekday: 'short', 
-          year: 'numeric', 
-          month: 'short', 
-          day: 'numeric' 
-        });
-        dateElement.textContent = dateFormat;
-      }
-    }
-    
-    // Update on page load
-    updateDateTime();
-    
-    // Update every second
-    setInterval(updateDateTime, 1000);
-  })();
-</script>
+{% comment %} Navbar interactions are handled by static/js/components/navbar.js {% endcomment %}

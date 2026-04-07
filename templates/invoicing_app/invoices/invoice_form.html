@@ -3,6 +3,8 @@
 
 {% block title %}Create Invoice{% endblock %}
 
+{% block page_title %}Create Invoice{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/invoices.css' }">
 {% endblock %}
@@ -13,7 +15,7 @@
         <h1>Create Invoice</h1>
         <p>Create a new invoice and add line items</p>
     </div>
-    
+
     {% if form.non_field_errors %}
     <div class="alert alert-danger" role="alert">
         <strong>Form Errors:</strong>
@@ -24,14 +26,14 @@
         </ul>
     </div>
     {% endif %}
-    
+
     <form method="post" action="{% url 'invoices:create' %}">
         {% csrf_token %}
-        
+
         <!-- Invoice Details Section -->
         <div class="form-section">
             <h2>Invoice Details</h2>
-            
+
             <div class="form-row">
                 <div class="form-group {% if form.client.errors %}has-error{% endif %}">
                     <label for="{{ form.client.id_for_label }}">{{ form.client.label }}</label>
@@ -43,7 +45,7 @@
                     {% endif %}
                     <div class="form-help-text">Select the client for this invoice</div>
                 </div>
-                
+
                 <div class="form-group {% if form.invoice_date.errors %}has-error{% endif %}">
                     <label for="{{ form.invoice_date.id_for_label }}">{{ form.invoice_date.label }}</label>
                     {{ form.invoice_date }}
@@ -54,7 +56,7 @@
                     {% endif %}
                 </div>
             </div>
-            
+
             <div class="form-row">
                 <div class="form-group {% if form.due_date.errors %}has-error{% endif %}">
                     <label for="{{ form.due_date.id_for_label }}">{{ form.due_date.label }}</label>
@@ -66,7 +68,7 @@
                     {% endif %}
                     <div class="form-help-text">Due date must be after invoice date</div>
                 </div>
-                
+
                 <div class="form-group {% if form.currency.errors %}has-error{% endif %}">
                     <label for="{{ form.currency.id_for_label }}">{{ form.currency.label }}</label>
                     {{ form.currency }}
@@ -77,7 +79,7 @@
                     {% endif %}
                 </div>
             </div>
-            
+
             <div class="form-group {% if form.description.errors %}has-error{% endif %}">
                 <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
                 {{ form.description }}
@@ -89,20 +91,20 @@
                 <div class="form-help-text">Add any special notes or terms for this invoice</div>
             </div>
         </div>
-        
+
         <!-- Line Items Section -->
         <div class="form-section">
             <h2>Line Items</h2>
-            
+
             <div class="formset-section">
                 {{ formset.management_form }}
-                
+
                 {% if formset.non_form_errors %}
                 <div class="alert alert-danger">
                     {{ formset.non_form_errors }}
                 </div>
                 {% endif %}
-                
+
                 <table class="formset-table">
                     <thead>
                         <tr>
@@ -156,20 +158,20 @@
                         {% endfor %}
                     </tbody>
                 </table>
-                
+
                 <p style="margin-top: 15px; color: #7f8c8d; font-size: 13px;">
                     Click the "Delete" checkbox next to a line item to remove it.
                 </p>
             </div>
         </div>
-        
+
         <!-- Form Actions -->
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Create Invoice</button>
             <a href="{% url 'invoices:list' %}" class="btn btn-secondary" style="text-decoration: none; display: inline-block;">Cancel</a>
         </div>
     </form>
-    
+
     <script>
         /**
          * Auto-populate client details when client is selected
@@ -179,23 +181,23 @@
           const currencyField = document.getElementById('{{ form.currency.id_for_label }}');
           const invoiceDateField = document.getElementById('{{ form.invoice_date.id_for_label }}');
           const dueDateField = document.getElementById('{{ form.due_date.id_for_label }}');
-          
+
           if (!clientField || !currencyField || !dueDateField) {
             return; // Form fields not found
           }
-          
+
           // Set today's date as default invoice date
           const today = new Date();
           if (invoiceDateField && !invoiceDateField.value) {
             invoiceDateField.value = today.toISOString().split('T')[0];
           }
-          
+
           // Set default due date to 30 days from today
           if (dueDateField && !dueDateField.value) {
             const defaultDueDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
             dueDateField.value = defaultDueDate.toISOString().split('T')[0];
           }
-          
+
           /**
            * Get CSRF token from DOM
            */
@@ -224,13 +226,13 @@
             }
             return cookieValue;
           }
-          
+
           /**
            * When client selection changes, fetch client details and auto-populate fields
            */
           clientField.addEventListener('change', function() {
             const clientId = this.value;
-            
+
             if (!clientId) {
               // Reset to defaults if no client selected
               currencyField.value = 'KES';
@@ -239,9 +241,9 @@
               dueDateField.value = defaultDueDate.toISOString().split('T')[0];
               return;
             }
-            
+
             const csrfToken = getCsrfToken();
-            
+
             // Fetch client details from API
             fetch(`/api/v1/clients/${clientId}/`, {
               method: 'GET',
@@ -273,7 +275,7 @@
                   currencyField.value = data.currency;
                   console.log(`✓ Currency auto-populated: ${data.currency}`);
                 }
-                
+
                 // Calculate and auto-populate due date based on client's payment terms
                 if (data.payment_terms_days) {
                   const invoiceDate = new Date(invoiceDateField.value);
@@ -287,14 +289,14 @@
               console.error('Error fetching client details:', error);
             });
           });
-          
+
           /**
            * When invoice date changes, recalculate due date based on client's payment terms
            */
           if (invoiceDateField) {
             invoiceDateField.addEventListener('change', function() {
               const clientId = clientField.value;
-              
+
               if (!clientId) {
                 // No client selected, just set default 30 days
                 const baseDate = new Date(this.value);
@@ -302,9 +304,9 @@
                 dueDateField.value = dueDate.toISOString().split('T')[0];
                 return;
               }
-              
+
               const csrfToken = getCsrfToken();
-              
+
               // Fetch client details to get payment terms
               fetch(`/api/v1/clients/${clientId}/`, {
                 method: 'GET',

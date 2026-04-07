@@ -3,6 +3,8 @@
 
 {% block title %}Payment Receipt - Invoicing App{% endblock %}
 
+{% block page_title %}Payment Receipt{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/payments.css' %}">
 {% endblock %}
@@ -20,7 +22,7 @@
                 <a href="{% url 'payments:detail' payment.id %}" class="btn btn-outline-secondary">← Back to Payment</a>
                 <a href="{% url 'payments:receipt_download' payment.id %}" class="btn btn-primary">📥 Download PDF</a>
             </div>
-            
+
             <script>
             function printPaymentReceipt(printUrl) {
                 // Open PDF in new window and trigger print when loaded

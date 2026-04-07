@@ -3,13 +3,15 @@
 
 {% block title %}{% endblock %}
 
+{% block page_title %}{% if rule %}Edit{% else %}Create{% endif %} VAT Rule{% endblock %}
+
 {% block extra_css %}
 <style>
     .form-section { margin-bottom: 2rem; }
-    .form-section h6 { 
-        color: #495057; 
-        font-weight: 600; 
-        padding-bottom: 0.5rem; 
+    .form-section h6 {
+        color: #495057;
+        font-weight: 600;
+        padding-bottom: 0.5rem;
         border-bottom: 2px solid #e9ecef;
         margin-bottom: 1rem;
     }
@@ -209,7 +211,7 @@
                     <i class="bi bi-info-circle"></i>
                     <strong>What is a VAT Rule?</strong><br>
                     <p class="mb-0 mt-2">
-                        A VAT rule defines conditional applicability of tax rates based on product tax classifications. 
+                        A VAT rule defines conditional applicability of tax rates based on product tax classifications.
                         Rules allow you to apply different tax rates to different product categories.
                     </p>
                 </div>

@@ -16,10 +16,10 @@
         <h1>Quotations</h1>
         <a href="{% url 'quotations:create' %}" class="btn-create">+ Create Quotation</a>
     </div>
-    
+
     {% include "10_modals/filter_form_quotations.html" %}
     {% include "10_modals/bulk_actions_modal.html" %}
-    
+
     {% if messages %}
         {% for message in messages %}
             <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
@@ -30,7 +30,7 @@
             </div>
         {% endfor %}
     {% endif %}
-    
+
     <!-- Bulk Actions Toolbar -->
     <div class="bulk-actions">
         <span class="bulk-count">0 selected</span>
@@ -38,7 +38,7 @@
         <button class="bulk-send-email">Send Email</button>
         <button class="bulk-delete">Delete</button>
     </div>
-    
+
     {% if quotes %}
     <table class="quotations-table">
         <thead>
@@ -87,14 +87,14 @@
             {% endfor %}
         </tbody>
     </table>
-    
+
     {% if is_paginated %}
     <div class="pagination">
         {% if page_obj.has_previous %}
             <a href="?page=1{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">First</a>
             <a href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">Previous</a>
         {% endif %}
-        
+
         {% for num in page_obj.paginator.page_range %}
             {% if page_obj.number == num %}
                 <span class="current">{{ num }}</span>
@@ -102,14 +102,14 @@
                 <a href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">{{ num }}</a>
             {% endif %}
         {% endfor %}
-        
+
         {% if page_obj.has_next %}
             <a href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">Next</a>
             <a href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">Last</a>
         {% endif %}
     </div>
     {% endif %}
-    
+
     {% else %}
     <div class="no-data">
         <p>No quotations found</p>

@@ -11,7 +11,7 @@
             {% endif %}
         </button>
     </div>
-    
+
     <div id="client-filters" class="filter-panel" {% if not request.GET.keys|length or 'search' in request.GET %}style="display: none;"{% endif %}>
         <form method="get" action="" class="filter-form">
             <div class="filter-grid">
@@ -20,13 +20,13 @@
                     <label>Client Name</label>
                     <input type="text" name="name" placeholder="Client name..." value="{{ name }}" class="filter-input">
                 </div>
-                
+
                 <!-- Email Filter -->
                 <div class="filter-group">
                     <label>Email</label>
                     <input type="email" name="email" placeholder="Email address..." value="{{ email }}" class="filter-input">
                 </div>
-                
+
                 <!-- Client Type Filter -->
                 <div class="filter-group">
                     <label>Client Type</label>
@@ -36,7 +36,7 @@
                         <option value="individual" {% if client_type == 'individual' %}selected{% endif %}>Individual</option>
                     </select>
                 </div>
-                
+
                 <!-- Active Status Filter -->
                 <div class="filter-group">
                     <label>Status</label>
@@ -46,7 +46,7 @@
                         <option value="false" {% if is_active == 'false' %}selected{% endif %}>Inactive</option>
                     </select>
                 </div>
-                
+
                 <!-- Has Invoices Filter -->
                 <div class="filter-group">
                     <label>Invoice Status</label>
@@ -56,20 +56,20 @@
                         <option value="false" {% if has_invoices == 'false' %}selected{% endif %}>No Invoices</option>
                     </select>
                 </div>
-                
+
                 <!-- Phone Filter -->
                 <div class="filter-group">
                     <label>Phone</label>
                     <input type="text" name="phone" placeholder="Phone number..." value="{{ phone }}" class="filter-input">
                 </div>
-                
+
                 <!-- Full-Text Search -->
                 <div class="filter-group full-width">
                     <label>Search All Fields</label>
                     <input type="text" name="q" placeholder="Search name, email, phone, tax ID..." value="{{ search_query }}" class="filter-input">
                 </div>
             </div>
-            
+
             <!-- Filter Actions -->
             <div class="filter-actions">
                 <button type="submit" class="btn-filter-apply">
@@ -97,11 +97,11 @@
 <style>
 .filter-section { margin-bottom: 20px; }
 .filter-header { display: flex; align-items: center; margin-bottom: 10px; }
-.filter-toggle { 
-    background: #f5f5f5; 
-    border: 1px solid #ddd; 
-    padding: 10px 15px; 
-    cursor: pointer; 
+.filter-toggle {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+    cursor: pointer;
     border-radius: 4px;
     font-weight: 500;
     display: flex;
@@ -111,44 +111,44 @@
 .filter-toggle:hover { background: #eeeeee; }
 .toggle-icon { font-size: 12px; transition: transform 0.2s; }
 .filter-toggle.open .toggle-icon { transform: rotate(180deg); }
-.filter-badge { 
-    background: #3498db; 
-    color: white; 
-    padding: 2px 8px; 
-    border-radius: 12px; 
-    font-size: 11px; 
+.filter-badge {
+    background: #3498db;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
     font-weight: 600;
 }
 
-.filter-panel { 
-    background: #f9f9f9; 
-    border: 1px solid #ddd; 
+.filter-panel {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
     border-top: none;
-    padding: 20px; 
+    padding: 20px;
     border-radius: 0 0 4px 4px;
     display: none;
 }
 .filter-panel.open { display: block; }
 
-.filter-grid { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
-    gap: 15px; 
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
     margin-bottom: 15px;
 }
 .filter-grid .full-width { grid-column: 1 / -1; }
 
 .filter-group { display: flex; flex-direction: column; }
-.filter-group label { 
-    font-weight: 600; 
-    margin-bottom: 5px; 
-    font-size: 12px; 
+.filter-group label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    font-size: 12px;
     text-transform: uppercase;
     color: #555;
 }
-.filter-input { 
-    padding: 8px 10px; 
-    border: 1px solid #ddd; 
+.filter-input {
+    padding: 8px 10px;
+    border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 13px;
 }
@@ -158,10 +158,10 @@
 .range-input { flex: 1; }
 .range-separator { color: #999; font-weight: 500; }
 
-.filter-actions { 
-    display: flex; 
-    gap: 10px; 
-    flex-wrap: wrap; 
+.filter-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
     margin-top: 15px;
     border-top: 1px solid #ddd;
     padding-top: 15px;
@@ -179,21 +179,21 @@
     align-items: center;
 }
 
-.btn-filter-apply { 
-    background: #3498db; 
+.btn-filter-apply {
+    background: #3498db;
     color: white;
 }
 .btn-filter-apply:hover { background: #2980b9; }
 
-.btn-filter-clear { 
-    background: #e74c3c; 
+.btn-filter-clear {
+    background: #e74c3c;
     color: white;
     text-decoration: none;
 }
 .btn-filter-clear:hover { background: #c0392b; }
 
-.btn-filter-save { 
-    background: #27ae60; 
+.btn-filter-save {
+    background: #27ae60;
     color: white;
 }
 .btn-filter-save:hover { background: #229954; }

@@ -3,6 +3,8 @@
 
 {% block title %}Account Settings{% endblock %}
 
+{% block page_title %}Account Settings{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/auth.css' %}">
 {% endblock %}
@@ -233,7 +235,7 @@
                 {% csrf_token %}
                 <div class="form-group">
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                        <input type="checkbox" id="enable_reminders" name="enable_reminders" 
+                        <input type="checkbox" id="enable_reminders" name="enable_reminders"
                                {% if company_settings.enable_reminders %}checked{% endif %}>
                         <label for="enable_reminders" style="margin: 0;">Enable automated reminders</label>
                     </div>
@@ -365,24 +367,24 @@
         // ===== TAB SWITCHING FUNCTIONALITY =====
         const tabs = document.querySelectorAll('.settings-tab');
         const sections = document.querySelectorAll('.settings-section');
-        
+
         console.log('Tabs found:', tabs.length);
         console.log('Sections found:', sections.length);
-        
+
         tabs.forEach(tab => {
             tab.addEventListener('click', function(e) {
                 e.preventDefault();
-                
+
                 const tabName = this.getAttribute('data-tab');
                 console.log('Clicked tab:', tabName);
-                
+
                 // Remove active class from all tabs and sections
                 tabs.forEach(t => t.classList.remove('active'));
                 sections.forEach(s => s.classList.remove('active'));
-                
+
                 // Add active class to clicked tab
                 this.classList.add('active');
-                
+
                 // Show corresponding section
                 const targetSection = document.getElementById(tabName);
                 if (targetSection) {
@@ -393,25 +395,25 @@
                 }
             });
         });
-        
+
         // ===== THEME SELECTOR - ONLY APPLY ON SAVE =====
         const themeSelector = document.getElementById('theme');
         const preferencesForm = themeSelector ? themeSelector.closest('form') : null;
-        
+
         if (themeSelector && preferencesForm && window.themeManager) {
             // Set initial value from session/localStorage
             const currentTheme = window.themeManager.getCurrentTheme();
             themeSelector.value = currentTheme;
-            
+
             // Update theme ONLY on form submission
             preferencesForm.addEventListener('submit', function(e) {
                 // Get the selected theme value
                 const newTheme = themeSelector.value;
-                
+
                 // Apply theme only when form is submitted
                 window.themeManager.setTheme(newTheme);
                 console.log('Theme changed to:', newTheme);
-                
+
                 // Form will submit to backend to save preference
             });
         }

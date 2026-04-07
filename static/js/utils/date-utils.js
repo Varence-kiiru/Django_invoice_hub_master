@@ -13,12 +13,12 @@ const DateUtils = {
    */
   format: function(date, format = 'MMM DD, YYYY') {
     if (!date) return '';
-    
+
     // If moment is available, use it
     if (typeof moment !== 'undefined') {
       return moment(date).format(format);
     }
-    
+
     // Fallback to standard Date formatting
     const d = new Date(date);
     const options = {
@@ -36,11 +36,11 @@ const DateUtils = {
    */
   formatDateTime: function(date) {
     if (!date) return '';
-    
+
     if (typeof moment !== 'undefined') {
       return moment(date).format('MMM DD, YYYY [at] h:mm A');
     }
-    
+
     const d = new Date(date);
     const options = {
       year: 'numeric',
@@ -83,9 +83,9 @@ const DateUtils = {
   daysOverdue: function(dueDate) {
     const today = new Date();
     const due = new Date(dueDate);
-    
+
     if (due >= today) return 0;
-    
+
     const diffTime = today - due;
     return Math.floor(diffTime / (1000 * 60 * 60 * 24));
   },
@@ -99,21 +99,21 @@ const DateUtils = {
     if (typeof moment !== 'undefined') {
       return moment(date).fromNow();
     }
-    
+
     const now = new Date();
     const then = new Date(date);
     const secondsAgo = Math.floor((now - then) / 1000);
-    
+
     if (secondsAgo < 60) return 'just now';
     if (secondsAgo < 3600) return Math.floor(secondsAgo / 60) + ' minutes ago';
     if (secondsAgo < 86400) return Math.floor(secondsAgo / 3600) + ' hours ago';
-    
+
     const daysAgo = Math.floor(secondsAgo / 86400);
     if (daysAgo === 1) return 'yesterday';
     if (daysAgo < 7) return daysAgo + ' days ago';
     if (daysAgo < 30) return Math.floor(daysAgo / 7) + ' weeks ago';
     if (daysAgo < 365) return Math.floor(daysAgo / 30) + ' months ago';
-    
+
     return Math.floor(daysAgo / 365) + ' years ago';
   },
 
@@ -127,7 +127,7 @@ const DateUtils = {
     if (typeof moment !== 'undefined') {
       return moment(date).add(days, 'days').toDate();
     }
-    
+
     const d = new Date(date);
     d.setDate(d.getDate() + days);
     return d;
@@ -143,7 +143,7 @@ const DateUtils = {
     if (typeof moment !== 'undefined') {
       return moment(date).startOf(period).toDate();
     }
-    
+
     const d = new Date(date);
     switch (period.toLowerCase()) {
       case 'week':
@@ -175,7 +175,7 @@ const DateUtils = {
     if (typeof moment !== 'undefined') {
       return moment(date).endOf(period).toDate();
     }
-    
+
     const d = new Date(date);
     switch (period.toLowerCase()) {
       case 'week':
@@ -223,7 +223,7 @@ const DateUtils = {
     start.setDate(today.getDate() - today.getDay());
     const end = new Date(start);
     end.setDate(start.getDate() + 6);
-    
+
     return d >= start && d <= end;
   },
 
@@ -283,11 +283,11 @@ const DateUtils = {
     const birth = new Date(birthDate);
     let age = today.getFullYear() - birth.getFullYear();
     const month = today.getMonth() - birth.getMonth();
-    
+
     if (month < 0 || (month === 0 && today.getDate() < birth.getDate())) {
       age--;
     }
-    
+
     return age;
   }
 };

@@ -101,6 +101,60 @@
   border-color: var(--color-danger);
 }
 
+/* Superadmin Read-Only Display */
+.role-readonly-display {
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%);
+  border: 2px solid #f59e0b;
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.superadmin-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: white;
+  border-radius: var(--radius-md);
+  border: 2px solid #f59e0b;
+}
+
+.badge-icon {
+  font-size: var(--font-size-2xl);
+  line-height: 1;
+}
+
+.badge-text {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+}
+
+.badge-label {
+  margin-left: auto;
+  font-size: var(--font-size-xs);
+  background: #fbbf24;
+  color: white;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+}
+
+.role-note {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-relaxed);
+  padding: var(--spacing-md);
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: var(--radius-md);
+  border-left: 4px solid #f59e0b;
+}
+
 .form-hint {
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
@@ -168,55 +222,207 @@
 }
 
 .permissions-section > p.form-hint {
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
 }
 
-.permissions-grid {
+/* Role Info Box */
+.role-info-box {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.role-info-box h4 {
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+#rolePermissionsDisplay {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  min-height: 60px;
+  align-items: center;
+  justify-content: center;
+}
+
+.role-permission-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  width: 100%;
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 2px solid #86efac;
+  border-radius: var(--radius-lg);
+}
+
+.permission-count {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  background: white;
+  border-radius: var(--radius-md);
+  border: 2px solid #86efac;
+  min-width: 70px;
+}
+
+.count-number {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: #16a34a;
+  line-height: 1;
+}
+
+.count-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  font-weight: var(--font-weight-bold);
+}
+
+.permission-summary-text {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+}
+
+/* Permission Categories */
+.permissions-categories {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
+  gap: var(--spacing-lg);
+}
+
+.permission-category {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  background: var(--color-bg-light);
+  transition: all var(--transition-base);
+}
+
+.permission-category:hover {
+  border-color: var(--color-primary);
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.category-title {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-bold);
+}
+
+.category-description {
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.permission-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: var(--spacing-md);
 }
 
 .permission-item {
   display: flex;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
-  border: 1px solid var(--color-border);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: white;
+  border: 2px solid #86efac;
   border-radius: var(--radius-md);
-  background: var(--color-bg-light);
   transition: all var(--transition-base);
 }
 
 .permission-item:hover {
-  border-color: var(--color-primary);
-  background: var(--color-white);
+  box-shadow: 0 4px 12px rgba(134, 239, 172, 0.3);
+  transform: translateY(-2px);
 }
 
 .permission-item input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  margin-top: var(--spacing-xs);
-  cursor: pointer;
-  accent-color: var(--color-primary);
-  flex-shrink: 0;
+  display: none;
 }
 
 .permission-item label {
-  cursor: pointer;
+  cursor: default;
   margin: 0;
   padding: 0;
   font-weight: normal;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
 }
 
 .permission-item strong {
   display: block;
   color: var(--color-text-primary);
   font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-sm);
 }
 
 .permission-item small {
   color: var(--color-text-secondary);
   font-size: var(--font-size-xs);
+}
+
+.permission-badges {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.permission-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: white;
+  border: 2px solid #86efac;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+}
+
+.permission-badge:hover {
+  box-shadow: 0 4px 12px rgba(134, 239, 172, 0.3);
+  transform: translateY(-2px);
+}
+
+.permission-badge strong {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-bold);
+  flex: 1;
+}
+
+.permission-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: #86efac;
+  color: #16a34a;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  flex-shrink: 0;
 }
 
 .form-actions {
@@ -355,4 +561,3 @@
     gap: var(--spacing-sm);
   }
 }
-

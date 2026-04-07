@@ -1,35 +1,51 @@
 {% comment %}
 Professional Sidebar Navigation Component
+Premium UI with enhanced aesthetics and accessibility
 Styles are in static/css/components/sidebar.css
 {% endcomment %}
 {% load static %}
 
 <aside class="sidebar" id="sidebar" role="navigation" aria-label="Application navigation">
-  <!-- Mobile Close Button (moved outside header for better positioning) -->
+  <!-- Mobile Close Button -->
   <button class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Close navigation menu" title="Close menu">
     ✕
   </button>
 
-  <!-- Mobile Header -->
+  <!-- Professional Brand Section -->
   <div class="sidebar-header">
     <div class="sidebar-brand">
-      💼 <span>Invoicing App</span>
+      <span class="brand-icon">💼</span>
+      <span class="brand-text">Invoicing App</span>
     </div>
+    <p class="brand-tagline">Complete Financial Management</p>
   </div>
 
   <nav class="sidebar-nav">
-    <!-- Main Section -->
+    <!-- ════════════════ MAIN SECTION ════════════════ -->
     <div class="sidebar-section">
-      <div class="sidebar-section-title">Main</div>
+      <h2 class="sidebar-section-title">Main</h2>
       <ul class="sidebar-list">
+        <!-- Dashboard -->
         <li class="sidebar-nav-item">
-          <a href="{% url 'core:dashboard' %}" class="sidebar-nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+          <a
+            href="{% url 'core:dashboard' %}"
+            class="sidebar-nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+            title="Go to Dashboard"
+            aria-current="{% if request.resolver_match.url_name == 'dashboard' %}page{% else %}false{% endif %}"
+          >
             <span class="icon" aria-hidden="true">📊</span>
             <span class="label">Dashboard</span>
           </a>
         </li>
+
+        <!-- Analytics -->
         <li class="sidebar-nav-item">
-          <a href="{% url 'core:analytics-dashboard' %}" class="sidebar-nav-link {% if request.resolver_match.url_name == 'analytics-dashboard' %}active{% endif %}">
+          <a
+            href="{% url 'core:analytics-dashboard' %}"
+            class="sidebar-nav-link {% if request.resolver_match.url_name == 'analytics-dashboard' %}active{% endif %}"
+            title="View Analytics"
+            aria-current="{% if request.resolver_match.url_name == 'analytics-dashboard' %}page{% else %}false{% endif %}"
+          >
             <span class="icon" aria-hidden="true">📈</span>
             <span class="label">Analytics</span>
           </a>
@@ -37,27 +53,41 @@ Styles are in static/css/components/sidebar.css
       </ul>
     </div>
 
-    <!-- Business Section -->
+    <!-- ════════════════ BUSINESS SECTION ════════════════ -->
     <div class="sidebar-section">
-      <div class="sidebar-section-title">Business</div>
+      <h2 class="sidebar-section-title">Business Operations</h2>
       <ul class="sidebar-list">
         <!-- Clients -->
         {% if can_view_clients %}
         <li class="sidebar-nav-item">
-          <a href="#" class="sidebar-nav-link sidebar-toggle-link" data-toggle="clients-menu" aria-expanded="false">
+          <a
+            href="#"
+            class="sidebar-nav-link sidebar-toggle-link"
+            data-toggle="clients-menu"
+            aria-expanded="false"
+            title="Manage Clients & Contacts"
+          >
             <span class="icon" aria-hidden="true">👥</span>
             <span class="label">Clients</span>
             <span class="sidebar-toggle-icon" id="clients-icon" aria-hidden="true">▼</span>
           </a>
-          <ul class="sidebar-submenu" id="clients-menu" hidden>
+          <ul class="sidebar-submenu" id="clients-menu" role="region" aria-label="Clients submenu">
             <li class="sidebar-submenu-item">
-              <a href="{% url 'clients:list' %}" class="sidebar-submenu-link {% if 'clients' in request.path and 'create' not in request.path %}active{% endif %}">
-                📋 All Clients
+              <a
+                href="{% url 'clients:list' %}"
+                class="sidebar-submenu-link {% if 'clients' in request.path and 'create' not in request.path %}active{% endif %}"
+                title="View all clients"
+              >
+                <span class="submenu-icon">📋</span> All Clients
               </a>
             </li>
             <li class="sidebar-submenu-item">
-              <a href="{% url 'clients:create' %}" class="sidebar-submenu-link">
-                ➕ New Client
+              <a
+                href="{% url 'clients:create' %}"
+                class="sidebar-submenu-link"
+                title="Add new client"
+              >
+                <span class="submenu-icon">➕</span> New Client
               </a>
             </li>
           </ul>
@@ -65,53 +95,91 @@ Styles are in static/css/components/sidebar.css
         {% endif %}
 
         <!-- Products -->
+        {% if can_manage_products %}
         <li class="sidebar-nav-item">
-          <a href="#" class="sidebar-nav-link sidebar-toggle-link" data-toggle="products-menu" aria-expanded="false">
+          <a
+            href="#"
+            class="sidebar-nav-link sidebar-toggle-link"
+            data-toggle="products-menu"
+            aria-expanded="false"
+            title="Manage Products & Services"
+          >
             <span class="icon" aria-hidden="true">📦</span>
             <span class="label">Products</span>
             <span class="sidebar-toggle-icon" id="products-icon" aria-hidden="true">▼</span>
           </a>
-          <ul class="sidebar-submenu" id="products-menu" hidden>
+          <ul class="sidebar-submenu" id="products-menu" role="region" aria-label="Products submenu">
             <li class="sidebar-submenu-item">
-              <a href="{% url 'products:list' %}" class="sidebar-submenu-link {% if 'products' in request.path and 'create' not in request.path and 'categories' not in request.path %}active{% endif %}">
-                📋 All Products
+              <a
+                href="{% url 'products:list' %}"
+                class="sidebar-submenu-link {% if 'products' in request.path and 'create' not in request.path and 'categories' not in request.path %}active{% endif %}"
+                title="View all products"
+              >
+                <span class="submenu-icon">📋</span> All Products
               </a>
             </li>
             <li class="sidebar-submenu-item">
-              <a href="{% url 'products:create' %}" class="sidebar-submenu-link {% if request.resolver_match.url_name == 'products:create' %}active{% endif %}">
-                ➕ New Product
+              <a
+                href="{% url 'products:create' %}"
+                class="sidebar-submenu-link {% if request.resolver_match.url_name == 'products:create' %}active{% endif %}"
+                title="Add new product"
+              >
+                <span class="submenu-icon">➕</span> New Product
               </a>
             </li>
             <li class="sidebar-submenu-item">
-              <a href="{% url 'products:categories' %}" class="sidebar-submenu-link {% if 'categories' in request.path %}active{% endif %}">
-                📁 Categories
+              <a
+                href="{% url 'products:categories' %}"
+                class="sidebar-submenu-link {% if 'categories' in request.path %}active{% endif %}"
+                title="Manage categories"
+              >
+                <span class="submenu-icon">📁</span> Categories
               </a>
             </li>
             <li class="sidebar-submenu-item">
-              <a href="{% url 'products:tax-classes-list' %}" class="sidebar-submenu-link {% if 'tax-class' in request.path %}active{% endif %}">
-                🏷️ Tax Classes
+              <a
+                href="{% url 'products:tax-classes-list' %}"
+                class="sidebar-submenu-link {% if 'tax-class' in request.path %}active{% endif %}"
+                title="Manage tax classes"
+              >
+                <span class="submenu-icon">🏷️</span> Tax Classes
               </a>
             </li>
           </ul>
         </li>
+        {% endif %}
 
         <!-- Invoices -->
         {% if can_view_invoices %}
         <li class="sidebar-nav-item">
-          <a href="#" class="sidebar-nav-link sidebar-toggle-link" data-toggle="invoices-menu" aria-expanded="false">
+          <a
+            href="#"
+            class="sidebar-nav-link sidebar-toggle-link"
+            data-toggle="invoices-menu"
+            aria-expanded="false"
+            title="Create & Manage Invoices"
+          >
             <span class="icon" aria-hidden="true">📄</span>
             <span class="label">Invoices</span>
             <span class="sidebar-toggle-icon" id="invoices-icon" aria-hidden="true">▼</span>
           </a>
-          <ul class="sidebar-submenu" id="invoices-menu" hidden>
+          <ul class="sidebar-submenu" id="invoices-menu" role="region" aria-label="Invoices submenu">
             <li class="sidebar-submenu-item">
-              <a href="{% url 'invoices:list' %}" class="sidebar-submenu-link {% if 'invoices' in request.path and 'create' not in request.path %}active{% endif %}">
-                📋 All Invoices
+              <a
+                href="{% url 'invoices:list' %}"
+                class="sidebar-submenu-link {% if 'invoices' in request.path and 'create' not in request.path %}active{% endif %}"
+                title="View all invoices"
+              >
+                <span class="submenu-icon">📋</span> All Invoices
               </a>
             </li>
             <li class="sidebar-submenu-item">
-              <a href="{% url 'invoices:create' %}" class="sidebar-submenu-link">
-                ➕ New Invoice
+              <a
+                href="{% url 'invoices:create' %}"
+                class="sidebar-submenu-link"
+                title="Create new invoice"
+              >
+                <span class="submenu-icon">➕</span> New Invoice
               </a>
             </li>
           </ul>
@@ -121,20 +189,34 @@ Styles are in static/css/components/sidebar.css
         <!-- Quotations -->
         {% if can_view_quotations %}
         <li class="sidebar-nav-item">
-          <a href="#" class="sidebar-nav-link sidebar-toggle-link" data-toggle="quotations-menu" aria-expanded="false">
+          <a
+            href="#"
+            class="sidebar-nav-link sidebar-toggle-link"
+            data-toggle="quotations-menu"
+            aria-expanded="false"
+            title="Create & Manage Quotations"
+          >
             <span class="icon" aria-hidden="true">📋</span>
             <span class="label">Quotations</span>
             <span class="sidebar-toggle-icon" id="quotations-icon" aria-hidden="true">▼</span>
           </a>
-          <ul class="sidebar-submenu" id="quotations-menu" hidden>
+          <ul class="sidebar-submenu" id="quotations-menu" role="region" aria-label="Quotations submenu">
             <li class="sidebar-submenu-item">
-              <a href="{% url 'quotations:list' %}" class="sidebar-submenu-link {% if 'quotations' in request.path and 'create' not in request.path %}active{% endif %}">
-                📋 All Quotations
+              <a
+                href="{% url 'quotations:list' %}"
+                class="sidebar-submenu-link {% if 'quotations' in request.path and 'create' not in request.path %}active{% endif %}"
+                title="View all quotations"
+              >
+                <span class="submenu-icon">📋</span> All Quotations
               </a>
             </li>
             <li class="sidebar-submenu-item">
-              <a href="{% url 'quotations:create' %}" class="sidebar-submenu-link">
-                ➕ New Quotation
+              <a
+                href="{% url 'quotations:create' %}"
+                class="sidebar-submenu-link"
+                title="Create new quotation"
+              >
+                <span class="submenu-icon">➕</span> New Quotation
               </a>
             </li>
           </ul>
@@ -142,54 +224,88 @@ Styles are in static/css/components/sidebar.css
         {% endif %}
 
         <!-- Deliveries -->
+        {% if can_view_deliveries %}
         <li class="sidebar-nav-item">
-          <a href="#" class="sidebar-nav-link sidebar-toggle-link" data-toggle="deliveries-menu" aria-expanded="false">
+          <a
+            href="#"
+            class="sidebar-nav-link sidebar-toggle-link"
+            data-toggle="deliveries-menu"
+            aria-expanded="false"
+            title="Track Deliveries"
+          >
             <span class="icon" aria-hidden="true">📦</span>
             <span class="label">Deliveries</span>
             <span class="sidebar-toggle-icon" id="deliveries-icon" aria-hidden="true">▼</span>
           </a>
-          <ul class="sidebar-submenu" id="deliveries-menu" hidden>
+          <ul class="sidebar-submenu" id="deliveries-menu" role="region" aria-label="Deliveries submenu">
             <li class="sidebar-submenu-item">
-              <a href="{% url 'deliveries:list' %}" class="sidebar-submenu-link {% if 'deliveries' in request.path and 'create' not in request.path %}active{% endif %}">
-                📋 All Deliveries
+              <a
+                href="{% url 'deliveries:list' %}"
+                class="sidebar-submenu-link {% if 'deliveries' in request.path and 'create' not in request.path %}active{% endif %}"
+                title="View all deliveries"
+              >
+                <span class="submenu-icon">📋</span> All Deliveries
               </a>
             </li>
             <li class="sidebar-submenu-item">
-              <a href="{% url 'deliveries:create' %}" class="sidebar-submenu-link">
-                ➕ New Delivery
+              <a
+                href="{% url 'deliveries:create' %}"
+                class="sidebar-submenu-link"
+                title="Create new delivery"
+              >
+                <span class="submenu-icon">➕</span> New Delivery
               </a>
             </li>
           </ul>
         </li>
+        {% endif %}
       </ul>
     </div>
 
-    <!-- Finance Section -->
+    <!-- ════════════════ FINANCE SECTION ════════════════ -->
     <div class="sidebar-section">
-      <div class="sidebar-section-title">Finance</div>
+      <h2 class="sidebar-section-title">Finance & Accounting</h2>
       <ul class="sidebar-list">
-        <!-- Payments (conditionally shown based on feature toggle AND permission) -->
+        <!-- Payments -->
         {% if settings.enable_payments and can_view_payments %}
         <li class="sidebar-nav-item">
-          <a href="#" class="sidebar-nav-link sidebar-toggle-link" data-toggle="payments-menu" aria-expanded="false">
+          <a
+            href="#"
+            class="sidebar-nav-link sidebar-toggle-link"
+            data-toggle="payments-menu"
+            aria-expanded="false"
+            title="Record & Track Payments"
+          >
             <span class="icon" aria-hidden="true">💳</span>
             <span class="label">Payments</span>
             <span class="sidebar-toggle-icon" id="payments-icon" aria-hidden="true">▼</span>
           </a>
-          <ul class="sidebar-submenu" id="payments-menu" hidden>
+          <ul class="sidebar-submenu" id="payments-menu" role="region" aria-label="Payments submenu">
             <li class="sidebar-submenu-item">
-              <a href="{% url 'payments:list' %}" class="sidebar-submenu-link {% if 'payments' in request.path and 'create' not in request.path and 'methods' not in request.path %}active{% endif %}">
-                💰 All Payments
+              <a
+                href="{% url 'payments:list' %}"
+                class="sidebar-submenu-link {% if 'payments' in request.path and 'create' not in request.path and 'methods' not in request.path %}active{% endif %}"
+                title="View all payments"
+              >
+                <span class="submenu-icon">💰</span> All Payments
               </a>
             </li>
             <li class="sidebar-submenu-item">
-              <a href="{% url 'payments:create' %}" class="sidebar-submenu-link">
-                ➕ Record Payment
+              <a
+                href="{% url 'payments:create' %}"
+                class="sidebar-submenu-link"
+                title="Record new payment"
+              >
+                <span class="submenu-icon">➕</span> Record Payment
               </a>
             </li>
             <li class="sidebar-submenu-item">
-              <a href="{% url 'payments:methods-list' %}" class="sidebar-submenu-link {% if 'methods' in request.path %}active{% endif %}">
-                🛠️ Payment Methods
+              <a
+                href="{% url 'payments:methods-list' %}"
+                class="sidebar-submenu-link {% if 'methods' in request.path %}active{% endif %}"
+                title="Manage payment methods"
+              >
+                <span class="submenu-icon">🛠️</span> Payment Methods
               </a>
             </li>
           </ul>
@@ -199,30 +315,52 @@ Styles are in static/css/components/sidebar.css
         <!-- Expenses -->
         {% if can_view_expenses %}
         <li class="sidebar-nav-item">
-          <a href="#" class="sidebar-nav-link sidebar-toggle-link" data-toggle="expenses-menu" aria-expanded="false">
+          <a
+            href="#"
+            class="sidebar-nav-link sidebar-toggle-link"
+            data-toggle="expenses-menu"
+            aria-expanded="false"
+            title="Track Business Expenses"
+          >
             <span class="icon" aria-hidden="true">💰</span>
             <span class="label">Expenses</span>
             <span class="sidebar-toggle-icon" id="expenses-icon" aria-hidden="true">▼</span>
           </a>
-          <ul class="sidebar-submenu" id="expenses-menu" hidden>
+          <ul class="sidebar-submenu" id="expenses-menu" role="region" aria-label="Expenses submenu">
             <li class="sidebar-submenu-item">
-              <a href="{% url 'expenses:list' %}" class="sidebar-submenu-link {% if 'expenses' in request.path and 'create' not in request.path and 'vendors' not in request.path and 'categories' not in request.path %}active{% endif %}">
-                📋 All Expenses
+              <a
+                href="{% url 'expenses:list' %}"
+                class="sidebar-submenu-link {% if 'expenses' in request.path and 'create' not in request.path and 'vendors' not in request.path and 'categories' not in request.path %}active{% endif %}"
+                title="View all expenses"
+              >
+                <span class="submenu-icon">📋</span> All Expenses
               </a>
             </li>
             <li class="sidebar-submenu-item">
-              <a href="{% url 'expenses:create' %}" class="sidebar-submenu-link">
-                ➕ New Expense
+              <a
+                href="{% url 'expenses:create' %}"
+                class="sidebar-submenu-link"
+                title="Add new expense"
+              >
+                <span class="submenu-icon">➕</span> New Expense
               </a>
             </li>
             <li class="sidebar-submenu-item">
-              <a href="{% url 'expenses:vendors-list' %}" class="sidebar-submenu-link {% if 'vendors' in request.path %}active{% endif %}">
-                🏢 Vendors
+              <a
+                href="{% url 'expenses:vendors-list' %}"
+                class="sidebar-submenu-link {% if 'vendors' in request.path %}active{% endif %}"
+                title="Manage vendors"
+              >
+                <span class="submenu-icon">🏢</span> Vendors
               </a>
             </li>
             <li class="sidebar-submenu-item">
-              <a href="{% url 'expenses:categories-list' %}" class="sidebar-submenu-link {% if 'categories' in request.path %}active{% endif %}">
-                📁 Categories
+              <a
+                href="{% url 'expenses:categories-list' %}"
+                class="sidebar-submenu-link {% if 'categories' in request.path %}active{% endif %}"
+                title="Manage expense categories"
+              >
+                <span class="submenu-icon">📁</span> Categories
               </a>
             </li>
           </ul>
@@ -232,115 +370,234 @@ Styles are in static/css/components/sidebar.css
         <!-- Tax Management -->
         {% if can_manage_taxes %}
         <li class="sidebar-nav-item">
-          <a href="#" class="sidebar-nav-link sidebar-toggle-link" data-toggle="tax-menu" aria-expanded="false">
+          <a
+            href="#"
+            class="sidebar-nav-link sidebar-toggle-link"
+            data-toggle="tax-menu"
+            aria-expanded="false"
+            title="Configure Tax Settings"
+          >
             <span class="icon" aria-hidden="true">🏛️</span>
             <span class="label">Tax Settings</span>
             <span class="sidebar-toggle-icon" id="tax-icon" aria-hidden="true">▼</span>
           </a>
-          <ul class="sidebar-submenu" id="tax-menu" hidden>
+          <ul class="sidebar-submenu" id="tax-menu" role="region" aria-label="Tax settings submenu">
             <li class="sidebar-submenu-item">
-              <a href="{% url 'taxes:list' %}" class="sidebar-submenu-link {% if 'taxes' in request.path and 'vat' not in request.path %}active{% endif %}">
-                📋 Tax Rates
+              <a
+                href="{% url 'taxes:list' %}"
+                class="sidebar-submenu-link {% if 'taxes' in request.path and 'vat' not in request.path %}active{% endif %}"
+                title="Manage tax rates"
+              >
+                <span class="submenu-icon">📋</span> Tax Rates
               </a>
             </li>
             <li class="sidebar-submenu-item">
-              <a href="{% url 'taxes:vat-rules-list' %}" class="sidebar-submenu-link {% if 'vat' in request.path %}active{% endif %}">
-                📊 VAT Rules
+              <a
+                href="{% url 'taxes:vat-rules-list' %}"
+                class="sidebar-submenu-link {% if 'vat' in request.path %}active{% endif %}"
+                title="Manage VAT rules"
+              >
+                <span class="submenu-icon">📊</span> VAT Rules
               </a>
             </li>
           </ul>
         </li>
         {% endif %}
 
-        <!-- Reports Link -->
+        <!-- Financials Dashboard -->
+        {% if can_view_financials %}
+        <li class="sidebar-nav-item">
+          <a
+            href="#"
+            class="sidebar-nav-link sidebar-toggle-link"
+            data-toggle="financials-menu"
+            aria-expanded="false"
+            title="Financial Overview & Analysis"
+          >
+            <span class="icon" aria-hidden="true">💰</span>
+            <span class="label">Financials</span>
+            <span class="sidebar-toggle-icon" id="financials-icon" aria-hidden="true">▼</span>
+          </a>
+          <ul class="sidebar-submenu" id="financials-menu" role="region" aria-label="Financials submenu">
+            <li class="sidebar-submenu-item">
+              <a
+                href="{% url 'financials:dashboard' %}"
+                class="sidebar-submenu-link {% if 'financials' in request.path and 'dashboard' in request.path %}active{% endif %}"
+                title="Financial dashboard"
+              >
+                <span class="submenu-icon">📊</span> Dashboard
+              </a>
+            </li>
+            <li class="sidebar-submenu-item">
+              <a
+                href="{% url 'financials:periods-list' %}"
+                class="sidebar-submenu-link {% if 'periods' in request.path and 'list' in request.path %}active{% endif %}"
+                title="Manage accounting periods"
+              >
+                <span class="submenu-icon">📅</span> Periods
+              </a>
+            </li>
+            <li class="sidebar-submenu-item">
+              <a
+                href="{% url 'financials:revenue-list' %}"
+                class="sidebar-submenu-link {% if 'revenue' in request.path and 'list' in request.path %}active{% endif %}"
+                title="Revenue tracking"
+              >
+                <span class="submenu-icon">💵</span> Revenue
+              </a>
+            </li>
+            <li class="sidebar-submenu-item">
+              <a
+                href="{% url 'financials:tax-liabilities-list' %}"
+                class="sidebar-submenu-link {% if 'tax-liabilities' in request.path and 'list' in request.path %}active{% endif %}"
+                title="Tax liabilities"
+              >
+                <span class="submenu-icon">🏛️</span> Tax Liabilities
+              </a>
+            </li>
+          </ul>
+        </li>
+        {% endif %}
+
+        <!-- Reports -->
         {% if can_view_reports %}
         <li class="sidebar-nav-item">
-          <a href="#" class="sidebar-nav-link sidebar-toggle-link" data-toggle="reports-menu" aria-expanded="false">
+          <a
+            href="#"
+            class="sidebar-nav-link sidebar-toggle-link"
+            data-toggle="reports-menu"
+            aria-expanded="false"
+            title="Generate & View Reports"
+          >
             <span class="icon" aria-hidden="true">📊</span>
             <span class="label">Reports</span>
             <span class="sidebar-toggle-icon" id="reports-icon" aria-hidden="true">▼</span>
           </a>
-          <ul class="sidebar-submenu" id="reports-menu" hidden>
-            <!-- Sales Pipeline -->
-            <li class="sidebar-submenu-item" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e9ecef;">
-              <small class="text-muted" style="font-size: 0.75rem; font-weight: 600; opacity: 0.7;">🔄 SALES PIPELINE</small>
+          <ul class="sidebar-submenu" id="reports-menu" role="region" aria-label="Reports submenu">
+            <!-- Sales Pipeline Reports -->
+            <li class="sidebar-submenu-category">
+              <span class="category-label">🔄 Sales Pipeline</span>
             </li>
             {% if can_view_quotations %}
             <li class="sidebar-submenu-item">
-              <a href="{% url 'core:reports-quotations' %}" class="sidebar-submenu-link">
-                📄 Quotation Register
+              <a
+                href="{% url 'core:reports-quotations' %}"
+                class="sidebar-submenu-link"
+                title="Quotation register"
+              >
+                <span class="submenu-icon">📄</span> Quotation Register
               </a>
             </li>
             <li class="sidebar-submenu-item">
-              <a href="{% url 'core:reports-quotation-pipeline' %}" class="sidebar-submenu-link">
-                🔄 Pipeline Analysis
+              <a
+                href="{% url 'core:reports-quotation-pipeline' %}"
+                class="sidebar-submenu-link"
+                title="Pipeline analysis"
+              >
+                <span class="submenu-icon">🔄</span> Pipeline Analysis
               </a>
             </li>
             <li class="sidebar-submenu-item">
-              <a href="{% url 'core:reports-quotation-performance' %}" class="sidebar-submenu-link">
-                📊 Performance Analysis
+              <a
+                href="{% url 'core:reports-quotation-performance' %}"
+                class="sidebar-submenu-link"
+                title="Performance analysis"
+              >
+                <span class="submenu-icon">📊</span> Performance
               </a>
             </li>
             {% endif %}
 
-            <!-- Invoicing -->
-            <li class="sidebar-submenu-item" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e9ecef;">
-              <small class="text-muted" style="font-size: 0.75rem; font-weight: 600; opacity: 0.7;">💵 INVOICING</small>
+            <!-- Invoicing Reports -->
+            <li class="sidebar-submenu-category">
+              <span class="category-label">💵 Invoicing</span>
             </li>
             {% if can_view_invoices %}
             <li class="sidebar-submenu-item">
-              <a href="{% url 'core:reports-invoices' %}" class="sidebar-submenu-link">
-                📄 Invoice Register
+              <a
+                href="{% url 'core:reports-invoices' %}"
+                class="sidebar-submenu-link"
+                title="Invoice register"
+              >
+                <span class="submenu-icon">📄</span> Invoice Register
               </a>
             </li>
             <li class="sidebar-submenu-item">
-              <a href="{% url 'core:reports-outstanding' %}" class="sidebar-submenu-link">
-                ⚠️ Outstanding Invoices
+              <a
+                href="{% url 'core:reports-outstanding' %}"
+                class="sidebar-submenu-link"
+                title="Outstanding invoices"
+              >
+                <span class="submenu-icon">⚠️</span> Outstanding
               </a>
             </li>
             <li class="sidebar-submenu-item">
-              <a href="{% url 'core:reports-aging' %}" class="sidebar-submenu-link">
-                📈 Client Aging
+              <a
+                href="{% url 'core:reports-aging' %}"
+                class="sidebar-submenu-link"
+                title="Client aging analysis"
+              >
+                <span class="submenu-icon">📈</span> Client Aging
               </a>
             </li>
             {% endif %}
 
-            <!-- Financial -->
-            <li class="sidebar-submenu-item" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e9ecef;">
-              <small class="text-muted" style="font-size: 0.75rem; font-weight: 600; opacity: 0.7;">💰 FINANCIAL</small>
+            <!-- Financial Reports -->
+            <li class="sidebar-submenu-category">
+              <span class="category-label">💰 Financial</span>
             </li>
             {% if can_view_payments %}
             <li class="sidebar-submenu-item">
-              <a href="{% url 'core:reports-payments' %}" class="sidebar-submenu-link">
-                💰 Payment Register
+              <a
+                href="{% url 'core:reports-payments' %}"
+                class="sidebar-submenu-link"
+                title="Payment register"
+              >
+                <span class="submenu-icon">💰</span> Payment Register
               </a>
             </li>
             {% endif %}
             {% if can_view_expenses %}
             <li class="sidebar-submenu-item">
-              <a href="{% url 'core:reports-tax' %}" class="sidebar-submenu-link">
-                📋 Tax Report
+              <a
+                href="{% url 'core:reports-tax' %}"
+                class="sidebar-submenu-link"
+                title="Tax report"
+              >
+                <span class="submenu-icon">📋</span> Tax Report
               </a>
             </li>
             <li class="sidebar-submenu-item">
-              <a href="{% url 'core:reports-vat' %}" class="sidebar-submenu-link">
-                🏛️ VAT Report
+              <a
+                href="{% url 'core:reports-vat' %}"
+                class="sidebar-submenu-link"
+                title="VAT report"
+              >
+                <span class="submenu-icon">🏛️</span> VAT Report
               </a>
             </li>
             <li class="sidebar-submenu-item">
-              <a href="{% url 'core:reports-monthly-summary' %}" class="sidebar-submenu-link">
-                📅 Monthly Summary
+              <a
+                href="{% url 'core:reports-monthly-summary' %}"
+                class="sidebar-submenu-link"
+                title="Monthly summary"
+              >
+                <span class="submenu-icon">📅</span> Monthly Summary
               </a>
             </li>
             {% endif %}
 
-            <!-- Analysis -->
-            <li class="sidebar-submenu-item" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e9ecef;">
-              <small class="text-muted" style="font-size: 0.75rem; font-weight: 600; opacity: 0.7;">📈 ANALYSIS</small>
+            <!-- Analysis Reports -->
+            <li class="sidebar-submenu-category">
+              <span class="category-label">📈 Analysis</span>
             </li>
             <li class="sidebar-submenu-item">
-              <a href="{% url 'core:reports-product-sales' %}" class="sidebar-submenu-link">
-                📦 Product Sales
+              <a
+                href="{% url 'core:reports-product-sales' %}"
+                class="sidebar-submenu-link"
+                title="Product sales analysis"
+              >
+                <span class="submenu-icon">📦</span> Product Sales
               </a>
             </li>
           </ul>
@@ -349,37 +606,63 @@ Styles are in static/css/components/sidebar.css
       </ul>
     </div>
 
-    <!-- Bottom Links -->
+    <!-- ════════════════ BOTTOM SECTION ════════════════ -->
     <div class="sidebar-bottom">
       {% if can_manage_settings or is_admin %}
-      <a href="#" class="sidebar-nav-link sidebar-toggle-link" data-toggle="settings-menu" aria-expanded="false">
-        <span class="icon" aria-hidden="true">⚙️</span>
-        <span class="label">Settings</span>
-        <span class="sidebar-toggle-icon" id="settings-icon" aria-hidden="true">▼</span>
-      </a>
-      <ul class="sidebar-submenu" id="settings-menu" hidden>
-        <li class="sidebar-submenu-item">
-          <a href="{% url 'core:settings' %}" class="sidebar-submenu-link">
-            👤 Account Settings
-          </a>
-        </li>
-        {% if is_admin %}
-        <li class="sidebar-submenu-item">
-          <a href="{% url 'core:team-members' %}" class="sidebar-submenu-link {% if 'team-members' in request.path %}active{% endif %}">
-            👥 Team Members
-          </a>
-        </li>
-        {% endif %}
-        {% if can_manage_settings %}
-        <li class="sidebar-submenu-item">
-          <a href="{% url 'core:settings-general' %}" class="sidebar-submenu-link">
-            🏢 Company Settings
-          </a>
-        </li>
-        {% endif %}
-      </ul>
+      <div class="sidebar-nav-item">
+        <a
+          href="#"
+          class="sidebar-nav-link sidebar-toggle-link"
+          data-toggle="settings-menu"
+          aria-expanded="false"
+          title="Account & System Settings"
+        >
+          <span class="icon" aria-hidden="true">⚙️</span>
+          <span class="label">Settings</span>
+          <span class="sidebar-toggle-icon" id="settings-icon" aria-hidden="true">▼</span>
+        </a>
+        <ul class="sidebar-submenu" id="settings-menu" role="region" aria-label="Settings submenu">
+          <li class="sidebar-submenu-item">
+            <a
+              href="{% url 'core:settings' %}"
+              class="sidebar-submenu-link"
+              title="Account settings"
+            >
+              <span class="submenu-icon">👤</span> Account Settings
+            </a>
+          </li>
+          {% if is_admin %}
+          <li class="sidebar-submenu-item">
+            <a
+              href="{% url 'core:team-members' %}"
+              class="sidebar-submenu-link {% if 'team-members' in request.path %}active{% endif %}"
+              title="Manage team members"
+            >
+              <span class="submenu-icon">👥</span> Team Members
+            </a>
+          </li>
+          {% endif %}
+          {% if can_manage_settings %}
+          <li class="sidebar-submenu-item">
+            <a
+              href="{% url 'core:settings-general' %}"
+              class="sidebar-submenu-link"
+              title="Company settings"
+            >
+              <span class="submenu-icon">🏢</span> Company Settings
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
       {% endif %}
-      <a href="{% url 'core:help-center' %}" class="sidebar-bottom-link">
+
+      <!-- Help & Support Link -->
+      <a
+        href="{% url 'core:help-center' %}"
+        class="sidebar-bottom-link"
+        title="Get help and support"
+      >
         <span class="icon" aria-hidden="true">❓</span>
         <span class="label">Help & Support</span>
       </a>
@@ -387,5 +670,7 @@ Styles are in static/css/components/sidebar.css
   </nav>
 </aside>
 
-<!-- Sidebar JavaScript functionality moved to static/js/components/sidebar.js -->
-<!-- This keeps the template clean and avoids duplicate event listeners -->
+<!-- Sidebar Mobile Overlay -->
+<div class="sidebar-overlay" id="sidebar-overlay" role="presentation" aria-hidden="true"></div>
+
+{% comment %} Sidebar interactions are handled by static/js/components/sidebar.js {% endcomment %}

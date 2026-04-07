@@ -1,0 +1,99 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Mark Tax Liability as Remitted - Invoicing App{% endblock %}
+
+{% block page_title %}Mark Tax Liability as Remitted{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/financials.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Form Container -->
+  <div class="form-container">
+    <!-- Form Header -->
+    <div class="form-header">
+      <h2>🏛️ Mark Tax Remittance</h2>
+      <p>Record the tax remittance to the revenue authority</p>
+    </div>
+
+    <!-- Liability Information -->
+    <div class="liability-info">
+      <div class="info-row">
+        <span class="info-label">Period:</span>
+        <span class="info-value">{{ liability.financial_period }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Tax Type:</span>
+        <span class="info-value">{{ liability.tax_type }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Tax Amount:</span>
+        <span class="info-value">KES {{ liability.total_tax_collected|floatformat:2 }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Status:</span>
+        <span class="status-badge {{ liability.status }}">{{ liability.get_status_display }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Due Date:</span>
+        <span class="info-value">{{ liability.due_date|date:"M d, Y" }}</span>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <form method="POST">
+      {% csrf_token %}
+
+      <!-- Remitted Date -->
+      <div class="form-group">
+        <label for="remitted_date" class="form-label">
+          Remittance Date
+          <span class="required">*</span>
+        </label>
+        <input
+          type="date"
+          id="remitted_date"
+          name="remitted_date"
+          class="form-control"
+          value="{{ remitted_date }}"
+          required
+        />
+        {% if errors.remitted_date %}
+          <span class="form-error">{{ errors.remitted_date }}</span>
+        {% endif %}
+        <span class="form-help">Date the tax was remitted to the revenue authority</span>
+      </div>
+
+      <!-- Remittance Reference -->
+      <div class="form-group">
+        <label for="remittance_reference" class="form-label">
+          Remittance Reference / Receipt Number
+          <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="remittance_reference"
+          name="remittance_reference"
+          class="form-control"
+          placeholder="e.g., KRA-REC-2026-0001 or Bank Reference"
+          value="{{ remittance_reference }}"
+          required
+        />
+        {% if errors.remittance_reference %}
+          <span class="form-error">{{ errors.remittance_reference }}</span>
+        {% endif %}
+        <span class="form-help">Receipt number or reference from the revenue authority</span>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">✓ Confirm Remittance</button>
+        <a href="{% url 'financials:tax-liability-detail' liability.pk %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

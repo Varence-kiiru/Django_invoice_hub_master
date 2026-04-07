@@ -102,7 +102,7 @@
 
       <div class="form-section">
         <h3 class="section-title">Invoice Details</h3>
-        
+
         <div class="form-grid">
           <div class="form-group">
             <label for="client">Client <span class="required">*</span></label>
@@ -186,15 +186,15 @@ document.addEventListener('DOMContentLoaded', function() {
   const currencySelect = document.getElementById('currency');
   const invoiceDateInput = document.getElementById('invoice_date');
   const dueDateInput = document.getElementById('due_date');
-  
+
   // Set today's date as default invoice date
   const today = new Date();
   invoiceDateInput.value = today.toISOString().split('T')[0];
-  
+
   // Set default due date to 30 days from today
   const defaultDueDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
   dueDateInput.value = defaultDueDate.toISOString().split('T')[0];
-  
+
   /**
    * Get CSRF token from DOM
    */
@@ -223,13 +223,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     return cookieValue;
   }
-  
+
   /**
    * When client selection changes, fetch client details and auto-populate fields
    */
   clientSelect.addEventListener('change', function() {
     const clientId = this.value;
-    
+
     if (!clientId) {
       // Reset to defaults if no client selected
       currencySelect.value = 'KES';
@@ -237,9 +237,9 @@ document.addEventListener('DOMContentLoaded', function() {
       dueDateInput.value = defaultDueDate.toISOString().split('T')[0];
       return;
     }
-    
+
     const csrfToken = getCsrfToken();
-    
+
     // Fetch client details from API
     fetch(`/api/v1/clients/${clientId}/`, {
       method: 'GET',
@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', function() {
           currencySelect.value = data.currency;
           console.log(`✓ Currency auto-populated: ${data.currency}`);
         }
-        
+
         // Calculate and auto-populate due date based on client's payment terms
         if (data.payment_terms_days) {
           const invoiceDate = new Date(invoiceDateInput.value);
@@ -285,13 +285,13 @@ document.addEventListener('DOMContentLoaded', function() {
       console.error('Error fetching client details:', error);
     });
   });
-  
+
   /**
    * When invoice date changes, recalculate due date based on client's payment terms
    */
   invoiceDateInput.addEventListener('change', function() {
     const clientId = clientSelect.value;
-    
+
     if (!clientId) {
       // No client selected, just set default 30 days
       const baseDate = new Date(this.value);
@@ -299,9 +299,9 @@ document.addEventListener('DOMContentLoaded', function() {
       dueDateInput.value = dueDate.toISOString().split('T')[0];
       return;
     }
-    
+
     const csrfToken = getCsrfToken();
-    
+
     // Fetch client details to get payment terms
     fetch(`/api/v1/clients/${clientId}/`, {
       method: 'GET',
@@ -336,7 +336,7 @@ document.getElementById('invoice-create-form').addEventListener('submit', functi
     alert('Please select a client for this invoice.');
     return false;
   }
-  
+
   // Show loading indicator
   if (typeof showLoadingIndicator === 'function') {
     showLoadingIndicator();

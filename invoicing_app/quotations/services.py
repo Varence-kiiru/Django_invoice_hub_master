@@ -2,11 +2,12 @@
 Quotation services.
 Handles quote number generation, quote-to-invoice conversion, and status management.
 """
+
 from django.db import transaction
 from django.utils import timezone
-from invoicing_app.invoices.services import TaxCalculationService, InvoiceNumberService
+from invoicing_app.invoices.services import InvoiceNumberService
 from invoicing_app.invoices.models import Invoice, InvoiceLineItem
-from .models import QuoteNumberSequence, Quote, QuoteLineItem
+from .models import QuoteNumberSequence
 
 
 # ━━━ Quote Number Generation ━━━
@@ -18,7 +19,7 @@ class QuoteNumberService:
     """
 
     @staticmethod
-    def generate_next_number(prefix='QUOTE', year=None):
+    def generate_next_number(prefix="QUOTE", year=None):
         """
         Generate the next quote number for the given prefix and year.
 
@@ -38,8 +39,7 @@ class QuoteNumberService:
         with transaction.atomic():
             # Lock the row to prevent concurrent increments
             seq_qs = QuoteNumberSequence.objects.select_for_update().filter(
-                prefix=prefix,
-                year=year
+                prefix=prefix, year=year
             )
 
             # Get or create the sequence row
@@ -48,9 +48,7 @@ class QuoteNumberService:
             except QuoteNumberSequence.DoesNotExist:
                 # Create new sequence row
                 seq = QuoteNumberSequence.objects.create(
-                    prefix=prefix,
-                    year=year,
-                    next_sequence=1
+                    prefix=prefix, year=year, next_sequence=1
                 )
 
             # Get current sequence value
@@ -58,14 +56,14 @@ class QuoteNumberService:
 
             # Increment for next call
             seq.next_sequence += 1
-            seq.save(update_fields=['next_sequence'])
+            seq.save(update_fields=["next_sequence"])
 
             # Generate and return quote number
             quote_number = f"{prefix}-{year}-{current_seq:04d}"
             return quote_number
 
     @staticmethod
-    def get_preview_number(prefix='QUOTE', year=None):
+    def get_preview_number(prefix="QUOTE", year=None):
         """
         Get preview of next quote number WITHOUT making any changes.
 
@@ -83,7 +81,7 @@ class QuoteNumberService:
         return f"{prefix}-{year}-{next_seq:04d}"
 
     @staticmethod
-    def get_next_sequence(prefix='QUOTE', year=None):
+    def get_next_sequence(prefix="QUOTE", year=None):
         """
         Get the next sequence number WITHOUT incrementing it.
         Useful for previewing the next quote number.
@@ -128,15 +126,19 @@ class QuoteConversionService:
         Raises:
             ValueError: If quote status is not 'accepted'
         """
-        if quote.status != 'accepted':
+        if quote.status != "accepted":
             raise ValueError(
                 f"Cannot convert {quote.status} quote to invoice. "
                 f"Only 'accepted' quotes can be converted."
             )
 
-        # Already converted?
-        if quote.converted_invoice:
-            return quote.converted_invoice
+        # Already converted? Check the foreign key ID to avoid querying
+        if quote.converted_invoice_id is not None:
+            try:
+                return quote.converted_invoice
+            except Exception:
+                # If the related invoice was deleted, proceed with conversion
+                pass
 
         # Defaults
         if invoice_date is None:
@@ -147,11 +149,12 @@ class QuoteConversionService:
         with transaction.atomic():
             # 1. Generate invoice number
             from invoicing_app.core.models import CompanySettings
+
             try:
                 settings = CompanySettings.objects.get()
                 prefix = settings.invoice_prefix
             except CompanySettings.DoesNotExist:
-                prefix = 'INV'
+                prefix = "INV"
             invoice_number = InvoiceNumberService.generate_next_number(prefix=prefix)
 
             # 2. Create invoice with quote's data
@@ -160,17 +163,15 @@ class QuoteConversionService:
                 client=quote.client,
                 invoice_date=invoice_date,
                 due_date=due_date,
-                status='draft',
+                status="draft",
                 description=quote.description,
                 currency=quote.currency,
-
                 # Copy totals (already calculated)
                 subtotal_amount=quote.subtotal_amount,
                 vat_amount=quote.vat_amount,
                 total_amount=quote.total_amount,
                 amount_due=quote.total_amount,  # No payments yet
                 amount_paid=0,
-
                 # Audit trail
                 created_by=quote.created_by,
             )
@@ -193,12 +194,17 @@ class QuoteConversionService:
 
             # 4. Update quote to mark as converted
             quote.converted_invoice = invoice
-            quote.status = 'converted'
+            quote.status = "converted"
             quote.converted_at = timezone.now()
             quote.updated_by = quote.created_by
-            quote.save(update_fields=[
-                'converted_invoice', 'status', 'converted_at', 'updated_by'
-            ])
+            quote.save(
+                update_fields=[
+                    "converted_invoice",
+                    "status",
+                    "converted_at",
+                    "updated_by",
+                ]
+            )
 
             return invoice
 
@@ -211,14 +217,14 @@ class QuoteStatusService:
     """
 
     VALID_TRANSITIONS = {
-        'draft': ['sent', 'archived'],
-        'sent': ['viewed', 'rejected', 'archived'],
-        'viewed': ['accepted', 'rejected', 'archived'],
-        'accepted': ['converted', 'archived'],
-        'rejected': ['archived'],
-        'expired': ['archived'],
-        'converted': [],
-        'archived': [],
+        "draft": ["sent", "archived"],
+        "sent": ["viewed", "rejected", "archived"],
+        "viewed": ["accepted", "rejected", "archived"],
+        "accepted": ["converted", "archived"],
+        "rejected": ["archived"],
+        "expired": ["archived"],
+        "converted": [],
+        "archived": [],
     }
 
     @staticmethod
@@ -248,17 +254,17 @@ class QuoteStatusService:
         quote.status = new_status
 
         # Update metadata based on status
-        if new_status == 'sent':
+        if new_status == "sent":
             quote.sent_at = timezone.now()
-        elif new_status == 'viewed':
+        elif new_status == "viewed":
             quote.viewed_at = timezone.now()
-        elif new_status == 'accepted':
+        elif new_status == "accepted":
             quote.accepted_at = timezone.now()
-        elif new_status == 'rejected':
+        elif new_status == "rejected":
             quote.rejected_at = timezone.now()
             if reason:
                 quote.rejection_reason = reason
-        elif new_status == 'expired':
+        elif new_status == "expired":
             quote.expired_at = timezone.now()
 
         if actor:

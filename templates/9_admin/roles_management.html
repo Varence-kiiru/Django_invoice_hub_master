@@ -12,198 +12,73 @@
 
 {% block content %}
 <div class="admin-container">
+  <!-- Alerts -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
   <!-- Roles Header -->
   <div class="roles-header">
     <h1>System Roles</h1>
-    <button class="btn btn-primary" onclick="showCreateRoleModal()">➕ Create New Role</button>
+    <a href="{% url 'core:role-create' %}" class="btn btn-primary">➕ Create New Role</a>
   </div>
 
-  <!-- Roles Grid -->
+  <!-- Roles Grid - Dynamic -->
   <div class="roles-grid">
-    <!-- Admin Role -->
-    <div class="role-card admin-role">
-      <div class="role-header">
-        <h2>Admin</h2>
-        <span class="role-badge">System</span>
+    {% if roles %}
+      {% for role in roles %}
+        <div class="role-card">
+          <div class="role-header">
+            <h2>{{ role.get_icon }} {{ role.get_display_name }}</h2>
+            <span class="role-badge">{% if role.name == 'admin' %}System{% else %}Custom{% endif %}</span>
+          </div>
+          <p class="role-description">{{ role.description|default:"No description provided" }}</p>
+          <div class="permissions-list">
+            <h3>Permissions ({{ role.permissions|length }}):</h3>
+            <ul>
+              {% if role.permissions %}
+                {% for perm in role.permissions|slice:":5" %}
+                  <li>✓ {{ perm }}</li>
+                {% endfor %}
+                {% if role.permissions|length > 5 %}
+                  <li><em>+{{ role.permissions|length|add:"-5" }} more...</em></li>
+                {% endif %}
+              {% else %}
+                <li><em>No permissions assigned</em></li>
+              {% endif %}
+            </ul>
+          </div>
+          <div class="role-actions">
+            <a href="{% url 'core:role-edit' role.id %}" class="btn btn-sm btn-secondary">✏️ Edit</a>
+            {% if role.users.count == 0 %}
+              <a href="#" class="btn btn-sm btn-danger btn-delete" data-delete-url="{% url 'core:role-delete' role.id %}" data-item-name="{{ role.name }}" data-item-type="Role" data-message="Are you sure you want to delete this role?">🗑️ Delete</a>
+            {% else %}
+              <button type="button" class="btn btn-sm btn-secondary" disabled title="Cannot delete role with assigned users">👥 {{ role.users.count }} User{{ role.users.count|pluralize }}</button>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="no-roles-message">
+        <p>No roles found. <a href="{% url 'core:role-create' %}">Create your first role</a></p>
       </div>
-      <p class="role-description">Full system access with all administrative privileges</p>
-      <div class="permissions-list">
-        <h3>Permissions:</h3>
-        <ul>
-          <li>✓ Manage all users</li>
-          <li>✓ Configure system settings</li>
-          <li>✓ View audit logs</li>
-          <li>✓ Manage backups</li>
-          <li>✓ Create/Edit invoices</li>
-          <li>✓ Access all reports</li>
-        </ul>
-      </div>
-      <div class="role-actions">
-        <button class="btn btn-sm btn-secondary" onclick="editRole('admin')">Edit</button>
-        <button class="btn btn-sm btn-secondary" onclick="viewMembers('admin')">Members</button>
-      </div>
-    </div>
-
-    <!-- Manager Role -->
-    <div class="role-card manager-role">
-      <div class="role-header">
-        <h2>Manager</h2>
-        <span class="role-badge">Standard</span>
-      </div>
-      <p class="role-description">Elevated access to manage operations and staff</p>
-      <div class="permissions-list">
-        <h3>Permissions:</h3>
-        <ul>
-          <li>✓ Manage staff users</li>
-          <li>✓ Create/Edit invoices</li>
-          <li>✓ View reports</li>
-          <li>✓ Manage clients</li>
-          <li>✗ System settings</li>
-          <li>✗ Manage backups</li>
-        </ul>
-      </div>
-      <div class="role-actions">
-        <button class="btn btn-sm btn-secondary" onclick="editRole('manager')">Edit</button>
-        <button class="btn btn-sm btn-secondary" onclick="viewMembers('manager')">Members</button>
-      </div>
-    </div>
-
-    <!-- Staff Role -->
-    <div class="role-card staff-role">
-      <div class="role-header">
-        <h2>Staff</h2>
-        <span class="role-badge">Standard</span>
-      </div>
-      <p class="role-description">Standard access for daily operations</p>
-      <div class="permissions-list">
-        <h3>Permissions:</h3>
-        <ul>
-          <li>✓ View own profile</li>
-          <li>✓ Create/View invoices</li>
-          <li>✓ Manage clients</li>
-          <li>✓ Process payments</li>
-          <li>✗ Edit other users</li>
-          <li>✗ System settings</li>
-        </ul>
-      </div>
-      <div class="role-actions">
-        <button class="btn btn-sm btn-secondary" onclick="editRole('staff')">Edit</button>
-        <button class="btn btn-sm btn-secondary" onclick="viewMembers('staff')">Members</button>
-      </div>
-    </div>
-
-    <!-- User Role -->
-    <div class="role-card user-role">
-      <div class="role-header">
-        <h2>User</h2>
-        <span class="role-badge">Basic</span>
-      </div>
-      <p class="role-description">Basic read-only access for general users</p>
-      <div class="permissions-list">
-        <h3>Permissions:</h3>
-        <ul>
-          <li>✓ View own profile</li>
-          <li>✓ View invoices</li>
-          <li>✓ View clients (read-only)</li>
-          <li>✓ Access reports</li>
-          <li>✗ Create/Edit invoices</li>
-          <li>✗ View financial details</li>
-        </ul>
-      </div>
-      <div class="role-actions">
-        <button class="btn btn-sm btn-secondary" onclick="editRole('user')">Edit</button>
-        <button class="btn btn-sm btn-secondary" onclick="viewMembers('user')">Members</button>
-      </div>
-    </div>
+    {% endif %}
   </div>
 
-  <!-- Role Permission Matrix -->
-  <div class="permission-matrix-section">
-    <h2>Permission Matrix</h2>
-    <div class="matrix-wrapper">
-      <table class="permission-matrix">
-        <thead>
-          <tr>
-            <th>Permission</th>
-            <th>Admin</th>
-            <th>Manager</th>
-            <th>Staff</th>
-            <th>User</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Manage Users</td>
-            <td class="allowed">✓</td>
-            <td class="denied">✗</td>
-            <td class="denied">✗</td>
-            <td class="denied">✗</td>
-          </tr>
-          <tr>
-            <td>Create Invoices</td>
-            <td class="allowed">✓</td>
-            <td class="allowed">✓</td>
-            <td class="allowed">✓</td>
-            <td class="denied">✗</td>
-          </tr>
-          <tr>
-            <td>Edit Invoices</td>
-            <td class="allowed">✓</td>
-            <td class="allowed">✓</td>
-            <td class="allowed">✓</td>
-            <td class="denied">✗</td>
-          </tr>
-          <tr>
-            <td>Delete Invoices</td>
-            <td class="allowed">✓</td>
-            <td class="allowed">✓</td>
-            <td class="denied">✗</td>
-            <td class="denied">✗</td>
-          </tr>
-          <tr>
-            <td>Manage Clients</td>
-            <td class="allowed">✓</td>
-            <td class="allowed">✓</td>
-            <td class="allowed">✓</td>
-            <td class="denied">✗</td>
-          </tr>
-          <tr>
-            <td>View Reports</td>
-            <td class="allowed">✓</td>
-            <td class="allowed">✓</td>
-            <td class="allowed">✓</td>
-            <td class="allowed">✓</td>
-          </tr>
-          <tr>
-            <td>Manage Payments</td>
-            <td class="allowed">✓</td>
-            <td class="allowed">✓</td>
-            <td class="allowed">✓</td>
-            <td class="denied">✗</td>
-          </tr>
-          <tr>
-            <td>System Settings</td>
-            <td class="allowed">✓</td>
-            <td class="denied">✗</td>
-            <td class="denied">✗</td>
-            <td class="denied">✗</td>
-          </tr>
-          <tr>
-            <td>View Audit Logs</td>
-            <td class="allowed">✓</td>
-            <td class="denied">✗</td>
-            <td class="denied">✗</td>
-            <td class="denied">✗</td>
-          </tr>
-          <tr>
-            <td>Manage Backups</td>
-            <td class="allowed">✓</td>
-            <td class="denied">✗</td>
-            <td class="denied">✗</td>
-            <td class="denied">✗</td>
-          </tr>
-        </tbody>
-      </table>
+  <!-- Role Stats Summary -->
+  <div class="role-stats-summary">
+    <h2>📊 Role Statistics</h2>
+    <div class="stats-grid">
+      {% for stat in role_stats %}
+        <div class="stat-card">
+          <div class="stat-card-title">{{ stat.name|title }}</div>
+          <div class="stat-card-value">{{ stat.permission_count }}/{{ stat.total_possible }}</div>
+          <div class="stat-card-percentage">{{ stat.percentage|floatformat:0 }}% coverage</div>
+          <div class="stat-card-members">{{ stat.members_count }} member{{ stat.members_count|pluralize }}</div>
+        </div>
+      {% endfor %}
     </div>
   </div>
 </div>
@@ -212,6 +87,14 @@
 {% include "10_modals/role_members_modal.html" %}
 
 <script>
+  // Initialize modal - ensure it's hidden on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    const membersModal = document.getElementById('members-modal');
+    if (membersModal) {
+      membersModal.style.display = 'none';
+    }
+  });
+
   // User data from Django context
   const usersData = {
     {% for user in users %}'{{ user.id }}': {
@@ -232,14 +115,10 @@
     {% endfor %}
   };
 
-  function showCreateRoleModal() {
-    alert('Create role form would appear here');
-  }
-
   function editRole(roleName) {
     const roleId = roleMap[roleName];
     if (roleId) {
-      window.location.href = `/system/role/${roleId}/permissions/`;
+      window.location.href = `/system/roles/${roleId}/edit/`;
     } else {
       alert('Role not found');
     }
@@ -247,14 +126,14 @@
 
   function viewMembers(roleName) {
     const members = Object.values(usersData).filter(user => user.role === roleName);
-    
+
     // Set modal title
     document.getElementById('roleName').textContent = roleName.charAt(0).toUpperCase() + roleName.slice(1);
-    
+
     // Populate table
     const tbody = document.getElementById('membersTableBody');
     const noMembers = document.getElementById('noMembers');
-    
+
     if (members.length === 0) {
       tbody.innerHTML = '';
       noMembers.style.display = 'block';
@@ -279,26 +158,28 @@
         </tr>
       `).join('');
     }
-    
+
     // Clear search
     document.getElementById('memberSearch').value = '';
-    
+
     // Show modal
-    document.getElementById('members-modal').style.display = 'flex';
+    const membersModal = document.getElementById('members-modal');
+    membersModal.style.display = 'flex';
   }
 
   function closeMembersModal() {
-    document.getElementById('members-modal').style.display = 'none';
+    const membersModal = document.getElementById('members-modal');
+    membersModal.style.display = 'none';
   }
 
   function filterMembers() {
     const searchTerm = document.getElementById('memberSearch').value.toLowerCase();
     const rows = document.querySelectorAll('.member-row');
-    
+
     rows.forEach(row => {
       const name = row.getAttribute('data-name');
       const email = row.getAttribute('data-email');
-      
+
       if (name.includes(searchTerm) || email.includes(searchTerm)) {
         row.style.display = '';
       } else {

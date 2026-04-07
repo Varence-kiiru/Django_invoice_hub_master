@@ -2,9 +2,9 @@ from django.apps import AppConfig
 
 
 class QuotationsConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'invoicing_app.quotations'
-    verbose_name = 'Quotations'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "invoicing_app.quotations"
+    verbose_name = "Quotations"
 
     def ready(self):
-        import invoicing_app.quotations.signals
+        pass

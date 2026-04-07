@@ -4,11 +4,10 @@ Handles sending quotations to clients and status change notifications.
 """
 
 from typing import Optional
-from django.core.mail import EmailMessage, EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
-from django.template import Template, Context
 import logging
 
 logger = logging.getLogger(__name__)
@@ -47,18 +46,15 @@ class QuoteEmailService:
             True if sent successfully, False otherwise
         """
         context = {
-            'client_name': client_name,
-            'quote_number': quote_number,
-            'quote_date': quote_date,
-            'total_amount': total_amount,
-            'valid_until': valid_until,
+            "client_name": client_name,
+            "quote_number": quote_number,
+            "quote_date": quote_date,
+            "total_amount": total_amount,
+            "valid_until": valid_until,
         }
 
         subject = f"Quotation {quote_number} - {self.sender_name}"
-        html_message = render_to_string(
-            'emails/quote_issued.html',
-            context
-        )
+        html_message = render_to_string("emails/quote_issued.html", context)
         text_message = strip_tags(html_message)
 
         return self._send_email(
@@ -79,16 +75,13 @@ class QuoteEmailService:
     ) -> bool:
         """Send notification when client accepts quotation."""
         context = {
-            'client_name': client_name,
-            'quote_number': quote_number,
-            'total_amount': total_amount,
+            "client_name": client_name,
+            "quote_number": quote_number,
+            "total_amount": total_amount,
         }
 
         subject = f"Quotation Accepted - {quote_number}"
-        html_message = render_to_string(
-            'emails/quote_accepted.html',
-            context
-        )
+        html_message = render_to_string("emails/quote_accepted.html", context)
         text_message = strip_tags(html_message)
 
         return self._send_email(
@@ -107,16 +100,13 @@ class QuoteEmailService:
     ) -> bool:
         """Send notification when client rejects quotation."""
         context = {
-            'client_name': client_name,
-            'quote_number': quote_number,
-            'rejection_reason': rejection_reason or 'No reason provided',
+            "client_name": client_name,
+            "quote_number": quote_number,
+            "rejection_reason": rejection_reason or "No reason provided",
         }
 
         subject = f"Quotation Rejected - {quote_number}"
-        html_message = render_to_string(
-            'emails/quote_rejected.html',
-            context
-        )
+        html_message = render_to_string("emails/quote_rejected.html", context)
         text_message = strip_tags(html_message)
 
         return self._send_email(
@@ -136,17 +126,14 @@ class QuoteEmailService:
     ) -> bool:
         """Send reminder before quotation expires."""
         context = {
-            'client_name': client_name,
-            'quote_number': quote_number,
-            'valid_until': valid_until,
-            'days_remaining': days_remaining,
+            "client_name": client_name,
+            "quote_number": quote_number,
+            "valid_until": valid_until,
+            "days_remaining": days_remaining,
         }
 
         subject = f"Quotation Expiring Soon - {quote_number}"
-        html_message = render_to_string(
-            'emails/quote_expiration_warning.html',
-            context
-        )
+        html_message = render_to_string("emails/quote_expiration_warning.html", context)
         text_message = strip_tags(html_message)
 
         return self._send_email(
@@ -167,18 +154,15 @@ class QuoteEmailService:
     ) -> bool:
         """Send notification when quotation is converted to invoice."""
         context = {
-            'client_name': client_name,
-            'quote_number': quote_number,
-            'invoice_number': invoice_number,
-            'total_amount': total_amount,
-            'due_date': due_date,
+            "client_name": client_name,
+            "quote_number": quote_number,
+            "invoice_number": invoice_number,
+            "total_amount": total_amount,
+            "due_date": due_date,
         }
 
         subject = f"Invoice Generated from {quote_number}"
-        html_message = render_to_string(
-            'emails/quote_converted.html',
-            context
-        )
+        html_message = render_to_string("emails/quote_converted.html", context)
         text_message = strip_tags(html_message)
 
         return self._send_email(
@@ -222,9 +206,7 @@ class QuoteEmailService:
                 )
                 email.attach_alternative(html_message, "text/html")
                 email.attach(
-                    pdf_filename or 'document.pdf',
-                    pdf_attachment,
-                    'application/pdf'
+                    pdf_filename or "document.pdf", pdf_attachment, "application/pdf"
                 )
             else:
                 # Use EmailMultiAlternatives for HTML + plain text

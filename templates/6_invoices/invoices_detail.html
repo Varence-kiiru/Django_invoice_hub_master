@@ -46,13 +46,13 @@
       {% else %}
         <a href="{% url 'invoices:clone' invoice.id %}" class="btn btn-secondary">📋 Clone</a>
       {% endif %}
-      
+
       {% if invoice.amount_due > 0 and invoice.status != 'cancelled' and invoice.status != 'draft' %}
         <a href="{% url 'payments:create' %}?invoice={{ invoice.id }}" class="btn btn-success">💰 Record Payment</a>
       {% elif invoice.amount_due <= 0 and invoice.status != 'paid' and invoice.status != 'cancelled' %}
         <a href="{% url 'invoices:mark-paid' invoice.id %}" class="btn btn-success">✅ Mark as Paid</a>
       {% endif %}
-      
+
       {% if invoice.status != 'cancelled' %}
         <a href="{% url 'invoices:cancel' invoice.id %}" class="btn btn-secondary">❌ Cancel</a>
       {% endif %}
@@ -126,7 +126,7 @@
           </thead>
           <tbody>
             {% for item in line_items %}
-              <tr class="invoice-item-row" 
+              <tr class="invoice-item-row"
                   data-item-id="{{ item.id }}"
                   data-description="{{ item.description }}"
                   data-quantity="{{ item.quantity }}"
@@ -451,7 +451,7 @@
 <script src="{% static 'js/pages/invoices.js' %}"></script>
 <script>
   // ========== EVENT LISTENERS FOR EDIT/DELETE MODALS ==========
-  
+
   document.addEventListener('DOMContentLoaded', function() {
     // Add real-time calculation listeners for edit form
     const editQuantityInput = document.getElementById('edit-modal-quantity');

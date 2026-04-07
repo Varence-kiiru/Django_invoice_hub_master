@@ -1,10 +1,10 @@
 # Privacy Policy
 
-**Last Updated: March 2025**
+**Last Updated: April 7, 2026**
 
 ## 1. Introduction
 
-InvoiceSystem ("we", "us", "our", or "Company") operates the Service. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service and the choices you have associated with that data.
+InvoiceHub ("we", "us", "our", or "Company") operates the InvoiceHub service. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service and the choices you have associated with that data.
 
 ## 2. Information Collection and Use
 
@@ -32,21 +32,61 @@ We collect several different types of information for various purposes to provid
 
 ## 3. Legal Basis for Processing Data (GDPR)
 
-InvoiceSystem's legal basis for collecting and using the personal data described in Section 2 depends on the Personal Data we collect and the specific context in which we collect it:
+InvoiceHub's legal basis for collecting and using the personal data described in Section 2 depends on the Personal Data we collect and the specific context in which we collect it:
 
-- InvoiceSystem needs to perform a contract with you
+- InvoiceHub needs to perform a contract with you
 - You have given us permission to do so
 - Processing of your Personal Data is in our legitimate interests
-- InvoiceSystem needs to comply with the law
+- InvoiceHub needs to comply with the law
 
 ## 4. Data Retention
 
-InvoiceSystem will retain your Personal Data only for as long as necessary for the purposes set out in this Privacy Policy. We will retain and use your Personal Data to the extent necessary to comply with our legal obligations.
+InvoiceHub will retain your Personal Data only for as long as necessary for the purposes set out in this Privacy Policy. We will retain and use your Personal Data to the extent necessary to comply with our legal obligations.
 
 For users who request account deletion:
 - Personal data deleted within 30 days
-- Transaction/invoice data retained for 7 years (tax compliance)
+- Transaction/invoice data retained for 7 years (tax/legal compliance)
 - Backup copies deleted within 90 days
+- Anonymized usage data may be retained indefinitely
+
+## 5. Data Security
+
+Your data security is important to us. InvoiceHub implements appropriate technical and organizational measures to protect Personal Data against unauthorized access, alteration, disclosure, or destruction, including:
+
+- Encryption of sensitive data in transit (HTTPS/TLS)
+- Encryption of sensitive data at rest (where applicable)
+- Secure database backup procedures
+- Access controls and role-based permissions
+- Regular security audits and vulnerability scanning
+- Multi-factor authentication support
+
+However, no method of transmission over the Internet or electronic storage is 100% secure.
+
+## 6. Data Sharing
+
+InvoiceHub does NOT sell personal data. We may share data with:
+- **Service Providers:** Email providers, payment processors (Stripe, PayPal), hosting providers - under data processing agreements
+- **Legal Requirements:** When required by law or government request
+- **Business Transfer:** In case of merger, acquisition, or bankruptcy
+- **Analytics:** Anonymized, aggregated data for service improvements
+
+## 7. Cookies
+
+InvoiceHub uses cookies for:
+- Session management (authentication)
+- User preferences (language, theme)
+- Analytics (understanding usage patterns)
+- Security (CSRF protection)
+
+Users can control cookie settings in their browser. Disabling cookies may affect functionality.
+
+## 8. Third-Party Links
+
+InvoiceHub may contain links to third-party websites. We are not responsible for their privacy practices. Users should review third-party privacy policies before providing data.
+
+## 9. Children's Privacy
+
+InvoiceHub is not intended for users under 13 (or applicable age in your jurisdiction). We do not knowingly collect personal data from children. If discovered, we will delete such data immediately.
 
 ## 5. Security of Data
 
@@ -125,8 +165,8 @@ If InvoiceSystem is involved in a merger, acquisition or asset sale, your Person
 
 If you have any questions about this Privacy Policy, please contact us:
 
-**Email**: privacy@invoicesystem.com  
-**Address**: [Company Address]  
+**Email**: privacy@invoicesystem.com
+**Address**: [Company Address]
 **Phone**: [Company Phone]
 
 ## 12. Data Protection Officer
@@ -136,5 +176,5 @@ For inquiries related to data protection and GDPR compliance:
 
 ---
 
-**Last Updated**: March 2025  
+**Last Updated**: March 2025
 **Version**: 1.0

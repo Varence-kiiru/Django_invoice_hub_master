@@ -1,4 +1,4 @@
-<!-- 
+<!--
 Sidebar Mobile Troubleshooting Checklist
 Add this to your browser console to diagnose sidebar issues
 -->
@@ -11,7 +11,7 @@ Add this to your browser console to diagnose sidebar issues
   // Check for sidebar element
   const sidebar = document.getElementById('sidebar');
   console.log('✓ Sidebar element found:', !!sidebar);
-  
+
   if (sidebar) {
     console.log('  - Classes:', sidebar.className);
     console.log('  - Display:', getComputedStyle(sidebar).display);
@@ -51,7 +51,7 @@ Add this to your browser console to diagnose sidebar issues
   // Test toggle functionality
   console.log('\n📋 Testing sidebar toggle...');
   console.log('Before toggle - sidebar.classList:', sidebar?.className);
-  
+
   // Manual test commands:
   console.log('\n💡 Test commands:');
   console.log('1. Toggle sidebar: sidebar.classList.toggle("open")');

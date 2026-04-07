@@ -3,54 +3,11 @@
 
 {% block title %}Quotation Pipeline Report - Sales Analysis{% endblock %}
 
+{% block page_title %}Quotation Pipeline{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/icons.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/reports.css' %}">
-<style>
-    .pipeline-stage {
-        text-align: center;
-        padding: 20px;
-        border-radius: 8px;
-        margin: 10px 5px;
-    }
-    
-    .pipeline-stage h4 {
-        margin: 10px 0 5px 0;
-        font-weight: 600;
-    }
-    
-    .pipeline-stage .stage-value {
-        font-size: 1.4rem;
-        font-weight: bold;
-        margin: 10px 0;
-    }
-    
-    .pipeline-stage .stage-rate {
-        font-size: 0.9rem;
-        color: #666;
-    }
-    
-    .conversion-arrow {
-        font-size: 1.8rem;
-        color: #007bff;
-        margin: 0 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .pipeline-container {
-        display: flex;
-        align-items: center;
-        overflow-x: auto;
-        padding: 20px 0;
-    }
-    
-    .stage-box {
-        flex: 1;
-        min-width: 150px;
-    }
-</style>
 {% endblock %}
 
 {% block content %}
@@ -99,10 +56,10 @@
                     <div class="stage-value text-secondary">{{ pipeline.draft }}</div>
                     <div class="stage-rate">KES {{ stage_values.draft|floatformat:2 }}</div>
                 </div>
-                
+
                 <!-- Arrow -->
                 <div class="conversion-arrow">→</div>
-                
+
                 <!-- Issued/Sent Stage -->
                 <div class="stage-box pipeline-stage" style="background-color: #e7f3ff; border: 2px solid #0d6efd;">
                     <h4>📤 Issued/Sent</h4>
@@ -110,10 +67,10 @@
                     <div class="stage-rate">KES {{ stage_values.issued|floatformat:2 }}</div>
                     <small>{% if pipeline.draft > 0 %}{{ conversion_rates.draft_to_issued|floatformat:1 }}% from draft{% endif %}</small>
                 </div>
-                
+
                 <!-- Arrow -->
                 <div class="conversion-arrow">→</div>
-                
+
                 <!-- Viewed/Accepted Stage -->
                 <div class="stage-box pipeline-stage" style="background-color: #fff3cd; border: 2px solid #ffc107;">
                     <h4>✅ Viewed/Accepted</h4>
@@ -121,10 +78,10 @@
                     <div class="stage-rate">KES {{ stage_values.viewed|floatformat:2 }}</div>
                     <small>{% if pipeline.issued > 0 %}{{ conversion_rates.issued_to_viewed|floatformat:1 }}% from issued{% endif %}</small>
                 </div>
-                
+
                 <!-- Arrow -->
                 <div class="conversion-arrow">→</div>
-                
+
                 <!-- Converted Stage -->
                 <div class="stage-box pipeline-stage" style="background-color: #d1e7dd; border: 2px solid #198754;">
                     <h4>🔄 Converted</h4>
@@ -229,7 +186,7 @@
                                     <strong>{{ quote.quote_number }}</strong>
                                 </td>
                                 <td>
-                                    <a href="{% url 'clients:detail' quote.client.id %}" 
+                                    <a href="{% url 'clients:detail' quote.client.id %}"
                                        class="text-decoration-none">
                                         {{ quote.client.name }}
                                     </a>

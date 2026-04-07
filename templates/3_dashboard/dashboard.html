@@ -20,7 +20,7 @@
   {% if can_manage_users or can_manage_roles or can_manage_settings %}
   <div class="dashboard-section">
     <div class="dashboard-section-title">Administration Controls</div>
-    
+
     <div class="admin-grid">
       <!-- User Management -->
       {% if can_manage_users %}
@@ -121,7 +121,7 @@
       <div class="kpi-label" id="kpi-revenue-label">💰 Total Revenue</div>
       <div class="kpi-value kpi-large" aria-labelledby="kpi-revenue-label" role="status">{{ company_settings.currency_symbol }}{{ total_revenue|default:'0'|floatformat:2 }}</div>
       <div class="kpi-change {% if revenue_trend == 'up' %}positive{% elif revenue_trend == 'down' %}negative{% else %}neutral{% endif %}">
-        <span aria-hidden="true">{% if revenue_trend == 'up' %}↑{% elif revenue_trend == 'down' %}↓{% else %}→{% endif %}</span> 
+        <span aria-hidden="true">{% if revenue_trend == 'up' %}↑{% elif revenue_trend == 'down' %}↓{% else %}→{% endif %}</span>
         <span>{% if month_revenue > prev_month_revenue %}+{{ revenue_change|floatformat:0 }}{% elif month_revenue < prev_month_revenue %}-{{ revenue_change|floatformat:0 }}{% else %}0{% endif %}% vs last month</span>
       </div>
     </div>
@@ -160,7 +160,7 @@
       <div class="kpi-label" id="kpi-quotes-label">📋 Total Quotations</div>
       <div class="kpi-value" aria-labelledby="kpi-quotes-label" role="status">{{ total_quotations|default:'0' }}</div>
       <div class="kpi-change {% if sent_quotations > 0 %}positive{% else %}neutral{% endif %}">
-        <span aria-hidden="true">{% if sent_quotations > 0 %}→{% else %}✓{% endif %}</span> 
+        <span aria-hidden="true">{% if sent_quotations > 0 %}→{% else %}✓{% endif %}</span>
         <span>{{ sent_quotations|default:'0' }} awaiting response</span>
       </div>
     </div>
@@ -179,7 +179,7 @@
       <div class="kpi-label" id="kpi-converted-label">🔄 Converted to Invoice</div>
       <div class="kpi-value" aria-labelledby="kpi-converted-label" role="status">{{ converted_quotations|default:'0' }}</div>
       <div class="kpi-change {% if accepted_quotations > 0 %}positive{% else %}neutral{% endif %}">
-        <span aria-hidden="true">{% if accepted_quotations > 0 %}→{% else %}✓{% endif %}</span> 
+        <span aria-hidden="true">{% if accepted_quotations > 0 %}→{% else %}✓{% endif %}</span>
         <span>{{ accepted_quotations|default:'0' }} accepted</span>
       </div>
     </div>
@@ -203,6 +203,28 @@
         <span>Revenue minus expenses</span>
       </div>
     </div>
+
+    <!-- Total Tax Collected (Financials) -->
+    {% if can_view_financials %}
+    <div class="kpi-card" role="article">
+      <div class="kpi-label" id="kpi-tax-label">🏛️ Tax Collected</div>
+      <div class="kpi-value" aria-labelledby="kpi-tax-label" role="status">{{ company_settings.currency_symbol }}{{ total_tax_collected|default:'0'|floatformat:2 }}</div>
+      <div class="kpi-change positive">
+        <span>VAT and other taxes</span>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Pending Tax (Financials) -->
+    {% if can_view_financials %}
+    <div class="kpi-card" role="article">
+      <div class="kpi-label" id="kpi-pending-tax-label">⏳ Pending Tax</div>
+      <div class="kpi-value {% if pending_tax > 0 %}kpi-alert{% else %}kpi-success{% endif %}" aria-labelledby="kpi-pending-tax-label" role="status">{{ company_settings.currency_symbol }}{{ pending_tax|default:'0'|floatformat:2 }}</div>
+      <div class="kpi-change {% if pending_tax > 0 %}negative{% else %}positive{% endif %}">
+        <span>{% if pending_tax > 0 %}Awaiting remittance{% else %}✓ All up to date{% endif %}</span>
+      </div>
+    </div>
+    {% endif %}
   </div>
 
   <!-- Invoice Status Breakdown -->
@@ -261,7 +283,7 @@
       <div class="dashboard-section-title">Recent Invoices</div>
       <a href="{% url 'invoices:list' %}" class="btn btn-secondary btn-sm">View All →</a>
     </div>
-    
+
     <div class="dashboard-card">
       {% if recent_invoices %}
         <table class="recent-table">

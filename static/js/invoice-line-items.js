@@ -260,7 +260,7 @@ const LineItemsModal = {
     if (form) {
       form.reset();
     }
-    
+
     // Explicitly set default values - use optional chaining for safety
     const productSelect = document.getElementById('modal-product');
     const descInput = document.getElementById('modal-description');
@@ -275,7 +275,7 @@ const LineItemsModal = {
     if (priceInput) priceInput.value = '0';
     if (rateInput) rateInput.value = '0';
     if (totalDisplay) totalDisplay.textContent = '0.00';
-    
+
     console.log('[Reset] Form reset to defaults - qty=1, price=0, tax=0');
   },
 
@@ -284,7 +284,7 @@ const LineItemsModal = {
     const invoiceId = window.location.pathname.split('/')[2];
     const productId = document.getElementById('modal-product')?.value || '';
     const description = document.getElementById('modal-description')?.value || '';
-    
+
     // Get input elements and their values
     const qtyElement = document.getElementById('modal-quantity');
     const priceElement = document.getElementById('modal-unit-price');

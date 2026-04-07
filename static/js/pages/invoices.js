@@ -28,11 +28,11 @@ function showAlert(message, type = 'info') {
       <span aria-hidden="true">&times;</span>
     </button>
   `;
-  
+
   const container = document.querySelector('.admin-container');
   if (container) {
     container.insertBefore(alertDiv, container.firstChild);
-    
+
     // Auto-dismiss after 5 seconds
     setTimeout(() => {
       alertDiv.style.opacity = '0';
@@ -47,32 +47,32 @@ function calculateLineTotal() {
   const qty = parseFloat(document.getElementById('quantity')?.value) || 0;
   const price = parseFloat(document.getElementById('unit-price')?.value) || 0;
   const taxRate = parseFloat(document.getElementById('tax-rate')?.value) || 0;
-  
+
   const subtotal = qty * price;
   const tax = subtotal * (taxRate / 100);
   const total = subtotal + tax;
-  
+
   const totalElement = document.getElementById('line-total');
   if (totalElement) {
     totalElement.value = total.toFixed(2);
     // Also update any display elements
-    const displayElement = document.getElementById('line-total-display') || 
+    const displayElement = document.getElementById('line-total-display') ||
                           document.querySelector('.line-total-display') ||
                           document.querySelector('[data-line-total]');
     if (displayElement) {
       displayElement.textContent = total.toFixed(2);
     }
   }
-  
+
   return { subtotal, tax, total };
 }
 
 function updateProductInfo() {
   const select = document.getElementById('product');
   if (!select) return;
-  
+
   const option = select.options[select.selectedIndex];
-  
+
   // Clear if no selection
   if (!option.value) {
     document.getElementById('description').value = '';
@@ -81,18 +81,18 @@ function updateProductInfo() {
     calculateLineTotal();
     return;
   }
-  
+
   // Get product data from option attributes
   const description = option.getAttribute('data-description');
   const price = option.getAttribute('data-price');
   const taxRateType = option.getAttribute('data-tax-rate-type');
-  
+
   console.log('[updateProductInfo] Selected product:', {
     description: description,
     price: price,
     taxRateType: taxRateType
   });
-  
+
   // Auto-populate description
   if (description) {
     const descInput = document.getElementById('description');
@@ -101,7 +101,7 @@ function updateProductInfo() {
       console.log('[updateProductInfo] Description set to:', description);
     }
   }
-  
+
   // Auto-populate unit price
   if (price) {
     const priceInput = document.getElementById('unit-price');
@@ -110,7 +110,7 @@ function updateProductInfo() {
       console.log('[updateProductInfo] Price set to:', parseFloat(price).toFixed(2));
     }
   }
-  
+
   // Auto-populate tax rate based on tax rate type
   if (taxRateType) {
     const taxRateSelect = document.getElementById('tax_rate');
@@ -121,11 +121,11 @@ function updateProductInfo() {
         try {
           const taxClassRateMap = JSON.parse(mapElement.textContent);
           console.log('[updateProductInfo] Tax class rate map:', taxClassRateMap);
-          
+
           if (taxClassRateMap[taxRateType]) {
             const rateInfo = taxClassRateMap[taxRateType];
             const rateId = rateInfo.rate_id;
-            
+
             // Find and select the option with matching rate ID
             for (let i = 0; i < taxRateSelect.options.length; i++) {
               const optionValue = taxRateSelect.options[i].value;
@@ -142,7 +142,7 @@ function updateProductInfo() {
       }
     }
   }
-  
+
   calculateLineTotal();
 }
 
@@ -154,12 +154,12 @@ function updateLineItemTotal() {
 document.addEventListener('DOMContentLoaded', function() {
   // Set default due date on create form
   setDefaultDueDate();
-  
+
   // Add real-time calculation listeners
   const quantityInput = document.getElementById('quantity');
   const priceInput = document.getElementById('unit-price');
   const taxRateInput = document.getElementById('tax-rate');
-  
+
   if (quantityInput) {
     quantityInput.addEventListener('input', calculateLineTotal);
   }
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (taxRateInput) {
     taxRateInput.addEventListener('input', calculateLineTotal);
   }
-  
+
   // Close modals on escape key
   document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
@@ -178,14 +178,14 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
   });
-  
+
   // Close alert messages
   document.querySelectorAll('.alert .close').forEach(btn => {
     btn.addEventListener('click', function() {
       this.closest('.alert').remove();
     });
   });
-  
+
   // Auto-format currency inputs
   document.querySelectorAll('[type="number"][data-currency]').forEach(input => {
     input.addEventListener('change', function() {
@@ -218,15 +218,15 @@ function formatDate(date) {
 
 function handleInvoiceCreate(event) {
   event.preventDefault();
-  
+
   const form = event.target;
   const client = form.querySelector('[name="client"]');
-  
+
   if (!client?.value) {
     showAlert('Please select a client', 'warning');
     return;
   }
-  
+
   showLoadingIndicator();
   form.submit();
 }
@@ -237,9 +237,9 @@ function handleBulkAction(action) {
     showAlert('Please select at least one invoice', 'warning');
     return;
   }
-  
+
   const ids = Array.from(checkboxes).map(cb => cb.value);
-  
+
   if (action === 'issue') {
     if (confirm(`Issue ${ids.length} invoice(s)?`)) {
       bulkIssueInvoices(ids);
@@ -255,7 +255,7 @@ function handleBulkAction(action) {
 
 function bulkIssueInvoices(ids) {
   showLoadingIndicator();
-  
+
   fetch('/api/v1/invoices/bulk-issue/', {
     method: 'POST',
     headers: {
@@ -282,7 +282,7 @@ function bulkIssueInvoices(ids) {
 
 function bulkSendInvoices(ids) {
   showLoadingIndicator();
-  
+
   fetch('/api/v1/invoices/bulk-send/', {
     method: 'POST',
     headers: {
@@ -310,7 +310,7 @@ function bulkSendInvoices(ids) {
 function deleteInvoice(invoiceId) {
   if (confirm('Are you sure you want to delete this invoice?')) {
     showLoadingIndicator();
-    
+
     fetch(`/invoices/${invoiceId}/delete/`, {
       method: 'POST',
       headers: {
@@ -336,7 +336,7 @@ function deleteInvoice(invoiceId) {
 
 function addLineItemAPI(invoiceId, lineItem) {
   showLoadingIndicator();
-  
+
   fetch(`/api/v1/invoices/${invoiceId}/add-line-item/`, {
     method: 'POST',
     headers: {
@@ -366,7 +366,7 @@ function addLineItemAPI(invoiceId, lineItem) {
 function removeLineItemAPI(invoiceId, lineItemId) {
   if (confirm('Are you sure you want to remove this line item?')) {
     showLoadingIndicator();
-    
+
     fetch(`/api/v1/invoices/${invoiceId}/remove-line-item/${lineItemId}/`, {
       method: 'DELETE',
       headers: {
@@ -661,7 +661,7 @@ document.addEventListener('keydown', function(event) {
       form.submit();
     }
   }
-  
+
   // Ctrl+Escape to close modal
   if (event.ctrlKey && event.key === 'Escape') {
     event.preventDefault();
@@ -677,7 +677,7 @@ document.addEventListener('keydown', function(event) {
 document.addEventListener('DOMContentLoaded', function() {
   // Set default due date on create form
   setDefaultDueDate();
-  
+
   // Close modals on escape key
   document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
@@ -686,14 +686,14 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
   });
-  
+
   // Close alert messages
   document.querySelectorAll('.alert .close').forEach(btn => {
     btn.addEventListener('click', function() {
       this.closest('.alert').remove();
     });
   });
-  
+
   // Auto-format currency inputs
   document.querySelectorAll('[type="number"][data-currency]').forEach(input => {
     input.addEventListener('change', function() {
@@ -709,21 +709,21 @@ document.addEventListener('DOMContentLoaded', function() {
 function exportToCSV() {
   const table = document.querySelector('.admin-table');
   if (!table) return;
-  
+
   let csv = [];
   const rows = table.querySelectorAll('tr');
-  
+
   rows.forEach(row => {
     const cols = row.querySelectorAll('td, th');
     let csvRow = [];
-    
+
     cols.forEach(col => {
       csvRow.push('"' + col.textContent.replace(/"/g, '""') + '"');
     });
-    
+
     csv.push(csvRow.join(','));
   });
-  
+
   const csvContent = csv.join('\n');
   const blob = new Blob([csvContent], { type: 'text/csv' });
   const url = window.URL.createObjectURL(blob);

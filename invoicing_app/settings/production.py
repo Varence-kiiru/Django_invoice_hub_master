@@ -7,12 +7,20 @@ from .base import *  # noqa: F401,F403
 
 DEBUG = False
 
-ALLOWED_HOSTS = get_env("DJANGO_ALLOWED_HOSTS", "").split(",") if get_env("DJANGO_ALLOWED_HOSTS", "") else []
+ALLOWED_HOSTS = (
+    get_env("DJANGO_ALLOWED_HOSTS", "").split(",")
+    if get_env("DJANGO_ALLOWED_HOSTS", "")
+    else []
+)
 
 # Strict security defaults
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
-SECURE_SSL_REDIRECT = get_env("SECURE_SSL_REDIRECT", "True").lower() in ("1", "true", "yes")
+SECURE_SSL_REDIRECT = get_env("SECURE_SSL_REDIRECT", "True").lower() in (
+    "1",
+    "true",
+    "yes",
+)
 
 # Database: require env variables in production
 DATABASES = {
@@ -28,7 +36,10 @@ DATABASES = {
 }
 
 # Static files should be served by CDN / web server in production; collectstatic into STATIC_ROOT
-STATICFILES_STORAGE = _get_env("STATICFILES_STORAGE", "django.contrib.staticfiles.storage.ManifestStaticFilesStorage")
+STATICFILES_STORAGE = _get_env(
+    "STATICFILES_STORAGE",
+    "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+)
 
 # Cache: prefer Redis or Memcached for production
 if _get_env("REDIS_URL"):

@@ -1,0 +1,195 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}{{ liability.financial_period }} - Tax Liability{% endblock %}
+
+{% block page_title %}Tax Liability Details{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/components/tables.css' %}">
+<link rel="stylesheet" href="{% static 'css/financials.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Liability Header -->
+  <div class="liability-header">
+    <h1 class="liability-title">{{ liability.financial_period }}</h1>
+    <p>{{ liability.tax_type }} Tax Liability</p>
+
+    <div class="liability-meta">
+      <div class="liability-meta-item">
+        <div class="liability-meta-label">Tax Type</div>
+        <div class="liability-meta-value">{{ liability.tax_type }}</div>
+      </div>
+      <div class="liability-meta-item">
+        <div class="liability-meta-label">Status</div>
+        <div class="liability-meta-value">
+          <span class="status-badge {{ liability.status }}">{{ liability.get_status_display }}</span>
+        </div>
+      </div>
+      <div class="liability-meta-item">
+        <div class="liability-meta-label">Due Date</div>
+        <div class="liability-meta-value">
+          {% if liability.due_date %}
+            <span class="{% if liability.status == 'overdue' %}due-date-warning{% elif liability.status == 'due_soon' %}due-date-soon{% endif %}">
+              {{ liability.due_date|date:"M j, Y" }}
+            </span>
+          {% else %}
+            Not set
+          {% endif %}
+        </div>
+      </div>
+      {% if liability.remitted_date %}
+      <div class="liability-meta-item">
+        <div class="liability-meta-label">Remitted Date</div>
+        <div class="liability-meta-value">{{ liability.remitted_date|date:"M j, Y" }}</div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Liability Statistics -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-title">💰 Total Revenue</div>
+      <div class="stat-value">{{ company_settings.currency_symbol }}{{ liability.total_revenue|floatformat:2 }}</div>
+      <div class="stat-change">Revenue collected this period</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-title">🏛️ Tax Collected</div>
+      <div class="stat-value">{{ company_settings.currency_symbol }}{{ liability.total_tax_collected|floatformat:2 }}</div>
+      <div class="stat-change">Tax amount to be remitted</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-title">📊 Final Liability</div>
+      <div class="stat-value">{{ company_settings.currency_symbol }}{{ liability.final_liability|floatformat:2 }}</div>
+      <div class="stat-change">After penalties and discounts</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-title">📋 Collections</div>
+      <div class="stat-value">{{ collections|length }}</div>
+      <div class="stat-change">Individual revenue records</div>
+    </div>
+  </div>
+
+  <!-- Remittance Information -->
+  {% if liability.remittance_reference %}
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">💳 Remittance Information</h3>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <strong>Reference Number:</strong> {{ liability.remittance_reference }}
+        </div>
+        {% if liability.remitted_date %}
+        <div class="col-md-6">
+          <strong>Remitted Date:</strong> {{ liability.remitted_date|date:"M j, Y" }}
+        </div>
+        {% endif %}
+      </div>
+      {% if liability.penalties > 0 or liability.discounts > 0 %}
+      <div class="row mt-2">
+        {% if liability.penalties > 0 %}
+        <div class="col-md-6">
+          <strong>Penalties:</strong> {{ company_settings.currency_symbol }}{{ liability.penalties|floatformat:2 }}
+        </div>
+        {% endif %}
+        {% if liability.discounts > 0 %}
+        <div class="col-md-6">
+          <strong>Discounts:</strong> {{ company_settings.currency_symbol }}{{ liability.discounts|floatformat:2 }}
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Action Buttons -->
+  {% if can_manage_financials %}
+  <div class="card remittance-details-card">
+    <div class="card-body">
+      {% if liability.status != 'remitted' %}
+      <a href="{% url 'financials:tax-liability-mark-remitted' liability.pk %}" class="btn-mark-remitted">
+        ✓ Mark as Remitted
+      </a>
+      <p class="remittance-note">
+        Record the tax remittance to the revenue authority
+      </p>
+      {% else %}
+      <div class="remittance-confirmation">
+        <strong class="remittance-label">✓ Remitted</strong><br/>
+        <span class="remittance-info">
+          Date: {{ liability.remitted_date|date:"M d, Y" }}<br/>
+          Reference: {{ liability.remittance_reference }}
+        </span>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Revenue Collections -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">💰 Revenue Collections</h3>
+    </div>
+    <div class="card-body">
+      {% if collections %}
+      <table class="collections-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Invoice</th>
+            <th>Revenue</th>
+            <th>Tax</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for collection in collections %}
+          <tr>
+            <td>{{ collection.collected_date|date:"M j, Y" }}</td>
+            <td>
+              <a href="{% url 'invoices:detail' collection.invoice.pk %}">
+                {{ collection.invoice.invoice_number }}
+              </a>
+            </td>
+            <td class="amount-column">{{ company_settings.currency_symbol }}{{ collection.revenue_amount|floatformat:2 }}</td>
+            <td class="amount-column">{{ company_settings.currency_symbol }}{{ collection.tax_amount|floatformat:2 }}</td>
+            <td class="amount-column"><strong>{{ company_settings.currency_symbol }}{{ collection.total_amount|floatformat:2 }}</strong></td>
+            <td>
+              <span class="status-badge {{ collection.status }}">
+                {{ collection.get_status_display }}
+              </span>
+            </td>
+            <td>
+              <a href="{% url 'financials:revenue-detail' collection.pk %}" class="btn btn-sm btn-outline-primary">
+                View
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">💰</div>
+        <h3 class="empty-state-title">No Revenue Collections</h3>
+        <p class="empty-state-description">
+          No revenue has been collected for this tax liability period.
+        </p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -3,6 +3,8 @@
 
 {% block title %}Edit Client - {{ client.name }}{% endblock %}
 
+{% block page_title %}Edit Client{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/clients.css' %}">
 {% endblock %}
@@ -13,7 +15,7 @@
     <div class="client-info">
         Created on {{ client.created_at|date:"M d, Y" }} | Last updated {{ client.updated_at|date:"M d, Y" }}
     </div>
-    
+
 {% if form.non_field_errors %}
     <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 20px;">
         <strong>Form Errors:</strong>
@@ -24,7 +26,7 @@
         </ul>
     </div>
     {% endif %}
-    
+
     {% for field in form %}
         {% if field.errors %}
             <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
@@ -37,10 +39,10 @@
             </div>
         {% endif %}
     {% endfor %}
-    
+
     <form method="post">
         {% csrf_token %}
-        
+
         <div class="form-group required">
             <label>{{ form.name.label }}</label>
             {{ form.name }}
@@ -48,7 +50,7 @@
                 <div class="form-error">{{ form.name.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-group required">
             <label>{{ form.client_type.label }}</label>
             {{ form.client_type }}
@@ -56,7 +58,7 @@
                 <div class="form-error">{{ form.client_type.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-group required">
             <label>{{ form.email.label }}</label>
             {{ form.email }}
@@ -64,7 +66,7 @@
                 <div class="form-error">{{ form.email.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-group">
             <label>{{ form.phone.label }}</label>
             {{ form.phone }}
@@ -72,7 +74,7 @@
                 <div class="form-error">{{ form.phone.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-group">
             <label>{{ form.tax_id.label }}</label>
             {{ form.tax_id }}
@@ -80,7 +82,7 @@
                 <div class="form-error">{{ form.tax_id.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-group">
             <label>{{ form.payment_terms_days.label }}</label>
             {{ form.payment_terms_days }}
@@ -88,7 +90,7 @@
                 <div class="form-error">{{ form.payment_terms_days.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-group">
             <label>{{ form.currency.label }}</label>
             {{ form.currency }}
@@ -96,7 +98,7 @@
                 <div class="form-error">{{ form.currency.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-group">
             <label>{{ form.credit_limit.label }}</label>
             {{ form.credit_limit }}
@@ -104,7 +106,7 @@
                 <div class="form-error">{{ form.credit_limit.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-group">
             <label>{{ form.notes.label }}</label>
             {{ form.notes }}
@@ -112,11 +114,11 @@
                 <div class="form-error">{{ form.notes.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Save Changes</button>
             <a href="{% url 'clients:detail' client.id %}" class="btn btn-secondary">Cancel</a>
-            <a href="{% url 'clients:delete' client.id %}" class="btn btn-danger">Delete</a>
+            <a href="#" class="btn btn-danger btn-delete" data-delete-url="{% url 'clients:delete' client.id %}" data-item-name="{{ client.name }}" data-item-type="Client" data-message="Delete this client? This action cannot be undone.">Delete</a>
         </div>
     </form>
 </div>

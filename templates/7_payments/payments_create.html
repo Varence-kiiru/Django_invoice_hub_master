@@ -3,6 +3,8 @@
 
 {% block title %}Record Payment - Invoicing App{% endblock %}
 
+{% block page_title %}Record Payment{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/payments.css' %}">
 {% endblock %}
@@ -49,7 +51,7 @@
                             <select name="invoice" id="invoice" class="form-control" required onchange="updateInvoiceAmount()">
                                 <option value="">-- Select Invoice --</option>
                                 {% for invoice in invoices %}
-                                    <option value="{{ invoice.id }}" 
+                                    <option value="{{ invoice.id }}"
                                         data-amount-due="{{ invoice.amount_due }}"
                                         data-client="{{ invoice.client.name }}"
                                         data-currency="{{ invoice.currency }}"
@@ -144,7 +146,7 @@
                             <label for="amount" class="form-label">Payment Amount <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text" id="currency-label">{{ company_settings.currency_symbol }}</span>
-                                <input type="number" name="amount" id="amount" class="form-control" 
+                                <input type="number" name="amount" id="amount" class="form-control"
                                     placeholder="0.00" step="0.01" min="0" required>
                             </div>
                             <small class="form-text text-muted">Amount received from the client</small>
@@ -160,7 +162,7 @@
                         <!-- Transaction Reference -->
                         <div class="mb-3">
                             <label for="reference" class="form-label">Transaction Reference</label>
-                            <input type="text" name="reference" id="reference" class="form-control" 
+                            <input type="text" name="reference" id="reference" class="form-control"
                                 placeholder="e.g., Cheque #123, M-Pesa code, Bank ref">
                             <small class="form-text text-muted">Transaction ID, check number, M-Pesa code, bank reference, etc.</small>
                         </div>
@@ -168,7 +170,7 @@
                         <!-- Notes -->
                         <div class="mb-3">
                             <label for="notes" class="form-label">Notes</label>
-                            <textarea name="notes" id="notes" class="form-control" rows="3" 
+                            <textarea name="notes" id="notes" class="form-control" rows="3"
                                 placeholder="Any additional notes about this payment"></textarea>
                             <small class="form-text text-muted">Optional: Any remarks or notes</small>
                         </div>
@@ -258,13 +260,13 @@
 function updateInvoiceAmount() {
     const select = document.getElementById('invoice');
     const selected = select.options[select.selectedIndex];
-    
+
     if (selected.value) {
         const amountDue = selected.getAttribute('data-amount-due');
         const clientName = selected.getAttribute('data-client');
         const currency = selected.getAttribute('data-currency');
         const invoiceId = selected.value;
-        
+
         // Store invoice data for reference
         const invoiceData = window.invoiceData = window.invoiceData || {};
         invoiceData[invoiceId] = {
@@ -272,10 +274,10 @@ function updateInvoiceAmount() {
             clientName: clientName,
             currency: currency
         };
-        
+
         // Fetch invoice details for breakdown
         fetchInvoiceDetails(invoiceId);
-        
+
         document.getElementById('client-name').textContent = clientName;
         document.getElementById('invoice-currency').textContent = currency;
         document.getElementById('balance-due').textContent = currency + ' ' + parseFloat(amountDue).toFixed(2);
@@ -283,7 +285,7 @@ function updateInvoiceAmount() {
         document.getElementById('currency-label').textContent = currency;
         document.getElementById('invoice-info').style.display = 'block';
         document.getElementById('amount').value = parseFloat(amountDue).toFixed(2);
-        
+
         // Setup payment history link
         document.getElementById('view-payment-history').onclick = function(e) {
             e.preventDefault();
@@ -305,16 +307,16 @@ function fetchInvoiceDetails(invoiceId) {
                 const originalAmount = data.total_amount;
                 const amountPaid = data.amount_paid;
                 const amountDue = data.amount_due;
-                
-                document.getElementById('original-amount').textContent = 
+
+                document.getElementById('original-amount').textContent =
                     currency + ' ' + parseFloat(originalAmount).toFixed(2);
-                document.getElementById('already-paid').textContent = 
+                document.getElementById('already-paid').textContent =
                     currency + ' ' + parseFloat(amountPaid).toFixed(2);
-                document.getElementById('balance-due').textContent = 
+                document.getElementById('balance-due').textContent =
                     currency + ' ' + parseFloat(amountDue).toFixed(2);
-                document.getElementById('quick-pay-amount').textContent = 
+                document.getElementById('quick-pay-amount').textContent =
                     currency + ' ' + parseFloat(amountDue).toFixed(2);
-                
+
                 // Visual feedback
                 if (amountPaid > 0) {
                     document.querySelector('.payment-breakdown').style.borderLeft = '4px solid #28a745';
@@ -327,28 +329,28 @@ function fetchInvoiceDetails(invoiceId) {
 function payRemainingBalance() {
     const select = document.getElementById('invoice');
     const selected = select.options[select.selectedIndex];
-    
+
     if (!selected.value) {
         alert('Please select an invoice first');
         return;
     }
-    
+
     const amountDue = parseFloat(selected.getAttribute('data-amount-due'));
     const currency = selected.getAttribute('data-currency');
-    
+
     // Fill the amount field with remaining balance
     document.getElementById('amount').value = parseFloat(amountDue).toFixed(2);
-    
+
     // Visual feedback
     document.getElementById('amount').classList.add('border-success');
     document.getElementById('amount').style.borderWidth = '2px';
-    
+
     // Scroll to payment method
     document.getElementById('payment_method').focus();
-    
+
     // Show a toast notification
     showPaymentNotification(`Amount set to ${currency} ${parseFloat(amountDue).toFixed(2)}`);
-    
+
     // Remove highlight after 3 seconds
     setTimeout(() => {
         document.getElementById('amount').classList.remove('border-success');
@@ -363,7 +365,7 @@ function showPaymentHistory(invoiceId) {
         .then(data => {
             if (data.success && data.payments) {
                 let historyText = `Payment History for Invoice ${data.invoice_number}\n─────────────────────────────\n`;
-                
+
                 if (data.payments.length > 0) {
                     data.payments.forEach(payment => {
                         historyText += `${payment.date} - ${payment.method}: ${data.currency} ${parseFloat(payment.amount).toFixed(2)}`;
@@ -375,9 +377,9 @@ function showPaymentHistory(invoiceId) {
                 } else {
                     historyText += 'No payments recorded yet.';
                 }
-                
+
                 historyText += `─────────────────────────────\nTotal Paid: ${data.currency} ${parseFloat(data.total_paid).toFixed(2)}\nRemaining: ${data.currency} ${parseFloat(data.total_due).toFixed(2)}`;
-                
+
                 alert(historyText);
             }
         })
@@ -404,7 +406,7 @@ function showPaymentNotification(message) {
     `;
     toast.textContent = message;
     document.body.appendChild(toast);
-    
+
     setTimeout(() => {
         toast.style.animation = 'slideOut 0.3s ease-out';
         setTimeout(() => toast.remove(), 300);
@@ -414,7 +416,7 @@ function showPaymentNotification(message) {
 function updatePaymentMethodInfo() {
     const select = document.getElementById('payment_method');
     const selected = select.options[select.selectedIndex];
-    
+
     if (selected.value) {
         const description = selected.getAttribute('data-description');
         document.getElementById('method-description').textContent = description || 'No additional information';
@@ -456,7 +458,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (invoiceSelect.value) {
         // Trigger the update to populate the breakdown card
         updateInvoiceAmount();
-        
+
         // Scroll to payment method section for better UX
         setTimeout(function() {
             document.getElementById('payment_method').scrollIntoView({ behavior: 'smooth', block: 'center' });

@@ -12,7 +12,7 @@
     <div id="quotations-filter" class="filter-panel" {% if not request.GET.keys|length %}style="display: none;"{% endif %}>
         <form method="get" action="" class="filter-form">
             <div class="filter-grid">
-                
+
                 <!-- Status Filter -->
                 <div class="filter-group">
                     <label for="status-filter">Status</label>
@@ -33,11 +33,11 @@
                 <!-- Client Search -->
                 <div class="filter-group">
                     <label for="client-name-filter">Client Name</label>
-                    <input 
-                        type="text" 
-                        id="client-name-filter" 
-                        name="client_name" 
-                        class="filter-input" 
+                    <input
+                        type="text"
+                        id="client-name-filter"
+                        name="client_name"
+                        class="filter-input"
                         placeholder="Search client..."
                         value="{{ client_name|default:'' }}"
                     >
@@ -46,11 +46,11 @@
                 <!-- Quote Number Search -->
                 <div class="filter-group">
                     <label for="quote-number-filter">Quote Number</label>
-                    <input 
-                        type="text" 
-                        id="quote-number-filter" 
-                        name="quote_number" 
-                        class="filter-input" 
+                    <input
+                        type="text"
+                        id="quote-number-filter"
+                        name="quote_number"
+                        class="filter-input"
                         placeholder="e.g., QUOTE-2026-001"
                         value="{{ quote_number|default:'' }}"
                     >
@@ -59,11 +59,11 @@
                 <!-- Amount Range -->
                 <div class="filter-group">
                     <label for="min-amount-filter">Min Amount</label>
-                    <input 
-                        type="number" 
-                        id="min-amount-filter" 
-                        name="min_amount" 
-                        class="filter-input" 
+                    <input
+                        type="number"
+                        id="min-amount-filter"
+                        name="min_amount"
+                        class="filter-input"
                         placeholder="0.00"
                         step="0.01"
                         value="{{ min_amount|default:'' }}"
@@ -72,11 +72,11 @@
 
                 <div class="filter-group">
                     <label for="max-amount-filter">Max Amount</label>
-                    <input 
-                        type="number" 
-                        id="max-amount-filter" 
-                        name="max_amount" 
-                        class="filter-input" 
+                    <input
+                        type="number"
+                        id="max-amount-filter"
+                        name="max_amount"
+                        class="filter-input"
                         placeholder="9999.99"
                         step="0.01"
                         value="{{ max_amount|default:'' }}"
@@ -86,10 +86,10 @@
                 <!-- Quote Date Range -->
                 <div class="filter-group">
                     <label for="from-date-filter">Quote Date From</label>
-                    <input 
-                        type="date" 
-                        id="from-date-filter" 
-                        name="from_date" 
+                    <input
+                        type="date"
+                        id="from-date-filter"
+                        name="from_date"
                         class="filter-input"
                         value="{{ from_date|default:'' }}"
                     >
@@ -97,10 +97,10 @@
 
                 <div class="filter-group">
                     <label for="to-date-filter">Quote Date To</label>
-                    <input 
-                        type="date" 
-                        id="to-date-filter" 
-                        name="to_date" 
+                    <input
+                        type="date"
+                        id="to-date-filter"
+                        name="to_date"
                         class="filter-input"
                         value="{{ to_date|default:'' }}"
                     >
@@ -109,10 +109,10 @@
                 <!-- Valid Until Range -->
                 <div class="filter-group">
                     <label for="valid-from-filter">Valid Until From</label>
-                    <input 
-                        type="date" 
-                        id="valid-from-filter" 
-                        name="valid_until_from" 
+                    <input
+                        type="date"
+                        id="valid-from-filter"
+                        name="valid_until_from"
                         class="filter-input"
                         value="{{ valid_until_from|default:'' }}"
                     >
@@ -120,10 +120,10 @@
 
                 <div class="filter-group">
                     <label for="valid-to-filter">Valid Until To</label>
-                    <input 
-                        type="date" 
-                        id="valid-to-filter" 
-                        name="valid_until_to" 
+                    <input
+                        type="date"
+                        id="valid-to-filter"
+                        name="valid_until_to"
                         class="filter-input"
                         value="{{ valid_until_to|default:'' }}"
                     >
@@ -142,11 +142,11 @@
                 <!-- Full-Text Search -->
                 <div class="filter-group">
                     <label for="search-filter">Full-Text Search</label>
-                    <input 
-                        type="text" 
-                        id="search-filter" 
-                        name="q" 
-                        class="filter-input" 
+                    <input
+                        type="text"
+                        id="search-filter"
+                        name="q"
+                        class="filter-input"
                         placeholder="Search all fields..."
                         value="{{ search_query|default:'' }}"
                     >
@@ -179,11 +179,11 @@
 <style>
 .filter-section { margin-bottom: 20px; }
 .filter-header { display: flex; align-items: center; margin-bottom: 10px; }
-.filter-toggle { 
-    background: #f5f5f5; 
-    border: 1px solid #ddd; 
-    padding: 10px 15px; 
-    cursor: pointer; 
+.filter-toggle {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+    cursor: pointer;
     border-radius: 4px;
     font-weight: 500;
     display: flex;
@@ -193,44 +193,44 @@
 .filter-toggle:hover { background: #eeeeee; }
 .toggle-icon { font-size: 12px; transition: transform 0.2s; }
 .filter-toggle.open .toggle-icon { transform: rotate(180deg); }
-.filter-badge { 
-    background: #3498db; 
-    color: white; 
-    padding: 2px 8px; 
-    border-radius: 12px; 
-    font-size: 11px; 
+.filter-badge {
+    background: #3498db;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
     font-weight: 600;
 }
 
-.filter-panel { 
-    background: #f9f9f9; 
-    border: 1px solid #ddd; 
+.filter-panel {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
     border-top: none;
-    padding: 20px; 
+    padding: 20px;
     border-radius: 0 0 4px 4px;
     display: none;
 }
 .filter-panel.open { display: block; }
 
-.filter-grid { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
-    gap: 15px; 
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
     margin-bottom: 15px;
 }
 .filter-grid .full-width { grid-column: 1 / -1; }
 
 .filter-group { display: flex; flex-direction: column; }
-.filter-group label { 
-    font-weight: 600; 
-    margin-bottom: 5px; 
-    font-size: 12px; 
+.filter-group label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    font-size: 12px;
     text-transform: uppercase;
     color: #555;
 }
-.filter-input { 
-    padding: 8px 10px; 
-    border: 1px solid #ddd; 
+.filter-input {
+    padding: 8px 10px;
+    border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 13px;
 }
@@ -240,10 +240,10 @@
 .range-input { flex: 1; }
 .range-separator { color: #999; font-weight: 500; }
 
-.filter-actions { 
-    display: flex; 
-    gap: 10px; 
-    flex-wrap: wrap; 
+.filter-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
     margin-top: 15px;
     border-top: 1px solid #ddd;
     padding-top: 15px;
@@ -261,21 +261,21 @@
     align-items: center;
 }
 
-.btn-filter-apply { 
-    background: #3498db; 
+.btn-filter-apply {
+    background: #3498db;
     color: white;
 }
 .btn-filter-apply:hover { background: #2980b9; }
 
-.btn-filter-clear { 
-    background: #e74c3c; 
+.btn-filter-clear {
+    background: #e74c3c;
     color: white;
     text-decoration: none;
 }
 .btn-filter-clear:hover { background: #c0392b; }
 
-.btn-filter-save { 
-    background: #27ae60; 
+.btn-filter-save {
+    background: #27ae60;
     color: white;
 }
 .btn-filter-save:hover { background: #229954; }

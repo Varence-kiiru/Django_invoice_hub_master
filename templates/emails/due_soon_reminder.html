@@ -1,0 +1,43 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Payment Due Soon Reminder{% endblock %}
+{% block header_class %}header-orange{% endblock %}
+{% block header_title %}📅 Payment Due Soon{% endblock %}
+
+{% block content %}
+    <p>Hello {{ client_name }},</p>
+
+    <div class="warning-badge">
+        <h2>Your invoice is due in {{ days_until_due }} day(s)</h2>
+        <p>This is a friendly reminder that payment for the invoice below is due on the date shown.</p>
+    </div>
+
+    <div class="section">
+        <div class="details-table">
+            <div class="detail-row">
+                <span class="detail-label accent-orange">Invoice Number:</span>
+                <span class="detail-value">{{ invoice_number }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label accent-orange">Due Date:</span>
+                <span class="detail-value">{{ due_date }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label accent-orange">Amount Due:</span>
+                <span class="detail-value amount orange">{{ amount_due }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label accent-orange">Days Remaining:</span>
+                <span class="detail-value">{{ days_until_due }}</span>
+            </div>
+        </div>
+    </div>
+
+    <p>Whether you plan to pay now or closer to the due date, we appreciate your prompt attention to this matter.</p>
+
+    <div class="button-container">
+        <a href="{{ payment_url }}" class="btn btn-warning">Pay Now</a>
+    </div>
+{% endblock %}
+</body>
+</html>

@@ -3,6 +3,8 @@
 
 {% block title %}Payment Details - Invoicing App{% endblock %}
 
+{% block page_title %}Payment Details{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/payments.css' %}">
 {% endblock %}
@@ -87,7 +89,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     {% if payment.notes %}
                         <div class="mb-3">
                             <label class="form-label fw-bold">Notes</label>
@@ -231,7 +233,7 @@
                         <a href="{% url 'payments:create' %}?invoice={{ payment.invoice.id }}" class="btn btn-outline-success">
                             ➕ Record Another Payment
                         </a>
-                        
+
                         {% if payment.status == 'pending' %}
                             <a href="{% url 'payments:confirm' payment.id %}" class="btn btn-outline-success">
                                 ✅ Confirm Payment

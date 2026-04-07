@@ -3,6 +3,8 @@
 
 {% block title %}Help & Support Center - Invoice System{% endblock %}
 
+{% block page_title %}Help Center{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/help_support/help_center.css' %}">
 {% endblock %}
@@ -18,10 +20,10 @@
     <!-- Search Box -->
     <div class="help-search-box">
         <form method="GET" action="{% url 'core:help-articles' %}">
-            <input 
-                type="text" 
-                name="search" 
-                placeholder="Search articles, FAQs, and more..." 
+            <input
+                type="text"
+                name="search"
+                placeholder="Search articles, FAQs, and more..."
                 value=""
             >
         </form>

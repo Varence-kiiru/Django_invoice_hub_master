@@ -35,15 +35,15 @@
 
       <div class="form-section">
         <h3 class="section-title">Item Details</h3>
-        
+
         <div class="form-grid">
           <div class="form-group">
             <label for="product">Product/Service</label>
             <select name="product" id="product" class="form-control" onchange="updateProductInfo()">
               <option value="">-- Select Product --</option>
               {% for product in products %}
-                <option value="{{ product.id }}" 
-                        data-description="{{ product.description|default:product.name|escapejs }}" 
+                <option value="{{ product.id }}"
+                        data-description="{{ product.description|default:product.name }}"
                         data-price="{{ product.unit_price }}"
                         data-tax-rate-type="{% if product.tax_class %}{{ product.tax_class.rate_type }}{% endif %}"
                         {% if line_item.product.id == product.id %}selected{% endif %}>
@@ -123,7 +123,7 @@ let TAX_CLASS_RATE_MAP = {};
  */
 document.addEventListener('DOMContentLoaded', function() {
   console.log('[QUOTATION-EDIT] ========== TAX AUTOPOPULATION INIT ==========');
-  
+
   // Step 1: Load and parse tax class rate map
   try {
     const mapElement = document.getElementById('tax-class-rate-map');
@@ -131,10 +131,10 @@ document.addEventListener('DOMContentLoaded', function() {
       console.error('[QUOTATION-EDIT] ERROR: tax-class-rate-map element not found!');
       return;
     }
-    
+
     const mapText = mapElement.textContent.trim();
     console.log('[QUOTATION-EDIT] Raw map text:', mapText);
-    
+
     if (!mapText || mapText === '{}') {
       console.warn('[QUOTATION-EDIT] WARNING: tax-class-rate-map is empty!');
       TAX_CLASS_RATE_MAP = {};
@@ -146,14 +146,14 @@ document.addEventListener('DOMContentLoaded', function() {
     console.error('[QUOTATION-EDIT] ERROR parsing tax-class-rate-map:', e);
     TAX_CLASS_RATE_MAP = {};
   }
-  
+
   // Step 2: Attach event listeners
   console.log('[QUOTATION-EDIT] Attaching event listeners...');
-  
+
   const productSelect = document.getElementById('product');
   const quantityInput = document.getElementById('quantity');
   const unitPriceInput = document.getElementById('unit_price');
-  
+
   if (productSelect) {
     productSelect.addEventListener('change', function() {
       console.log('[QUOTATION-EDIT] Product selection changed');
@@ -161,21 +161,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     console.log('[QUOTATION-EDIT] - Product select listener attached');
   }
-  
+
   if (quantityInput) {
     quantityInput.addEventListener('input', function() {
       calculateLineTotal();
     });
     console.log('[QUOTATION-EDIT] - Quantity listener attached');
   }
-  
+
   if (unitPriceInput) {
     unitPriceInput.addEventListener('input', function() {
       calculateLineTotal();
     });
     console.log('[QUOTATION-EDIT] - Unit price listener attached');
   }
-  
+
   // Step 3: Initial calculation
   calculateLineTotal();
   console.log('[QUOTATION-EDIT] ========== TAX AUTOPOPULATION READY ==========\n');
@@ -187,43 +187,43 @@ document.addEventListener('DOMContentLoaded', function() {
  */
 function updateProductInfo() {
   console.log('[updateProductInfo] START');
-  
+
   const productSelect = document.getElementById('product');
   if (!productSelect) {
     console.error('[updateProductInfo] ERROR: product select element not found');
     return;
   }
-  
+
   const selectedOption = productSelect.options[productSelect.selectedIndex];
   console.log('[updateProductInfo] Selected option value:', selectedOption.value);
-  
+
   // Get all the data from the option element
   const productId = selectedOption.value;
   const description = selectedOption.getAttribute('data-description') || '';
   const price = selectedOption.getAttribute('data-price') || '0';
   const taxRateType = selectedOption.getAttribute('data-tax-rate-type') || '';
-  
+
   console.log('[updateProductInfo] Extracted data:', {
     productId: productId,
     description: description,
     price: price,
     taxRateType: taxRateType
   });
-  
+
   // Handle empty selection
   if (!productId) {
     console.log('[updateProductInfo] No product selected - clearing fields');
     clearProductFields();
     return;
   }
-  
+
   // Set description field
   const descriptionInput = document.getElementById('description');
   if (descriptionInput && description) {
     descriptionInput.value = description;
     console.log('[updateProductInfo] Description set to:', description);
   }
-  
+
   // Set price field
   const priceInput = document.getElementById('unit_price');
   if (priceInput && price) {
@@ -231,24 +231,24 @@ function updateProductInfo() {
     priceInput.value = priceValue;
     console.log('[updateProductInfo] Unit price set to:', priceValue);
   }
-  
+
   // Set tax rate field
   if (taxRateType) {
     console.log('[updateProductInfo] Tax rate type from product:', taxRateType);
     console.log('[updateProductInfo] Looking up in tax map...');
     console.log('[updateProductInfo] Current tax map:', TAX_CLASS_RATE_MAP);
-    
+
     if (TAX_CLASS_RATE_MAP && TAX_CLASS_RATE_MAP[taxRateType]) {
       const rateInfo = TAX_CLASS_RATE_MAP[taxRateType];
       console.log('[updateProductInfo] FOUND tax rate:', rateInfo);
-      
+
       // Set hidden field with rate ID
       const hiddenRateField = document.getElementById('tax_rate');
       if (hiddenRateField) {
         hiddenRateField.value = rateInfo.rate_id;
         console.log('[updateProductInfo] Hidden tax_rate field set to:', rateInfo.rate_id);
       }
-      
+
       // Set display field with percentage
       const displayRateField = document.getElementById('tax_rate_display');
       if (displayRateField) {
@@ -265,7 +265,7 @@ function updateProductInfo() {
     console.log('[updateProductInfo] No tax rate type on product - clearing tax field');
     clearTaxRateField();
   }
-  
+
   // Recalculate total
   calculateLineTotal();
   console.log('[updateProductInfo] END\n');
@@ -287,7 +287,7 @@ function clearProductFields() {
 function clearTaxRateField() {
   const displayRateField = document.getElementById('tax_rate_display');
   const hiddenRateField = document.getElementById('tax_rate');
-  
+
   if (displayRateField) {
     displayRateField.value = '';
   }
@@ -302,29 +302,29 @@ function clearTaxRateField() {
  */
 function calculateLineTotal() {
   console.log('[calculateLineTotal] START');
-  
+
   try {
     // Get form values
     const quantityInput = document.getElementById('quantity');
     const unitPriceInput = document.getElementById('unit_price');
     const taxRateInput = document.getElementById('tax_rate_display');
     const lineTotalDisplay = document.getElementById('line-total');
-    
+
     const quantity = parseFloat(quantityInput?.value) || 0;
     const unitPrice = parseFloat(unitPriceInput?.value) || 0;
     const taxPercentage = parseFloat(taxRateInput?.value) || 0;
-    
+
     console.log('[calculateLineTotal] Values:', {
       quantity: quantity,
       unitPrice: unitPrice,
       taxPercentage: taxPercentage + '%'
     });
-    
+
     // Calculate totals
     const subtotal = quantity * unitPrice;
     const taxAmount = subtotal * (taxPercentage / 100);
     const total = subtotal + taxAmount;
-    
+
     // Display result
     if (lineTotalDisplay) {
       lineTotalDisplay.textContent = total.toFixed(2);
@@ -337,7 +337,7 @@ function calculateLineTotal() {
   } catch (e) {
     console.error('[calculateLineTotal] ERROR:', e);
   }
-  
+
   console.log('[calculateLineTotal] END\n');
 }
 

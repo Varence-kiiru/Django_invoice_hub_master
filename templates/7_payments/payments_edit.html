@@ -3,6 +3,8 @@
 
 {% block title %}Edit Payment - Invoicing App{% endblock %}
 
+{% block page_title %}Edit Payment{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/payments.css' %}">
 {% endblock %}
@@ -48,7 +50,7 @@
                             <label for="amount" class="form-label">Payment Amount <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text">{{ payment.currency }}</span>
-                                <input type="number" name="amount" id="amount" class="form-control" 
+                                <input type="number" name="amount" id="amount" class="form-control"
                                     value="{{ payment.amount }}" step="0.01" min="0" required>
                             </div>
                             <small class="form-text text-muted">Amount received from the client</small>
@@ -71,7 +73,7 @@
                         <!-- Payment Date -->
                         <div class="mb-3">
                             <label for="payment_date" class="form-label">Payment Date <span class="text-danger">*</span></label>
-                            <input type="date" name="payment_date" id="payment_date" class="form-control" 
+                            <input type="date" name="payment_date" id="payment_date" class="form-control"
                                 value="{{ payment.payment_date|date:'Y-m-d' }}" required>
                             <small class="form-text text-muted">When payment was received</small>
                         </div>
@@ -79,8 +81,8 @@
                         <!-- Transaction Reference -->
                         <div class="mb-3">
                             <label for="reference" class="form-label">Transaction Reference</label>
-                            <input type="text" name="reference" id="reference" class="form-control" 
-                                value="{{ payment.transaction_reference }}" 
+                            <input type="text" name="reference" id="reference" class="form-control"
+                                value="{{ payment.transaction_reference }}"
                                 placeholder="e.g., Cheque #123, M-Pesa code, Bank ref">
                             <small class="form-text text-muted">Transaction ID, check number, M-Pesa code, bank reference, etc.</small>
                         </div>
@@ -88,7 +90,7 @@
                         <!-- Notes -->
                         <div class="mb-3">
                             <label for="notes" class="form-label">Notes</label>
-                            <textarea name="notes" id="notes" class="form-control" rows="3" 
+                            <textarea name="notes" id="notes" class="form-control" rows="3"
                                 placeholder="Any additional notes about this payment">{{ payment.notes }}</textarea>
                             <small class="form-text text-muted">Optional: Any remarks or notes</small>
                         </div>
@@ -113,7 +115,7 @@
                 </div>
                 <div class="card-body">
                     <p class="text-muted">
-                        <strong>Note:</strong> Editing payment information may affect invoice balances and financial reports. 
+                        <strong>Note:</strong> Editing payment information may affect invoice balances and financial reports.
                         Please ensure all changes are accurate and properly documented.
                     </p>
                     <ul class="text-muted">

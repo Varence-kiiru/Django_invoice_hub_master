@@ -93,7 +93,7 @@
 
 /* Loading & Activity */
 .icon-spinner::before { content: "⟳"; }
-.icon-spinner.spin { 
+.icon-spinner.spin {
     display: inline-block;
     animation: spin 1s linear infinite;
 }

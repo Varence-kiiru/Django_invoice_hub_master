@@ -1,4 +1,3 @@
-
 """Production-minded base Django settings.
 
 This file is intentionally conservative and environment-driven. It exposes
@@ -36,7 +35,11 @@ def get_env(key: str, default: Any = None) -> Any:
 SECRET_KEY = get_env("DJANGO_SECRET_KEY", "replace-me-local")
 DEBUG = False
 
-ALLOWED_HOSTS = get_env("DJANGO_ALLOWED_HOSTS", "").split(",") if get_env("DJANGO_ALLOWED_HOSTS", "") else []
+ALLOWED_HOSTS = (
+    get_env("DJANGO_ALLOWED_HOSTS", "").split(",")
+    if get_env("DJANGO_ALLOWED_HOSTS", "")
+    else []
+)
 
 # Applications
 INSTALLED_APPS = [
@@ -47,7 +50,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     # Third-party
     "rest_framework",
     "corsheaders",
@@ -56,7 +58,6 @@ INSTALLED_APPS = [
     "storages",
     "django_celery_beat",
     "django_celery_results",
-
     # Invoicing App Modules
     "invoicing_app.core.apps.CoreConfig",
     "invoicing_app.organizations.apps.OrganizationsConfig",
@@ -71,6 +72,7 @@ INSTALLED_APPS = [
     "invoicing_app.audit.apps.AuditConfig",
     "invoicing_app.notifications.apps.NotificationsConfig",
     "invoicing_app.expenses.apps.ExpensesConfig",
+    "invoicing_app.financials.apps.FinancialsConfig",
 ]
 
 # Conditionals: add if available to avoid hard dependency during bootstrap
@@ -133,38 +135,26 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ),
-    
     # Permissions
-    "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticated",
-    ),
-    
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     # Filtering & Search
     "DEFAULT_FILTER_BACKENDS": (
         "django_filters.rest_framework.DjangoFilterBackend",
         "rest_framework.filters.SearchFilter",
         "rest_framework.filters.OrderingFilter",
     ),
-    
     # Pagination Configuration
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": int(get_env("DRF_PAGE_SIZE", 25)),
-    
     # Pagination Limits
     "MAX_PAGE_SIZE": int(get_env("DRF_MAX_PAGE_SIZE", 1000)),
     "COUNT_TIMEOUT": 5,  # Cache count for performance
-    
     # Error Handling
     "EXCEPTION_HANDLER": "invoicing_app.core.exception_handlers.custom_exception_handler",
-    
     # Response Formatting
-    "DEFAULT_RENDERER_CLASSES": (
-        "rest_framework.renderers.JSONRenderer",
-    ),
-    
+    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
     # Versioning (optional, for API evolution)
     "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
-    
     # Throttling (rate limiting per user/IP)
     "DEFAULT_THROTTLE_CLASSES": (
         "rest_framework.throttling.AnonRateThrottle",
@@ -174,7 +164,6 @@ REST_FRAMEWORK = {
         "anon": "100/hour",
         "user": "1000/hour",
     },
-    
     # Schema
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
@@ -247,8 +236,16 @@ CELERY_TASK_TIME_LIMIT = int(get_env("CELERY_TASK_TIME_LIMIT", 300))
 
 
 # Security defaults
-CSRF_COOKIE_SECURE = get_env("CSRF_COOKIE_SECURE", "False").lower() in ("1", "true", "yes")
-SESSION_COOKIE_SECURE = get_env("SESSION_COOKIE_SECURE", "False").lower() in ("1", "true", "yes")
+CSRF_COOKIE_SECURE = get_env("CSRF_COOKIE_SECURE", "False").lower() in (
+    "1",
+    "true",
+    "yes",
+)
+SESSION_COOKIE_SECURE = get_env("SESSION_COOKIE_SECURE", "False").lower() in (
+    "1",
+    "true",
+    "yes",
+)
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
@@ -258,8 +255,14 @@ LOGIN_URL = "/auth/login/"
 
 if get_env("SECURE_HSTS_SECONDS"):
     SECURE_HSTS_SECONDS = int(get_env("SECURE_HSTS_SECONDS", 31536000))
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = get_env("SECURE_HSTS_INCLUDE_SUBDOMAINS", "True").lower() in ("1", "true", "yes")
-    SECURE_HSTS_PRELOAD = get_env("SECURE_HSTS_PRELOAD", "True").lower() in ("1", "true", "yes")
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = get_env(
+        "SECURE_HSTS_INCLUDE_SUBDOMAINS", "True"
+    ).lower() in ("1", "true", "yes")
+    SECURE_HSTS_PRELOAD = get_env("SECURE_HSTS_PRELOAD", "True").lower() in (
+        "1",
+        "true",
+        "yes",
+    )
 
 
 # Logging - structured, designed for cloud
@@ -316,10 +319,10 @@ CELERY_BROKER_URL = get_env("CELERY_BROKER_URL", "redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = get_env("CELERY_RESULT_BACKEND", "redis://localhost:6379/1")
 
 # Celery app settings
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "UTC"
 
 # Task configuration
 CELERY_TASK_TRACK_STARTED = True
@@ -331,7 +334,7 @@ CELERY_RESULT_EXPIRES = 3600  # Results expire after 1 hour
 CELERY_RESULT_EXTENDED = True
 
 # Celery Beat Scheduler (persistent storage for scheduled tasks)
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 # Email configuration for Celery tasks
 EMAIL_BACKEND = "invoicing_app.core.email_backend.DynamicEmailBackend"
@@ -356,18 +359,26 @@ STRIPE_PUBLISHABLE_KEY = get_env("STRIPE_PUBLISHABLE_KEY", "pk_test_YOUR_KEY_HER
 # Security Middleware (Production)
 # ============================================================================
 
-SECURITY_MIDDLEWARE_ENABLED = get_env("SECURITY_MIDDLEWARE_ENABLED", "True").lower() == "true"
+# Security middleware only in production (DEBUG=False)
+# Can be overridden with SECURITY_MIDDLEWARE_ENABLED env var
+SECURITY_MIDDLEWARE_ENABLED = (
+    get_env("SECURITY_MIDDLEWARE_ENABLED", str(not DEBUG)).lower() == "true"
+)
 
 if SECURITY_MIDDLEWARE_ENABLED:
     MIDDLEWARE.insert(0, "invoicing_app.organizations.security.RateLimitMiddleware")
-    MIDDLEWARE.insert(1, "invoicing_app.organizations.security.SecurityHeadersMiddleware")
+    MIDDLEWARE.insert(
+        1, "invoicing_app.organizations.security.SecurityHeadersMiddleware"
+    )
     MIDDLEWARE.insert(2, "invoicing_app.organizations.security.CSPMiddleware")
 
 # ============================================================================
 # CORS Configuration (API Access)
 # ============================================================================
 
-CORS_ALLOWED_ORIGINS = get_env("CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8000").split(",")
+CORS_ALLOWED_ORIGINS = get_env(
+    "CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8000"
+).split(",")
 CORS_ALLOW_CREDENTIALS = True
 
 # ============================================================================

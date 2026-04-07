@@ -3,6 +3,8 @@
 
 {% block title %}Help & Documentation - Invoice System{% endblock %}
 
+{% block page_title %}Documentation{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/help_support/help_articles.css' %}">
 {% endblock %}
@@ -19,10 +21,10 @@
     <div class="articles-controls">
         <div class="articles-search">
             <form method="GET" style="display: flex; gap: 10px; width: 100%;">
-                <input 
-                    type="text" 
-                    name="search" 
-                    placeholder="Search articles..." 
+                <input
+                    type="text"
+                    name="search"
+                    placeholder="Search articles..."
                     value="{{ search_query }}"
                     style="flex: 1;"
                 >

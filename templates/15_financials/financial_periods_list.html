@@ -1,0 +1,89 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Financial Periods - Invoicing App{% endblock %}
+
+{% block page_title %}Financial Periods{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/components/tables.css' %}">
+<link rel="stylesheet" href="{% static 'css/financials.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-header-content">
+      <h1 class="page-title">📅 Financial Periods</h1>
+      <p class="page-subtitle">Manage your financial reporting periods</p>
+    </div>
+    {% if can_manage_financials %}
+    <div class="page-header-actions">
+      <a href="#" class="btn btn-primary">
+        <span class="icon">➕</span> Create Period
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Periods Table -->
+  <div class="card">
+    <div class="card-body">
+      {% if periods %}
+      <table class="periods-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th>Type</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Status</th>
+            <th class="actions-column">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for period in periods %}
+          <tr>
+            <td>
+              <strong>{{ period }}</strong>
+            </td>
+            <td>
+              <span class="period-badge {{ period.period_type }}">
+                {{ period.get_period_type_display }}
+              </span>
+            </td>
+            <td>{{ period.start_date|date:"M j, Y" }}</td>
+            <td>{{ period.end_date|date:"M j, Y" }}</td>
+            <td>
+              {% if period.is_closed %}
+                <span class="status-badge closed">Closed</span>
+              {% else %}
+                <span class="status-badge active">Active</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'financials:period-detail' period.pk %}" class="btn btn-sm btn-outline-primary">
+                View
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">📅</div>
+        <h3 class="empty-state-title">No Financial Periods</h3>
+        <p class="empty-state-description">
+          Financial periods will be automatically created when payments are processed.
+        </p>
+        {% if can_manage_financials %}
+        <a href="#" class="btn btn-primary">Create Manual Period</a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

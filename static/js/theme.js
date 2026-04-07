@@ -9,7 +9,7 @@ class ThemeManager {
     this.LIGHT = 'light';
     this.DARK = 'dark';
     this.AUTO = 'auto';
-    
+
     // Initialize theme on page load
     this.init();
   }
@@ -20,7 +20,7 @@ class ThemeManager {
   init() {
     const savedTheme = this.getSavedTheme();
     const preferredTheme = savedTheme || this.getSystemPreference();
-    
+
     this.setTheme(preferredTheme);
     this.updateThemeSelector(preferredTheme);
     this.listenForSystemChanges();
@@ -48,7 +48,7 @@ class ThemeManager {
    */
   setTheme(theme) {
     const html = document.documentElement;
-    
+
     if (theme === this.AUTO) {
       // Remove data-theme to let CSS use system preference
       html.removeAttribute('data-theme');
@@ -56,10 +56,10 @@ class ThemeManager {
       // Set explicit theme
       html.setAttribute('data-theme', theme);
     }
-    
+
     // Save preference
     localStorage.setItem(this.STORAGE_KEY, theme);
-    
+
     // Update display
     this.updateThemeDisplay(theme);
   }
@@ -96,7 +96,7 @@ class ThemeManager {
     if (window.matchMedia) {
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
         const savedTheme = this.getSavedTheme();
-        
+
         // Only apply system change if user has auto selected
         if (!savedTheme || savedTheme === this.AUTO) {
           const newTheme = e.matches ? this.DARK : this.LIGHT;

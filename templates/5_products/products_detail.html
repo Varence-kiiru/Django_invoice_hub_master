@@ -3,6 +3,8 @@
 
 {% block title %}Product - {{ product.name }}{% endblock %}
 
+{% block page_title %}{{ product.name }}{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/products.css' %}">
 {% endblock %}
@@ -11,7 +13,7 @@
 <div class="product-header">
     <h1>{{ product.name }}</h1>
     <p style="margin: 0; opacity: 0.9;">SKU: {{ product.sku }}</p>
-    
+
     <div class="product-header-info">
         <div class="product-header-item">
             <label>Unit Price</label>
@@ -30,7 +32,7 @@
             <value>{{ product.tax_class.name }}</value>
         </div>
     </div>
-    
+
     <div class="product-actions">
         <a href="{% url 'products:edit' product.id %}" class="btn-primary">Edit</a>
         <a href="{% url 'products:list' %}" class="btn-secondary">Back to Products</a>
@@ -48,7 +50,7 @@
 <!-- Usage Metrics -->
 <div class="section">
     <div class="section-title">Usage Metrics</div>
-    
+
     <div class="metrics-grid">
         <div class="metric-card">
             <div class="metric-label">Total Used</div>
@@ -72,7 +74,7 @@
 <!-- Recent Invoices -->
 <div class="section">
     <div class="section-title">Recent Invoices Using This Product</div>
-    
+
     {% if recent_invoices %}
     <table class="section-table">
         <thead>
@@ -106,7 +108,7 @@
 <!-- Product Details -->
 <div class="section">
     <div class="section-title">Product Details</div>
-    
+
     <table style="width: 100%;">
         <tr>
             <td style="padding: var(--spacing-sm); width: 30%;"><strong>Created Date:</strong></td>

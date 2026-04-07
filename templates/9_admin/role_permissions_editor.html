@@ -256,7 +256,7 @@
   <!-- Permission Categories -->
   <form id="permission-form" method="post">
     {% csrf_token %}
-    
+
     <!-- Expenses Permissions -->
     <div class="permission-category">
       <div class="category-title">
@@ -266,8 +266,8 @@
       <div class="permission-list">
         {% for perm_code, perm_data in permission_groups.expenses.items %}
           <div class="permission-item">
-            <input type="checkbox" class="permission-checkbox category-expenses" value="{{ perm_code }}" 
-                   id="perm-{{ perm_code }}" 
+            <input type="checkbox" class="permission-checkbox category-expenses" value="{{ perm_code }}"
+                   id="perm-{{ perm_code }}"
                    {% if perm_code in role_permissions %}checked{% endif %}
                    onchange="updateSummary()">
             <div class="permission-details">
@@ -288,8 +288,8 @@
       <div class="permission-list">
         {% for perm_code, perm_data in permission_groups.invoices.items %}
           <div class="permission-item">
-            <input type="checkbox" class="permission-checkbox category-invoices" value="{{ perm_code }}" 
-                   id="perm-{{ perm_code }}" 
+            <input type="checkbox" class="permission-checkbox category-invoices" value="{{ perm_code }}"
+                   id="perm-{{ perm_code }}"
                    {% if perm_code in role_permissions %}checked{% endif %}
                    onchange="updateSummary()">
             <div class="permission-details">
@@ -310,8 +310,8 @@
       <div class="permission-list">
         {% for perm_code, perm_data in permission_groups.clients.items %}
           <div class="permission-item">
-            <input type="checkbox" class="permission-checkbox category-clients" value="{{ perm_code }}" 
-                   id="perm-{{ perm_code }}" 
+            <input type="checkbox" class="permission-checkbox category-clients" value="{{ perm_code }}"
+                   id="perm-{{ perm_code }}"
                    {% if perm_code in role_permissions %}checked{% endif %}
                    onchange="updateSummary()">
             <div class="permission-details">
@@ -332,8 +332,8 @@
       <div class="permission-list">
         {% for perm_code, perm_data in permission_groups.payments.items %}
           <div class="permission-item">
-            <input type="checkbox" class="permission-checkbox category-payments" value="{{ perm_code }}" 
-                   id="perm-{{ perm_code }}" 
+            <input type="checkbox" class="permission-checkbox category-payments" value="{{ perm_code }}"
+                   id="perm-{{ perm_code }}"
                    {% if perm_code in role_permissions %}checked{% endif %}
                    onchange="updateSummary()">
             <div class="permission-details">
@@ -354,8 +354,8 @@
       <div class="permission-list">
         {% for perm_code, perm_data in permission_groups.quotations.items %}
           <div class="permission-item">
-            <input type="checkbox" class="permission-checkbox category-quotations" value="{{ perm_code }}" 
-                   id="perm-{{ perm_code }}" 
+            <input type="checkbox" class="permission-checkbox category-quotations" value="{{ perm_code }}"
+                   id="perm-{{ perm_code }}"
                    {% if perm_code in role_permissions %}checked{% endif %}
                    onchange="updateSummary()">
             <div class="permission-details">
@@ -376,8 +376,8 @@
       <div class="permission-list">
         {% for perm_code, perm_data in permission_groups.users.items %}
           <div class="permission-item">
-            <input type="checkbox" class="permission-checkbox category-users" value="{{ perm_code }}" 
-                   id="perm-{{ perm_code }}" 
+            <input type="checkbox" class="permission-checkbox category-users" value="{{ perm_code }}"
+                   id="perm-{{ perm_code }}"
                    {% if perm_code in role_permissions %}checked{% endif %}
                    onchange="updateSummary()">
             <div class="permission-details">
@@ -398,8 +398,8 @@
       <div class="permission-list">
         {% for perm_code, perm_data in permission_groups.system.items %}
           <div class="permission-item">
-            <input type="checkbox" class="permission-checkbox category-system" value="{{ perm_code }}" 
-                   id="perm-{{ perm_code }}" 
+            <input type="checkbox" class="permission-checkbox category-system" value="{{ perm_code }}"
+                   id="perm-{{ perm_code }}"
                    {% if perm_code in role_permissions %}checked{% endif %}
                    onchange="updateSummary()">
             <div class="permission-details">
@@ -420,8 +420,8 @@
       <div class="permission-list">
         {% for perm_code, perm_data in permission_groups.reports.items %}
           <div class="permission-item">
-            <input type="checkbox" class="permission-checkbox category-reports" value="{{ perm_code }}" 
-                   id="perm-{{ perm_code }}" 
+            <input type="checkbox" class="permission-checkbox category-reports" value="{{ perm_code }}"
+                   id="perm-{{ perm_code }}"
                    {% if perm_code in role_permissions %}checked{% endif %}
                    onchange="updateSummary()">
             <div class="permission-details">

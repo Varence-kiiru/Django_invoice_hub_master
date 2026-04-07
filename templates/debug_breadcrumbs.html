@@ -1,0 +1,29 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Debug Breadcrumbs{% endblock %}
+
+{% block page_title %}Debug: Breadcrumbs Test{% endblock %}
+
+{% block content %}
+<div style="padding: 20px; background: #f5f5f5; border: 2px solid #333; margin: 20px;">
+  <h2>Breadcrumbs Debug Information</h2>
+
+  <p><strong>Breadcrumbs variable exists:</strong> {{ breadcrumbs|default:"MISSING" }}</p>
+
+  {% if breadcrumbs %}
+    <p style="color: green;"><strong>✓ Breadcrumbs is truthy (will render)</strong></p>
+    <p><strong>Breadcrumbs type:</strong> {{ breadcrumbs|length }} items</p>
+    <p><strong>Breadcrumbs raw:</strong></p>
+    <pre>{{ breadcrumbs }}</pre>
+
+    <p><strong>Breadcrumbs formatted:</strong></p>
+    <ul>
+      {% for item in breadcrumbs %}
+        <li>{{ item.label }} - URL: "{{ item.url }}"</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p style="color: red;"><strong>✗ Breadcrumbs is falsy (will NOT render)</strong></p>
+  {% endif %}
+</div>
+{% endblock %}

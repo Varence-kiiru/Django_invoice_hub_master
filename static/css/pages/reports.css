@@ -614,11 +614,60 @@
    PRINT STYLES
    ─────────────────────────────────────────────── */
 
+/* ─── Pipeline Report Styles ─── */
+.pipeline-stage {
+    text-align: center;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 10px 5px;
+}
+
+.pipeline-stage h4 {
+    margin: 10px 0 5px 0;
+    font-weight: 600;
+}
+
+.pipeline-stage .stage-value {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.pipeline-stage .stage-rate {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.conversion-arrow {
+    font-size: 1.8rem;
+    color: #007bff;
+    margin: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pipeline-container {
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    padding: 20px 0;
+}
+
+.stage-box {
+    flex: 1;
+    min-width: 150px;
+}
+
+/* ─── Print Media Styles ─── */
 @media print {
+    .btn,
     .btn-group,
     .card-header .btn,
-    .page-actions {
-        display: none;
+    .page-actions,
+    .row:has(.col-md-4),
+    form {
+        display: none !important;
     }
 
     .table {
@@ -627,6 +676,11 @@
 
     .table tbody tr {
         page-break-inside: avoid;
+    }
+
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
     }
 
     .page-title {

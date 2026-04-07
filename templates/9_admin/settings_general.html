@@ -40,7 +40,7 @@
               <p class="text-muted">No logo uploaded yet</p>
               {% endif %}
             </div>
-            <input type="file" class="form-control" id="company_logo" name="company_logo" 
+            <input type="file" class="form-control" id="company_logo" name="company_logo"
                    accept="image/png,image/jpeg,image/jpg" onchange="previewLogo(this)">
             <small class="form-text text-muted d-block mt-2">
               Supported formats: PNG and JPG | Maximum size: 2MB | Recommended dimensions: 300×150px (landscape)
@@ -53,14 +53,14 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="company_name" class="form-label">Company Name</label>
-              <input type="text" class="form-control" id="company_name" name="company_name" 
+              <input type="text" class="form-control" id="company_name" name="company_name"
                      value="{{ settings.company_name }}" placeholder="Enter your company name" required>
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               <label for="company_email" class="form-label">Company Email</label>
-              <input type="email" class="form-control" id="company_email" name="company_email" 
+              <input type="email" class="form-control" id="company_email" name="company_email"
                      value="{{ settings.company_email }}" placeholder="company@example.com" required>
             </div>
           </div>
@@ -70,14 +70,14 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="company_phone" class="form-label">Company Phone</label>
-              <input type="tel" class="form-control" id="company_phone" name="company_phone" 
+              <input type="tel" class="form-control" id="company_phone" name="company_phone"
                      value="{{ settings.company_phone }}" placeholder="+1 (555) 000-0000" required>
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               <label for="company_website" class="form-label">Company Website</label>
-              <input type="url" class="form-control" id="company_website" name="company_website" 
+              <input type="url" class="form-control" id="company_website" name="company_website"
                      value="{{ settings.company_website }}" placeholder="https://example.com">
             </div>
           </div>
@@ -85,7 +85,7 @@
 
         <div class="form-group">
           <label for="company_address" class="form-label">Company Address</label>
-          <textarea class="form-control" id="company_address" name="company_address" 
+          <textarea class="form-control" id="company_address" name="company_address"
                     rows="3" placeholder="Enter your complete company address" required>{{ settings.company_address }}</textarea>
         </div>
 
@@ -94,7 +94,7 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="tax_id" class="form-label">Tax ID / VAT Registration</label>
-              <input type="text" class="form-control" id="tax_id" name="tax_id" 
+              <input type="text" class="form-control" id="tax_id" name="tax_id"
                      value="{{ settings.tax_id }}" placeholder="e.g., KRA PIN for Kenya">
               <small class="form-text text-muted">Tax identification number used for compliance and displayed on invoices</small>
             </div>
@@ -102,7 +102,7 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="invoice_prefix" class="form-label">Invoice Number Prefix</label>
-              <input type="text" class="form-control" id="invoice_prefix" name="invoice_prefix" 
+              <input type="text" class="form-control" id="invoice_prefix" name="invoice_prefix"
                      value="{{ settings.invoice_prefix }}" placeholder="INV" maxlength="10">
               <small class="form-text text-muted">Format: PREFIX-YEAR-NUMBER (e.g., INV-2026-0001)</small>
             </div>
@@ -110,7 +110,7 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="payment_prefix" class="form-label">Payment Receipt Prefix</label>
-              <input type="text" class="form-control" id="payment_prefix" name="payment_prefix" 
+              <input type="text" class="form-control" id="payment_prefix" name="payment_prefix"
                      value="{{ settings.payment_prefix }}" placeholder="REC" maxlength="10">
               <small class="form-text text-muted">Format: PREFIX-YEAR-NUMBER (e.g., REC-2026-0001)</small>
             </div>
@@ -118,7 +118,7 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="quote_prefix" class="form-label">Quotation Number Prefix</label>
-              <input type="text" class="form-control" id="quote_prefix" name="quote_prefix" 
+              <input type="text" class="form-control" id="quote_prefix" name="quote_prefix"
                      value="{{ settings.quote_prefix }}" placeholder="QUOTE" maxlength="10">
               <small class="form-text text-muted">Format: PREFIX-YEAR-NUMBER (e.g., QUOTE-2026-0001)</small>
             </div>
@@ -126,7 +126,7 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="delivery_prefix" class="form-label">📦 Delivery Note Prefix</label>
-              <input type="text" class="form-control" id="delivery_prefix" name="delivery_prefix" 
+              <input type="text" class="form-control" id="delivery_prefix" name="delivery_prefix"
                      value="{{ settings.delivery_prefix }}" placeholder="DLV" maxlength="10">
               <small class="form-text text-muted">Format: PREFIX-YEAR-NUMBER (e.g., DLV-2026-0001)</small>
             </div>
@@ -157,7 +157,7 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="default_payment_terms" class="form-label">Default Payment Terms</label>
-              <textarea class="form-control" id="default_payment_terms" name="default_payment_terms" 
+              <textarea class="form-control" id="default_payment_terms" name="default_payment_terms"
                         rows="3" placeholder="e.g., Net 30 days&#10;Payment due within 30 days of invoice date">{{ settings.default_payment_terms }}</textarea>
             </div>
           </div>
@@ -228,7 +228,7 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="currency_symbol" class="form-label">Default Currency Symbol</label>
-              <input type="text" class="form-control" id="currency_symbol" name="currency_symbol" 
+              <input type="text" class="form-control" id="currency_symbol" name="currency_symbol"
                      placeholder="$" maxlength="5" value="{{ settings.currency_symbol }}" required>
             </div>
           </div>
@@ -278,14 +278,14 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="bank_account_name" class="form-label">Account Holder Name</label>
-              <input type="text" class="form-control" id="bank_account_name" name="bank_account_name" 
+              <input type="text" class="form-control" id="bank_account_name" name="bank_account_name"
                      value="{{ settings.bank_account_name }}" placeholder="The Olivian Group Limited">
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               <label for="bank_account_number" class="form-label">Account Number</label>
-              <input type="text" class="form-control" id="bank_account_number" name="bank_account_number" 
+              <input type="text" class="form-control" id="bank_account_number" name="bank_account_number"
                      value="{{ settings.bank_account_number }}" placeholder="1323876154">
             </div>
           </div>
@@ -295,14 +295,14 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="bank_name" class="form-label">Bank Name</label>
-              <input type="text" class="form-control" id="bank_name" name="bank_name" 
+              <input type="text" class="form-control" id="bank_name" name="bank_name"
                      value="{{ settings.bank_name }}" placeholder="Kenya Commercial Bank">
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               <label for="bank_branch" class="form-label">Bank Branch (Optional)</label>
-              <input type="text" class="form-control" id="bank_branch" name="bank_branch" 
+              <input type="text" class="form-control" id="bank_branch" name="bank_branch"
                      value="{{ settings.bank_branch }}" placeholder="e.g., Nairobi Main Branch">
             </div>
           </div>
@@ -312,7 +312,7 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="bank_swift_code" class="form-label">SWIFT Code (Optional)</label>
-              <input type="text" class="form-control" id="bank_swift_code" name="bank_swift_code" 
+              <input type="text" class="form-control" id="bank_swift_code" name="bank_swift_code"
                      value="{{ settings.bank_swift_code }}" placeholder="e.g., KCBLKENX">
               <small class="form-text text-muted">For international bank transfers</small>
             </div>
@@ -320,7 +320,7 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="bank_iban" class="form-label">IBAN (Optional)</label>
-              <input type="text" class="form-control" id="bank_iban" name="bank_iban" 
+              <input type="text" class="form-control" id="bank_iban" name="bank_iban"
                      value="{{ settings.bank_iban }}" placeholder="e.g., KE89KCBL0000000000001">
               <small class="form-text text-muted">International Bank Account Number</small>
             </div>
@@ -340,7 +340,7 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="mpesa_paybill_number" class="form-label">Paybill Number</label>
-              <input type="text" class="form-control" id="mpesa_paybill_number" name="mpesa_paybill_number" 
+              <input type="text" class="form-control" id="mpesa_paybill_number" name="mpesa_paybill_number"
                      value="{{ settings.mpesa_paybill_number }}" placeholder="e.g., 247247">
               <small class="form-text text-muted">Your M-Pesa business paybill number</small>
             </div>
@@ -348,7 +348,7 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="mpesa_account_name" class="form-label">Account Name / Reference</label>
-              <input type="text" class="form-control" id="mpesa_account_name" name="mpesa_account_name" 
+              <input type="text" class="form-control" id="mpesa_account_name" name="mpesa_account_name"
                      value="{{ settings.mpesa_account_name }}" placeholder="e.g., Invoice Number or Account ID">
               <small class="form-text text-muted">What customers should enter as the reference/account name</small>
             </div>
@@ -359,7 +359,7 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="mpesa_phone" class="form-label">Till Number / Phone (Optional)</label>
-              <input type="text" class="form-control" id="mpesa_phone" name="mpesa_phone" 
+              <input type="text" class="form-control" id="mpesa_phone" name="mpesa_phone"
                      value="{{ settings.mpesa_phone }}" placeholder="e.g., 0719728666">
               <small class="form-text text-muted">Till number or phone for direct M-Pesa transfers (optional)</small>
             </div>
@@ -377,7 +377,7 @@
       <div class="card-body">
         <div class="form-group">
           <label for="terms_and_conditions" class="form-label">Default Terms and Conditions</label>
-          <textarea class="form-control" id="terms_and_conditions" name="terms_and_conditions" 
+          <textarea class="form-control" id="terms_and_conditions" name="terms_and_conditions"
                     rows="8" placeholder="Enter your standard terms and conditions here. This will be displayed on quotations and invoices.&#10;&#10;Example:&#10;1. Payment is due within the agreed number of days&#10;2. All goods remain the property of [Company Name] until paid in full&#10;3. Prices subject to change without notice">{{ settings.terms_and_conditions }}</textarea>
           <small class="form-text text-muted d-block mt-2">
             Use line breaks to format your terms. They will be displayed on all quotations and invoices.
@@ -429,12 +429,12 @@
 <script>
 function previewLogo(input) {
   const preview = document.getElementById('logo-preview');
-  
+
   if (input.files && input.files[0]) {
     // Check file type
     const file = input.files[0];
     const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
-    
+
     if (!validTypes.includes(file.type)) {
       preview.innerHTML = `
         <div class="alert alert-danger" role="alert">
@@ -444,7 +444,7 @@ function previewLogo(input) {
       `;
       return;
     }
-    
+
     // Check file size (2MB max)
     const maxSize = 2 * 1024 * 1024; // 2MB in bytes
     if (file.size > maxSize) {
@@ -457,7 +457,7 @@ function previewLogo(input) {
       `;
       return;
     }
-    
+
     // Show preview
     const reader = new FileReader();
     reader.onload = function(e) {
@@ -466,7 +466,7 @@ function previewLogo(input) {
         <p class="mt-2">New logo selected (click Save to apply changes)</p>
       `;
     };
-    
+
     reader.readAsDataURL(file);
   }
 }

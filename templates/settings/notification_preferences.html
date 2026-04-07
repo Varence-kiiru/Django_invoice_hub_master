@@ -1,0 +1,273 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Notification Preferences - Settings{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/notifications.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Settings Sidebar -->
+        <div class="col-lg-2 col-md-3 mb-4">
+            <div class="card settings-sidebar">
+                <div class="card-body">
+                    <div class="settings-menu">
+                        <a href="{% url 'core:settings' %}" class="settings-item">
+                            <span class="item-icon">⚙️</span>
+                            <span class="item-text">General Settings</span>
+                        </a>
+                        <a href="{% url 'core:settings-notifications' %}" class="settings-item active">
+                            <span class="item-icon">🔔</span>
+                            <span class="item-text">Notifications</span>
+                        </a>
+                        <a href="{% url 'organizations:billing_dashboard' %}" class="settings-item">
+                            <span class="item-icon">💳</span>
+                            <span class="item-text">Billing</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Preferences Content -->
+        <div class="col-lg-10 col-md-9">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="card">
+                <div class="card-header bg-gradient">
+                    <h4 class="mb-0">
+                        <span class="header-icon">🔔</span>
+                        Notification Preferences
+                    </h4>
+                    <p class="text-muted mb-0 mt-1">Manage how and when you receive notifications</p>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'core:update-notifications' %}" class="notification-form">
+                        {% csrf_token %}
+
+                        <!-- Email Notifications Section -->
+                        <div class="preferences-section">
+                            <h5 class="section-title">
+                                <span class="section-icon">📧</span>
+                                Email Notifications
+                            </h5>
+                            <p class="section-description">Choose which email notifications you'd like to receive</p>
+
+                            <div class="preference-group">
+                                <div class="form-check preference-item">
+                                    <input class="form-check-input" type="checkbox" name="email_invoices_issued"
+                                           id="email_invoices" checked>
+                                    <label class="form-check-label" for="email_invoices">
+                                        <strong>Invoice Issued</strong>
+                                        <small class="d-block text-muted">Receive email when new invoices are issued to clients</small>
+                                    </label>
+                                </div>
+
+                                <div class="form-check preference-item">
+                                    <input class="form-check-input" type="checkbox" name="email_payments_received"
+                                           id="email_payments" checked>
+                                    <label class="form-check-label" for="email_payments">
+                                        <strong>Payment Received</strong>
+                                        <small class="d-block text-muted">Receive email when payments are received</small>
+                                    </label>
+                                </div>
+
+                                <div class="form-check preference-item">
+                                    <input class="form-check-input" type="checkbox" name="email_payment_reminders"
+                                           id="email_reminders" checked>
+                                    <label class="form-check-label" for="email_reminders">
+                                        <strong>Payment Reminders</strong>
+                                        <small class="d-block text-muted">Receive reminders for overdue payments and upcoming due dates</small>
+                                    </label>
+                                </div>
+
+                                <div class="form-check preference-item">
+                                    <input class="form-check-input" type="checkbox" name="email_quotations_activity"
+                                           id="email_quotes" checked>
+                                    <label class="form-check-label" for="email_quotes">
+                                        <strong>Quotation Activity</strong>
+                                        <small class="d-block text-muted">Receive notifications about quotation status changes</small>
+                                    </label>
+                                </div>
+
+                                <div class="form-check preference-item">
+                                    <input class="form-check-input" type="checkbox" name="email_deliveries"
+                                           id="email_deliveries" checked>
+                                    <label class="form-check-label" for="email_deliveries">
+                                        <strong>Delivery Updates</strong>
+                                        <small class="d-block text-muted">Receive notifications about delivery status changes</small>
+                                    </label>
+                                </div>
+
+                                <div class="form-check preference-item">
+                                    <input class="form-check-input" type="checkbox" name="email_expenses"
+                                           id="email_expenses" checked>
+                                    <label class="form-check-label" for="email_expenses">
+                                        <strong>Expense Approvals</strong>
+                                        <small class="d-block text-muted">Receive notifications about expense approvals and rejections</small>
+                                    </label>
+                                </div>
+
+                                <div class="form-check preference-item">
+                                    <input class="form-check-input" type="checkbox" name="email_team_updates"
+                                           id="email_team" checked>
+                                    <label class="form-check-label" for="email_team">
+                                        <strong>Team Updates</strong>
+                                        <small class="d-block text-muted">Receive notifications about team member activities</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- In-App Notifications Section -->
+                        <div class="preferences-section">
+                            <h5 class="section-title">
+                                <span class="section-icon">ℹ️</span>
+                                In-App Notifications
+                            </h5>
+                            <p class="section-description">Manage notifications you see in the application</p>
+
+                            <div class="preference-group">
+                                <div class="form-check preference-item">
+                                    <input class="form-check-input" type="checkbox" name="inapp_enabled"
+                                           id="inapp_enabled" checked>
+                                    <label class="form-check-label" for="inapp_enabled">
+                                        <strong>Enable In-App Notifications</strong>
+                                        <small class="d-block text-muted">Show notification bell with updates in the top navigation</small>
+                                    </label>
+                                </div>
+
+                                <div class="form-check preference-item">
+                                    <input class="form-check-input" type="checkbox" name="inapp_sound"
+                                           id="inapp_sound" checked>
+                                    <label class="form-check-label" for="inapp_sound">
+                                        <strong>Enable Sound Alerts</strong>
+                                        <small class="d-block text-muted">Play a sound when important notifications arrive</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Notification Frequency Section -->
+                        <div class="preferences-section">
+                            <h5 class="section-title">
+                                <span class="section-icon">⏰</span>
+                                Notification Frequency
+                            </h5>
+                            <p class="section-description">Control how often you receive notifications</p>
+
+                            <div class="form-group">
+                                <label for="digest_frequency" class="form-label">Email Digest Frequency</label>
+                                <select class="form-select" name="digest_frequency" id="digest_frequency">
+                                    <option value="immediate">Immediately - Send right away</option>
+                                    <option value="daily" selected>Daily Summary - Collect and send once daily</option>
+                                    <option value="weekly">Weekly Summary - Collect and send once weekly</option>
+                                    <option value="never">Disabled - Don't send email digests</option>
+                                </select>
+                                <small class="form-text text-muted d-block mt-2">
+                                    Choose how notifications are bundled and sent to your email
+                                </small>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Quiet Hours Section -->
+                        <div class="preferences-section">
+                            <h5 class="section-title">
+                                <span class="section-icon">🌙</span>
+                                Quiet Hours
+                            </h5>
+                            <p class="section-description">Pause email notifications during specific times (in-app notifications still show)</p>
+
+                            <div class="form-check preference-item mb-3">
+                                <input class="form-check-input" type="checkbox" name="quiet_hours_enabled"
+                                       id="quiet_hours_enabled">
+                                <label class="form-check-label" for="quiet_hours_enabled">
+                                    <strong>Enable Quiet Hours</strong>
+                                </label>
+                            </div>
+
+                            <div class="quiet-hours-control" id="quiet_hours_control" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="quiet_hours_start" class="form-label">Start Time</label>
+                                            <input type="time" class="form-control" name="quiet_hours_start"
+                                                   id="quiet_hours_start" value="22:00">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="quiet_hours_end" class="form-label">End Time</label>
+                                            <input type="time" class="form-control" name="quiet_hours_end"
+                                                   id="quiet_hours_end" value="08:00">
+                                        </div>
+                                    </div>
+                                </div>
+                                <small class="form-text text-muted d-block">
+                                    No email notifications will be sent between these times. In-app notifications will still appear.
+                                </small>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <button type="submit" class="btn btn-primary">
+                                <span class="btn-icon">💾</span>
+                                Save Preferences
+                            </button>
+                            <a href="{% url 'core:dashboard' %}" class="btn btn-secondary">
+                                <span class="btn-icon">✕</span>
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info Box -->
+            <div class="card mt-4 info-card">
+                <div class="card-body">
+                    <div class="alert alert-info" role="alert">
+                        <strong>💡 Tip:</strong> You can also view all your notifications in the
+                        <a href="{% url 'core:notifications' %}" class="alert-link">Notification Center</a>.
+                        Important notifications will still be delivered via email even during quiet hours.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Toggle quiet hours input fields
+    document.getElementById('quiet_hours_enabled').addEventListener('change', function() {
+        document.getElementById('quiet_hours_control').style.display =
+            this.checked ? 'block' : 'none';
+    });
+
+    // Initialize form state
+    document.addEventListener('DOMContentLoaded', function() {
+        const quietHoursEnabled = document.getElementById('quiet_hours_enabled').checked;
+        document.getElementById('quiet_hours_control').style.display =
+            quietHoursEnabled ? 'block' : 'none';
+    });
+</script>
+{% endblock %}

@@ -3,6 +3,8 @@
 
 {% block title %}A/R Statement - {{ client.name }}{% endblock %}
 
+{% block page_title %}A/R Statement{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/clients.css' }">
 {% endblock %}
@@ -19,33 +21,33 @@
 <!-- Aging Summary -->
 <div class="section">
     <div class="section-title">Accounts Receivable Aging Summary</div>
-    
+
     <div class="summary-grid">
         <div class="summary-card aging-0">
             <div class="summary-label">Current (0-30 days)</div>
             <div class="summary-value">{{ client.currency }} {{ aging_current|default:"0.00" }}</div>
             <div class="summary-meta">Not yet due</div>
         </div>
-        
+
         <div class="summary-card aging-30">
             <div class="summary-label">31-60 Days</div>
             <div class="summary-value">{{ client.currency }} {{ aging_30|default:"0.00" }}</div>
             <div class="summary-meta">Slightly overdue</div>
         </div>
-        
+
         <div class="summary-card aging-60">
             <div class="summary-label">61-90 Days</div>
             <div class="summary-value">{{ client.currency }} {{ aging_60|default:"0.00" }}</div>
             <div class="summary-meta">Significantly overdue</div>
         </div>
-        
+
         <div class="summary-card aging-90">
             <div class="summary-label">90+ Days</div>
             <div class="summary-value red">{{ client.currency }} {{ aging_over_90|default:"0.00" }}</div>
             <div class="summary-meta">Very overdue</div>
         </div>
     </div>
-    
+
     <table class="aging-table">
         <thead>
             <tr>
@@ -87,7 +89,7 @@
 <!-- Outstanding Invoices -->
 <div class="section">
     <div class="section-title">Outstanding Invoices</div>
-    
+
     {% if outstanding_invoices %}
     <table class="invoice-table">
         <thead>
@@ -139,7 +141,7 @@
 <!-- Payment History Summary -->
 <div class="section">
     <div class="section-title">Payment History (Last 12 Months)</div>
-    
+
     <table class="invoice-table">
         <thead>
             <tr>

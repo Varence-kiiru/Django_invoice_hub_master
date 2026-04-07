@@ -37,6 +37,21 @@
     margin-left: auto;
   }
 
+  /* Mobile responsive dropdowns */
+  .notification-panel,
+  .user-dropdown {
+    position: fixed;
+    right: var(--spacing-sm, 0.5rem);
+    left: var(--spacing-sm, 0.5rem);
+    width: auto;
+    min-width: auto;
+    max-width: calc(100vw - var(--spacing-md, 1rem));
+  }
+
+  .notification-panel {
+    max-height: 60vh;
+  }
+
   /* ===== Sidebar ===== */
   .sidebar {
     position: fixed;

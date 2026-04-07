@@ -67,34 +67,39 @@ class SidebarManager {
 
   handleToggleClick(e, link) {
     e.preventDefault();
+
     const menuId = link.getAttribute('data-toggle');
     const menu = document.getElementById(menuId);
     const toggleIcon = link.querySelector('.sidebar-toggle-icon');
 
     if (!menu) return;
 
-    // Toggle active state
+    const isCollapsed = document.body.classList.contains('sidebar-collapsed');
+
+    // ✅ In collapsed mode → pin/unpin submenu (stays visible after click)
+    if (isCollapsed) {
+      const isPinned = menu.classList.toggle('pinned');
+      toggleIcon?.classList.toggle('open', isPinned);
+      link.setAttribute('aria-expanded', isPinned.toString());
+      return; // Don't close other menus in collapsed mode
+    }
+
+    // ✅ Normal (expanded mode) behavior - accordion style
     const isOpen = menu.classList.toggle('open');
     toggleIcon?.classList.toggle('open');
     link.setAttribute('aria-expanded', isOpen.toString());
 
-    // Add/remove hidden attribute
-    if (isOpen) {
-      menu.removeAttribute('hidden');
-    } else {
-      menu.setAttribute('hidden', '');
-    }
-
-    // Close other menus in the same section
+    // Close others in same section (accordion)
     const section = link.closest('.sidebar-section');
     if (section) {
       const otherMenus = section.querySelectorAll('.sidebar-submenu');
       otherMenus.forEach(otherMenu => {
         if (otherMenu !== menu && otherMenu.classList.contains('open')) {
           otherMenu.classList.remove('open');
-          otherMenu.setAttribute('hidden', '');
-          const otherToggleLink = otherMenu.previousElementSibling;
+
+          const otherToggleLink = otherMenu.closest('.sidebar-nav-item')?.querySelector('.sidebar-toggle-link');
           otherToggleLink?.setAttribute('aria-expanded', 'false');
+
           const otherIcon = otherToggleLink?.querySelector('.sidebar-toggle-icon');
           otherIcon?.classList.remove('open');
         }
@@ -105,6 +110,7 @@ class SidebarManager {
   // Highlight active menu based on current URL
   setActiveMenu() {
     const currentPath = window.location.pathname;
+    const isCollapsed = document.body.classList.contains('sidebar-collapsed');
     const links = this.sidebar.querySelectorAll('a[href]');
 
     links.forEach(link => {
@@ -115,8 +121,13 @@ class SidebarManager {
         // Expand parent submenu if applicable
         const submenu = link.closest('.sidebar-submenu');
         if (submenu) {
-          submenu.classList.add('open');
-          submenu.removeAttribute('hidden');
+          // In collapsed mode, use 'pinned' class; in expanded mode, use 'open'
+          if (isCollapsed) {
+            submenu.classList.add('pinned');
+          } else {
+            submenu.classList.add('open');
+          }
+
           const toggleLink = submenu.closest('.sidebar-nav-item')?.querySelector('.sidebar-toggle-link');
           toggleLink?.setAttribute('aria-expanded', 'true');
           const toggleIcon = toggleLink?.querySelector('.sidebar-toggle-icon');

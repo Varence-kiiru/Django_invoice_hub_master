@@ -7,7 +7,7 @@
 function toggleAdvancedFilter(filterId) {
     const filterPanel = document.getElementById(filterId);
     const filterToggle = event.target.closest('.filter-toggle');
-    
+
     if (filterPanel) {
         if (filterPanel.style.display === 'none') {
             filterPanel.style.display = 'block';
@@ -23,12 +23,12 @@ function toggleAdvancedFilter(filterId) {
 function openSaveFilterModal(filterType) {
     const modal = document.getElementById('saveFilterModal');
     const filterTypeInput = document.getElementById('filterType');
-    
+
     if (modal) {
         filterTypeInput.value = filterType;
         modal.style.display = 'flex';
         modal.classList.add('show');
-        
+
         // Focus on filter name input
         setTimeout(() => {
             document.getElementById('filterName').focus();
@@ -69,7 +69,7 @@ function closeSavedFiltersModal() {
 // Load saved filter and apply it
 function loadSavedFilter(filterId) {
     if (!filterId) return;
-    
+
     // Fetch the saved filter and navigate to URL with params
     fetch(`/api/filters/${filterId}/`)
         .then(response => response.json())
@@ -83,7 +83,7 @@ function loadSavedFilter(filterId) {
                         params.append(key, value);
                     }
                 });
-                
+
                 // Redirect to list page with filters applied
                 window.location.href = `${window.location.pathname}?${params.toString()}`;
             }
@@ -125,12 +125,12 @@ function editSavedFilter(filterId) {
             document.getElementById('filterDescription').value = data.description || '';
             document.getElementById('filterGlobal').checked = data.is_global;
             document.getElementById('filterType').value = data.filter_type;
-            
+
             // Change modal action to update
             const form = document.getElementById('saveFilterForm');
             form.action = `/api/filters/${filterId}/`;
             form.dataset.method = 'PATCH';
-            
+
             openSaveFilterModal(data.filter_type);
         })
         .catch(error => console.error('Error loading filter:', error));
@@ -139,7 +139,7 @@ function editSavedFilter(filterId) {
 // Load and display saved filters list
 function loadSavedFiltersList() {
     const container = document.getElementById('savedFiltersList');
-    
+
     fetch('/api/filters/')
         .then(response => response.json())
         .then(data => {
@@ -182,20 +182,20 @@ document.addEventListener('DOMContentLoaded', function() {
     if (form) {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const filterType = document.getElementById('filterType').value;
             const formData = new FormData(form);
-            
+
             // Get current filter criteria from URL
             const urlParams = new URLSearchParams(window.location.search);
             const criteria = {};
-            
+
             urlParams.forEach((value, key) => {
                 if (key !== 'page' && key !== 'csrfmiddlewaretoken') {
                     criteria[key] = value;
                 }
             });
-            
+
             // Prepare submission data
             const submitData = {
                 name: formData.get('name'),
@@ -204,11 +204,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 filter_criteria: criteria,
                 is_global: formData.get('is_global') === 'true'
             };
-            
+
             // Determine if POST (create) or PATCH (update)
             const method = form.dataset.method || 'POST';
             const url = form.action || '/api/filters/';
-            
+
             fetch(url, {
                 method: method,
                 headers: {
@@ -235,14 +235,14 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-    
+
     // Close modals when clicking outside
     document.addEventListener('click', function(e) {
         const modal = document.getElementById('saveFilterModal');
         if (modal && e.target === modal) {
             closeSaveFilterModal();
         }
-        
+
         const savedModal = document.getElementById('savedFiltersModal');
         if (savedModal && e.target === savedModal) {
             closeSavedFiltersModal();
@@ -294,7 +294,7 @@ function showNotification(message, type = 'info') {
     `;
     notification.textContent = message;
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
         notification.style.animation = 'slideOut 0.3s ease-out forwards';
         setTimeout(() => notification.remove(), 300);
@@ -314,7 +314,7 @@ style.textContent = `
             opacity: 1;
         }
     }
-    
+
     @keyframes slideOut {
         from {
             transform: translateX(0);

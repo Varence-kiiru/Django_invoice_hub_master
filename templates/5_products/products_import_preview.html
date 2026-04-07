@@ -1,7 +1,9 @@
 {% extends "layouts/base.html" %}
 {% load static %}
 
-{% block title %}Import Products - Preview{% endblock %}
+{% block title %}Import Products - {% if error %}Error{% else %}Preview{% endif %}{% endblock %}
+
+{% block page_title %}{% if error %}Import Error{% else %}{{ page_title|default:"Import Results" }}{% endif %}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/products.css' %}">
@@ -10,7 +12,7 @@
 {% block content %}
 <div class="form-container">
     <h1>Import Products - Results</h1>
-    
+
     {% if error %}
     <div class="form-error" style="margin-bottom: var(--spacing-xl);">
         <strong>Error:</strong> {{ error }}
@@ -20,7 +22,7 @@
         <a href="{% url 'products:list' %}" class="btn-primary">Back to Products</a>
     </div>
     {% else %}
-    
+
     <!-- Success Summary -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
         <div class="stat-card">
@@ -38,19 +40,19 @@
             <div class="stat-label">Total Rows Processed</div>
         </div>
     </div>
-    
+
     {% if success_count > 0 %}
     <div class="form-success" style="margin-bottom: var(--spacing-xl);">
         <strong>✓ Success!</strong> {{ success_count }} product{{ success_count|pluralize }} successfully imported to your catalog.
     </div>
     {% endif %}
-    
+
     {% if failed_rows %}
     <!-- Failed Rows -->
     <div class="section">
         <h2 style="color: var(--color-danger); margin-top: var(--spacing-xl);">Failed Rows ({{ failed_rows|length }})</h2>
         <p>The following rows could not be imported. Please fix the issues and try again.</p>
-        
+
         <div style="overflow-x: auto; margin-top: var(--spacing-lg);">
             <table class="data-table">
                 <thead>
@@ -81,7 +83,7 @@
         </div>
     </div>
     {% endif %}
-    
+
     <!-- Action Buttons -->
     <div class="form-actions" style="margin-top: var(--spacing-xl);">
         {% if failed_rows %}
@@ -90,7 +92,7 @@
         <a href="{% url 'products:list' %}" class="btn-primary">View Products</a>
         <a href="{% url 'products:import' %}" class="btn-secondary">Import More</a>
     </div>
-    
+
     {% endif %}
 </div>
 
@@ -103,19 +105,19 @@
         border: 1px solid var(--color-border);
         transition: all var(--transition-base);
     }
-    
+
     .stat-card:hover {
         transform: translateY(-2px);
         box-shadow: var(--shadow-md);
         background: var(--color-white);
     }
-    
+
     .stat-value {
         font-size: var(--font-size-2xl);
         font-weight: var(--font-weight-bold);
         line-height: 1;
     }
-    
+
     .stat-label {
         font-size: var(--font-size-sm);
         color: var(--color-text-secondary);
@@ -123,7 +125,7 @@
         text-transform: uppercase;
         letter-spacing: 0.05em;
     }
-    
+
     .data-table {
         width: 100%;
         border-collapse: collapse;
@@ -132,12 +134,12 @@
         border-radius: var(--radius-md);
         overflow: hidden;
     }
-    
+
     .data-table thead {
         background: var(--color-gray-50);
         border-bottom: 2px solid var(--color-border);
     }
-    
+
     .data-table th {
         padding: var(--spacing-md);
         text-align: left;
@@ -147,18 +149,18 @@
         text-transform: uppercase;
         letter-spacing: 0.05em;
     }
-    
+
     .data-table td {
         padding: var(--spacing-md);
         border-bottom: 1px solid var(--color-gray-100);
         vertical-align: top;
         font-size: var(--font-size-sm);
     }
-    
+
     .data-table tbody tr:hover {
         background: var(--color-gray-50);
     }
-    
+
     .section {
         margin-top: var(--spacing-xl);
         padding-top: var(--spacing-xl);

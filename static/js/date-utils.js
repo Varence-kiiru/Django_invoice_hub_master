@@ -11,18 +11,18 @@ function formatDate(date, pattern = 'YYYY-MM-DD') {
   if (typeof date === 'string') {
     date = new Date(date);
   }
-  
+
   if (!(date instanceof Date) || isNaN(date.getTime())) {
     return '';
   }
-  
+
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
   const seconds = String(date.getSeconds()).padStart(2, '0');
-  
+
   return pattern
     .replace('YYYY', year)
     .replace('MM', month)
@@ -40,18 +40,18 @@ function formatDateTime(date, timeFormat = '12h') {
   if (typeof date === 'string') {
     date = new Date(date);
   }
-  
+
   if (!(date instanceof Date) || isNaN(date.getTime())) {
     return '';
   }
-  
+
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const monthStr = months[date.getMonth()];
   const dateStr = date.getDate();
   const yearStr = date.getFullYear();
-  
+
   let timeStr = '';
-  
+
   if (timeFormat === '12h') {
     const hours = date.getHours() % 12 || 12;
     const minutes = String(date.getMinutes()).padStart(2, '0');
@@ -62,7 +62,7 @@ function formatDateTime(date, timeFormat = '12h') {
     const minutes = String(date.getMinutes()).padStart(2, '0');
     timeStr = `${hours}:${minutes}`;
   }
-  
+
   return `${monthStr} ${dateStr}, ${yearStr} ${timeStr}`;
 }
 
@@ -72,9 +72,9 @@ function formatDateTime(date, timeFormat = '12h') {
 function daysBetween(date1, date2) {
   const d1 = new Date(date1).getTime();
   const d2 = new Date(date2).getTime();
-  
+
   if (isNaN(d1) || isNaN(d2)) return 0;
-  
+
   const msPerDay = 24 * 60 * 60 * 1000;
   return Math.floor(Math.abs(d2 - d1) / msPerDay);
 }
@@ -85,9 +85,9 @@ function daysBetween(date1, date2) {
 function isOverdue(dueDate, referenceDate = null) {
   const due = new Date(dueDate).getTime();
   const ref = referenceDate ? new Date(referenceDate).getTime() : Date.now();
-  
+
   if (isNaN(due) || isNaN(ref)) return false;
-  
+
   return ref > due;
 }
 
@@ -97,9 +97,9 @@ function isOverdue(dueDate, referenceDate = null) {
 function daysOverdue(dueDate, referenceDate = null) {
   const due = new Date(dueDate);
   const ref = referenceDate ? new Date(referenceDate) : new Date();
-  
+
   if (isNaN(due.getTime()) || isNaN(ref.getTime())) return 0;
-  
+
   const days = daysBetween(due, ref);
   return isOverdue(due, ref) ? days : 0;
 }
@@ -111,9 +111,9 @@ function daysOverdue(dueDate, referenceDate = null) {
 function relativeTime(date, now = new Date()) {
   const timestamp = new Date(date).getTime();
   const nowTime = new Date(now).getTime();
-  
+
   if (isNaN(timestamp)) return '';
-  
+
   const seconds = Math.floor((nowTime - timestamp) / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
@@ -121,7 +121,7 @@ function relativeTime(date, now = new Date()) {
   const weeks = Math.floor(days / 7);
   const months = Math.floor(days / 30);
   const years = Math.floor(days / 365);
-  
+
   if (seconds < 60) return 'just now';
   if (minutes < 60) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
   if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
@@ -214,7 +214,7 @@ function endOfYear(date) {
 function isToday(date) {
   const today = new Date();
   const checkDate = new Date(date);
-  
+
   return checkDate.getFullYear() === today.getFullYear() &&
          checkDate.getMonth() === today.getMonth() &&
          checkDate.getDate() === today.getDate();
@@ -226,13 +226,13 @@ function isToday(date) {
 function isThisWeek(date) {
   const today = new Date();
   const checkDate = new Date(date);
-  
+
   const startOfWeek = new Date(today);
   startOfWeek.setDate(today.getDate() - today.getDay());
-  
+
   const endOfWeek = new Date(startOfWeek);
   endOfWeek.setDate(startOfWeek.getDate() + 6);
-  
+
   return checkDate >= startOfWeek && checkDate <= endOfWeek;
 }
 
@@ -242,7 +242,7 @@ function isThisWeek(date) {
 function isThisMonth(date) {
   const today = new Date();
   const checkDate = new Date(date);
-  
+
   return checkDate.getFullYear() === today.getFullYear() &&
          checkDate.getMonth() === today.getMonth();
 }
@@ -253,7 +253,7 @@ function isThisMonth(date) {
 function isThisYear(date) {
   const today = new Date();
   const checkDate = new Date(date);
-  
+
   return checkDate.getFullYear() === today.getFullYear();
 }
 
@@ -263,16 +263,16 @@ function isThisYear(date) {
 function getAge(birthDate) {
   const today = new Date();
   const birth = new Date(birthDate);
-  
+
   if (isNaN(birth.getTime())) return null;
-  
+
   let age = today.getFullYear() - birth.getFullYear();
   const monthDiff = today.getMonth() - birth.getMonth();
-  
+
   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
     age--;
   }
-  
+
   return age;
 }
 
@@ -281,10 +281,10 @@ function getAge(birthDate) {
  */
 function getDayName(date, format = 'short') {
   const d = new Date(date);
-  const days = format === 'short' 
+  const days = format === 'short'
     ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
     : ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  
+
   return days[d.getDay()];
 }
 
@@ -296,7 +296,7 @@ function getMonthName(date, format = 'short') {
   const months = format === 'short'
     ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  
+
   return months[d.getMonth()];
 }
 

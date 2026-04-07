@@ -7,7 +7,7 @@
 {% block page_description %}Manage tax rates and configurations{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/admin/tax_management.css' %}">
+<link rel="stylesheet" href="{% static 'css/admin/taxes.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -32,11 +32,11 @@
   <div class="alert alert-info alert-soft mb-4">
     <h5 class="alert-heading"><i class="bi bi-info-circle"></i> Professional Tax Management System</h5>
     <p class="mb-2">
-      The tax rate management system has been completely redesigned with a professional HTML interface. 
+      The tax rate management system has been completely redesigned with a professional HTML interface.
       You can now manage all tax rates and VAT rules directly through the web interface without using REST APIs.
     </p>
     <p class="mb-0">
-      <strong>Benefits:</strong> Full CRUD operations, advanced filtering, search functionality, bulk operations, 
+      <strong>Benefits:</strong> Full CRUD operations, advanced filtering, search functionality, bulk operations,
       and comprehensive audit trails for all tax-related changes.
     </p>
   </div>
@@ -68,7 +68,7 @@
     <div class="card-header bg-light">
       <h5 class="mb-0">💰 Tax Rates</h5>
     </div>
-    
+
     {% if tax_rates %}
       <div class="table-responsive">
         <table class="table table-hover mb-0">

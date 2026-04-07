@@ -27,7 +27,7 @@ const Modals = {
       } = options;
 
       const modalId = 'modal-' + Math.random().toString(36).substr(2, 9);
-      
+
       // Create modal HTML
       const modalHTML = `
         <div class="modal fade" id="${modalId}" tabindex="-1" role="dialog" aria-labelledby="${modalId}-label" aria-hidden="true">
@@ -205,7 +205,7 @@ const Modals = {
     document.querySelectorAll('.btn-delete').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
-        
+
         const url = btn.getAttribute('data-delete-url');
         const name = btn.getAttribute('data-delete-name') || 'this item';
         const csrfToken = btn.getAttribute('data-csrf-token');

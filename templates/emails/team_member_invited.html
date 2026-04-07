@@ -1,0 +1,35 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}You're Invited to Join {{ organization_name }}{% endblock %}
+
+{% block header_class %}header-purple{% endblock %}
+
+{% block header_title %}👋 Welcome to {{ organization_name }}!{% endblock %}
+
+{% block content %}
+    <p>Hello,</p>
+
+    <p><strong>{{ invited_by }}</strong> has invited you to join <strong>{{ organization_name }}</strong> as a <strong>{{ role }}</strong>.</p>
+
+    <div class="highlight-box highlight-purple">
+        <strong>🎉 You're Invited!</strong>
+        <p>Click the button below to accept this invitation and join the team. You'll be able to access all team resources and collaborate with your colleagues.</p>
+    </div>
+
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{{ invitation_url }}" class="btn btn-primary" style="background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
+            Accept Invitation
+        </a>
+    </div>
+
+    <p style="text-align: center;">
+        <small>Or copy and paste this link in your browser: <a href="{{ invitation_url }}">{{ invitation_url }}</a></small>
+    </p>
+
+    <div class="highlight-box highlight-blue">
+        <strong>ℹ️ Role Information:</strong>
+        <p>You will be joining as a <strong>{{ role }}</strong>. This role has been assigned specific permissions to help you collaborate effectively with your team.</p>
+    </div>
+
+    <p>We look forward to working with you!</p>
+{% endblock %}

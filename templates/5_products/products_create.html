@@ -3,6 +3,8 @@
 
 {% block title %}Create Product{% endblock %}
 
+{% block page_title %}New Product{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/products.css' %}">
 {% endblock %}
@@ -10,16 +12,16 @@
 {% block content %}
 <div class="form-container">
     <h1>Create New Product</h1>
-    
+
     {% if form.non_field_errors %}
     <div class="form-error" style="margin-bottom: var(--spacing-xl);">
         {{ form.non_field_errors }}
     </div>
     {% endif %}
-    
+
     <form method="post">
         {% csrf_token %}
-        
+
         <div class="form-group required">
             <label>{{ form.sku.label }}</label>
             {{ form.sku }}
@@ -27,7 +29,7 @@
                 <div class="form-error">{{ form.sku.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-group required">
             <label>{{ form.name.label }}</label>
             {{ form.name }}
@@ -35,7 +37,7 @@
                 <div class="form-error">{{ form.name.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-group">
             <label>{{ form.description.label }}</label>
             {{ form.description }}
@@ -43,7 +45,7 @@
                 <div class="form-error">{{ form.description.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-group">
             <label>{{ form.category.label }}</label>
             {{ form.category }}
@@ -51,7 +53,7 @@
                 <div class="form-error">{{ form.category.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-group required">
             <label>{{ form.unit_price.label }}</label>
             {{ form.unit_price }}
@@ -59,7 +61,7 @@
                 <div class="form-error">{{ form.unit_price.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-group required">
             <label>{{ form.unit.label }}</label>
             {{ form.unit }}
@@ -67,7 +69,7 @@
                 <div class="form-error">{{ form.unit.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-group">
             <label>{{ form.tax_class.label }}</label>
             {{ form.tax_class }}
@@ -75,7 +77,7 @@
                 <div class="form-error">{{ form.tax_class.errors.0 }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-actions">
             <button type="submit" class="btn-primary">Create Product</button>
             <a href="{% url 'products:list' %}" class="btn-secondary">Cancel</a>

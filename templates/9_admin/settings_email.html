@@ -33,13 +33,13 @@
         <div class="row">
           <div class="col-md-6 mb-3">
             <label for="smtp_host" class="form-label">SMTP Host</label>
-            <input type="text" class="form-control" id="smtp_host" name="smtp_host" 
+            <input type="text" class="form-control" id="smtp_host" name="smtp_host"
                    placeholder="smtp.gmail.com" value="{{ email_config.smtp_host }}">
             <small class="text-muted">SMTP server address</small>
           </div>
           <div class="col-md-6 mb-3">
             <label for="smtp_port" class="form-label">SMTP Port</label>
-            <input type="number" class="form-control" id="smtp_port" name="smtp_port" 
+            <input type="number" class="form-control" id="smtp_port" name="smtp_port"
                    placeholder="587" value="{{ email_config.smtp_port }}">
             <small class="text-muted">Default: 587 (TLS) or 465 (SSL)</small>
           </div>
@@ -47,12 +47,12 @@
         <div class="row">
           <div class="col-md-6 mb-3">
             <label for="smtp_username" class="form-label">SMTP Username</label>
-            <input type="text" class="form-control" id="smtp_username" name="smtp_username" 
+            <input type="text" class="form-control" id="smtp_username" name="smtp_username"
                    placeholder="your-email@gmail.com" value="{{ email_config.smtp_username }}">
           </div>
           <div class="col-md-6 mb-3">
             <label for="smtp_password" class="form-label">SMTP Password</label>
-            <input type="password" class="form-control" id="smtp_password" name="smtp_password" 
+            <input type="password" class="form-control" id="smtp_password" name="smtp_password"
                    placeholder="••••••••">
             <small class="text-muted">Your SMTP password or app-specific password</small>
           </div>
@@ -61,7 +61,7 @@
           <div class="col-md-6 mb-3">
             <label class="form-label">Encryption Method</label>
             <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="smtp_use_tls" name="smtp_use_tls" 
+              <input class="form-check-input" type="checkbox" id="smtp_use_tls" name="smtp_use_tls"
                      {% if email_config.smtp_use_tls %}checked{% endif %}>
               <label class="form-check-label" for="smtp_use_tls">
                 Use TLS (Port 587)
@@ -78,7 +78,7 @@
           </div>
           <div class="col-md-6 mb-3">
             <label for="from_email" class="form-label">From Email Address</label>
-            <input type="email" class="form-control" id="from_email" name="from_email" 
+            <input type="email" class="form-control" id="from_email" name="from_email"
                    placeholder="noreply@example.com" value="{{ email_config.from_email }}">
             <small class="text-muted">Email address for sending notifications</small>
           </div>
@@ -86,7 +86,7 @@
         <div class="row">
           <div class="col-md-6 mb-3">
             <label for="from_name" class="form-label">From Name</label>
-            <input type="text" class="form-control" id="from_name" name="from_name" 
+            <input type="text" class="form-control" id="from_name" name="from_name"
                    placeholder="Invoice System" value="{{ email_config.from_name }}">
             <small class="text-muted">Display name in recipient's email client</small>
           </div>
@@ -101,7 +101,7 @@
       </div>
       <div class="card-body">
         <div class="form-check mb-3">
-          <input class="form-check-input" type="checkbox" id="enable_invoice_created" name="enable_invoice_created" 
+          <input class="form-check-input" type="checkbox" id="enable_invoice_created" name="enable_invoice_created"
                  {% if email_config.enable_invoice_created %}checked{% endif %}>
           <label class="form-check-label" for="enable_invoice_created">
             <strong>Invoice Created</strong>
@@ -109,7 +109,7 @@
           </label>
         </div>
         <div class="form-check mb-3">
-          <input class="form-check-input" type="checkbox" id="enable_invoice_sent" name="enable_invoice_sent" 
+          <input class="form-check-input" type="checkbox" id="enable_invoice_sent" name="enable_invoice_sent"
                  {% if email_config.enable_invoice_sent %}checked{% endif %}>
           <label class="form-check-label" for="enable_invoice_sent">
             <strong>Invoice Sent to Client</strong>
@@ -117,7 +117,7 @@
           </label>
         </div>
         <div class="form-check mb-3">
-          <input class="form-check-input" type="checkbox" id="enable_payment_received" name="enable_payment_received" 
+          <input class="form-check-input" type="checkbox" id="enable_payment_received" name="enable_payment_received"
                  {% if email_config.enable_payment_received %}checked{% endif %}>
           <label class="form-check-label" for="enable_payment_received">
             <strong>Payment Received</strong>
@@ -125,7 +125,7 @@
           </label>
         </div>
         <div class="form-check mb-3">
-          <input class="form-check-input" type="checkbox" id="enable_payment_overdue" name="enable_payment_overdue" 
+          <input class="form-check-input" type="checkbox" id="enable_payment_overdue" name="enable_payment_overdue"
                  {% if email_config.enable_payment_overdue %}checked{% endif %}>
           <label class="form-check-label" for="enable_payment_overdue">
             <strong>Payment Overdue</strong>
@@ -142,7 +142,7 @@
       </div>
       <div class="card-body">
         <div class="form-check mb-3">
-          <input class="form-check-input" type="checkbox" id="send_to_client_on_creation" name="send_to_client_on_creation" 
+          <input class="form-check-input" type="checkbox" id="send_to_client_on_creation" name="send_to_client_on_creation"
                  {% if email_config.send_to_client_on_creation %}checked{% endif %}>
           <label class="form-check-label" for="send_to_client_on_creation">
             <strong>Send Invoice to Client on Creation</strong>
@@ -151,7 +151,7 @@
         </div>
         <div class="mb-3">
           <label for="days_before_due_reminder" class="form-label">Days Before Sending Reminder</label>
-          <input type="number" class="form-control" id="days_before_due_reminder" name="days_before_due_reminder" 
+          <input type="number" class="form-control" id="days_before_due_reminder" name="days_before_due_reminder"
                  placeholder="3" value="{{ email_config.days_before_due_reminder }}" min="0">
           <small class="text-muted">Send payment reminder X days before due date (0 = no reminder)</small>
         </div>
@@ -166,7 +166,7 @@
       <div class="card-body">
         <div class="mb-3">
           <label for="test_email" class="form-label">Test Email Address</label>
-          <input type="email" class="form-control" id="test_email" name="test_email" 
+          <input type="email" class="form-control" id="test_email" name="test_email"
                  placeholder="your-email@example.com">
           <small class="text-muted">Enter email address to receive test message</small>
         </div>
@@ -233,7 +233,7 @@
 document.getElementById('send_test_btn').addEventListener('click', async function() {
   const testEmail = document.getElementById('test_email').value;
   const resultDiv = document.getElementById('test_result');
-  
+
   if (!testEmail) {
     resultDiv.classList.remove('alert-success', 'alert-danger');
     resultDiv.classList.add('alert-danger');
@@ -241,28 +241,28 @@ document.getElementById('send_test_btn').addEventListener('click', async functio
     resultDiv.style.display = 'block';
     return;
   }
-  
+
   // Show loading state
   const btn = this;
   const originalText = btn.textContent;
   btn.disabled = true;
   btn.textContent = 'Sending...';
   resultDiv.style.display = 'none';
-  
+
   try {
     const formData = new FormData();
     formData.append('test_email', testEmail);
     formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
-    
+
     const response = await fetch('{% url "core:test-email" %}', {
       method: 'POST',
       body: formData
     });
-    
+
     // Check if response is JSON
     const contentType = response.headers.get('content-type');
     let data;
-    
+
     if (contentType && contentType.includes('application/json')) {
       data = await response.json();
     } else {
@@ -271,17 +271,17 @@ document.getElementById('send_test_btn').addEventListener('click', async functio
       console.error('Non-JSON response:', text);
       throw new Error(`Server returned ${response.status}: ${response.statusText}`);
     }
-    
+
     resultDiv.classList.remove('alert-success', 'alert-danger');
     if (data.success) {
       resultDiv.classList.add('alert-success');
     } else {
       resultDiv.classList.add('alert-danger');
     }
-    
+
     resultDiv.textContent = data.message;
     resultDiv.style.display = 'block';
-    
+
   } catch (error) {
     resultDiv.classList.remove('alert-success', 'alert-danger');
     resultDiv.classList.add('alert-danger');

@@ -1,0 +1,135 @@
+/* Breadcrumb Navigation Styling */
+
+:root {
+  --breadcrumb-gap: 0.75rem;
+  --breadcrumb-font-size: 1rem;
+  --breadcrumb-color: #666;
+  --breadcrumb-link-color: #0066cc;
+  --breadcrumb-link-hover-color: #0052a3;
+  --breadcrumb-current-color: #1a1a1a;
+  --breadcrumb-separator-color: #999;
+  --breadcrumb-margin-bottom: 1.5rem;
+  --breadcrumb-bg: transparent;
+  --breadcrumb-padding: 0.75rem 0;
+}
+
+.breadcrumb-nav {
+  margin-bottom: var(--breadcrumb-margin-bottom);
+  padding: var(--breadcrumb-padding);
+  padding-left: 0;
+  list-style: none;
+  background-color: var(--breadcrumb-bg);
+}
+
+.breadcrumb-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--breadcrumb-gap);
+  align-items: center;
+  font-size: var(--breadcrumb-font-size);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: var(--breadcrumb-gap);
+  margin: 0;
+  padding: 0;
+}
+
+.breadcrumb-link {
+  color: var(--breadcrumb-link-color);
+  text-decoration: none;
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+  white-space: nowrap;
+}
+
+.breadcrumb-link:hover {
+  color: var(--breadcrumb-link-hover-color);
+  text-decoration: underline;
+}
+
+.breadcrumb-link:active {
+  color: var(--breadcrumb-link-hover-color);
+}
+
+.breadcrumb-current {
+  color: var(--breadcrumb-current-color);
+  font-weight: 500;
+  white-space: nowrap;
+  word-break: break-word;
+}
+
+.breadcrumb-separator {
+  color: var(--breadcrumb-separator-color);
+  user-select: none;
+  margin: 0 2px;
+}
+
+/* Responsive: Hide separator on very small screens, adjust font size */
+@media (max-width: 576px) {
+  :root {
+    --breadcrumb-font-size: 0.85rem;
+    --breadcrumb-margin-bottom: 1rem;
+  }
+
+  .breadcrumb-list {
+    gap: 0.25rem;
+  }
+
+  .breadcrumb-separator {
+    margin: 0 2px;
+  }
+
+  /* Optional: Hide intermediate breadcrumbs on mobile, keep first and last */
+  .breadcrumb-item:nth-child(n+2):not(:last-child) {
+    display: none;
+  }
+
+  .breadcrumb-item:nth-child(2) {
+    display: flex;
+  }
+}
+
+/* Tablet: Normal spacing and visibility */
+@media (min-width: 577px) and (max-width: 768px) {
+  :root {
+    --breadcrumb-font-size: 0.9rem;
+  }
+}
+
+/* Accessibility: Ensure sufficient color contrast */
+@media (prefers-contrast: more) {
+  :root {
+    --breadcrumb-link-color: #0044aa;
+    --breadcrumb-link-hover-color: #003d93;
+    --breadcrumb-current-color: #1a1a1a;
+  }
+
+  .breadcrumb-link {
+    text-decoration: underline;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --breadcrumb-color: #aaa;
+    --breadcrumb-link-color: #66b3ff;
+    --breadcrumb-link-hover-color: #99ccff;
+    --breadcrumb-current-color: #e0e0e0;
+    --breadcrumb-separator-color: #666;
+  }
+}
+
+/* RTL (Right-to-Left) language support */
+[dir="rtl"] .breadcrumb-list {
+  direction: rtl;
+}
+
+[dir="rtl"] .breadcrumb-link {
+  unicode-bidi: normal;
+}

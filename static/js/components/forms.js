@@ -317,7 +317,7 @@ const Forms = {
       // Custom submit handler
       if (options.onSubmit) {
         const result = await options.onSubmit(this.getData(form));
-        
+
         if (options.onSuccess) {
           if (typeof options.onSuccess === 'string') {
             window.location.href = options.onSuccess;

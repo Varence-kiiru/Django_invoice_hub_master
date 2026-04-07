@@ -10,7 +10,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      
+
       <div class="modal-body">
         <div class="permissions-editor">
           <!-- Tabs for Permission Categories -->
@@ -56,7 +56,7 @@
               </a>
             </li>
           </ul>
-          
+
           <!-- Tab Content -->
           <div class="tab-content" id="permissionTabContent">
             <!-- Permissions will be dynamically loaded here -->
@@ -66,7 +66,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- Permission Summary -->
           <div class="permission-summary mt-3 p-3 bg-light rounded">
             <h5>Summary</h5>
@@ -79,7 +79,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
         <button type="button" class="btn btn-primary" id="savePermissionsBtn" onclick="saveRolePermissions()">
@@ -100,14 +100,14 @@ let allPermissionsData = {};
 function editRolePermissions(roleId, roleName) {
   currentEditingRoleId = roleId;
   selectedPermissions = [];
-  
+
   // Update modal title
   document.getElementById('permissionRoleName').textContent = roleName;
-  
+
   // Load permissions and current role permissions
   loadPermissionsData();
   loadRolePermissions(roleId);
-  
+
   // Show modal
   $('#permissions-modal').modal('show');
 }
@@ -144,28 +144,28 @@ function loadRolePermissions(roleId) {
 function renderPermissionTabs() {
   const tabContent = document.getElementById('permissionTabContent');
   tabContent.innerHTML = '';
-  
+
   const categories = [
-    'expenses', 'invoices', 'clients', 'payments', 
+    'expenses', 'invoices', 'clients', 'payments',
     'quotations', 'users', 'system', 'reports'
   ];
-  
+
   categories.forEach(category => {
     if (allPermissionsData[category]) {
       const tabPane = document.createElement('div');
       tabPane.className = 'tab-pane fade';
       tabPane.id = `${category}-perms`;
       if (category === 'expenses') tabPane.classList.add('show', 'active');
-      
+
       const permsList = document.createElement('div');
       permsList.className = 'permissions-checklist';
-      
+
       Object.entries(allPermissionsData[category]).forEach(([code, description]) => {
         const checkboxDiv = document.createElement('div');
         checkboxDiv.className = 'custom-control custom-checkbox mb-2';
         checkboxDiv.innerHTML = `
-          <input type="checkbox" class="custom-control-input permission-checkbox" 
-                 id="perm-${code}" value="${code}" 
+          <input type="checkbox" class="custom-control-input permission-checkbox"
+                 id="perm-${code}" value="${code}"
                  onchange="onPermissionToggled('${code}', this.checked)">
           <label class="custom-control-label" for="perm-${code}">
             <strong>${code.replace(/_/g, ' ')}</strong>
@@ -175,7 +175,7 @@ function renderPermissionTabs() {
         `;
         permsList.appendChild(checkboxDiv);
       });
-      
+
       tabPane.appendChild(permsList);
       tabContent.appendChild(tabPane);
     }
@@ -206,14 +206,14 @@ function updatePermissionSummary() {
   const total = Object.values(allPermissionsData).reduce((sum, category) => sum + Object.keys(category).length, 0);
   const selected = selectedPermissions.length;
   const percentage = total > 0 ? Math.round((selected / total) * 100) : 0;
-  
+
   document.getElementById('permissionCount').textContent = selected;
   document.getElementById('totalCount').textContent = total;
-  
+
   const progressBar = document.getElementById('permissionProgressBar');
   progressBar.style.width = percentage + '%';
   progressBar.textContent = percentage + '%';
-  
+
   // Update save button state
   document.getElementById('savePermissionsBtn').disabled = false;
 }
@@ -224,11 +224,11 @@ function saveRolePermissions() {
     alert('Error: No role selected');
     return;
   }
-  
+
   const btn = document.getElementById('savePermissionsBtn');
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-  
+
   fetch(`/api/system/roles/${currentEditingRoleId}/update-permissions/`, {
     method: 'POST',
     headers: {

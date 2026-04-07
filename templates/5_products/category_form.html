@@ -9,21 +9,16 @@
     {% endif %}
 {% endblock %}
 
+{% block page_title %}
+    {% if category %}
+        Edit Category
+    {% else %}
+        New Category
+    {% endif %}
+{% endblock %}
+
 {% block extra_css %}
-<style>
-    .form-section { margin-bottom: 2rem; }
-    .form-section h6 { 
-        color: #495057; 
-        font-weight: 600; 
-        padding-bottom: 0.5rem; 
-        border-bottom: 2px solid #e9ecef;
-        margin-bottom: 1rem;
-    }
-    .help-text { font-size: 0.85rem; color: #6c757d; margin-top: 0.25rem; }
-    .required-indicator { color: #dc3545; }
-    .tips-panel { background: #f8f9fa; border-left: 4px solid #0d6efd; }
-    .current-values { background: #f0f7ff; border-left: 4px solid #0d6efd; }
-</style>
+<link rel="stylesheet" href="{% static 'css/category-form.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -36,7 +31,7 @@
         {% if category %}
             <h1><i class="bi bi-folder-check"></i> Edit Category: {{ category.name }}</h1>
             <p class="text-muted">
-                Created on {{ category.created_at|date:"M d, Y" }} 
+                Created on {{ category.created_at|date:"M d, Y" }}
                 | Last updated {{ category.updated_at|date:"M d, Y" }}
             </p>
         {% else %}
@@ -117,7 +112,7 @@
                         <i class="bi bi-arrow-left"></i> Cancel
                     </a>
                     <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-check-circle"></i> 
+                        <i class="bi bi-check-circle"></i>
                         {% if category %}Save Changes{% else %}Create Category{% endif %}
                     </button>
                 </div>
@@ -135,7 +130,7 @@
                     <div class="mb-3">
                         <strong>Category Names:</strong>
                         <p class="mb-0 mt-2">
-                            Keep category names short, descriptive, and relevant to your business. 
+                            Keep category names short, descriptive, and relevant to your business.
                             Examples: "Software", "Hardware", "Services", "Consulting"
                         </p>
                     </div>
@@ -181,7 +176,7 @@
                     <i class="bi bi-info-circle"></i>
                     <strong>About Categories</strong><br>
                     <p class="mb-0 mt-2">
-                        Categories help organize your product inventory. 
+                        Categories help organize your product inventory.
                         You can assign products to a category during creation or editing.
                     </p>
                 </div>

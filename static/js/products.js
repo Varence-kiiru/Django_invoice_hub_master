@@ -15,22 +15,22 @@ function validateProductForm() {
     const name = document.getElementById('id_name');
     const unitPrice = document.getElementById('id_unit_price');
     const unitOfMeasure = document.getElementById('id_unit_of_measure');
-    
+
     let isValid = true;
     clearFormErrors();
-    
+
     // Validate SKU
     if (!sku || !sku.value.trim()) {
         showFieldError(sku, 'SKU is required');
         isValid = false;
     }
-    
+
     // Validate name
     if (!name || !name.value.trim()) {
         showFieldError(name, 'Product name is required');
         isValid = false;
     }
-    
+
     // Validate unit price
     if (!unitPrice || !unitPrice.value) {
         showFieldError(unitPrice, 'Unit price is required');
@@ -39,13 +39,13 @@ function validateProductForm() {
         showFieldError(unitPrice, 'Please enter a valid price');
         isValid = false;
     }
-    
+
     // Validate unit of measure
     if (!unitOfMeasure || !unitOfMeasure.value.trim()) {
         showFieldError(unitOfMeasure, 'Unit of measure is required');
         isValid = false;
     }
-    
+
     return isValid;
 }
 
@@ -55,14 +55,14 @@ function validateProductForm() {
 function validateCSVData() {
     const csvData = document.querySelector('textarea[name="csv_data"]');
     const csvFile = document.getElementById('csv-file');
-    
+
     clearFormErrors();
-    
+
     if (!csvFile.files.length && !csvData.value.trim()) {
         alert('Please select a CSV file or paste CSV data');
         return false;
     }
-    
+
     return true;
 }
 
@@ -75,10 +75,10 @@ function validateCSVData() {
  */
 function showFieldError(fieldElement, message) {
     if (!fieldElement) return;
-    
+
     fieldElement.classList.add('has-error');
     const formGroup = fieldElement.closest('.form-group');
-    
+
     if (formGroup) {
         const existingError = formGroup.querySelector('.form-error');
         if (existingError) {
@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.closest('form').submit();
         });
     }
-    
+
     // Category filter
     const categoryFilter = document.querySelector('select[name="category"]');
     if (categoryFilter) {
@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.closest('form').submit();
         });
     }
-    
+
     // Confirmation dialogs for delete buttons
     const deleteButtons = document.querySelectorAll('a[href*="delete"]');
     deleteButtons.forEach(btn => {
@@ -163,10 +163,10 @@ document.addEventListener('DOMContentLoaded', function() {
 function handleFileSelect(input) {
     const label = document.getElementById('file-label');
     const fileName = document.getElementById('file-name');
-    
+
     if (input.files && input.files[0]) {
         const file = input.files[0];
-        
+
         // Validate file type
         if (!file.name.endsWith('.csv')) {
             alert('Please select a CSV file');
@@ -175,7 +175,7 @@ function handleFileSelect(input) {
             fileName.textContent = '';
             return;
         }
-        
+
         label.classList.add('has-file');
         fileName.textContent = '✓ Selected: ' + file.name;
         document.getElementById('submit-btn').textContent = 'Import ' + file.name;
@@ -192,24 +192,24 @@ function handleFileSelect(input) {
 document.addEventListener('DOMContentLoaded', function() {
     const fileLabel = document.getElementById('file-label');
     const fileInput = document.getElementById('csv-file');
-    
+
     if (fileLabel && fileInput) {
         fileLabel.addEventListener('dragover', (e) => {
             e.preventDefault();
             fileLabel.style.backgroundColor = '#e8f4f8';
             fileLabel.style.borderColor = '#2980b9';
         });
-        
+
         fileLabel.addEventListener('dragleave', () => {
             fileLabel.style.backgroundColor = '';
             fileLabel.style.borderColor = '';
         });
-        
+
         fileLabel.addEventListener('drop', (e) => {
             e.preventDefault();
             fileLabel.style.backgroundColor = '';
             fileLabel.style.borderColor = '';
-            
+
             if (e.dataTransfer.files) {
                 fileInput.files = e.dataTransfer.files;
                 handleFileSelect(fileInput);
@@ -229,7 +229,7 @@ function switchTab(tabName) {
     document.querySelectorAll('.tab-button').forEach(btn => {
         btn.classList.remove('active');
     });
-    
+
     // Show selected tab
     const targetTab = document.getElementById(tabName);
     if (targetTab) {
@@ -243,25 +243,25 @@ function switchTab(tabName) {
  */
 function previewCSVData() {
     const csvData = document.querySelector('textarea[name="csv_data"]').value;
-    
+
     if (!csvData.trim()) {
         alert('Please paste CSV data first');
         return;
     }
-    
+
     // Simple CSV parsing
     const lines = csvData.trim().split('\n');
     const headers = lines[0].split(',').map(h => h.trim());
-    
+
     let previewHtml = '<table style="border-collapse: collapse; width: 100%; margin-top: 15px;">';
     previewHtml += '<thead><tr style="background: #f5f7fa;">';
-    
+
     headers.forEach(header => {
         previewHtml += `<th style="padding: 10px; text-align: left; border: 1px solid #ddd;">${header}</th>`;
     });
-    
+
     previewHtml += '</tr></thead><tbody>';
-    
+
     // Show up to 5 rows preview
     for (let i = 1; i < Math.min(6, lines.length); i++) {
         const cells = lines[i].split(',').map(c => c.trim());
@@ -273,9 +273,9 @@ function previewCSVData() {
         });
         previewHtml += '</tr>';
     }
-    
+
     previewHtml += '</tbody></table>';
-    
+
     // Insert preview
     let previewDiv = document.getElementById('csv-preview');
     if (!previewDiv) {
@@ -295,7 +295,7 @@ function previewCSVData() {
  */
 document.addEventListener('DOMContentLoaded', function() {
     const unitPrice = document.getElementById('id_unit_price');
-    
+
     if (unitPrice) {
         unitPrice.addEventListener('input', function() {
             // Validate as number
@@ -328,11 +328,11 @@ function editCategory(id, name, description) {
     document.getElementById('form-action').value = 'update';
     document.getElementById('submit-btn').textContent = 'Save Category';
     document.getElementById('category-id').value = id;
-    
+
     // Pre-fill form
     document.getElementById('id_name').value = name;
     document.getElementById('id_description').value = description;
-    
+
     // Scroll to form
     document.getElementById('category-form').scrollIntoView({ behavior: 'smooth' });
 }
@@ -345,7 +345,7 @@ function resetForm() {
     document.getElementById('form-action').value = 'create';
     document.getElementById('submit-btn').textContent = 'Create Category';
     document.getElementById('category-id').value = '';
-    
+
     document.getElementById('category-form').reset();
 }
 
@@ -403,7 +403,7 @@ function printProductList() {
 // Price field validation
 document.addEventListener('DOMContentLoaded', function() {
     const priceFields = document.querySelectorAll('input[type="number"]');
-    
+
     priceFields.forEach(field => {
         field.addEventListener('blur', function() {
             if (this.value) {
@@ -415,7 +415,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-        
+
         field.addEventListener('input', function() {
             if (this.classList.contains('has-error') && this.value && !isNaN(parseFloat(this.value))) {
                 clearFieldError(this);
@@ -437,7 +437,7 @@ document.addEventListener('keydown', function(e) {
             form.submit();
         }
     }
-    
+
     // Escape to cancel
     if (e.key === 'Escape') {
         const cancelBtn = document.querySelector('[href*="cancel"], a.btn-secondary');

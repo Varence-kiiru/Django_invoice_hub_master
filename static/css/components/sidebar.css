@@ -1,5 +1,114 @@
 /* ==================== SIDEBAR COMPONENT ==================== */
+/* Professional Sidebar Navigation with Premium Design */
 /* Styles for templates/1_base/sidebar.html */
+
+/* ==================== PROFESSIONAL ENHANCEMENTS ==================== */
+
+/* Enhanced Brand Section */
+.sidebar-header {
+  padding: var(--spacing-lg) var(--spacing-md);
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: var(--spacing-lg);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.08), rgba(212, 175, 55, 0.04));
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.sidebar-brand span {
+  background: linear-gradient(135deg, var(--color-primary), #e5c158);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.5px;
+}
+
+.brand-tagline {
+  font-size: 0.75rem;
+  color: rgba(229, 231, 235, 0.5);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* Enhanced Section Titles */
+.sidebar-section-title {
+  font-size: 0.75rem;
+  color: rgba(229, 231, 235, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin: var(--spacing-lg) 0 var(--spacing-md) 0;
+  font-weight: 700;
+  padding: 0 var(--spacing-md);
+  display: block;
+  transition: color 0.3s ease;
+}
+
+/* Enhanced Submenu Links */
+.submenu-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  width: 20px;
+}
+
+.sidebar-submenu-link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 0.55rem 0.8rem;
+  border-radius: var(--radius-md);
+  color: rgba(229, 231, 235, 0.75);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.sidebar-submenu-link:hover {
+  background: rgba(212, 175, 55, 0.12);
+  color: var(--color-primary);
+  padding-left: 1rem;
+  transform: translateX(2px);
+}
+
+.sidebar-submenu-link.active {
+  color: var(--color-primary);
+  font-weight: 600;
+  background: rgba(212, 175, 55, 0.15);
+  box-shadow: inset -2px 0 0 var(--color-primary);
+}
+
+/* Submenu Categories */
+.sidebar-submenu-category {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-md) var(--spacing-sm) var(--spacing-md);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.category-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(229, 231, 235, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: var(--spacing-sm);
+}
+
+/* ==================== SIDEBAR COMPONENT ==================== */
 
 .sidebar {
   width: var(--sidebar-width);
@@ -7,7 +116,7 @@
   border-right: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--color-sidebar-text);
   min-height: 100vh;
-  padding-top: var(--spacing-lg);
+  padding-top: calc(var(--navbar-height) + var(--spacing-lg));
   padding-bottom: var(--spacing-lg);
   padding-left: 0.75rem;
   padding-right: 0.75rem;
@@ -16,6 +125,8 @@
   flex-direction: column;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
   overflow-y: auto;
+  /* Premium smooth transitions */
+  transition: width 0.25s ease, padding 0.25s ease, box-shadow 0.3s ease;
 }
 
 /* Nav Container */
@@ -37,6 +148,8 @@
   letter-spacing: 0.5px;
   margin-bottom: var(--spacing-md);
   font-weight: var(--font-weight-semibold);
+  /* Smooth fade transition */
+  transition: opacity 0.2s ease;
 }
 
 /* Nav List */
@@ -53,6 +166,8 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  /* Positioned for floating submenu */
+  position: relative;
 }
 
 /* Nav Links */
@@ -76,10 +191,31 @@
 }
 
 .sidebar-nav-link.active {
-  background: linear-gradient(90deg, rgba(212, 175, 55, 0.15), transparent);
+  position: relative;
+  background: rgba(212, 175, 55, 0.12);
   color: var(--color-primary);
   font-weight: var(--font-weight-semibold);
-  box-shadow: inset 3px 0 0 var(--color-primary);
+}
+
+/* Active indicator bar with glow */
+.sidebar-nav-link.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 20%;
+  height: 60%;
+  width: 4px;
+  background: var(--color-primary);
+  border-radius: 4px;
+  box-shadow: 0 0 10px var(--color-primary), inset 0 0 8px rgba(212, 175, 55, 0.3);
+  transition: all 0.3s ease;
+}
+
+/* Active icon glow */
+.sidebar-nav-link.active .icon {
+  color: var(--color-primary);
+  filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.6));
+  transition: filter 0.3s ease;
 }
 
 /* Toggle Link (for submenu toggle) */
@@ -104,13 +240,15 @@
   word-wrap: break-word;
   overflow-wrap: break-word;
   word-break: break-word;
+  /* Smooth fade transition */
+  transition: opacity 0.2s ease;
 }
 
 /* Submenu Toggle Icon */
 .sidebar-toggle-icon {
   margin-left: auto;
   opacity: 0.7;
-  transition: transform var(--transition-base);
+  transition: transform var(--transition-base), opacity 0.2s ease;
   font-size: 0.9rem;
   flex-shrink: 0;
 }
@@ -134,7 +272,7 @@
 }
 
 .sidebar-submenu[hidden] {
-  display: none;
+  display: none;  /* Fallback for semantic HTML */
 }
 
 .sidebar-submenu-item {
@@ -230,6 +368,184 @@
 /* Note: All responsive/mobile styles consolidated in responsive/mobile.css *
 /* All responsive and mobile sidebar styles have been consolidated in static/css/responsive/mobile.css
    to avoid CSS cascade conflicts and maintain a single source of truth for responsive design */
+
+/* ==================== GRID LAYOUT (ALL STATES) ==================== */
+
+/* Base grid layout - sidebar + content with flexible height for footer */
+body {
+  display: grid;
+  grid-template-columns: var(--sidebar-width, 280px) 1fr;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+  /* Removed: height: 100vh and overflow: hidden to allow footer to display */
+}
+
+/* Main content in column 2 */
+main {
+  grid-column: 2;
+  grid-row: 1 / -1; /* Span to bottom to make room for footer */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Sidebar in column 1 */
+body > .sidebar {
+  grid-column: 1;
+  grid-row: 1 / -1; /* Span full height */
+}
+
+/* Footer spans full width below main content */
+footer {
+  grid-column: 1 / -1; /* Span all columns */
+  grid-row: 2;
+}
+
+/* ==================== COLLAPSED STATE (MINI SIDEBAR) ==================== */
+
+/* Shrink grid layout for mini sidebar */
+body.sidebar-collapsed {
+  grid-template-columns: 70px 1fr;
+}
+
+/* Mini sidebar - icon only */
+body.sidebar-collapsed #sidebar {
+  width: 70px;
+  padding-left: 0.4rem;
+  padding-right: 0.4rem;
+  overflow: hidden;
+  position: relative;
+  z-index: 50;
+}
+
+/* Hide text labels smoothly (opacity instead of display:none) */
+body.sidebar-collapsed .label,
+body.sidebar-collapsed .sidebar-section-title,
+body.sidebar-collapsed .sidebar-toggle-icon {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  width: 0;
+  overflow: hidden;
+}
+
+/* ==================== FLOATING SUBMENU (SLACK-STYLE) ==================== */
+
+/* Floating submenu in mini mode - hidden by default */
+body.sidebar-collapsed .sidebar-submenu {
+  position: absolute;
+  left: 70px;
+  top: 0;
+  min-width: 220px;
+  background: var(--color-sidebar-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  padding: 0.5rem;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 999 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+/* ✅ Show when JS toggle adds .open class (click behavior) */
+.sidebar-submenu.open {
+  display: flex !important;
+}
+
+/* ✅ Pin submenu in mini mode (stays visible after click) */
+body.sidebar-collapsed .sidebar-submenu.pinned {
+  display: flex;
+}
+
+/* ✅ ALSO show on parent hover (Slack-style hover behavior) */
+body.sidebar-collapsed .sidebar-nav-item:hover > .sidebar-submenu {
+  display: flex;
+}
+
+/* Center icons in mini mode */
+body.sidebar-collapsed .sidebar-nav-link,
+body.sidebar-collapsed .sidebar-bottom-link {
+  justify-content: center;
+  padding: 0.6rem;
+  gap: 0;
+}
+
+/* Icons larger in mini mode */
+body.sidebar-collapsed .icon {
+  font-size: 1.3rem;
+  width: auto;
+  margin: 0;
+}
+
+/* Main content stays beside mini sidebar */
+body.sidebar-collapsed main {
+  /* Grid positioning already set in base rule */
+  /* Just adjust padding as needed */
+  padding-left: var(--spacing-lg);
+  padding-right: var(--spacing-lg);
+}
+
+/* Hide overlay in mini mode (not needed - sidebar visible) */
+body.sidebar-collapsed .sidebar-overlay {
+  display: none !important;
+}
+
+/* ==================== MINI SIDEBAR HOVER EXPANSION (PREMIUM UX) ==================== */
+
+/* Expand on hover - float over main content */
+body.sidebar-collapsed #sidebar:hover {
+  width: var(--sidebar-width);
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  position: relative;
+  z-index: 100; /* Float above main content when expanded */
+  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.25);
+  overflow-y: auto; /* ✅ Restore scrolling on hover */
+}
+
+/* Show labels smoothly on sidebar hover */
+body.sidebar-collapsed #sidebar:hover .label,
+body.sidebar-collapsed #sidebar:hover .sidebar-section-title,
+body.sidebar-collapsed #sidebar:hover .sidebar-toggle-icon {
+  opacity: 1;
+  pointer-events: auto;
+  position: relative;
+  width: auto;
+}
+
+/* Restore alignment on hover */
+body.sidebar-collapsed #sidebar:hover .sidebar-nav-link,
+body.sidebar-collapsed #sidebar:hover .sidebar-bottom-link {
+  justify-content: flex-start;
+  padding: var(--spacing-sm);
+  gap: var(--spacing-md);
+}
+
+/* Restore icon width on hover */
+body.sidebar-collapsed #sidebar:hover .icon {
+  width: 34px;
+  font-size: 1.15rem;
+}
+
+/* Show submenus on full sidebar hover (expanded state) */
+body.sidebar-collapsed #sidebar:hover .sidebar-submenu {
+  position: static !important;
+  left: auto !important;
+  min-width: auto !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  backdrop-filter: none !important;
+  display: flex !important;
+  padding: 0 0 0 calc(34px + var(--spacing-md));
+}
+
+/* Restore section styling on hover */
+body.sidebar-collapsed #sidebar:hover .sidebar-section {
+  padding: 0 var(--spacing-sm);
+}
+
 /* ==================== DARK THEME SUPPORT ==================== */
 [data-theme="dark"] .sidebar {
   background: var(--color-sidebar-bg);

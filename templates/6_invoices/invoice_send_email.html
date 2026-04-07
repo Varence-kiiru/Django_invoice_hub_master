@@ -150,16 +150,16 @@ Thank you!</textarea>
 <script>
   document.getElementById('send-email-form')?.addEventListener('submit', function(e) {
     e.preventDefault(); // Prevent default form submission
-    
+
     const btn = document.getElementById('send-btn');
     const form = document.getElementById('send-email-form');
     const originalText = btn.innerHTML;
-    
+
     // Show loading modal
     showLoadingModal('Sending Invoice', 'Generating PDF and sending email...');
     btn.innerHTML = '📧 Sending...';
     btn.disabled = true;
-    
+
     // Submit form via AJAX
     fetch(form.action || window.location.href, {
       method: 'POST',
@@ -172,11 +172,11 @@ Thank you!</textarea>
     .then(response => response.json().catch(() => ({success: response.ok})))
     .then(data => {
       hideLoadingModal();
-      
+
       if (data.success) {
         // Show success message
         showAlert('✅ Email Sent Successfully!', `Invoice has been sent to {{ invoice.client.email }}. Redirecting...`, 'success');
-        
+
         // Redirect after 2 seconds
         setTimeout(() => {
           window.location.href = '{% url "invoices:detail" invoice.id %}';
@@ -185,7 +185,7 @@ Thank you!</textarea>
         // Show error message
         const errorMsg = data.message || 'Failed to send invoice. Please try again.';
         showAlert('❌ Error Sending Email', errorMsg, 'error');
-        
+
         // Reset button
         btn.innerHTML = originalText;
         btn.disabled = false;
@@ -194,18 +194,18 @@ Thank you!</textarea>
     .catch(error => {
       hideLoadingModal();
       showAlert('❌ Error', 'An error occurred while sending the email: ' + error.message, 'error');
-      
+
       // Reset button
       btn.innerHTML = originalText;
       btn.disabled = false;
     });
   });
-  
+
   function showLoadingModal(title, message) {
     // Remove existing modal if present
     const existing = document.getElementById('loading-modal');
     if (existing) existing.remove();
-    
+
     const modal = document.createElement('div');
     modal.id = 'loading-modal';
     modal.style.cssText = `
@@ -220,7 +220,7 @@ Thank you!</textarea>
       justify-content: center;
       z-index: 9999;
     `;
-    
+
     modal.innerHTML = `
       <div style="
         background: white;
@@ -250,20 +250,20 @@ Thank you!</textarea>
         }
       </style>
     `;
-    
+
     document.body.appendChild(modal);
   }
-  
+
   function hideLoadingModal() {
     const modal = document.getElementById('loading-modal');
     if (modal) modal.remove();
   }
-  
+
   function showAlert(title, message, type) {
     // Remove existing alert if present
     const existing = document.getElementById('alert-modal');
     if (existing) existing.remove();
-    
+
     const modal = document.createElement('div');
     modal.id = 'alert-modal';
     modal.style.cssText = `
@@ -278,11 +278,11 @@ Thank you!</textarea>
       justify-content: center;
       z-index: 9999;
     `;
-    
+
     const bgColor = type === 'success' ? '#d4edda' : '#f8d7da';
     const borderColor = type === 'success' ? '#c3e6cb' : '#f5c6cb';
     const textColor = type === 'success' ? '#155724' : '#721c24';
-    
+
     modal.innerHTML = `
       <div style="
         background: white;
@@ -314,7 +314,7 @@ Thank you!</textarea>
         ">OK</button>
       </div>
     `;
-    
+
     document.body.appendChild(modal);
   }
 </script>

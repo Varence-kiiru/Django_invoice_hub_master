@@ -7,7 +7,7 @@
   /* Font Families */
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Open Sans', sans-serif;
   --font-mono: 'SFMono-Regular', 'Menlo', 'Monaco', 'Courier New', monospace;
-  
+
   /* Font Sizes */
   --text-xs: 0.75rem;      /* 12px */
   --text-sm: 0.875rem;     /* 14px */
@@ -17,13 +17,13 @@
   --text-2xl: 1.5rem;      /* 24px */
   --text-3xl: 1.875rem;    /* 30px */
   --text-4xl: 2.25rem;     /* 36px */
-  
+
   /* Line Heights */
   --leading-tight: 1.25;
   --leading-normal: 1.5;
   --leading-relaxed: 1.625;
   --leading-loose: 2;
-  
+
   /* Font Weights */
   --font-light: 300;
   --font-normal: 400;

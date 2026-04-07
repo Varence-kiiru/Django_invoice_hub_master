@@ -3,6 +3,8 @@
 
 {% block title %}Record Payment{% endblock %}
 
+{% block page_title %}Record Payment{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/payments.css' %}">
 {% endblock %}
@@ -13,7 +15,7 @@
         <h1>Record Payment</h1>
         <p>Process a payment for an invoice</p>
     </div>
-    
+
     {% if form.non_field_errors %}
     <div class="alert alert-danger" role="alert">
         <strong>Error:</strong>
@@ -22,14 +24,14 @@
         {% endfor %}
     </div>
     {% endif %}
-    
+
     <form method="post" action="{% url 'payments:create' %}">
         {% csrf_token %}
-        
+
         <!-- Invoice Selection -->
         <div class="form-section">
             <h2>Select Invoice</h2>
-            
+
             <div class="form-group {% if form.invoice.errors %}has-error{% endif %}">
                 <label for="{{ form.invoice.id_for_label }}">{{ form.invoice.label }}</label>
                 {{ form.invoice }}
@@ -39,7 +41,7 @@
                 <div class="form-help-text">Choose an unpaid invoice from your list</div>
             </div>
         </div>
-        
+
         <!-- Invoice Summary (JavaScript populated) -->
         <div class="form-section" id="invoice-summary-section" style="display: none;">
             <h2>Invoice Summary</h2>
@@ -66,11 +68,11 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Payment Details -->
         <div class="form-section">
             <h2>Payment Details</h2>
-            
+
             <div class="form-group {% if form.amount.errors %}has-error{% endif %}">
                 <label for="{{ form.amount.id_for_label }}">{{ form.amount.label }}</label>
                 {{ form.amount }}
@@ -81,7 +83,7 @@
                     Payment cannot exceed outstanding balance
                 </div>
             </div>
-            
+
             <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div class="form-group {% if form.payment_method.errors %}has-error{% endif %}">
                     <label for="{{ form.payment_method.id_for_label }}">{{ form.payment_method.label }}</label>
@@ -90,7 +92,7 @@
                         <div class="form-error">{{ form.payment_method.errors.0 }}</div>
                     {% endif %}
                 </div>
-                
+
                 <div class="form-group {% if form.payment_date.errors %}has-error{% endif %}">
                     <label for="{{ form.payment_date.id_for_label }}">{{ form.payment_date.label }}</label>
                     {{ form.payment_date }}
@@ -99,7 +101,7 @@
                     {% endif %}
                 </div>
             </div>
-            
+
             <div class="form-group {% if form.transaction_reference.errors %}has-error{% endif %}">
                 <label for="{{ form.transaction_reference.id_for_label }}">{{ form.transaction_reference.label }}</label>
                 {{ form.transaction_reference }}
@@ -108,7 +110,7 @@
                 {% endif %}
                 <div class="form-help-text">Optional: Check number, reference ID, or transaction code</div>
             </div>
-            
+
             <div class="form-group {% if form.notes.errors %}has-error{% endif %}">
                 <label for="{{ form.notes.id_for_label }}">{{ form.notes.label }}</label>
                 {{ form.notes }}
@@ -118,7 +120,7 @@
                 <div class="form-help-text">Optional: Any additional payment notes</div>
             </div>
         </div>
-        
+
         <!-- Form Actions -->
         <div class="form-actions">
             <button type="submit" class="btn btn-success">Record Payment</button>
@@ -134,14 +136,14 @@
         const amountInput = document.getElementById('id_amount');
         const amountInfo = document.getElementById('amount-info');
         const currencySymbol = document.querySelector('.payment-form-container').getAttribute('data-currency-symbol');
-        
+
         // Fetch and display invoice details when selected
         invoiceSelect?.addEventListener('change', function() {
             if (!this.value) {
                 summarySection.style.display = 'none';
                 return;
             }
-            
+
             // Fetch invoice data via AJAX
             fetch(`/api/invoices/${this.value}/detail/`)
                 .then(response => response.json())
@@ -151,14 +153,14 @@
                     document.getElementById('summary-total').textContent = `${currencySymbol}${parseFloat(data.total_amount).toFixed(2)}`;
                     document.getElementById('summary-paid').textContent = `${currencySymbol}${parseFloat(data.amount_paid).toFixed(2)}`;
                     document.getElementById('summary-outstanding').textContent = `${currencySymbol}${parseFloat(data.amount_due).toFixed(2)}`;
-                    
+
                     // Set maximum payment amount
                     amountInput.max = data.amount_due;
                     summarySection.style.display = 'block';
                 })
                 .catch(error => console.error('Error fetching invoice details:', error));
         });
-        
+
         // Show/hide amount info
         amountInput?.addEventListener('change', function() {
             amountInfo.style.display = this.value ? 'block' : 'none';

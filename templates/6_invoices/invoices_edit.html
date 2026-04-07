@@ -42,7 +42,7 @@
 
         <div class="form-section">
           <h3 class="section-title">Invoice Details</h3>
-          
+
           <div class="form-grid">
             <div class="form-group">
               <label for="client">Client</label>
@@ -113,7 +113,7 @@
       </form>
     {% else %}
       <div class="alert alert-warning">
-        <strong>⚠️ Cannot Edit:</strong> This invoice is no longer in draft status and cannot be edited. 
+        <strong>⚠️ Cannot Edit:</strong> This invoice is no longer in draft status and cannot be edited.
         <a href="{% url 'invoices:detail' invoice.id %}">View invoice details</a>
       </div>
       <div class="form-actions">

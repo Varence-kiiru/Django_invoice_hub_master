@@ -1,0 +1,79 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Revenue Collections - Invoicing App{% endblock %}
+
+{% block page_title %}Revenue Collections{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/components/tables.css' %}">
+<link rel="stylesheet" href="{% static 'css/financials.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-header-content">
+      <h1 class="page-title">💰 Revenue Collections</h1>
+      <p class="page-subtitle">Track all revenue and tax collections from payments</p>
+    </div>
+  </div>
+
+  <!-- Collections Table -->
+  <div class="card">
+    <div class="card-body">
+      {% if collections %}
+      <table class="collections-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Invoice</th>
+            <th>Period</th>
+            <th>Revenue</th>
+            <th>Tax</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th class="actions-column">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for collection in collections %}
+          <tr>
+            <td>{{ collection.collected_date|date:"M j, Y" }}</td>
+            <td>
+              <a href="{% url 'invoices:detail' collection.invoice.pk %}">
+                {{ collection.invoice.invoice_number }}
+              </a>
+            </td>
+            <td>{{ collection.financial_period }}</td>
+            <td class="amount-column">{{ company_settings.currency_symbol }}{{ collection.revenue_amount|floatformat:2 }}</td>
+            <td class="amount-column">{{ company_settings.currency_symbol }}{{ collection.tax_amount|floatformat:2 }}</td>
+            <td class="amount-column"><strong>{{ company_settings.currency_symbol }}{{ collection.total_amount|floatformat:2 }}</strong></td>
+            <td>
+              <span class="status-badge {{ collection.status }}">
+                {{ collection.get_status_display }}
+              </span>
+            </td>
+            <td>
+              <a href="{% url 'financials:revenue-detail' collection.pk %}" class="btn btn-sm btn-outline-primary">
+                View
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">💰</div>
+        <h3 class="empty-state-title">No Revenue Collections</h3>
+        <p class="empty-state-description">
+          Revenue collections will appear here when payments are confirmed.
+        </p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

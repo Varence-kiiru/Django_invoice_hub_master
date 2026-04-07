@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  web:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - '8000:8000'
+    depends_on:
+      - db
+      - redis
+    command: gunicorn invoicing_app.wsgi:application --bind 0.0.0.0:8000
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: invoice
+      POSTGRES_USER: invoice
+      POSTGRES_PASSWORD: invoice
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    restart: always
+
+  worker:
+    build: .
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    command: celery -A invoicing_app worker -l info
+
+volumes:
+  postgres_data:

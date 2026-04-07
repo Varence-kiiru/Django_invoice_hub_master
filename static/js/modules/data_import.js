@@ -1,7 +1,7 @@
 /**
  * Data Importer Module
  * Handles CSV/Excel file import with preview, validation, and progress tracking
- * 
+ *
  * Usage:
  *   const importer = new DataImporter('#dataImportModal');
  *   importer.show();
@@ -14,7 +14,7 @@ class DataImporter {
     this.currentFile = null;
     this.fileData = null;
     this.importResults = null;
-    
+
     // Cache DOM elements
     this.elements = {
       entityType: document.getElementById('entityType'),
@@ -25,13 +25,13 @@ class DataImporter {
       confirmImportBtn: document.getElementById('confirmImportBtn'),
       importAgainBtn: document.getElementById('importAgainBtn'),
       downloadTemplate: document.getElementById('downloadTemplate'),
-      
+
       // Steps
       stepFileSelection: document.getElementById('step-file-selection'),
       stepPreview: document.getElementById('step-preview'),
       stepProgress: document.getElementById('step-progress'),
       stepResults: document.getElementById('step-results'),
-      
+
       // Preview elements
       previewTable: document.getElementById('previewTable'),
       previewWarning: document.getElementById('previewWarning'),
@@ -39,12 +39,12 @@ class DataImporter {
       totalRows: document.getElementById('totalRows'),
       validRows: document.getElementById('validRows'),
       errorRows: document.getElementById('errorRows'),
-      
+
       // Progress elements
       importProgress: document.getElementById('importProgress'),
       progressText: document.getElementById('progressText'),
       progressStatus: document.getElementById('progressStatus'),
-      
+
       // Result elements
       resultAlert: document.getElementById('resultAlert'),
       resultCreated: document.getElementById('resultCreated'),
@@ -56,7 +56,7 @@ class DataImporter {
       errorTableBody: document.getElementById('errorTableBody'),
       toggleErrors: document.getElementById('toggleErrors'),
     };
-    
+
     this.init();
   }
 
@@ -66,25 +66,25 @@ class DataImporter {
   init() {
     // File input change
     this.elements.csvFile.addEventListener('change', (e) => this.handleFileSelect(e));
-    
+
     // Preview button
     this.elements.previewBtn.addEventListener('click', () => this.showPreview());
-    
+
     // Back button
     this.elements.backBtn.addEventListener('click', () => this.backToFileSelection());
-    
+
     // Confirm import button
     this.elements.confirmImportBtn.addEventListener('click', () => this.startImport());
-    
+
     // Import again button
     this.elements.importAgainBtn.addEventListener('click', () => this.reset());
-    
+
     // Download template
     this.elements.downloadTemplate.addEventListener('click', (e) => {
       e.preventDefault();
       this.downloadTemplate();
     });
-    
+
     // Toggle errors
     if (this.elements.toggleErrors) {
       this.elements.toggleErrors.addEventListener('click', () => this.toggleErrorDisplay());
@@ -110,7 +110,7 @@ class DataImporter {
    */
   handleFileSelect(event) {
     const file = event.target.files[0];
-    
+
     if (!file) {
       this.elements.fileLabel.textContent = 'Choose file...';
       return;
@@ -119,7 +119,7 @@ class DataImporter {
     // Validate file
     const validExtensions = ['csv', 'xlsx', 'xls'];
     const fileExt = file.name.split('.').pop().toLowerCase();
-    
+
     if (!validExtensions.includes(fileExt)) {
       this.showError('Invalid file type. Please upload CSV or Excel file.');
       return;
@@ -141,13 +141,13 @@ class DataImporter {
   async parseCSV(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      
+
       reader.onload = (e) => {
         try {
           const csv = e.target.result;
           const lines = csv.trim().split('\n');
           const headers = lines[0].split(',').map(h => h.trim());
-          
+
           const data = lines.slice(1).map(line => {
             const values = line.split(',').map(v => v.trim());
             const row = {};
@@ -156,13 +156,13 @@ class DataImporter {
             });
             return row;
           });
-          
+
           resolve({ headers, data });
         } catch (error) {
           reject(error);
         }
       };
-      
+
       reader.onerror = () => reject(reader.error);
       reader.readAsText(file);
     });
@@ -174,7 +174,7 @@ class DataImporter {
   async parseExcel(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      
+
       reader.onload = async (e) => {
         try {
           // Using a simple approach - in production use a library like xlsx
@@ -184,19 +184,19 @@ class DataImporter {
             reject(new Error('XLSX library not loaded'));
             return;
           }
-          
+
           const data = new Uint8Array(e.target.result);
           const workbook = XLSX.read(data, { type: 'array' });
           const sheet = workbook.Sheets[workbook.SheetNames[0]];
           const rows = XLSX.utils.sheet_to_json(sheet);
-          
+
           const headers = rows.length > 0 ? Object.keys(rows[0]) : [];
           resolve({ headers, data: rows });
         } catch (error) {
           reject(error);
         }
       };
-      
+
       reader.onerror = () => reject(reader.error);
       reader.readAsArrayBuffer(file);
     });
@@ -207,7 +207,7 @@ class DataImporter {
    */
   async showPreview() {
     const entityType = this.elements.entityType.value;
-    
+
     if (!entityType) {
       this.showError('Please select an entity type');
       return;
@@ -221,10 +221,10 @@ class DataImporter {
     try {
       this.showStep('preview');
       this.elements.progressStatus.textContent = 'Parsing file...';
-      
+
       // Parse file based on extension
       const fileExt = this.currentFile.name.split('.').pop().toLowerCase();
-      
+
       if (fileExt === 'csv') {
         this.fileData = await this.parseCSV(this.currentFile);
       } else if (['xlsx', 'xls'].includes(fileExt)) {
@@ -233,13 +233,13 @@ class DataImporter {
 
       // Get import template to validate fields
       await this.getImportTemplate(entityType);
-      
+
       // Validate data
       const validation = this.validateData(entityType);
-      
+
       // Display preview
       this.displayPreview(validation);
-      
+
     } catch (error) {
       console.error('Preview error:', error);
       this.showError(`Error parsing file: ${error.message}`);
@@ -255,9 +255,9 @@ class DataImporter {
       const response = await fetch(`/api/import/template/?entity_type=${entityType}`, {
         credentials: 'include'
       });
-      
+
       if (!response.ok) throw new Error('Failed to fetch template');
-      
+
       const data = await response.json();
       this.template = data.data;
       return this.template;
@@ -280,10 +280,10 @@ class DataImporter {
     };
 
     const requiredFields = this.template?.required_fields || [];
-    
+
     this.fileData.data.forEach((row, index) => {
       const rowErrors = [];
-      
+
       // Check required fields
       requiredFields.forEach(field => {
         if (!row[field] || row[field].trim() === '') {
@@ -318,7 +318,7 @@ class DataImporter {
     // Build preview table
     const headers = this.fileData.headers.slice(0, 5);
     let html = '<table class="table table-sm table-bordered"><thead><tr>';
-    
+
     headers.forEach(header => {
       html += `<th>${this.escapeHtml(header)}</th>`;
     });
@@ -336,7 +336,7 @@ class DataImporter {
     });
 
     html += '</tbody></table>';
-    
+
     if (this.fileData.data.length > 5) {
       html += `<small class="text-muted">Showing 5 of ${this.fileData.data.length} rows</small>`;
     }
@@ -346,12 +346,12 @@ class DataImporter {
     // Show warning/info message
     if (validation.errors.length > 0) {
       this.elements.previewWarning.className = 'alert alert-warning';
-      this.elements.previewMessage.textContent = 
+      this.elements.previewMessage.textContent =
         `${validation.errors.length} row(s) have validation errors and will be skipped.`;
       this.elements.confirmImportBtn.disabled = validation.valid === 0;
     } else {
       this.elements.previewWarning.className = 'alert alert-success';
-      this.elements.previewMessage.innerHTML = 
+      this.elements.previewMessage.innerHTML =
         `<i class="fas fa-check-circle"></i> All data looks good! Ready to import.`;
       this.elements.confirmImportBtn.disabled = false;
     }
@@ -366,7 +366,7 @@ class DataImporter {
 
     try {
       this.showStep('progress');
-      
+
       // Prepare FormData
       const formData = new FormData();
       formData.append('csv_file', this.currentFile);
@@ -376,7 +376,7 @@ class DataImporter {
 
       // Get CSRF token
       const csrfToken = this.getCSRFToken();
-      
+
       // Make import request
       const response = await fetch('/api/import/data/', {
         method: 'POST',
@@ -391,9 +391,9 @@ class DataImporter {
       this.simulateProgress(30);
 
       const data = await response.json();
-      
+
       this.simulateProgress(100);
-      
+
       // Show results
       await new Promise(resolve => setTimeout(resolve, 500));
       this.displayResults(data);
@@ -413,7 +413,7 @@ class DataImporter {
     return new Promise(resolve => {
       const interval = setInterval(() => {
         const current = parseInt(this.elements.importProgress.style.width) || 0;
-        
+
         if (current >= targetPercent) {
           clearInterval(interval);
           this.updateProgress(targetPercent);
@@ -441,7 +441,7 @@ class DataImporter {
    */
   displayResults(apiResponse) {
     const results = apiResponse.data;
-    
+
     // Update result counts
     this.elements.resultCreated.textContent = results.created_count || 0;
     this.elements.resultUpdated.textContent = results.updated_count || 0;
@@ -480,7 +480,7 @@ class DataImporter {
    */
   displayErrorDetails(errors) {
     this.elements.errorDetails.style.display = 'block';
-    
+
     const html = errors.slice(0, 10).map(error => `
       <tr>
         <td class="font-weight-bold">Row ${error.row}</td>
@@ -516,7 +516,7 @@ class DataImporter {
    */
   downloadTemplate() {
     const entityType = this.elements.entityType.value;
-    
+
     if (!entityType) {
       this.showError('Please select an entity type first');
       return;
@@ -628,7 +628,7 @@ class DataImporter {
     // Try to get from cookie
     const name = 'csrftoken';
     let cookieValue = null;
-    
+
     if (document.cookie && document.cookie !== '') {
       const cookies = document.cookie.split(';');
       for (let i = 0; i < cookies.length; i++) {
@@ -639,7 +639,7 @@ class DataImporter {
         }
       }
     }
-    
+
     // Try to get from form
     if (!cookieValue) {
       const tokens = document.querySelectorAll('[name=csrfmiddlewaretoken]');
@@ -647,7 +647,7 @@ class DataImporter {
         cookieValue = tokens[0].value;
       }
     }
-    
+
     return cookieValue;
   }
 
@@ -665,7 +665,7 @@ class DataImporter {
 document.addEventListener('DOMContentLoaded', function() {
   // Make global reference available
   window.dataImporter = new DataImporter('#dataImportModal');
-  
+
   // Add button to show modal (if button exists)
   const importBtn = document.getElementById('showDataImportBtn');
   if (importBtn) {

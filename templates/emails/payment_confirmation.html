@@ -1,0 +1,41 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Payment Confirmation{% endblock %}
+{% block header_class %}header-green{% endblock %}
+{% block header_title %}✓ Payment Confirmed{% endblock %}
+
+{% block content %}
+    <p>Hello {{ client_name }},</p>
+
+    <div class="success-badge">
+        <h2>Payment Received and Confirmed!</h2>
+        <p style="margin: 10px 0 0 0; color: #155724;">Thank you for your prompt payment</p>
+    </div>
+
+    <div class="section">
+        <div class="details-table">
+            <div class="detail-row">
+                <span class="detail-label accent-green">Invoice Number:</span>
+                <span class="detail-value">{{ invoice_number }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label accent-green">Payment Amount:</span>
+                <span class="detail-value amount green">{{ payment_amount }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label accent-green">Payment Date:</span>
+                <span class="detail-value">{{ payment_date }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label accent-green">Payment Method:</span>
+                <span class="detail-value">{{ payment_method }}</span>
+            </div>
+        </div>
+    </div>
+
+    <p>Your account is now up to date. We appreciate your business and look forward to working with you again.</p>
+
+    <p>If you need any assistance or have questions, please don't hesitate to contact us.</p>
+{% endblock %}
+</body>
+</html>

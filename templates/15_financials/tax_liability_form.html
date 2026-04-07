@@ -1,0 +1,266 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}{% if liability %}Edit{% else %}Create{% endif %} Tax Liability{% endblock %}
+
+{% block page_title %}{% if liability %}Edit{% else %}Create{% endif %} Tax Liability{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+<link rel="stylesheet" href="{% static 'css/financials.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container max-width-600">
+  <!-- Form Header -->
+  <div class="form-header">
+    <h1 class="form-title">{% if liability %}Edit Tax Liability{% else %}Create Tax Liability{% endif %}</h1>
+    <p class="form-subtitle">
+      {% if liability %}
+        Update tax liability and remittance information
+      {% else %}
+        Record a new tax liability for remittance
+      {% endif %}
+    </p>
+  </div>
+
+  <!-- Error Messages -->
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger">
+    <strong>Error:</strong>
+    {% for error in form.non_field_errors %}
+      <p>{{ error }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Tax Liability Form -->
+  <form method="POST" class="tax-liability-form">
+    {% csrf_token %}
+
+    <div class="form-section">
+      <h3 class="form-section-title">📊 Tax Information</h3>
+
+      <!-- Financial Period -->
+      <div class="form-group">
+        <label for="{{ form.financial_period.id_for_label }}" class="form-label">
+          Financial Period
+          <span class="required-indicator">*</span>
+        </label>
+        {{ form.financial_period }}
+        {% if form.financial_period.errors %}
+          <div class="form-error">{{ form.financial_period.errors.0 }}</div>
+        {% endif %}
+        <small class="form-help">Select the financial period this liability applies to</small>
+      </div>
+
+      <!-- Tax Type -->
+      <div class="form-group">
+        <label for="{{ form.tax_type.id_for_label }}" class="form-label">
+          Tax Type
+          <span class="required-indicator">*</span>
+        </label>
+        {{ form.tax_type }}
+        {% if form.tax_type.errors %}
+          <div class="form-error">{{ form.tax_type.errors.0 }}</div>
+        {% endif %}
+        <small class="form-help">e.g., VAT, Income Tax, Withholding Tax</small>
+      </div>
+
+      <!-- Total Revenue -->
+      <div class="form-group">
+        <label for="{{ form.total_revenue.id_for_label }}" class="form-label">
+          Total Revenue
+          <span class="form-hint">(Optional)</span>
+        </label>
+        {{ form.total_revenue }}
+        {% if form.total_revenue.errors %}
+          <div class="form-error">{{ form.total_revenue.errors.0 }}</div>
+        {% endif %}
+        <small class="form-help">Total revenue collected in this period</small>
+      </div>
+
+      <!-- Total Tax Collected -->
+      <div class="form-group">
+        <label for="{{ form.total_tax_collected.id_for_label }}" class="form-label">
+          Total Tax Collected
+          <span class="required-indicator">*</span>
+        </label>
+        {{ form.total_tax_collected }}
+        {% if form.total_tax_collected.errors %}
+          <div class="form-error">{{ form.total_tax_collected.errors.0 }}</div>
+        {% endif %}
+        <small class="form-help">Total tax amount to be remitted</small>
+      </div>
+    </div>
+
+    <!-- Adjustments Section -->
+    <div class="form-section">
+      <h3 class="form-section-title">🔧 Adjustments & Final Amount</h3>
+
+      <!-- Penalties -->
+      <div class="form-group">
+        <label for="{{ form.penalties.id_for_label }}" class="form-label">
+          Penalties
+          <span class="form-hint">(Optional)</span>
+        </label>
+        {{ form.penalties }}
+        {% if form.penalties.errors %}
+          <div class="form-error">{{ form.penalties.errors.0 }}</div>
+        {% endif %}
+        <small class="form-help">Late payment penalties or additional charges</small>
+      </div>
+
+      <!-- Discounts -->
+      <div class="form-group">
+        <label for="{{ form.discounts.id_for_label }}" class="form-label">
+          Discounts
+          <span class="form-hint">(Optional)</span>
+        </label>
+        {{ form.discounts }}
+        {% if form.discounts.errors %}
+          <div class="form-error">{{ form.discounts.errors.0 }}</div>
+        {% endif %}
+        <small class="form-help">Tax discounts or incentives applied</small>
+      </div>
+
+      <!-- Final Liability -->
+      <div class="form-group">
+        <label for="{{ form.final_liability.id_for_label }}" class="form-label">
+          Final Liability
+          <span class="form-hint">(Optional)</span>
+        </label>
+        {{ form.final_liability }}
+        {% if form.final_liability.errors %}
+          <div class="form-error">{{ form.final_liability.errors.0 }}</div>
+        {% endif %}
+        <small class="form-help">Final amount = Tax Collected + Penalties - Discounts</small>
+      </div>
+    </div>
+
+    <!-- Remittance Section -->
+    <div class="form-section">
+      <h3 class="form-section-title">💳 Remittance Information</h3>
+
+      <!-- Due Date -->
+      <div class="form-group">
+        <label for="{{ form.due_date.id_for_label }}" class="form-label">
+          Due Date
+          <span class="required-indicator">*</span>
+        </label>
+        {{ form.due_date }}
+        {% if form.due_date.errors %}
+          <div class="form-error">{{ form.due_date.errors.0 }}</div>
+        {% endif %}
+        <small class="form-help">When the tax remittance is due to the tax authority</small>
+      </div>
+
+      <!-- Remitted Date -->
+      <div class="form-group">
+        <label for="{{ form.remitted_date.id_for_label }}" class="form-label">
+          Remitted Date
+          <span class="form-hint">(Optional)</span>
+        </label>
+        {{ form.remitted_date }}
+        {% if form.remitted_date.errors %}
+          <div class="form-error">{{ form.remitted_date.errors.0 }}</div>
+        {% endif %}
+        <small class="form-help">Date when tax was remitted to tax authority</small>
+      </div>
+
+      <!-- Remittance Reference -->
+      <div class="form-group">
+        <label for="{{ form.remittance_reference.id_for_label }}" class="form-label">
+          Remittance Reference
+          <span class="form-hint">(Optional)</span>
+        </label>
+        {{ form.remittance_reference }}
+        {% if form.remittance_reference.errors %}
+          <div class="form-error">{{ form.remittance_reference.errors.0 }}</div>
+        {% endif %}
+        <small class="form-help">Reference/receipt number from tax authority</small>
+      </div>
+
+      <!-- Status -->
+      <div class="form-group">
+        <label for="{{ form.status.id_for_label }}" class="form-label">
+          Status
+          <span class="required-indicator">*</span>
+        </label>
+        {{ form.status }}
+        {% if form.status.errors %}
+          <div class="form-error">{{ form.status.errors.0 }}</div>
+        {% endif %}
+        <small class="form-help">Current status of the tax liability</small>
+      </div>
+    </div>
+
+    <!-- Notes Section -->
+    <div class="form-section">
+      <h3 class="form-section-title">📝 Notes</h3>
+
+      <!-- Notes -->
+      <div class="form-group">
+        <label for="{{ form.notes.id_for_label }}" class="form-label">
+          Additional Notes
+          <span class="form-hint">(Optional)</span>
+        </label>
+        {{ form.notes }}
+        {% if form.notes.errors %}
+          <div class="form-error">{{ form.notes.errors.0 }}</div>
+        {% endif %}
+        <small class="form-help">Any additional information about this tax liability</small>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        {% if liability %}💾 Update Tax Liability{% else %}➕ Create Tax Liability{% endif %}
+      </button>
+      <a href="{% url 'financials:tax-liabilities-list' %}" class="btn btn-secondary">
+        ← Cancel
+      </a>
+    </div>
+  </form>
+</div>
+
+<style>
+  .tax-liability-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .form-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .form-section:last-of-type {
+    border-bottom: none;
+  }
+
+  .form-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e9ecef;
+  }
+
+  .btn {
+    flex: 1;
+    max-width: 200px;
+  }
+</style>
+{% endblock %}

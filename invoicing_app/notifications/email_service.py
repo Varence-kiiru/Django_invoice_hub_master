@@ -10,7 +10,7 @@ Supports:
 """
 
 from typing import Dict, List, Optional
-from django.core.mail import EmailMessage, EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
@@ -52,18 +52,15 @@ class EmailService:
             True if sent successfully, False otherwise
         """
         context = {
-            'client_name': client_name,
-            'invoice_number': invoice_number,
-            'invoice_date': invoice_date,
-            'total_amount': total_amount,
-            'due_date': due_date,
+            "client_name": client_name,
+            "invoice_number": invoice_number,
+            "invoice_date": invoice_date,
+            "total_amount": total_amount,
+            "due_date": due_date,
         }
 
         subject = f"Invoice {invoice_number} - {self.sender_name}"
-        html_message = render_to_string(
-            'emails/invoice_issued.html',
-            context
-        )
+        html_message = render_to_string("emails/invoice_issued.html", context)
         text_message = strip_tags(html_message)
 
         return self._send_email(
@@ -101,18 +98,15 @@ class EmailService:
             True if sent successfully, False otherwise
         """
         context = {
-            'client_name': client_name,
-            'quote_number': quote_number,
-            'quote_date': quote_date,
-            'total_amount': total_amount,
-            'valid_until': valid_until,
+            "client_name": client_name,
+            "quote_number": quote_number,
+            "quote_date": quote_date,
+            "total_amount": total_amount,
+            "valid_until": valid_until,
         }
 
         subject = f"Quotation {quote_number} - {self.sender_name}"
-        html_message = render_to_string(
-            'emails/quote_issued.html',
-            context
-        )
+        html_message = render_to_string("emails/quote_issued.html", context)
         text_message = strip_tags(html_message)
 
         return self._send_email(
@@ -135,18 +129,15 @@ class EmailService:
     ) -> bool:
         """Send payment confirmation to client."""
         context = {
-            'client_name': client_name,
-            'invoice_number': invoice_number,
-            'payment_amount': payment_amount,
-            'payment_date': payment_date,
-            'payment_method': payment_method,
+            "client_name": client_name,
+            "invoice_number": invoice_number,
+            "payment_amount": payment_amount,
+            "payment_date": payment_date,
+            "payment_method": payment_method,
         }
 
         subject = f"Payment Confirmed - Invoice {invoice_number}"
-        html_message = render_to_string(
-            'emails/payment_confirmation.html',
-            context
-        )
+        html_message = render_to_string("emails/payment_confirmation.html", context)
         text_message = strip_tags(html_message)
 
         return self._send_email(
@@ -167,18 +158,15 @@ class EmailService:
     ) -> bool:
         """Send overdue payment reminder."""
         context = {
-            'client_name': client_name,
-            'invoice_number': invoice_number,
-            'amount_due': amount_due,
-            'original_due_date': original_due_date,
-            'days_overdue': days_overdue,
+            "client_name": client_name,
+            "invoice_number": invoice_number,
+            "amount_due": amount_due,
+            "original_due_date": original_due_date,
+            "days_overdue": days_overdue,
         }
 
         subject = f"URGENT: Invoice {invoice_number} is {days_overdue} days overdue"
-        html_message = render_to_string(
-            'emails/overdue_reminder.html',
-            context
-        )
+        html_message = render_to_string("emails/overdue_reminder.html", context)
         text_message = strip_tags(html_message)
 
         return self._send_email(
@@ -199,18 +187,15 @@ class EmailService:
     ) -> bool:
         """Send reminder for invoice due soon."""
         context = {
-            'client_name': client_name,
-            'invoice_number': invoice_number,
-            'amount_due': amount_due,
-            'due_date': due_date,
-            'days_until_due': days_until_due,
+            "client_name": client_name,
+            "invoice_number": invoice_number,
+            "amount_due": amount_due,
+            "due_date": due_date,
+            "days_until_due": days_until_due,
         }
 
         subject = f"Reminder: Invoice {invoice_number} due in {days_until_due} days"
-        html_message = render_to_string(
-            'emails/due_soon_reminder.html',
-            context
-        )
+        html_message = render_to_string("emails/due_soon_reminder.html", context)
         text_message = strip_tags(html_message)
 
         return self._send_email(
@@ -218,6 +203,182 @@ class EmailService:
             html_message=html_message,
             text_message=text_message,
             recipient_email=client_email,
+        )
+
+    # QUOTATION NOTIFICATIONS
+    def send_quotation_accepted_notification(
+        self,
+        client_email: str,
+        client_name: str,
+        quote_number: str,
+        amount: str,
+    ) -> bool:
+        """Send notification when client accepts a quote."""
+        context = {
+            "client_name": client_name,
+            "quote_number": quote_number,
+            "amount": amount,
+        }
+        subject = f"Quotation {quote_number} Accepted"
+        html_message = render_to_string("emails/quote_accepted.html", context)
+        text_message = strip_tags(html_message)
+        return self._send_email(
+            subject=subject,
+            html_message=html_message,
+            text_message=text_message,
+            recipient_email=client_email,
+        )
+
+    def send_quotation_rejected_notification(
+        self,
+        client_email: str,
+        client_name: str,
+        quote_number: str,
+    ) -> bool:
+        """Send notification when quote is rejected."""
+        context = {
+            "client_name": client_name,
+            "quote_number": quote_number,
+        }
+        subject = f"Quotation {quote_number} Rejected"
+        html_message = render_to_string("emails/quote_rejected.html", context)
+        text_message = strip_tags(html_message)
+        return self._send_email(
+            subject=subject,
+            html_message=html_message,
+            text_message=text_message,
+            recipient_email=client_email,
+        )
+
+    # DELIVERY NOTIFICATIONS
+    def send_delivery_confirmed_notification(
+        self,
+        client_email: str,
+        client_name: str,
+        invoice_number: str,
+        delivery_date: str,
+        expected_arrival: str,
+    ) -> bool:
+        """Send notification when delivery is confirmed."""
+        context = {
+            "client_name": client_name,
+            "invoice_number": invoice_number,
+            "delivery_date": delivery_date,
+            "expected_arrival": expected_arrival,
+        }
+        subject = f"Delivery Confirmed - Invoice {invoice_number}"
+        html_message = render_to_string("emails/delivery_confirmed.html", context)
+        text_message = strip_tags(html_message)
+        return self._send_email(
+            subject=subject,
+            html_message=html_message,
+            text_message=text_message,
+            recipient_email=client_email,
+        )
+
+    # EXPENSE NOTIFICATIONS
+    def send_expense_approval_required(
+        self,
+        manager_email: str,
+        manager_name: str,
+        expense_id: int,
+        amount: str,
+        description: str,
+        submitter_name: str,
+    ) -> bool:
+        """Send notification requesting expense approval."""
+        context = {
+            "manager_name": manager_name,
+            "expense_id": expense_id,
+            "amount": amount,
+            "description": description,
+            "submitter_name": submitter_name,
+        }
+        subject = f"Expense Approval Required - ${amount}"
+        html_message = render_to_string(
+            "emails/expense_approval_required.html", context
+        )
+        text_message = strip_tags(html_message)
+        return self._send_email(
+            subject=subject,
+            html_message=html_message,
+            text_message=text_message,
+            recipient_email=manager_email,
+        )
+
+    def send_expense_approved_notification(
+        self,
+        submitter_email: str,
+        submitter_name: str,
+        expense_id: int,
+        amount: str,
+    ) -> bool:
+        """Send notification when expense is approved."""
+        context = {
+            "submitter_name": submitter_name,
+            "expense_id": expense_id,
+            "amount": amount,
+        }
+        subject = f"Your Expense Has Been Approved - ${amount}"
+        html_message = render_to_string("emails/expense_approved.html", context)
+        text_message = strip_tags(html_message)
+        return self._send_email(
+            subject=subject,
+            html_message=html_message,
+            text_message=text_message,
+            recipient_email=submitter_email,
+        )
+
+    # TEAM NOTIFICATIONS
+    def send_team_member_invited(
+        self,
+        new_member_email: str,
+        organization_name: str,
+        invited_by: str,
+        invitation_url: str,
+        role: str,
+    ) -> bool:
+        """Send invitation to new team member."""
+        context = {
+            "organization_name": organization_name,
+            "invited_by": invited_by,
+            "invitation_url": invitation_url,
+            "role": role,
+        }
+        subject = f"You're invited to join {organization_name}"
+        html_message = render_to_string("emails/team_member_invited.html", context)
+        text_message = strip_tags(html_message)
+        return self._send_email(
+            subject=subject,
+            html_message=html_message,
+            text_message=text_message,
+            recipient_email=new_member_email,
+        )
+
+    # FINANCIAL NOTIFICATIONS
+    def send_financial_report_summary(
+        self,
+        recipient_email: str,
+        recipient_name: str,
+        report_type: str,
+        period: str,
+        summary_data: dict,
+    ) -> bool:
+        """Send financial report summary."""
+        context = {
+            "recipient_name": recipient_name,
+            "report_type": report_type,
+            "period": period,
+            "summary_data": summary_data,
+        }
+        subject = f"{report_type} Report - {period}"
+        html_message = render_to_string("emails/financial_report.html", context)
+        text_message = strip_tags(html_message)
+        return self._send_email(
+            subject=subject,
+            html_message=html_message,
+            text_message=text_message,
+            recipient_email=recipient_email,
         )
 
     def send_bulk_email(

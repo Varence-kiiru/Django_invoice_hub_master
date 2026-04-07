@@ -1,0 +1,763 @@
+/* ============================================================================
+   FINANCIALS MODULE STYLES
+   Consolidated CSS for all financial tracking pages
+   ============================================================================ */
+
+/* Financial Dashboard - KPI Cards */
+.financial-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.financial-kpi-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.financial-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.financial-kpi-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.financial-kpi-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.financial-kpi-value.large {
+  font-size: 2.5rem;
+}
+
+.financial-kpi-change {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.financial-kpi-change.positive {
+  color: #28a745;
+}
+
+.financial-kpi-change.negative {
+  color: #dc3545;
+}
+
+.financial-kpi-change.neutral {
+  color: #6c757d;
+}
+
+/* Financial Section Layout */
+.financial-section {
+  margin-bottom: 2rem;
+}
+
+.financial-section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.financial-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.financial-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+}
+
+.financial-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 1rem;
+}
+
+.financial-card-content {
+  color: #6c757d;
+}
+
+.financial-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Pending Tax Card Interactive Styles */
+.pending-tax-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.pending-tax-card-clickable {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pending-tax-label {
+  text-decoration: underline;
+}
+
+.btn-remit-action {
+  margin-left: 0.25rem;
+}
+
+/* ============================================================================
+   FINANCIAL PERIODS
+   ============================================================================ */
+
+.periods-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.periods-table th,
+.periods-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.periods-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+}
+
+.periods-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.period-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.period-badge.monthly {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.period-badge.quarterly {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.period-badge.annual {
+  background-color: #e8f5e8;
+  color: #388e3c;
+}
+
+/* ============================================================================
+   FINANCIAL PERIOD DETAILS
+   ============================================================================ */
+
+.period-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.period-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.period-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.period-meta-item {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.period-meta-label {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  margin-bottom: 0.25rem;
+}
+
+.period-meta-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+}
+
+.stat-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.stat-change {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.tax-liability-card {
+  margin-bottom: 2rem;
+}
+
+.btn-header-action {
+  float: right;
+}
+
+/* ============================================================================
+   REVENUE COLLECTIONS
+   ============================================================================ */
+
+.collections-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.collections-table th,
+.collections-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.collections-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+}
+
+.collections-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.amount-column {
+  text-align: right;
+  font-family: 'Courier New', monospace;
+}
+
+/* ============================================================================
+   REVENUE COLLECTION DETAILS
+   ============================================================================ */
+
+.collection-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.collection-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.collection-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.collection-meta-item {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.collection-meta-label {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  margin-bottom: 0.25rem;
+}
+
+.collection-meta-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.amount-breakdown {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.amount-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  text-align: center;
+}
+
+.amount-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.amount-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.amount-percentage {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.detail-section {
+  margin-bottom: 2rem;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.detail-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+}
+
+.detail-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 1rem;
+}
+
+.detail-item {
+  margin-bottom: 0.75rem;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.25rem;
+}
+
+.detail-value {
+  color: #6c757d;
+}
+
+.detail-item-action {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
+/* ============================================================================
+   STATUS BADGES - Unified across all pages
+   ============================================================================ */
+
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-badge.collected {
+  background-color: #e8f5e8;
+  color: #388e3c;
+}
+
+.status-badge.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.pending_remittance {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.due_soon {
+  background-color: #ffeaa7;
+  color: #d63031;
+}
+
+.status-badge.overdue {
+  background-color: #fab1a0;
+  color: #e17055;
+}
+
+.status-badge.remitted {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.status-badge.disputed {
+  background-color: #fdcb6e;
+  color: #e17055;
+}
+
+.status-badge.active {
+  background-color: #e8f5e8;
+  color: #388e3c;
+}
+
+.status-badge.closed {
+  background-color: #f5f5f5;
+  color: #616161;
+}
+
+/* ============================================================================
+   TAX LIABILITIES
+   ============================================================================ */
+
+.liability-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.liability-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.liability-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.liability-meta-item {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.liability-meta-label {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  margin-bottom: 0.25rem;
+}
+
+.liability-meta-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.liabilities-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.liabilities-table th,
+.liabilities-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.liabilities-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+}
+
+.liabilities-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.due-date-warning {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.due-date-soon {
+  color: #fd7e14;
+  font-weight: 600;
+}
+
+.actions-column {
+  width: 120px;
+}
+
+/* ============================================================================
+   TAX LIABILITY DETAILS & REMITTANCE
+   ============================================================================ */
+
+.tax-liability-overview-card {
+  margin-bottom: 2rem;
+}
+
+.remittance-details-card {
+  margin-bottom: 2rem;
+}
+
+.remittance-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.remittance-note {
+  color: #6c757d;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.btn-mark-remitted {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: #28a745;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-mark-remitted:hover {
+  background-color: #218838;
+}
+
+.remittance-confirmation {
+  background-color: #d4edda;
+  border-left: 4px solid #28a745;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.remittance-label {
+  color: #155724;
+  font-weight: bold;
+}
+
+.remittance-info {
+  color: #155724;
+  font-size: 0.875rem;
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.btn-remit-action {
+  color: #28a745;
+  margin-left: 0.25rem;
+}
+
+/* ============================================================================
+   FORM STYLES - Mark Remitted Form
+   ============================================================================ */
+
+.form-container {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.form-header {
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 1rem;
+}
+
+.form-header h2 {
+  margin-bottom: 0.5rem;
+  color: #495057;
+}
+
+.form-header p {
+  color: #6c757d;
+  margin: 0;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #495057;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.form-label .required {
+  color: #dc3545;
+  margin-left: 0.25rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-error {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.form-help {
+  color: #6c757d;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.liability-info {
+  background: #f8f9fa;
+  border-left: 4px solid #667eea;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 2rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.info-label {
+  font-weight: 600;
+  color: #495057;
+}
+
+.info-value {
+  color: #6c757d;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary {
+  background-color: #667eea;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #5568d3;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}

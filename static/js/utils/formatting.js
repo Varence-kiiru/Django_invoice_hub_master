@@ -13,17 +13,17 @@ const Formatting = {
    */
   currency: function(amount, currency = 'USD', decimals = 2) {
     if (isNaN(amount)) return '$0.00';
-    
+
     const multiplier = Math.pow(10, decimals);
     const rounded = Math.round(amount * multiplier) / multiplier;
-    
+
     const formatter = new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: currency,
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals
     });
-    
+
     return formatter.format(rounded);
   },
 
@@ -35,7 +35,7 @@ const Formatting = {
    */
   number: function(num, decimals = 0) {
     if (isNaN(num)) return '0';
-    
+
     return new Intl.NumberFormat('en-US', {
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals
@@ -50,12 +50,12 @@ const Formatting = {
    */
   percentage: function(value, decimals = 1) {
     if (isNaN(value)) return '0%';
-    
+
     // If value is between 0-1, multiply by 100
     if (Math.abs(value) <= 1 && value !== 0) {
       value = value * 100;
     }
-    
+
     return this.number(value, decimals) + '%';
   },
 
@@ -67,11 +67,11 @@ const Formatting = {
    */
   fileSize: function(bytes, decimals = 2) {
     if (bytes === 0) return '0 Bytes';
-    
+
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
+
     return this.number(bytes / Math.pow(k, i), decimals) + ' ' + sizes[i];
   },
 

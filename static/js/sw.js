@@ -56,7 +56,7 @@ self.addEventListener('fetch', event => {
   }
 
   // Skip certain URLs
-  if (event.request.url.includes('/admin/') || 
+  if (event.request.url.includes('/admin/') ||
       event.request.url.includes('/api/') ||
       event.request.url.includes('chrome-extension://')) {
     return;

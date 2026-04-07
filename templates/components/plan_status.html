@@ -21,7 +21,7 @@ Shows plan tier, usage/limits, and upgrade buttons
             <a href="{% url 'organizations:upgrade' %}" class="plan-upgrade-link">Upgrade →</a>
             {% endif %}
         </div>
-        
+
         {% if current_usage %}
         <div class="plan-usage">
             <div class="usage-item">
@@ -193,12 +193,12 @@ Shows plan tier, usage/limits, and upgrade buttons
         flex-direction: column;
         align-items: flex-start;
     }
-    
+
     .plan-status-header {
         flex-direction: column;
         width: 100%;
     }
-    
+
     .plan-upgrade-link {
         width: 100%;
         text-align: center;

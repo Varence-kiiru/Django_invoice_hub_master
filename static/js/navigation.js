@@ -32,6 +32,12 @@
     attachDropdownListeners();
     attachNavLinkListeners();
     attachOutsideClickListener();
+    attachSidebarToggleListener();
+    attachOverlayListener();
+    attachSidebarLinkListener();
+    attachWindowResizeListener();
+    // NOTE: attachSidebarToggleLinkListeners() removed - sidebar.js SidebarManager handles this properly
+    attachSmartSubmenuPositioning();
     restoreSidebarState();
   }
 
@@ -154,7 +160,7 @@
     closeAllDropdowns();
   }
 
-  // ==================== SIDEBAR COLLAPSE (Future Enhancement) ====================
+  // ==================== SIDEBAR COLLAPSE & TOGGLE ====================
 
   /**
    * Restores sidebar state from localStorage
@@ -166,45 +172,182 @@
   }
 
   /**
-   * Toggles sidebar collapse state
+   * Toggles sidebar collapse state on desktop/tablet
+   * On mobile, handles open/close with overlay
    */
   function toggleSidebarCollapse() {
-    state.isSidebarCollapsed = !state.isSidebarCollapsed;
-    localStorage.setItem('sidebar-collapsed', state.isSidebarCollapsed);
+    const sidebar = document.querySelector(CONFIG.sidebarSelector);
+    const overlay = document.querySelector('.sidebar-overlay');
+    const isMobile = window.innerWidth < 768;
 
-    if (state.isSidebarCollapsed) {
-      applySidebarCollapsed();
+    if (isMobile) {
+      // Mobile: toggle slide-in sidebar
+      if (sidebar) {
+        sidebar.classList.toggle('open');
+      }
+      if (overlay) {
+        overlay.classList.toggle('active');
+      }
     } else {
-      removeSidebarCollapsed();
+      // Desktop/Tablet: toggle collapsed state
+      state.isSidebarCollapsed = !state.isSidebarCollapsed;
+      localStorage.setItem('sidebar-collapsed', state.isSidebarCollapsed);
+
+      if (state.isSidebarCollapsed) {
+        applySidebarCollapsed();
+      } else {
+        removeSidebarCollapsed();
+      }
     }
   }
 
   /**
-   * Applies collapsed state styling to sidebar
+   * Applies collapsed state to sidebar (desktop/tablet only)
    */
   function applySidebarCollapsed() {
-    const sidebar = document.querySelector(CONFIG.sidebarSelector);
-    if (sidebar) {
-      sidebar.setAttribute('data-collapsed', 'true');
-    }
+    document.body.classList.add('sidebar-collapsed');
   }
 
   /**
    * Removes collapsed state from sidebar
    */
   function removeSidebarCollapsed() {
+    document.body.classList.remove('sidebar-collapsed');
+  }
+
+  /**
+   * Closes sidebar (mobile only)
+   */
+  function closeSidebar() {
     const sidebar = document.querySelector(CONFIG.sidebarSelector);
+    const overlay = document.querySelector('.sidebar-overlay');
     if (sidebar) {
-      sidebar.removeAttribute('data-collapsed');
+      sidebar.classList.remove('open');
+    }
+    if (overlay) {
+      overlay.classList.remove('active');
     }
   }
 
   /**
-   * Public method to toggle sidebar (for future button use)
+   * Attaches sidebar toggle button listener
+   */
+  function attachSidebarToggleListener() {
+    const toggleBtn = document.getElementById(CONFIG.sidebarToggleButtonId);
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleSidebarCollapse();
+      });
+    }
+  }
+
+  /**
+   * Attaches overlay click listener to close sidebar (mobile only)
+   */
+  function attachOverlayListener() {
+    const overlay = document.querySelector('.sidebar-overlay');
+    if (overlay) {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          closeSidebar();
+        }
+      });
+    }
+  }
+
+  // ==================== SIDEBAR TOGGLE SECTIONS (COLLAPSIBLE) ====================
+
+  /**
+   * REMOVED: This function was causing conflicts with sidebar.js SidebarManager
+   * The sidebar.js properly handles submenu expansion with:
+   * - Section-aware accordion behavior (only one menu per section opens)
+   * - Support for both collapsed ('pinned') and expanded ('open') modes
+   * - Proper aria-expanded attribute management
+   *
+   * This function was closing ALL submenus globally, breaking the accordion behavior.
+   */
+  // function attachSidebarToggleLinkListeners() {
+  //   // REMOVED - Use sidebar.js instead
+  // }
+
+  // ==================== SMART SUBMENU POSITIONING ====================
+
+  /**
+   * Adjusts floating submenu position to prevent going off-screen
+   * Useful for mini sidebar floating submenus
+   */
+  function attachSmartSubmenuPositioning() {
+    document.querySelectorAll('.sidebar-nav-item').forEach(item => {
+      item.addEventListener('mouseenter', () => {
+        if (!document.body.classList.contains('sidebar-collapsed')) return;
+
+        const submenu = item.querySelector('.sidebar-submenu');
+        if (!submenu) return;
+
+        const rect = submenu.getBoundingClientRect();
+
+        // Position submenu: if it goes off bottom, align to bottom of item
+        if (rect.bottom > window.innerHeight - 20) {
+          submenu.style.top = 'auto';
+          submenu.style.bottom = '0';
+        } else {
+          submenu.style.top = '0';
+          submenu.style.bottom = 'auto';
+        }
+
+        // Right-side check (if needed for RTL or edge cases)
+        if (rect.right > window.innerWidth - 20) {
+          submenu.style.left = 'auto';
+          submenu.style.right = '100%';
+        } else {
+          submenu.style.left = 'var(--sidebar-width, 70px)';
+          submenu.style.right = 'auto';
+        }
+      });
+    });
+  }
+
+  /**
+   * Closes sidebar when a link is clicked (mobile only)
+   */
+  function attachSidebarLinkListener() {
+    const sidebarLinks = document.querySelectorAll('.sidebar-nav-link, .sidebar-submenu-link');
+    sidebarLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth < 768) {
+          closeSidebar();
+        }
+      });
+    });
+  }
+
+  /**
+   * Public method to toggle sidebar
    */
   window.toggleSidebar = function() {
     toggleSidebarCollapse();
   };
+
+  /**
+   * Handle window resize - close sidebar overlay on mobile->desktop transition
+   */
+  function attachWindowResizeListener() {
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 768) {
+        // Desktop - close overlay if open
+        const overlay = document.querySelector('.sidebar-overlay');
+        if (overlay && overlay.classList.contains('active')) {
+          overlay.classList.remove('active');
+        }
+        const sidebar = document.querySelector(CONFIG.sidebarSelector);
+        if (sidebar && sidebar.classList.contains('open')) {
+          sidebar.classList.remove('open');
+        }
+      }
+    });
+  }
 
   // ==================== UTILITY FUNCTIONS ====================
 

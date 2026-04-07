@@ -8,14 +8,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Payment gateway integration (Stripe, PayPal)
+- Advanced payment gateway integration (PayPal, Razorpay)
 - Mobile app companion
 - Advanced forecasting and predictive analytics
-- Multi-currency conversion rates
+- Multi-currency conversion rates with live updates
 - Custom reporting builder
 - Advanced import history and audit logs
 
-## [3.0.0] - 2026-02-28 **LATEST**
+## [4.5.0] - 2026-04-07 **CURRENT**
+
+### Added - Phase 5 (UI/UX Polish & Admin Features)
+- **Backup & Restore System** (Complete)
+  - Full system backup (database + media files)
+  - Database-only backup option
+  - Compressed SQL backups
+  - One-click restore from uploaded files
+  - Automated daily backups with 30-day retention
+  - Backup history with download/delete actions
+  - Full system and database restore with modal confirmation
+  - Backup progress tracking and status indicators
+
+- **UI/UX Consistency Improvements** (Complete)
+  - Standardized button styling across all admin pages
+  - Consistent action buttons (Download/Delete) in tables
+  - Unified modal dialogs for confirmations
+  - Consistent color scheme and spacing
+  - Dark mode support across new components
+  - Responsive design for mobile devices
+  - Improved accessibility (ARIA labels, keyboard navigation)
+
+- **Admin Dashboard Enhancements**
+  - Backup management interface
+  - System status monitoring
+  - Audit log viewing
+
+### Fixed
+- Backup restore modal styling and layout
+- Action button inconsistency in backup history table
+- Inline styles replaced with CSS classes for maintainability
+- Dark theme support in all new admin components
+
+### Performance
+- Optimized backup/restore operations
+- Improved database query efficiency
+- Static file serving optimization
+
+### Security
+- Encrypted backup uploads
+- Secure restore operation with confirmation
+- Backup file validation before restore
+- CSRF protection on all backup operations
+- Input validation for file uploads
+
+## [3.0.0] - 2026-02-28
 
 ### Added - Phase 4 (UI Implementation)
 - **Analytics Dashboard** (Complete)
@@ -77,7 +122,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Atomic transaction handling
   - Comprehensive error reporting
   - Import template API
-  
+
 ### Fixed
 - API endpoint path configuration
 - URL routing for analytics endpoints
@@ -190,10 +235,10 @@ When contributing changes:
 3. **Commit Messages:**
    ```
    type: description
-   
+
    - Item 1
    - Item 2
-   
+
    Closes #issue_number
    ```
 
