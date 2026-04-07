@@ -14,6 +14,7 @@ from rest_framework_simplejwt.views import (
 # Import drf-spectacular views for API documentation
 try:
     from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+    from drf_spectacular.renderers import OpenApiJsonRenderer, OpenApiYamlRenderer
 
     SPECTACULAR_AVAILABLE = True
 except ImportError:
@@ -128,7 +129,10 @@ urlpatterns = [
 # Add API Documentation endpoints (drf-spectacular)
 if SPECTACULAR_AVAILABLE:
     urlpatterns += [
-        path("api/schema/", SpectacularAPIView.as_view(permission_classes=[AllowAny]), name="schema"),
+        path("api/schema/", SpectacularAPIView.as_view(
+            permission_classes=[AllowAny],
+            renderer_classes=[OpenApiJsonRenderer, OpenApiYamlRenderer]
+        ), name="schema"),
         path(
             "api/docs/",
             SpectacularSwaggerView.as_view(url_name="schema", permission_classes=[AllowAny]),
