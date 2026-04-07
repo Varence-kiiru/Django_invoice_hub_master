@@ -228,7 +228,8 @@ InvoiceHub is a modern, feature-rich invoicing and invoice management system des
 
 1. **Clone the repository:**
    ```bash
-   cd c:\xampp\htdocs\invoice
+   git clone https://github.com/Varence-kiiru/Django_invoice_hub_master.git
+   cd Django_invoice_hub_master
    ```
 
 2. **Create and activate virtual environment:**
@@ -265,8 +266,7 @@ InvoiceHub is a modern, feature-rich invoicing and invoice management system des
 
 7. **Load demo/seed data (optional):**
    ```bash
-   python manage.py demo_filters
-   python manage.py seed_demo_data  # Creates sample invoices, clients, etc.
+   python manage.py demo_filters  # Creates sample filter presets
    ```
 
 8. **Collect static files:**
@@ -2014,9 +2014,9 @@ class Invoice(models.Model):
 **Developer:** Varence-kiiru
 **Email:** hernandezngash@gmail.com
 **GitHub:** https://github.com/Varence-kiiru
-**Repository:** https://github.com/Varence-kiiru/invoice
-**Issue Tracker:** https://github.com/Varence-kiiru/invoice/issues
-**Discussions:** https://github.com/Varence-kiiru/invoice/discussions
+**Repository:** https://github.com/Varence-kiiru/Django_invoice_hub_master
+**Issue Tracker:** https://github.com/Varence-kiiru/Django_invoice_hub_master/issues
+**Discussions:** https://github.com/Varence-kiiru/Django_invoice_hub_master/discussions
 
 ---
 

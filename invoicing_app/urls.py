@@ -8,6 +8,14 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
+# Import drf-spectacular views for API documentation
+try:
+    from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+
+    SPECTACULAR_AVAILABLE = True
+except ImportError:
+    SPECTACULAR_AVAILABLE = False
+
 # Import viewsets
 from invoicing_app.clients.views import ClientViewSet
 from invoicing_app.products.views import ProductViewSet
@@ -113,6 +121,17 @@ urlpatterns = [
     path("api/v1/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/v1/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]
+
+# API Documentation endpoints (drf-spectacular)
+if SPECTACULAR_AVAILABLE:
+    urlpatterns += [
+        path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+        path(
+            "api/docs/",
+            SpectacularSwaggerView.as_view(url_name="schema"),
+            name="swagger-ui",
+        ),
+    ]
 
 # Serve media files in development
 from django.conf import settings
