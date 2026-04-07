@@ -153,8 +153,8 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "invoicing_app.core.exception_handlers.custom_exception_handler",
     # Response Formatting
     "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
-    # Versioning (optional, for API evolution)
-    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
+    # Versioning - disabled, URL path versioning used instead (/api/v1/)
+    # "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
     # Throttling (rate limiting per user/IP)
     "DEFAULT_THROTTLE_CLASSES": (
         "rest_framework.throttling.AnonRateThrottle",
@@ -166,6 +166,24 @@ REST_FRAMEWORK = {
     },
     # Schema
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+# drf-spectacular schema generation settings  
+SPECTACULAR_SETTINGS = {
+    "TITLE": "InvoiceHub API",
+    "DESCRIPTION": "Professional invoice management system API",
+    "VERSION": "4.5.0",
+    "SERVE_INCLUDE_SCHEMA": True,
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.AllowAny"],
+    # Use DefaultRouter for schema discovery - this tells spectacular to scan all patterns
+    "SCHEMA_PATH_PREFIX": "/api/v1",
+    # Enable authentication bypass for schema generation
+    "SPECTACULAR_DEFAULTS": {
+        "FORCE_INIT_DOCSTRING_EXAMPLES": False,
+    },
+    # These settings might help with endpoint discovery
+    "ENUM_FIELD_DEPTH": 2,
+    "ENUM_ADD_EXPLICIT_BLANK_CHOICE": False,
 }
 
 # Simple JWT sensible defaults
