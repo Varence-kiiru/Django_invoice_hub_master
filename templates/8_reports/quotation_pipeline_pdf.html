@@ -26,23 +26,23 @@
 <table class="summary-table">
     <tr>
         <td class="label">Draft Quotations:</td>
-        <td class="value">{{ pipeline.draft|default:0 }} (KES {{ stage_values.draft|floatformat:2 }})</td>
+        <td class="value">{{ pipeline.draft|default:0 }} ({{ company_settings.currency_symbol }} {{ stage_values.draft|floatformat:2 }})</td>
     </tr>
     <tr>
         <td class="label">Issued/Sent:</td>
-        <td class="value">{{ pipeline.issued|default:0 }} (KES {{ stage_values.issued|floatformat:2 }})</td>
+        <td class="value">{{ pipeline.issued|default:0 }} ({{ company_settings.currency_symbol }} {{ stage_values.issued|floatformat:2 }})</td>
     </tr>
     <tr>
         <td class="label">Viewed/Accepted:</td>
-        <td class="value">{{ pipeline.viewed|default:0 }} (KES {{ stage_values.viewed|floatformat:2 }})</td>
+        <td class="value">{{ pipeline.viewed|default:0 }} ({{ company_settings.currency_symbol }} {{ stage_values.viewed|floatformat:2 }})</td>
     </tr>
     <tr>
         <td class="label">Converted to Invoice:</td>
-        <td class="value">{{ pipeline.converted|default:0 }} (KES {{ stage_values.converted|floatformat:2 }})</td>
+        <td class="value">{{ pipeline.converted|default:0 }} ({{ company_settings.currency_symbol }} {{ stage_values.converted|floatformat:2 }})</td>
     </tr>
     <tr>
         <td class="label">Expired:</td>
-        <td class="value">{{ pipeline.expired|default:0 }} (KES {{ stage_values.expired|floatformat:2 }})</td>
+        <td class="value">{{ pipeline.expired|default:0 }} ({{ company_settings.currency_symbol }} {{ stage_values.expired|floatformat:2 }})</td>
     </tr>
 </table>
 
@@ -72,7 +72,7 @@
 <table class="summary-table">
     <tr style="background-color: #f0f4f8; font-weight: bold;">
         <td class="label">Total Value in Pipeline:</td>
-        <td class="value">KES {{ total_pipeline_value|floatformat:2 }}</td>
+        <td class="value">{{ company_settings.currency_symbol }} {{ total_pipeline_value|floatformat:2 }}</td>
     </tr>
 </table>
 
@@ -92,35 +92,35 @@
         <tr>
             <td><strong>Draft</strong></td>
             <td>{{ pipeline.draft|default:0 }}</td>
-            <td>KES {{ stage_values.draft|floatformat:2 }}</td>
+            <td>{{ company_settings.currency_symbol }} {{ stage_values.draft|floatformat:2 }}</td>
             <td>{{ stage_percentages.draft|default:'0' }}%</td>
             <td>-</td>
         </tr>
         <tr>
             <td><strong>Issued/Sent</strong></td>
             <td>{{ pipeline.issued|default:0 }}</td>
-            <td>KES {{ stage_values.issued|floatformat:2 }}</td>
+            <td>{{ company_settings.currency_symbol }} {{ stage_values.issued|floatformat:2 }}</td>
             <td>{{ stage_percentages.issued|default:'0' }}%</td>
             <td>{{ conversion_rates.draft_to_issued|floatformat:1 }}%</td>
         </tr>
         <tr>
             <td><strong>Viewed/Accepted</strong></td>
             <td>{{ pipeline.viewed|default:0 }}</td>
-            <td>KES {{ stage_values.viewed|floatformat:2 }}</td>
+            <td>{{ company_settings.currency_symbol }} {{ stage_values.viewed|floatformat:2 }}</td>
             <td>{{ stage_percentages.viewed|default:'0' }}%</td>
             <td>{{ conversion_rates.issued_to_viewed|floatformat:1 }}%</td>
         </tr>
         <tr>
             <td><strong>Converted</strong></td>
             <td>{{ pipeline.converted|default:0 }}</td>
-            <td>KES {{ stage_values.converted|floatformat:2 }}</td>
+            <td>{{ company_settings.currency_symbol }} {{ stage_values.converted|floatformat:2 }}</td>
             <td>{{ stage_percentages.converted|default:'0' }}%</td>
             <td>{{ conversion_rates.viewed_to_converted|floatformat:1 }}%</td>
         </tr>
         <tr style="background-color: #fff3cd;">
             <td><strong>Expired</strong></td>
             <td>{{ pipeline.expired|default:0 }}</td>
-            <td>KES {{ stage_values.expired|floatformat:2 }}</td>
+            <td>{{ company_settings.currency_symbol }} {{ stage_values.expired|floatformat:2 }}</td>
             <td>{{ stage_percentages.expired|default:'0' }}%</td>
             <td>Lost</td>
         </tr>

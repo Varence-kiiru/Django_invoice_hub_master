@@ -235,7 +235,7 @@
 
             if (!clientId) {
               // Reset to defaults if no client selected
-              currencyField.value = 'KES';
+              currencyField.value = '{{ company_settings.default_currency }}';
               invoiceDateField.value = today.toISOString().split('T')[0];
               const defaultDueDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
               dueDateField.value = defaultDueDate.toISOString().split('T')[0];

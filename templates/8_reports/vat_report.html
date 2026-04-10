@@ -61,7 +61,7 @@
             <div class="card bg-light border-0 shadow-sm">
                 <div class="card-body">
                     <h6 class="text-muted mb-2">Total Taxable Amount</h6>
-                    <h3 class="mb-0 text-primary">KES {{ subtotal|floatformat:2 }}</h3>
+                    <h3 class="mb-0 text-primary">{{ company_settings.currency_symbol }} {{ subtotal|floatformat:2 }}</h3>
                 </div>
             </div>
         </div>
@@ -69,7 +69,7 @@
             <div class="card bg-light border-0 shadow-sm">
                 <div class="card-body">
                     <h6 class="text-muted mb-2">Total VAT Collected</h6>
-                    <h3 class="mb-0 text-success">KES {{ vat_total|floatformat:2 }}</h3>
+                    <h3 class="mb-0 text-success">{{ company_settings.currency_symbol }} {{ vat_total|floatformat:2 }}</h3>
                 </div>
             </div>
         </div>
@@ -100,10 +100,10 @@
                         <td><strong>{{ invoice.invoice_number }}</strong></td>
                         <td>{{ invoice.client.name }}</td>
                         <td>{{ invoice.invoice_date|date:"d M Y" }}</td>
-                        <td class="text-end">KES {{ invoice.subtotal_amount|floatformat:2 }}</td>
+                        <td class="text-end">{{ company_settings.currency_symbol }} {{ invoice.subtotal_amount|floatformat:2 }}</td>
                         <td class="text-center">16%</td>
-                        <td class="text-end"><strong>KES {{ invoice.vat_amount|floatformat:2 }}</strong></td>
-                        <td class="text-end">KES {{ invoice.total_amount|floatformat:2 }}</td>
+                        <td class="text-end"><strong>{{ company_settings.currency_symbol }} {{ invoice.vat_amount|floatformat:2 }}</strong></td>
+                        <td class="text-end">{{ company_settings.currency_symbol }} {{ invoice.total_amount|floatformat:2 }}</td>
                         <td>
                             <a href="{% url 'invoices:detail' invoice.id %}" class="btn btn-sm btn-outline-primary">View</a>
                         </td>

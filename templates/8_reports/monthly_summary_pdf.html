@@ -31,12 +31,12 @@
         </td>
         <td style="border: 1px solid #ddd; padding: 15px; background: #f9f9f9; text-align: center;">
             <div style="font-size: 11px; color: #666; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Total Revenue</div>
-            <div style="font-size: 18px; font-weight: bold; color: #0066cc;">KES {{ total_revenue|default:'0.00' }}</div>
+            <div style="font-size: 18px; font-weight: bold; color: #0066cc;">{{ company_settings.currency_symbol }} {{ total_revenue|default:'0.00' }}</div>
             <div style="font-size: 10px; color: #999; margin-top: 5px;">Collected</div>
         </td>
         <td style="border: 1px solid #ddd; padding: 15px; background: #f9f9f9; text-align: center;">
             <div style="font-size: 11px; color: #666; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Outstanding</div>
-            <div style="font-size: 18px; font-weight: bold; color: #0066cc;">KES {{ total_outstanding|default:'0.00' }}</div>
+            <div style="font-size: 18px; font-weight: bold; color: #0066cc;">{{ company_settings.currency_symbol }} {{ total_outstanding|default:'0.00' }}</div>
             <div style="font-size: 10px; color: #999; margin-top: 5px;">Unpaid</div>
         </td>
         <td style="border: 1px solid #ddd; padding: 15px; background: #f9f9f9; text-align: center;">
@@ -67,10 +67,10 @@
         <tr>
             <td><strong>{{ data.month|date:"M Y" }}</strong></td>
             <td class="amount">{{ data.invoices }}</td>
-            <td class="amount">KES {{ data.revenue|floatformat:2 }}</td>
-            <td class="amount">KES {{ data.payments|floatformat:2 }}</td>
-            <td class="amount">KES {{ data.outstanding|floatformat:2 }}</td>
-            <td class="amount">KES {{ data.vat|floatformat:2 }}</td>
+            <td class="amount">{{ company_settings.currency_symbol }} {{ data.revenue|floatformat:2 }}</td>
+            <td class="amount">{{ company_settings.currency_symbol }} {{ data.payments|floatformat:2 }}</td>
+            <td class="amount">{{ company_settings.currency_symbol }} {{ data.outstanding|floatformat:2 }}</td>
+            <td class="amount">{{ company_settings.currency_symbol }} {{ data.vat|floatformat:2 }}</td>
         </tr>
         {% endfor %}
     </tbody>

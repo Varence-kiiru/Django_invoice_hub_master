@@ -97,9 +97,14 @@ def can_edit_expense(user, expense):
     Check if user can edit this expense.
     Based on permission system and expense status/ownership.
     """
+    # Paid expenses cannot be edited by anyone
+    if expense.status == "paid":
+        return False
+
     # Check edit_any_expense (admin only)
     if user_has_permission(user, "edit_any_expense"):
-        return True
+        # Admins can edit draft, submitted, and approved expenses, but not paid
+        return expense.status in ["draft", "submitted", "approved"]
 
     # Check edit_own_expenses (manager level)
     if user_has_permission(user, "edit_own_expenses"):
@@ -324,20 +329,36 @@ def expenses_detail_view(request, pk):
         messages.error(request, "You do not have permission to view this expense.")
         return redirect("expenses:list")
 
-    # Get approval history if available
-    approval_history = []
-    if expense.approved_date:
-        approval_history.append(
-            {
-                "status": "Approved",
-                "user": expense.approved_by,
-                "date": expense.approved_date,
-            }
-        )
+    # Build complete approval workflow history
+    workflow_history = {
+        "created": {
+            "status": "Created",
+            "date": expense.created_at,
+            "user": expense.submitted_by,
+            "completed": True,
+        },
+        "submitted": {
+            "status": "Submitted",
+            "date": expense.submitted_date,
+            "completed": expense.status
+            in ["submitted", "approved", "paid", "rejected"],
+        },
+        "approved": {
+            "status": "Approved",
+            "date": expense.approved_date,
+            "user": expense.approved_by,
+            "completed": expense.status in ["approved", "paid"],
+        },
+        "paid": {
+            "status": "Paid",
+            "date": expense.paid_date,
+            "completed": expense.status == "paid",
+        },
+    }
 
     context = {
         "expense": expense,
-        "approval_history": approval_history,
+        "workflow_history": workflow_history,
         "page_title": f"Expense: {expense.description}",
         "can_edit": can_edit_expense(request.user, expense),
         "can_delete": can_delete_expense(request.user, expense),
@@ -361,10 +382,19 @@ def expenses_detail_view(request, pk):
 def expenses_edit_view(request, pk):
     """
     Edit an existing expense.
-    Admin: can edit any expense
-    Accountant/User: can only edit their own draft expenses
+    Admin: can edit draft, submitted, and approved expenses
+    Accountant/User: can only edit their own draft and submitted expenses
+    Paid expenses cannot be edited by anyone.
     """
     expense = get_object_or_404(Expense, pk=pk)
+
+    # Check if expense is paid - cannot be edited
+    if expense.status == "paid":
+        messages.error(
+            request,
+            "Paid expenses cannot be edited. Please contact an administrator if changes are needed.",
+        )
+        return redirect("expenses:detail", pk=expense.id)
 
     # Check if user can edit this expense
     if not can_edit_expense(request.user, expense):

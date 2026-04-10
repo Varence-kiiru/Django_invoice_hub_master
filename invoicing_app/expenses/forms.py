@@ -216,13 +216,74 @@ class ExpenseForm(forms.ModelForm):
                 attrs={"class": "form-control"},
             )
 
+        # If editing an existing expense that is paid, disable critical fields
+        if self.instance and self.instance.pk and self.instance.status == "paid":
+            # Disable fields that shouldn't be changed for paid expenses
+            locked_fields = [
+                "description",
+                "category",
+                "vendor",
+                "amount",
+                "currency",
+                "expense_date",
+                "payment_method",
+            ]
+            for field_name in locked_fields:
+                if field_name in self.fields:
+                    self.fields[field_name].disabled = True
+                    self.fields[field_name].widget.attrs["readonly"] = True
+                    self.fields[field_name].help_text = (
+                        "This field is locked for paid expenses."
+                    )
+
     def clean(self):
-        """Validate form data."""
+        """Validate form data and prevent invalid status transitions."""
         cleaned_data = super().clean()
         amount = cleaned_data.get("amount")
+        new_status = cleaned_data.get("status")
 
         if amount and amount <= 0:
             raise ValidationError("Expense amount must be greater than 0.")
+
+        # If editing an existing expense, validate status transitions
+        if self.instance and self.instance.pk:
+            current_status = self.instance.status
+
+            # Prevent changing status of paid expenses
+            if current_status == "paid":
+                if new_status != current_status:
+                    raise ValidationError(
+                        "Cannot change the status of a paid expense. "
+                        "Paid expenses are locked and cannot be modified."
+                    )
+
+            # Validate valid status transitions
+            valid_transitions = {
+                "draft": ["draft", "submitted"],  # Draft can go to submitted
+                "submitted": [
+                    "draft",
+                    "submitted",
+                    "approved",
+                    "rejected",
+                ],  # Submitted can go back to draft, stay, or be approved/rejected
+                "approved": [
+                    "draft",
+                    "approved",
+                    "paid",
+                ],  # Approved can go back to draft, stay, or be paid
+                "rejected": [
+                    "draft",
+                    "rejected",
+                ],  # Rejected can only go back to draft or stay
+                "paid": ["paid"],  # Paid cannot change
+            }
+
+            if current_status in valid_transitions:
+                if new_status not in valid_transitions[current_status]:
+                    raise ValidationError(
+                        f"Cannot transition from {current_status} to {new_status}. "
+                        f"Valid transitions from {current_status}: {', '.join(valid_transitions[current_status])}"
+                    )
 
         return cleaned_data
 

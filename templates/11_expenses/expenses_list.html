@@ -151,10 +151,14 @@
                         <a href="{% url 'expenses:detail' expense.id %}" class="btn btn-sm btn-info" title="View">
                             👁️
                         </a>
-                        {% if expense.status == 'draft' %}
+                        {% if expense.status != 'paid' %}
                         <a href="{% url 'expenses:edit' expense.id %}" class="btn btn-sm btn-warning" title="Edit">
                             ✏️
                         </a>
+                        {% else %}
+                        <span class="btn btn-sm btn-secondary disabled" title="Paid expenses cannot be edited">
+                            🔒
+                        </span>
                         {% endif %}
                     </td>
                 </tr>

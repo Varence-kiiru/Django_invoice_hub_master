@@ -491,7 +491,7 @@ pre code {
 
 /* ==================== RESPONSIVE ==================== */
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   html {
     font-size: 15px;
   }

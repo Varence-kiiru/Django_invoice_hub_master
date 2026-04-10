@@ -421,12 +421,58 @@
     <!-- Form Actions -->
     <div class="form-actions">
       <button type="submit" class="btn btn-primary">Save Settings</button>
-      <button type="reset" class="btn btn-secondary">Reset Changes</button>
+      <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset Changes</button>
     </div>
   </form>
 </div>
 
 <script>
+// Store original form state when page loads
+let originalFormState = {};
+
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  saveOriginalFormState(form);
+});
+
+function saveOriginalFormState(form) {
+  const elements = form.querySelectorAll('input, textarea, select');
+  elements.forEach(element => {
+    if (element.type === 'checkbox' || element.type === 'radio') {
+      originalFormState[element.name] = element.checked;
+    } else if (element.type !== 'file') {
+      originalFormState[element.name] = element.value;
+    }
+  });
+}
+
+function resetForm() {
+  const form = document.querySelector('form');
+  const elements = form.querySelectorAll('input, textarea, select');
+
+  elements.forEach(element => {
+    if (element.name in originalFormState) {
+      if (element.type === 'checkbox' || element.type === 'radio') {
+        element.checked = originalFormState[element.name];
+      } else if (element.type !== 'file') {
+        element.value = originalFormState[element.name];
+      }
+    }
+  });
+
+  // Clear file input
+  const fileInputs = form.querySelectorAll('input[type="file"]');
+  fileInputs.forEach(input => input.value = '');
+
+  // Reset logo preview if needed
+  const logoPreview = document.getElementById('logo-preview');
+  if (logoPreview) {
+    // Logo will remain as is since we don't want to lose the current image on reset
+  }
+
+  alert('Settings have been reset to their saved values.');
+}
+
 function previewLogo(input) {
   const preview = document.getElementById('logo-preview');
 

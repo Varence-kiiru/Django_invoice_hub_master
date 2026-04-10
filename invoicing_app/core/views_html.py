@@ -1035,12 +1035,18 @@ def invoices_report_view(request):
         "client_name": client_name or "",
     }
 
+    # Get company settings for currency display
+    from invoicing_app.core.models import CompanySettings
+
+    company_settings = CompanySettings.get_settings()
+
     context = {
         "page_title": "Invoice Register Report",
         "invoices": invoices,
         "total_count": total_count,
         "summary": summary,
         "filters": filters,
+        "company_settings": company_settings,
         "breadcrumbs": (
             BreadcrumbBuilder().add_home().add_current("Reports - Invoices").build()
         ),
@@ -1092,6 +1098,11 @@ def vat_report_view(request):
     vat_total = queryset.aggregate(Sum("vat_amount"))["vat_amount__sum"] or 0
     subtotal = queryset.aggregate(Sum("subtotal_amount"))["subtotal_amount__sum"] or 0
 
+    # Get company settings for currency display
+    from invoicing_app.core.models import CompanySettings
+
+    company_settings = CompanySettings.get_settings()
+
     context = {
         "page_title": "VAT Report",
         "invoices": queryset,
@@ -1099,6 +1110,7 @@ def vat_report_view(request):
         "subtotal": subtotal,
         "from_date": from_date,
         "to_date": to_date,
+        "company_settings": company_settings,
         "breadcrumbs": (
             BreadcrumbBuilder().add_home().add_current("Reports - VAT").build()
         ),
@@ -1133,10 +1145,16 @@ def client_aging_view(request):
             )
             total_outstanding += total_due
 
+    # Get company settings for currency display
+    from invoicing_app.core.models import CompanySettings
+
+    company_settings = CompanySettings.get_settings()
+
     context = {
         "page_title": "Client Aging Report",
         "aging_data": aging_data,
         "total_due": total_outstanding,
+        "company_settings": company_settings,
         "breadcrumbs": (
             BreadcrumbBuilder().add_home().add_current("Reports - Client Aging").build()
         ),
@@ -1329,6 +1347,11 @@ def quotation_pipeline_view(request):
         :10
     ]
 
+    # Get company settings for currency display
+    from invoicing_app.core.models import CompanySettings
+
+    company_settings = CompanySettings.get_settings()
+
     context = {
         "page_title": "Quotation Pipeline Report",
         "pipeline": pipeline,
@@ -1336,6 +1359,7 @@ def quotation_pipeline_view(request):
         "conversion_rates": conversion_rates,
         "converted_quotes": converted_quotes,
         "total_pipeline_value": sum(stage_values.values()),
+        "company_settings": company_settings,
         "breadcrumbs": (
             BreadcrumbBuilder()
             .add_home()
@@ -1609,12 +1633,18 @@ def quotation_pipeline_pdf_view(request):
         else:
             stage_percentages = {stage: 0 for stage in stage_values}
 
+        # Get company settings for currency display
+        from invoicing_app.core.models import CompanySettings
+
+        company_settings = CompanySettings.get_settings()
+
         context = {
             "pipeline": pipeline,
             "stage_values": stage_values,
             "stage_percentages": stage_percentages,
             "conversion_rates": conversion_rates,
             "total_pipeline_value": total_pipeline_value,
+            "company_settings": company_settings,
         }
 
         # Generate PDF (returns bytes)
@@ -1821,6 +1851,11 @@ def monthly_summary_view(request):
                     }
                 )
 
+        # Get company settings for currency display
+        from invoicing_app.core.models import CompanySettings
+
+        company_settings = CompanySettings.get_settings()
+
         context = {
             "page_title": "Monthly Summary",
             "total_invoices": total_invoices,
@@ -1828,6 +1863,7 @@ def monthly_summary_view(request):
             "total_outstanding": f"{total_outstanding:.2f}",
             "total_clients": total_clients,
             "monthly_data": monthly_data,
+            "company_settings": company_settings,
             "breadcrumbs": (
                 BreadcrumbBuilder()
                 .add_home()
@@ -1992,12 +2028,18 @@ def vat_report_pdf_view(request):
             queryset.aggregate(Sum("subtotal_amount"))["subtotal_amount__sum"] or 0
         )
 
+        # Get company settings for currency display
+        from invoicing_app.core.models import CompanySettings
+
+        company_settings = CompanySettings.get_settings()
+
         context = {
             "invoices": queryset,
             "vat_total": vat_total,
             "subtotal": subtotal,
             "from_date": from_date,
             "to_date": to_date,
+            "company_settings": company_settings,
         }
 
         # Generate PDF (returns bytes)
@@ -2070,10 +2112,16 @@ def client_aging_pdf_view(request):
             else:
                 item["percentage"] = "0.0"
 
+        # Get company settings for currency display
+        from invoicing_app.core.models import CompanySettings
+
+        company_settings = CompanySettings.get_settings()
+
         context = {
             "aging_data": aging_data,
             "today": today,
             "total_due": f"{total_outstanding:.2f}",
+            "company_settings": company_settings,
         }
 
         # Generate PDF (returns bytes)
@@ -2252,12 +2300,18 @@ def monthly_summary_pdf_view(request):
                     }
                 )
 
+        # Get company settings for currency display
+        from invoicing_app.core.models import CompanySettings
+
+        company_settings = CompanySettings.get_settings()
+
         context = {
             "total_invoices": total_invoices,
             "total_revenue": f"{total_revenue:.2f}",
             "total_outstanding": f"{total_outstanding:.2f}",
             "total_clients": total_clients,
             "monthly_data": monthly_data,
+            "company_settings": company_settings,
         }
 
         # Generate PDF (returns bytes)
@@ -2364,6 +2418,9 @@ def settings_general_view(request):
             settings.date_format = request.POST.get("date_format", settings.date_format)
             settings.currency_symbol = request.POST.get(
                 "currency_symbol", settings.currency_symbol
+            )
+            settings.default_currency = request.POST.get(
+                "default_currency", settings.default_currency
             )
             settings.decimal_places = request.POST.get(
                 "decimal_places", settings.decimal_places

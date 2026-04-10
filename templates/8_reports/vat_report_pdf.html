@@ -34,17 +34,17 @@
 <div class="stats-grid">
     <div class="stat-card">
         <div class="stat-label">Subtotal</div>
-        <div class="stat-value">KES {{ subtotal|default:'0.00' }}</div>
+        <div class="stat-value">{{ company_settings.currency_symbol }} {{ subtotal|default:'0.00' }}</div>
         <div class="stat-detail">Before VAT</div>
     </div>
     <div class="stat-card">
         <div class="stat-label">VAT Amount</div>
-        <div class="stat-value">KES {{ vat_total|default:'0.00' }}</div>
+        <div class="stat-value">{{ company_settings.currency_symbol }} {{ vat_total|default:'0.00' }}</div>
         <div class="stat-detail">16% taxable</div>
     </div>
     <div class="stat-card">
         <div class="stat-label">Total</div>
-        <div class="stat-value">KES {{ subtotal|add:vat_total|stringformat:".2f" }}</div>
+        <div class="stat-value">{{ company_settings.currency_symbol }} {{ subtotal|add:vat_total|stringformat:".2f" }}</div>
         <div class="stat-detail">Grand total</div>
     </div>
 </div>
@@ -71,10 +71,10 @@
             <td><strong>{{ invoice.invoice_number }}</strong></td>
             <td>{{ invoice.client.name }}</td>
             <td>{{ invoice.invoice_date|date:"d/m/Y" }}</td>
-            <td class="amount">KES {{ invoice.subtotal_amount|floatformat:2 }}</td>
+            <td class="amount">{{ company_settings.currency_symbol }} {{ invoice.subtotal_amount|floatformat:2 }}</td>
             <td class="amount">16%</td>
-            <td class="amount">KES {{ invoice.vat_amount|floatformat:2 }}</td>
-            <td class="amount">KES {{ invoice.total_amount|floatformat:2 }}</td>
+            <td class="amount">{{ company_settings.currency_symbol }} {{ invoice.vat_amount|floatformat:2 }}</td>
+            <td class="amount">{{ company_settings.currency_symbol }} {{ invoice.total_amount|floatformat:2 }}</td>
         </tr>
         {% endfor %}
     </tbody>
@@ -87,15 +87,15 @@
 <table class="summary-table">
     <tr>
         <td class="label">Total Subtotal:</td>
-        <td class="value">KES {{ subtotal|default:'0.00' }}</td>
+        <td class="value">{{ company_settings.currency_symbol }} {{ subtotal|default:'0.00' }}</td>
     </tr>
     <tr>
         <td class="label">Total VAT (16%):</td>
-        <td class="value">KES {{ vat_total|default:'0.00' }}</td>
+        <td class="value">{{ company_settings.currency_symbol }} {{ vat_total|default:'0.00' }}</td>
     </tr>
     <tr>
         <td class="label">GRAND TOTAL:</td>
-        <td class="value">KES {{ subtotal|add:vat_total|stringformat:".2f" }}</td>
+        <td class="value">{{ company_settings.currency_symbol }} {{ subtotal|add:vat_total|stringformat:".2f" }}</td>
     </tr>
 </table>
 {% endblock %}

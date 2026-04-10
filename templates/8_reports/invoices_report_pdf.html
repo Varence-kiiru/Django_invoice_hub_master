@@ -39,17 +39,17 @@
     </div>
     <div class="stat-card">
         <div class="stat-label">Total Value</div>
-        <div class="stat-value">KES {{ summary.total_amount|default:'0.00' }}</div>
+        <div class="stat-value">{{ company_settings.currency_symbol }} {{ summary.total_amount|default:'0.00' }}</div>
         <div class="stat-detail">Grand total</div>
     </div>
     <div class="stat-card">
         <div class="stat-label">Outstanding</div>
-        <div class="stat-value">KES {{ summary.outstanding_amount|default:'0.00' }}</div>
+        <div class="stat-value">{{ company_settings.currency_symbol }} {{ summary.outstanding_amount|default:'0.00' }}</div>
         <div class="stat-detail">Unpaid/partial</div>
     </div>
     <div class="stat-card">
         <div class="stat-label">Paid</div>
-        <div class="stat-value">KES {{ summary.paid_amount|default:'0.00' }}</div>
+        <div class="stat-value">{{ company_settings.currency_symbol }} {{ summary.paid_amount|default:'0.00' }}</div>
         <div class="stat-detail">Collected</div>
     </div>
 </div>
@@ -78,9 +78,9 @@
             <td>{{ invoice.client.name }}</td>
             <td>{{ invoice.invoice_date|date:"d/m/Y" }}</td>
             <td>{{ invoice.due_date|date:"d/m/Y" }}</td>
-            <td class="amount">KES {{ invoice.total_amount|floatformat:2 }}</td>
-            <td class="amount">KES {{ invoice.paid_amount|floatformat:2 }}</td>
-            <td class="amount">KES {{ invoice.amount_due|floatformat:2 }}</td>
+            <td class="amount">{{ company_settings.currency_symbol }} {{ invoice.total_amount|floatformat:2 }}</td>
+            <td class="amount">{{ company_settings.currency_symbol }} {{ invoice.paid_amount|floatformat:2 }}</td>
+            <td class="amount">{{ company_settings.currency_symbol }} {{ invoice.amount_due|floatformat:2 }}</td>
             <td>
                 <span class="status-badge status-{{ invoice.status|lower }}">
                     {{ invoice.get_status_display|upper }}
@@ -102,15 +102,15 @@
     </tr>
     <tr>
         <td class="label">Total Amount:</td>
-        <td class="value">KES {{ summary.total_amount|default:'0.00' }}</td>
+        <td class="value">{{ company_settings.currency_symbol }} {{ summary.total_amount|default:'0.00' }}</td>
     </tr>
     <tr>
         <td class="label">Outstanding Amount:</td>
-        <td class="value">KES {{ summary.outstanding_amount|default:'0.00' }}</td>
+        <td class="value">{{ company_settings.currency_symbol }} {{ summary.outstanding_amount|default:'0.00' }}</td>
     </tr>
     <tr>
         <td class="label">Paid Amount:</td>
-        <td class="value">KES {{ summary.paid_amount|default:'0.00' }}</td>
+        <td class="value">{{ company_settings.currency_symbol }} {{ summary.paid_amount|default:'0.00' }}</td>
     </tr>
 </table>
 {% endblock %}

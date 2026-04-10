@@ -25,7 +25,7 @@
 <div class="stats-grid">
     <div class="stat-card">
         <div class="stat-label">Total Outstanding</div>
-        <div class="stat-value">KES {{ total_due|default:'0.00' }}</div>
+        <div class="stat-value">{{ company_settings.currency_symbol }} {{ total_due|default:'0.00' }}</div>
         <div class="stat-detail">All clients</div>
     </div>
 </div>
@@ -48,8 +48,8 @@
         {% for item in aging_data %}
         <tr>
             <td><strong>{{ item.client.name }}</strong></td>
-            <td class="amount">KES {{ item.total_due|floatformat:2 }}</td>
-            <td class="amount">KES {{ item.overdue|floatformat:2 }}</td>
+            <td class="amount">{{ company_settings.currency_symbol }} {{ item.total_due|floatformat:2 }}</td>
+            <td class="amount">{{ company_settings.currency_symbol }} {{ item.overdue|floatformat:2 }}</td>
             <td class="amount">{{ item.days_overdue }}</td>
             <td class="amount">
                 {{ item.percentage }}%
@@ -66,7 +66,7 @@
 <table class="summary-table">
     <tr>
         <td class="label">Total Outstanding:</td>
-        <td class="value">KES {{ total_due|default:'0.00' }}</td>
+        <td class="value">{{ company_settings.currency_symbol }} {{ total_due|default:'0.00' }}</td>
     </tr>
 </table>
 {% endblock %}

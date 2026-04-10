@@ -78,6 +78,13 @@ def client_edit(request, pk):
     else:
         form = ClientForm(instance=client)
 
+    # Get company settings for currency display
+    from invoicing_app.core.models import CompanySettings
+
+    company_settings = CompanySettings.get_settings()
+
     return render(
-        request, "4_clients/clients_edit.html", {"form": form, "client": client}
+        request,
+        "4_clients/clients_edit.html",
+        {"form": form, "client": client, "company_settings": company_settings},
     )

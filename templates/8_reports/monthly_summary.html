@@ -48,7 +48,7 @@
             <div class="card bg-success text-white shadow-sm">
                 <div class="card-body">
                     <h6 class="card-title small mb-2 opacity-85">Total Revenue</h6>
-                    <h3 class="mb-0">KES {{ total_revenue|default:'0.00' }}</h3>
+                    <h3 class="mb-0">{{ company_settings.currency_symbol }} {{ total_revenue|default:'0.00' }}</h3>
                 </div>
             </div>
         </div>
@@ -56,7 +56,7 @@
             <div class="card bg-warning text-white shadow-sm">
                 <div class="card-body">
                     <h6 class="card-title small mb-2 opacity-85">Outstanding</h6>
-                    <h3 class="mb-0">KES {{ total_outstanding|default:'0.00' }}</h3>
+                    <h3 class="mb-0">{{ company_settings.currency_symbol }} {{ total_outstanding|default:'0.00' }}</h3>
                 </div>
             </div>
         </div>
@@ -93,10 +93,10 @@
                         <tr>
                             <td><strong>{{ data.month|date:"M Y" }}</strong></td>
                             <td class="text-end">{{ data.invoices }}</td>
-                            <td class="text-end">KES {{ data.revenue|floatformat:2 }}</td>
-                            <td class="text-end">KES {{ data.payments|floatformat:2 }}</td>
-                            <td class="text-end">KES {{ data.outstanding|floatformat:2 }}</td>
-                            <td class="text-end">KES {{ data.vat|floatformat:2 }}</td>
+                            <td class="text-end">{{ company_settings.currency_symbol }} {{ data.revenue|floatformat:2 }}</td>
+                            <td class="text-end">{{ company_settings.currency_symbol }} {{ data.payments|floatformat:2 }}</td>
+                            <td class="text-end">{{ company_settings.currency_symbol }} {{ data.outstanding|floatformat:2 }}</td>
+                            <td class="text-end">{{ company_settings.currency_symbol }} {{ data.vat|floatformat:2 }}</td>
                         </tr>
                         {% endfor %}
                     {% else %}

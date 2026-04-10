@@ -49,7 +49,9 @@ class ClientForm(forms.ModelForm):
                     "max": "365",
                 }
             ),
-            "currency": forms.Select(attrs={"class": "form-control"}),
+            "currency": forms.TextInput(
+                attrs={"class": "form-control", "readonly": True, "disabled": True}
+            ),
             "credit_limit": forms.NumberInput(
                 attrs={"class": "form-control", "placeholder": "0.00", "step": "0.01"}
             ),
@@ -61,6 +63,18 @@ class ClientForm(forms.ModelForm):
                 }
             ),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Set currency to system default and make it read-only
+        from invoicing_app.core.models import CompanySettings
+
+        company_settings = CompanySettings.get_settings()
+        self.fields["currency"].initial = company_settings.default_currency
+        self.fields["currency"].disabled = True
+        # Override any existing value to ensure it's always the system default
+        if not self.instance.pk:  # For new clients, set to default
+            self.initial["currency"] = company_settings.default_currency
 
     def clean_email(self):
         """Validate email uniqueness."""
@@ -106,6 +120,16 @@ class ClientForm(forms.ModelForm):
         if days < 0 or days > 365:
             raise forms.ValidationError("Payment terms must be between 0 and 365 days.")
         return days
+
+    def clean(self):
+        """Ensure currency is always set to system default."""
+        cleaned_data = super().clean()
+        from invoicing_app.core.models import CompanySettings
+
+        company_settings = CompanySettings.get_settings()
+        # Force currency to system default regardless of form input
+        cleaned_data["currency"] = company_settings.default_currency
+        return cleaned_data
 
 
 class ClientAddressForm(forms.ModelForm):

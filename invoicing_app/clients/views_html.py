@@ -97,9 +97,15 @@ def clients_create_view(request):
     else:
         form = ClientForm()
 
+    # Get company settings for currency display
+    from invoicing_app.core.models import CompanySettings
+
+    company_settings = CompanySettings.get_settings()
+
     context = {
         "page_title": "New Client",
         "form": form,
+        "company_settings": company_settings,
         "breadcrumbs": (
             BreadcrumbBuilder()
             .add_home()
@@ -126,10 +132,16 @@ def clients_edit_view(request, pk):
     else:
         form = ClientForm(instance=client)
 
+    # Get company settings for currency display
+    from invoicing_app.core.models import CompanySettings
+
+    company_settings = CompanySettings.get_settings()
+
     context = {
         "page_title": "Edit Client",
         "client": client,
         "form": form,
+        "company_settings": company_settings,
         "breadcrumbs": (
             BreadcrumbBuilder()
             .add_home()

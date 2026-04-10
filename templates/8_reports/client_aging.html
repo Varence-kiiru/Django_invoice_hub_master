@@ -39,7 +39,7 @@
         <div class="card-body">
             <h6 class="text-muted mb-2">Total Outstanding</h6>
             <h3 class="mb-0 text-danger">
-                KES {{ total_due|default:"0.00"|floatformat:2 }}
+                {{ company_settings.currency_symbol }} {{ total_due|default:"0.00"|floatformat:2 }}
             </h3>
         </div>
     </div>
@@ -67,13 +67,13 @@
                     <tr>
                         <td><strong>{{ item.client.name }}</strong></td>
                         <td class="text-end">
-                            KES {{ item.current|floatformat:2 }}
+                            {{ company_settings.currency_symbol }} {{ item.current|floatformat:2 }}
                         </td>
                         <td class="text-end">
-                            <span class="badge bg-danger">KES {{ item.overdue|floatformat:2 }}</span>
+                            <span class="badge bg-danger">{{ company_settings.currency_symbol }} {{ item.overdue|floatformat:2 }}</span>
                         </td>
                         <td class="text-end">
-                            <strong>KES {{ item.total_due|floatformat:2 }}</strong>
+                            <strong>{{ company_settings.currency_symbol }} {{ item.total_due|floatformat:2 }}</strong>
                         </td>
                         <td class="text-end">
                             {% if total_due > 0 %}

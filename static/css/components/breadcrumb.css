@@ -8,9 +8,9 @@
   --breadcrumb-link-hover-color: #0052a3;
   --breadcrumb-current-color: #1a1a1a;
   --breadcrumb-separator-color: #999;
-  --breadcrumb-margin-bottom: 1.5rem;
+  --breadcrumb-margin-bottom: 0.75rem;
   --breadcrumb-bg: transparent;
-  --breadcrumb-padding: 0.75rem 0;
+  --breadcrumb-padding: 0.5rem 0;
 }
 
 .breadcrumb-nav {

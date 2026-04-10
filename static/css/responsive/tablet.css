@@ -12,16 +12,29 @@
 
   .navbar {
     height: var(--navbar-height);
+    padding-left: max(var(--spacing-md), env(safe-area-inset-left));
+    padding-right: max(var(--spacing-md), env(safe-area-inset-right));
   }
 
   .sidebar {
     width: var(--sidebar-width);
+    height: auto;
+    min-height: calc(100dvh - var(--navbar-height));
+    min-height: calc(100vh - var(--navbar-height));
   }
 
   /* ===== Main Container ===== */
   main, .main-content {
     margin-left: var(--sidebar-width);
     padding-top: var(--navbar-height);
+    padding-left: max(var(--spacing-xl), env(safe-area-inset-left));
+    padding-right: max(var(--spacing-xl), env(safe-area-inset-right));
+    overflow-y: visible;
+    height: auto;
+  }
+
+  #main-content {
+    overflow-y: visible;
   }
 
   /* ===== Typography ===== */

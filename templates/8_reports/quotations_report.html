@@ -65,7 +65,7 @@
             <div class="card stat-card">
                 <div class="card-body">
                     <h6 class="card-title text-muted">Total Value</h6>
-                    <h3 class="text-success">KES {{ summary.total_value|default:'0.00' }}</h3>
+                    <h3 class="text-success">{{ company_settings.currency_symbol }} {{ summary.total_value|default:'0.00' }}</h3>
                     <small class="text-muted"><i class="icon-calculator"></i> Grand total</small>
                 </div>
             </div>
@@ -83,7 +83,7 @@
             <div class="card stat-card">
                 <div class="card-body">
                     <h6 class="card-title text-muted">VAT</h6>
-                    <h3 class="text-warning">KES {{ summary.vat_total|default:'0.00' }}</h3>
+                    <h3 class="text-warning">{{ company_settings.currency_symbol }} {{ summary.vat_total|default:'0.00' }}</h3>
                     <small class="text-muted"><i class="icon-percentage"></i> Total VAT</small>
                 </div>
             </div>
@@ -148,7 +148,7 @@
                         </div>
                         <div class="col-6 mb-3">
                             <label class="form-label text-muted small">Total Value</label>
-                            <h4 class="text-success">KES {{ summary.total_value|default:'0.00' }}</h4>
+                            <h4 class="text-success">{{ company_settings.currency_symbol }} {{ summary.total_value|default:'0.00' }}</h4>
                         </div>
                         <div class="col-6 mb-3">
                             <label class="form-label text-muted small">Converted to Invoice</label>
@@ -262,7 +262,7 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-end">
-                                    <strong>KES {{ quote.total_amount|floatformat:2 }}</strong>
+                                    <strong>{{ company_settings.currency_symbol }} {{ quote.total_amount|floatformat:2 }}</strong>
                                 </td>
                                 <td class="text-end text-muted">
                                     KES {{ quote.vat_amount|default:'0.00'|floatformat:2 }}

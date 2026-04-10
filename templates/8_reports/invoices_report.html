@@ -68,7 +68,7 @@
             <div class="card stat-card">
                 <div class="card-body">
                     <h6 class="card-title text-muted">Total Value</h6>
-                    <h3 class="text-success">KES {{ summary.total_amount|default:'0.00' }}</h3>
+                    <h3 class="text-success">{{ company_settings.currency_symbol }} {{ summary.total_amount|default:'0.00' }}</h3>
                     <small class="text-muted"><i class="icon-calculator"></i> Grand total</small>
                 </div>
             </div>
@@ -77,7 +77,7 @@
             <div class="card stat-card">
                 <div class="card-body">
                     <h6 class="card-title text-muted">Outstanding</h6>
-                    <h3 class="text-warning">KES {{ summary.outstanding_amount|default:'0.00' }}</h3>
+                    <h3 class="text-warning">{{ company_settings.currency_symbol }} {{ summary.outstanding_amount|default:'0.00' }}</h3>
                     <small class="text-muted"><i class="icon-hourglass-end"></i> Unpaid/partial</small>
                 </div>
             </div>
@@ -86,7 +86,7 @@
             <div class="card stat-card">
                 <div class="card-body">
                     <h6 class="card-title text-muted">Collected</h6>
-                    <h3 class="text-info">KES {{ summary.paid_amount|default:'0.00' }}</h3>
+                    <h3 class="text-info">{{ company_settings.currency_symbol }} {{ summary.paid_amount|default:'0.00' }}</h3>
                     <small class="text-muted"><i class="icon-cash-register"></i> Received</small>
                 </div>
             </div>
@@ -200,7 +200,7 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-end">
-                                    <strong>KES {{ invoice.total_amount|floatformat:2 }}</strong>
+                                    <strong>{{ company_settings.currency_symbol }} {{ invoice.total_amount|floatformat:2 }}</strong>
                                 </td>
                                 <td class="text-end text-success">
                                     <strong><i class="icon-check"></i> {{ invoice.amount_paid|floatformat:2 }}</strong>

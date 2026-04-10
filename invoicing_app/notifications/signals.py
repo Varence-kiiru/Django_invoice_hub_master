@@ -236,7 +236,11 @@ def expense_status_changed_notification(sender, instance, created, **kwargs):
             entity_type="expense",
             entity_id=instance.id,
             notification_type="expense_created",
-            recipient=instance.created_by.email if instance.created_by.email else "N/A",
+            recipient=(
+                instance.submitted_by.email
+                if instance.submitted_by and instance.submitted_by.email
+                else "N/A"
+            ),
             subject=f"Expense #{instance.id} created - {instance.description}",
         )
     else:
@@ -246,8 +250,8 @@ def expense_status_changed_notification(sender, instance, created, **kwargs):
                 entity_id=instance.id,
                 notification_type="expense_pending_approval",
                 recipient=(
-                    instance.approver.email
-                    if instance.approver and instance.approver.email
+                    instance.approved_by.email
+                    if instance.approved_by and instance.approved_by.email
                     else "N/A"
                 ),
                 subject=f"Expense approval required - ${instance.amount}",
@@ -258,7 +262,9 @@ def expense_status_changed_notification(sender, instance, created, **kwargs):
                 entity_id=instance.id,
                 notification_type="expense_approved",
                 recipient=(
-                    instance.created_by.email if instance.created_by.email else "N/A"
+                    instance.submitted_by.email
+                    if instance.submitted_by and instance.submitted_by.email
+                    else "N/A"
                 ),
                 subject=f"Your expense has been approved - ${instance.amount}",
             )
@@ -268,7 +274,9 @@ def expense_status_changed_notification(sender, instance, created, **kwargs):
                 entity_id=instance.id,
                 notification_type="expense_rejected",
                 recipient=(
-                    instance.created_by.email if instance.created_by.email else "N/A"
+                    instance.submitted_by.email
+                    if instance.submitted_by and instance.submitted_by.email
+                    else "N/A"
                 ),
                 subject="Your expense has been rejected",
             )

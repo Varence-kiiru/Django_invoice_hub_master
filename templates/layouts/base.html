@@ -70,14 +70,6 @@
   <!-- ==================== MAIN CONTENT AREA ==================== -->
   <main role="main" id="main-content">
     <div class="page-container">
-      <div style="background: #fff3cd; padding: 10px; margin-bottom: 20px; border: 1px solid #ffc107; display: {% if DEBUG %}block{% else %}none{% endif %};">
-        <strong>DEBUG MODE:</strong>
-        Breadcrumbs in context: <span style="color: {% if breadcrumbs %}green{% else %}red{% endif %}; font-weight: bold;">
-          {{ breadcrumbs|default:"NOT_IN_CONTEXT"|default:"FALSE" }}
-        </span>
-        ({{ breadcrumbs|length }} items)
-      </div>
-
       {% if breadcrumbs %}
         {% include '1_base/breadcrumb.html' %}
       {% endif %}
