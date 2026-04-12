@@ -8,6 +8,7 @@ A comprehensive, enterprise-grade Django-based invoicing application with advanc
 
 ## 📋 Table of Contents
 
+- [Demo](#demo)
 - [Overview](#overview)
 - [Key Features](#key-features)
 - [Project Status](#project-status)
@@ -30,7 +31,31 @@ A comprehensive, enterprise-grade Django-based invoicing application with advanc
 
 ---
 
-## 🎯 Overview
+## � Demo
+
+### Video Preview
+[![Watch Demo on YouTube](https://img.youtube.com/vi/5Q8_-K1UFZg/0.jpg)](https://youtu.be/5Q8_-K1UFZg)
+
+### Screenshots
+
+**Dashboard Overview**
+![Dashboard](docs/screenshots/Dashboard.jpeg)
+
+**Invoice Management**
+![Invoice Management](docs/screenshots/Invoices%20Management%20Page.jpeg)
+
+**Payment Tracking**
+![Payment Tracking](docs/screenshots/Payments%20Recording%20Page.jpeg)
+
+**Client Management**
+![Client Management](docs/screenshots/Clients%20Management%20Page.jpeg)
+
+**Analytics & Reports**
+![Analytics & Reports](docs/screenshots/Analytics%20Page.jpeg)
+
+---
+
+## �🎯 Overview
 
 InvoiceHub is a modern, feature-rich invoicing and invoice management system designed for businesses of all sizes. It provides a complete solution for managing the complete invoicing lifecycle:
 
