@@ -2,7 +2,22 @@
 
 A comprehensive, enterprise-grade Django-based invoicing application with advanced features for managing invoices, payments, clients, quotations, and multi-tenant organizations. Built for scale with comprehensive API, data analytics, and automation capabilities.
 
-**Version:** 4.5.0 | **Status:** Production Ready ✅ | **Last Updated:** April 7, 2026 | **API:** v2.1
+**Version:** 4.5.0 | **Status:** Production Ready ✅ | **Last Updated:** April 12, 2026 | **API:** v2.1
+
+---
+
+## 🛒 **COMMERCIAL LICENSE AVAILABLE**
+
+> **This is a premium source code product sold via Lemon Squeezy.**  
+> **Free evaluation available. Production use requires a Commercial License.**
+
+### ⭐ [👉 PURCHASE COMMERCIAL LICENSE 👈](https://lemon.squeezy.com/YOUR-LINK-HERE)
+
+**After purchase you get:**
+- ✅ Full source code + documentation
+- ✅ 1 year free updates
+- ✅ Email support
+- ✅ Production deployment rights
 
 ---
 
@@ -1672,26 +1687,35 @@ python manage.py test --verbosity=2
 
 ## 📄 License
 
-**This project is licensed for commercial use.**
+**This project is sold as a commercial product via Lemon Squeezy.**
 
-✅ **You can:**
-- Use this project commercially
-- Modify and customize the code
-- Deploy to production
-- Use it as a SaaS product
-- Integrate with other systems
-- Sell services using this system
+### Free Evaluation License
+You may use this software **free for evaluation** offline:
+- Test it locally on your development machine
+- Learn how it works
+- Evaluate for personal/educational use
 
-❌ **You cannot:**
-- Redistribute the source code commercially
-- Resell this project as-is
-- Remove or alter license information
-- Create a competing product from this code
+❌ **NOT permitted without purchasing a license:**
+- Production deployment (live servers)
+- Commercial use / serving customers
+- SaaS/multi-tenant deployments
+- Reselling or redistributing the code
 
-**License Type:** Commercial Use License  
-**Redistribution:** Not allowed  
+### Commercial License Required For:
+- ✅ Production deployment
+- ✅ Feature implementation for clients
+- ✅ Commercial/revenue-generating use
+- ✅ Team/company use
 
-See [LICENSE](LICENSE) file for full details.
+**👉 [PURCHASE COMMERCIAL LICENSE ON LEMON SQUEEZY](https://lemon.squeezy.com/YOUR-LINK-HERE)**
+
+### What You Get with Purchase:
+- Full source code access
+- 1 year of free updates
+- Email support
+- License documentation
+
+**See [LICENSE](LICENSE) file for full legal terms.**
 
 ---
 

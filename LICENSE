@@ -1,21 +1,109 @@
-MIT License
+InvoiceHub - Commercial Source Code License
 
-Copyright (c) 2026 InvoiceHub Contributors
+Copyright (c) 2026 Varence-kiiru. All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+IMPORTANT: This software source code is provided under a DUAL LICENSE model:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+================================================================================
+1. EVALUATION & DEVELOPMENT LICENSE (FREE)
+================================================================================
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+You may use this software for:
+- Evaluation and testing purposes
+- Non-commercial personal projects
+- Educational/learning purposes
+- Internal business evaluation (limited deployment)
+
+WITHOUT PURCHASE.
+
+RESTRICTIONS:
+- Cannot be used in production commercial deployments
+- Cannot be redistributed or resold
+- Cannot be used to build competing products
+- Cannot be licensed or sublicensed to third parties
+
+================================================================================
+2. COMMERCIAL LICENSE (REQUIRES PURCHASE)
+================================================================================
+
+To use this software in a commercial production environment, you MUST:
+
+✓ Purchase a Commercial License via Lemon Squeezy: 
+  [Your Lemon Squeezy Product Link Here]
+
+A Commercial License grants you the right to:
+- Deploy and use the software in production
+- Modify the code for your business needs
+- Use it to serve your clients/customers
+- Run it as a SaaS product (per license tier)
+- Receive 1 year of updates and support
+
+COMMERCIAL USE RESTRICTIONS:
+- License is per-deployment (separate license for each deployment)
+- Cannot redistribute the source code to others
+- Cannot resell the software as-is or under your brand
+- Cannot sublicense to third parties
+- Cannot use for competing product development
+
+================================================================================
+3. WHAT REQUIRES A COMMERCIAL LICENSE
+================================================================================
+
+You MUST have a Commercial License if you:
+❌ Deploy this software on production servers for business
+❌ Use it to serve paying customers (SaaS, consultancy, etc.)
+❌ Use it in a revenue-generating application
+❌ Integrate it into a commercial product you sell
+❌ Use it on more than one production instance
+
+You DON'T need a Commercial License if you:
+✅ Evaluate it locally/on a test server
+✅ Use it for personal, non-commercial projects
+✅ Use it for educational purposes only
+✅ Contribute improvements back to the project
+
+================================================================================
+4. LEGAL TERMS
+================================================================================
+
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
+
+INDEMNIFICATION: You agree to indemnify and hold harmless the author from any 
+claims arising from your use of this software.
+
+ENFORCEMENT: Unauthorized commercial use violates copyright law. The author 
+reserves the right to pursue legal action for unlicensed commercial use, 
+including cease and desist orders, statutory damages, and attorney fees.
+
+DISCLAIMER: In no event shall the author be liable for any indirect, 
+incidental, special, or consequential damages arising from use of this software.
+
+================================================================================
+5. PURCHASE & LICENSING
+================================================================================
+
+Commercial License: Sold via Lemon Squeezy
+
+After purchase, you receive:
+- Commercial usage rights
+- Email support
+- 1 year of free updates
+- License receipt/documentation
+
+For bulk/enterprise licenses, contact directly.
+
+================================================================================
+6. SUPPORT & UPDATES
+================================================================================
+
+- Evaluators (free): No official support
+- Commercial licensees: 1 year email support included
+- Updates available for 1 year from purchase
+
+================================================================================
+
+By using this software, you agree to these terms.
+
+Unauthorized commercial use violates this license and copyright law.
+
+Last Updated: April 12, 2026
