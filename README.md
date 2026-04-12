@@ -11,7 +11,7 @@ A comprehensive, enterprise-grade Django-based invoicing application with advanc
 > **This is a premium source code product sold via Lemon Squeezy.**  
 > **Free evaluation available. Production use requires a Commercial License.**
 
-### ⭐ [👉 PURCHASE COMMERCIAL LICENSE 👈](https://lemon.squeezy.com/YOUR-LINK-HERE)
+### ⭐ [👉 PURCHASE COMMERCIAL LICENSE 👈](https://cody014.lemonsqueezy.com/checkout/buy/464509b1-03d3-47fb-bc4a-47535a955070)
 
 **After purchase you get:**
 - ✅ Full source code + documentation
@@ -1707,7 +1707,7 @@ You may use this software **free for evaluation** offline:
 - ✅ Commercial/revenue-generating use
 - ✅ Team/company use
 
-**👉 [PURCHASE COMMERCIAL LICENSE ON LEMON SQUEEZY](https://lemon.squeezy.com/YOUR-LINK-HERE)**
+**👉 [PURCHASE COMMERCIAL LICENSE ON LEMON SQUEEZY](https://cody014.lemonsqueezy.com/checkout/buy/464509b1-03d3-47fb-bc4a-47535a955070)**
 
 ### What You Get with Purchase:
 - Full source code access
