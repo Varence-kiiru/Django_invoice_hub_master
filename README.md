@@ -8,7 +8,8 @@ A comprehensive, enterprise-grade Django-based invoicing application with advanc
 
 ## 📋 Table of Contents
 
-- [Demo](#demo)
+- [Demo](#-demo)
+- [What You Get](#-what-you-get)
 - [Overview](#overview)
 - [Key Features](#key-features)
 - [Project Status](#project-status)
@@ -28,6 +29,7 @@ A comprehensive, enterprise-grade Django-based invoicing application with advanc
 - [Troubleshooting](#troubleshooting)
 - [Security & Compliance](#security--compliance)
 - [Support & Contributing](#support--contributing)
+- [License](#-license)
 
 ---
 
@@ -55,7 +57,21 @@ A comprehensive, enterprise-grade Django-based invoicing application with advanc
 
 ---
 
-## �🎯 Overview
+
+## 📦 What You Get
+
+✅ **Complete Source Code** — Full Django application with all modules, views, and APIs  
+✅ **Production Ready** — Tested, optimized, and deployment-ready (v4.5.0)  
+✅ **Comprehensive Documentation** — Installation, setup, deployment, and API guides  
+✅ **Multi-Tenant Support** — Out-of-the-box organization isolation and multi-tenancy  
+✅ **45+ Screenshots** — Full visual walkthrough of all features  
+✅ **Video Preview** — YouTube demo showing the system in action  
+✅ **API & REST** — Complete RESTful API with Django REST Framework  
+✅ **Free Updates** — Access to improvements and bug fixes  
+✅ **Deployment Scripts** — Docker, Nginx, Gunicorn configuration included  
+✅ **Database Migrations** — 13+ core models with full ORM setup  
+
+---�🎯 Overview
 
 InvoiceHub is a modern, feature-rich invoicing and invoice management system designed for businesses of all sizes. It provides a complete solution for managing the complete invoicing lifecycle:
 
@@ -1654,6 +1670,31 @@ python manage.py test --verbosity=2
 
 ---
 
+## 📄 License
+
+**This project is licensed for commercial use.**
+
+✅ **You can:**
+- Use this project commercially
+- Modify and customize the code
+- Deploy to production
+- Use it as a SaaS product
+- Integrate with other systems
+- Sell services using this system
+
+❌ **You cannot:**
+- Redistribute the source code commercially
+- Resell this project as-is
+- Remove or alter license information
+- Create a competing product from this code
+
+**License Type:** Commercial Use License  
+**Redistribution:** Not allowed  
+
+See [LICENSE](LICENSE) file for full details.
+
+---
+
 ## � Security & Compliance
 
 ### Security Features
@@ -2047,3 +2088,4 @@ class Invoice(models.Model):
 
 **Last Updated:** April 7, 2026
 **InvoiceHub v4.5.0** - Professional Invoice Management System
+
